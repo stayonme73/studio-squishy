@@ -10,6 +10,15 @@ import { promises as fs } from "fs";
 import path from "path";
 
 import { normalizeEmail } from "@/lib/auth/email-normalize";
+import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
+import {
+  pgConsumeProjectClaimReceipt,
+  pgFindActiveReceiptForCampaign,
+  pgFindClaimReceiptByTokenHash,
+  pgListClaimReceipts,
+  pgSupersedeClaimReceiptsForCheckout,
+  pgWriteProjectClaimReceipt,
+} from "@/lib/studio-durable-persistence/postgres-identity";
 
 const RECEIPTS_PATH = path.join(
   process.cwd(),
@@ -37,6 +46,12 @@ export type ProjectClaimReceiptRecord = {
   usedAt: string | null;
   claimedByUserId: string | null;
   supersededAt: string | null;
+  /**
+   * Set when the raw token was returned to the paying browser.
+   * Absent or null means the receipt exists only on the server (webhook / mail).
+   * The raw token is never stored.
+   */
+  deliveredToBrowserAt?: string | null;
 };
 
 function getTtlMs(): number {
@@ -56,6 +71,9 @@ export function generateProjectClaimRawToken(): string {
 }
 
 async function readReceipts(): Promise<ProjectClaimReceiptRecord[]> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgListClaimReceipts();
+  }
   try {
     const raw = await fs.readFile(RECEIPTS_PATH, "utf8");
     return JSON.parse(raw) as ProjectClaimReceiptRecord[];
@@ -80,6 +98,7 @@ export async function issueProjectClaimReceipt(input: {
   campaignId: string;
   checkoutSessionId: string;
   customerEmail?: string | null;
+  deliveredToBrowserAt?: string | null;
 }): Promise<{ rawToken: string; record: ProjectClaimReceiptRecord }> {
   const now = new Date();
   const receipts = await readReceipts();
@@ -110,7 +129,17 @@ export async function issueProjectClaimReceipt(input: {
     usedAt: null,
     claimedByUserId: null,
     supersededAt: null,
+    deliveredToBrowserAt: input.deliveredToBrowserAt ?? null,
   };
+  if (isPostgresPersistenceEnabled()) {
+    await pgSupersedeClaimReceiptsForCheckout({
+      campaignId: input.campaignId,
+      checkoutSessionId: input.checkoutSessionId,
+      supersededAt: now.toISOString(),
+    });
+    await pgWriteProjectClaimReceipt(record);
+    return { rawToken, record };
+  }
   receipts.push(record);
   await writeReceipts(receipts);
   return { rawToken, record };
@@ -152,6 +181,55 @@ export async function consumeProjectClaimReceipt(input: {
     };
   }
   const tokenHash = hashProjectClaimToken(trimmed);
+  if (isPostgresPersistenceEnabled()) {
+    const receipt = await pgFindClaimReceiptByTokenHash(tokenHash);
+    if (!receipt) {
+      return {
+        ok: false,
+        code: "unknown_token",
+        message: "Claim token is not recognized.",
+      };
+    }
+    if (
+      input.expectedCampaignId &&
+      receipt.campaignId !== input.expectedCampaignId
+    ) {
+      return {
+        ok: false,
+        code: "campaign_mismatch",
+        message: "Claim token does not match this project.",
+      };
+    }
+    const consumed = await pgConsumeProjectClaimReceipt({
+      tokenHash,
+      userId: input.userId,
+    });
+    if (!consumed.ok) {
+      const code =
+        consumed.code === "unknown"
+          ? "unknown_token"
+          : consumed.code === "used_by_other"
+            ? "used_by_other"
+            : consumed.code;
+      return {
+        ok: false,
+        code,
+        message:
+          consumed.code === "expired"
+            ? "Claim token has expired."
+            : consumed.code === "superseded"
+              ? "Claim token was replaced. Use the latest claim link."
+              : consumed.code === "used_by_other"
+                ? "Claim token was already used."
+                : "Claim token is not recognized.",
+      };
+    }
+    return {
+      ok: true,
+      receipt: consumed.receipt,
+      alreadyConsumedBySameUser: consumed.alreadyConsumedBySameUser,
+    };
+  }
   const receipts = await readReceipts();
   const index = receipts.findIndex((r) => r.tokenHash === tokenHash);
   if (index < 0) {
@@ -211,9 +289,72 @@ export async function consumeProjectClaimReceipt(input: {
   };
 }
 
+/** Mark the receipt for this raw token as already handed to the paying browser. */
+export async function markProjectClaimReceiptDeliveredToBrowser(
+  rawToken: string,
+): Promise<boolean> {
+  const trimmed = rawToken.trim();
+  if (!trimmed) return false;
+  const tokenHash = hashProjectClaimToken(trimmed);
+  const receipts = await readReceipts();
+  const index = receipts.findIndex(
+    (receipt) =>
+      receipt.tokenHash === tokenHash &&
+      !receipt.usedAt &&
+      !receipt.supersededAt,
+  );
+  if (index < 0) return false;
+  if (receipts[index]?.deliveredToBrowserAt) return true;
+  const next = {
+    ...receipts[index]!,
+    deliveredToBrowserAt: new Date().toISOString(),
+  };
+  if (isPostgresPersistenceEnabled()) {
+    await pgWriteProjectClaimReceipt(next);
+    return true;
+  }
+  receipts[index] = next;
+  await writeReceipts(receipts);
+  return true;
+}
+
+/**
+ * Hand the paying browser a one-time claim token for an unowned checkout.
+ * A checkout session that already delivered a token does not get another.
+ * Campaign id alone cannot call this — the caller must already hold the
+ * checkout session id bound to that campaign.
+ */
+export async function releaseUnclaimedBrowserClaimToken(input: {
+  campaignId: string;
+  checkoutSessionId: string;
+  customerEmail?: string | null;
+}): Promise<string | null> {
+  const receipts = await readReceipts();
+  const alreadyDelivered = receipts.some(
+    (receipt) =>
+      receipt.campaignId === input.campaignId &&
+      receipt.checkoutSessionId === input.checkoutSessionId &&
+      !receipt.usedAt &&
+      !receipt.supersededAt &&
+      Boolean(receipt.deliveredToBrowserAt),
+  );
+  if (alreadyDelivered) return null;
+
+  const issued = await issueProjectClaimReceipt({
+    campaignId: input.campaignId,
+    checkoutSessionId: input.checkoutSessionId,
+    customerEmail: input.customerEmail,
+    deliveredToBrowserAt: new Date().toISOString(),
+  });
+  return issued.rawToken;
+}
+
 export async function findActiveReceiptForCampaign(
   campaignId: string,
 ): Promise<ProjectClaimReceiptRecord | null> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgFindActiveReceiptForCampaign(campaignId);
+  }
   const receipts = await readReceipts();
   const now = Date.now();
   return (

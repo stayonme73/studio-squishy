@@ -11,6 +11,8 @@ import {
   isClientVisibleMaterialItem,
   winningClientFacingKeyForBucket,
 } from "./promotion";
+import { CONDENSED_PACKAGE_IDS } from "@/config/studio-customer-journey-condense-v1";
+import { condensedPackageMaterialSlots } from "./condensed-package-slots";
 import type {
   CampaignMaterialItem,
   CampaignMaterialsRecord,
@@ -64,6 +66,8 @@ export type ConsolidatedClientRequest = {
   isBlocking: boolean;
   isPendingReview: boolean;
   canSubmit: boolean;
+  /** This row is one slot. Submit and withdraw target only that slot. */
+  isolateSlot?: boolean;
   submittedAt?: string;
   clientAvailability?: CampaignMaterialItem["clientAvailability"];
   /** Customer-facing stored filename only — never a checksum, path, or item id. */
@@ -86,6 +90,10 @@ export type ClientConsolidatedRequest = {
   statusLabel: string;
   canSubmit: boolean;
   isPendingReview: boolean;
+  /** False for an optional slot. Required slots block the next stage. */
+  isBlocking: boolean;
+  /** This row is one slot. Submit and withdraw target only that slot. */
+  isolateSlot?: boolean;
   submittedAt?: string;
   clientAvailability?: CampaignMaterialItem["clientAvailability"];
   fileName?: string;
@@ -109,6 +117,10 @@ export type OptionalClientRequest = {
   submittedAt?: string;
   clientAvailability?: CampaignMaterialItem["clientAvailability"];
   fileName?: string;
+  contentRoutingState?: ContentRoutingState;
+  contentRoutingLabel?: string;
+  contentRoutingExplanation?: string;
+  canWithdrawFile?: boolean;
 };
 
 /** Client API payload for optional rows (Slice 3d-c-c L4). */
@@ -166,11 +178,22 @@ export function parseConsolidatedRequestId(
   return { category, contentKind };
 }
 
+function currentCondensedSlotCopy(
+  item: CampaignMaterialItem | undefined,
+): { label: string; prompt: string } | null {
+  if (!item) return null;
+  const slots = CONDENSED_PACKAGE_IDS.flatMap((id) => condensedPackageMaterialSlots(id));
+  const slot = slots.find((entry) => entry.id === item.id);
+  return slot ? { label: slot.label, prompt: slot.prompt } : null;
+}
+
 function clientRequestLabel(
   category: MaterialCategory,
   contentKind: MaterialContentKind,
   item?: CampaignMaterialItem,
 ): string {
+  const current = currentCondensedSlotCopy(item);
+  if (current) return current.label;
   if (item?.clientFacingLabel?.trim()) return item.clientFacingLabel.trim();
   const key = `${category}:${contentKind}` as keyof typeof materialsConfig.clientRequestLabels;
   return materialsConfig.clientRequestLabels[key] ?? materialCategoryLabel(category);
@@ -181,6 +204,8 @@ function clientRequestPrompt(
   contentKind: MaterialContentKind,
   item?: CampaignMaterialItem,
 ): string {
+  const current = currentCondensedSlotCopy(item);
+  if (current) return current.prompt;
   if (item?.clientFacingPrompt?.trim()) return item.clientFacingPrompt.trim();
   if (item?.requirementLevel === "optional" && category === "logo-brand") {
     return studioMaterialsUploadV1.customerCopy.optionalLogoPrompt;
@@ -320,9 +345,23 @@ function bucketItemsForConsolidatedId(
 
   return record.items.filter(
     (item) =>
+      item.isolatedSlot !== true &&
       isClientVisibleMaterialItem(item) &&
       item.category === parsed.category &&
       item.contentKind === parsed.contentKind,
+  );
+}
+
+function clientRequestGroupKey(item: CampaignMaterialItem): string {
+  if (item.isolatedSlot) return `isolated:${item.id}`;
+  return consolidatedRequestId(item.category, item.contentKind);
+}
+
+function isVisibleIsolatedOptional(item: CampaignMaterialItem): boolean {
+  return (
+    item.isolatedSlot === true &&
+    item.requirementLevel === "optional" &&
+    OPTIONAL_INTAKE_STATUSES.has(item.reviewStatus)
   );
 }
 
@@ -333,8 +372,8 @@ function groupClientIntakeItems(
   const groups = new Map<string, CampaignMaterialItem[]>();
 
   for (const item of visible) {
-    if (!isClientIntakeMaterialItem(item)) continue;
-    const key = consolidatedRequestId(item.category, item.contentKind);
+    if (!isClientIntakeMaterialItem(item) && !isVisibleIsolatedOptional(item)) continue;
+    const key = clientRequestGroupKey(item);
     const bucket = groups.get(key) ?? [];
     bucket.push(item);
     groups.set(key, bucket);
@@ -364,6 +403,7 @@ export function resolveConsolidatedClientRequests(
       });
 
       const first = visibleItems[0] ?? groupItems[0]!;
+      const isolated = visibleItems.every((item) => item.isolatedSlot === true);
       const relatedServiceIds = [
         ...new Set(visibleItems.flatMap((item) => [...item.relatedServiceIds])),
       ];
@@ -379,7 +419,8 @@ export function resolveConsolidatedClientRequests(
       const withdrawable = latestWithdrawableItem(visibleItems);
 
       return {
-        id,
+        id: isolated ? first.id : id,
+        isolateSlot: isolated,
         category: first.category,
         contentKind: first.contentKind,
         label: clientRequestLabel(first.category, first.contentKind, first),
@@ -388,8 +429,11 @@ export function resolveConsolidatedClientRequests(
         relatedServiceIds,
         underlyingItemIds: visibleItems.map((item) => item.id),
         reviewStatus,
-        statusLabel: clientMaterialStatusLabel(reviewStatus),
-        isBlocking: canSubmit,
+        statusLabel: clientMaterialStatusLabel(
+          reviewStatus,
+          isolated && first.requirementLevel !== "required" ? "optional" : undefined,
+        ),
+        isBlocking: isolated ? first.requirementLevel === "required" && canSubmit : canSubmit,
         isPendingReview: reviewStatus === "submitted",
         canSubmit,
         submittedAt: latestSubmittedAt(visibleItems),
@@ -421,6 +465,8 @@ export function sanitizeClientConsolidatedRequests(
     statusLabel: request.statusLabel,
     canSubmit: request.canSubmit,
     isPendingReview: request.isPendingReview,
+    isBlocking: request.isBlocking,
+    ...(request.isolateSlot ? { isolateSlot: true as const } : {}),
     submittedAt: request.submittedAt,
     clientAvailability: request.clientAvailability,
     ...(request.fileName ? { fileName: request.fileName } : {}),
@@ -443,6 +489,7 @@ export function resolveOptionalClientRequests(
     .filter(
       (item) =>
         isClientVisibleMaterialItem(item) &&
+        item.isolatedSlot !== true &&
         item.requirementLevel === "optional" &&
         OPTIONAL_INTAKE_STATUSES.has(item.reviewStatus),
     )

@@ -57,6 +57,9 @@ export type FeedbackStickyNote = {
   color: StickyNoteColorId;
   text: string;
   createdAt: string;
+  /** Optional 0–1 proof placement. Omitted notes keep the legacy corner pin. */
+  anchorX?: number;
+  anchorY?: number;
 };
 
 export type FeedbackVoiceNote = {
@@ -211,6 +214,16 @@ export const feedbackStudio = {
     versionCompare: "Version Compare",
     highlighter: "Highlighter",
     textComment: "Text Comment",
+    laptopWorkDesk: {
+      marker: "Marker",
+      highlighter: "Highlighter",
+      voice: "Voice",
+      message: "Message",
+      messagePlaceholder: "Type a message about this work.",
+      saveMessage: "Save message",
+      workArea: "Work area",
+      submit: "Submit",
+    },
     approveSection: "Mark section as approved",
     requestRevision: "Mark section for changes",
     skipSection: "Skip Section",
@@ -239,6 +252,59 @@ export const feedbackStudio = {
       skip: (section: string) => `${section} skipped`,
       draw: "Annotation saved",
       submit: "Feedback submitted — thank you.",
+    },
+    /**
+     * Phone job Review only. Desktop copy above stays locked for Room 2.
+     * Opening these controls does not consume a revision round.
+     */
+    phoneCustomerRevision: {
+      title: "Your review",
+      hint: "Look at your work, then approve it, request a change, or ask The Studio.",
+      looksGood: "Looks good",
+      approve: "Approve",
+      requestChange: "Request a Change",
+      skipForNow: "Skip for now",
+      askStudio: "Ask The Studio",
+      changeLabel: "Tell us what you'd like changed.",
+      changeHint: "Sending this uses one revision round.",
+      changePlaceholder: "Type the change you want.",
+      changeOpened: "Type the change you want. You can also mark the proof or leave voice feedback.",
+      sendRevision: "Send Revision Request",
+      sendNeedsChange: "Type a change, draw on the proof, or leave voice feedback before sending.",
+      revisionRequested: "Revision requested",
+      revisionWorking: "The Studio is working on your changes.",
+      stickyTool: "Sticky Note",
+      voiceTool: "Voice feedback",
+      highlightTool: "Highlight",
+      drawTool: "Draw on proof",
+      optionalToolsLabel: "Optional",
+      optionalToolsHint: "You can also mark the proof or leave voice feedback.",
+      stickyTapHint: "Tap the proof where you want the note, then type the change.",
+      voiceHint: "Record what you want changed.",
+      highlightHint: "Highlight the area, then add the instruction.",
+      drawHint: "Circle or underline on the proof.",
+      erase: "Erase",
+      addDetail: "Add detail",
+      addDetailSticky: "Sticky Note",
+      addDetailDraw: "Draw",
+      addDetailHighlight: "Highlight",
+      addDetailVoice: "Voice Feedback",
+      moreTools: "More feedback tools",
+      moreToolsHint: "These do not send a revision by themselves.",
+      closeComposer: "Cancel",
+      projectDetails: "Project details",
+      projectHistory: "Project history",
+      revisionGlance: (included: number, remaining: number) =>
+        `${included} revision${included === 1 ? "" : "s"} included • ${remaining} remaining`,
+      compareVersions: "Compare versions",
+      confirmTitle: "Confirm revision request",
+      confirmLead: (versionLabel: string) =>
+        `You're requesting a revision of ${versionLabel}. This uses one included revision round.`,
+      confirmRequestLabel: "Your request",
+      confirmDrawingAttachment: "Drawing on the proof",
+      confirmVoiceAttachment: "Voice feedback",
+      confirmCancel: "Keep Reviewing",
+      confirmSend: "Send Revision Request",
     },
   },
 
@@ -269,6 +335,8 @@ export const feedbackStudio = {
   versionCompare: {
     title: "Version Compare",
     lead: "Select two recorded proof versions for this deliverable. Labels and dates come from Studio records.",
+    phoneLead:
+      "Optional. See two saved versions side by side. This does not send a revision.",
     currentLabel: "Current version",
     priorLabel: "Prior version",
     selectCurrent: "Choose current proof version",

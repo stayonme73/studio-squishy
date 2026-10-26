@@ -597,6 +597,7 @@
     border-left-color: var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
   }
 
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__eligibility,
   [data-mobile-customer-spine] .sb--v4 .sb-refund-request__lead,
   [data-mobile-customer-spine] .sb--v4 .sb-refund-request__help,
   [data-mobile-customer-spine] .sb--v4 .sb-refund-request__meta,
@@ -795,5 +796,17 @@
   [data-mobile-customer-spine] .sb--v4 .sb-card--refund-request > * {
     position: relative;
     z-index: 1;
+  }
+
+  [data-mobile-customer-spine] .fs-room .fs-page,
+  [data-mobile-customer-spine] .fs-room .rd-shell,
+  [data-mobile-customer-spine] .utility-page {
+    padding-bottom: calc(var(--studio-review-mobile-bottom, 3.25rem) + 1.25rem);
+  }
+
+  [data-mobile-customer-spine] .fs-room .fs-review__action,
+  [data-mobile-customer-spine] .fs-room .fs-feedback-panel__btn,
+  [data-mobile-customer-spine] .fs-room .rd-stage-card__actions .utility-btn {
+    min-height: 44px;
   }
 }

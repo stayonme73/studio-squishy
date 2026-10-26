@@ -22,6 +22,10 @@ import { resolveServiceProductionContract } from "@/lib/studio-kitchen-productio
 import { ensureDispatchExecution } from "./ensure";
 import { shouldObserveDesignRenderer } from "./design-renderer-observer";
 import { evaluateJobDispatch } from "./evaluate";
+import {
+  buildClearedCustomerLogoMaterial,
+  stageGenericCustomerLogoPng,
+} from "./cleared-customer-logo";
 
 const REPO = path.resolve(__dirname, "../../..");
 const CAMPAIGNS_DIR = path.join(REPO, "data", "campaigns");
@@ -122,6 +126,26 @@ function stageLogo(campaignId: string): void {
   const abs = path.join(REPO, rel);
   mkdirSync(path.dirname(abs), { recursive: true });
   writeFileSync(abs, HARBOR_OAK_LOGO_SVG, "utf8");
+}
+
+async function seedClearedObserverLogo(
+  campaignId: string,
+  skuId: string,
+): Promise<void> {
+  const now = new Date().toISOString();
+  const staged = stageGenericCustomerLogoPng({ repoRoot: REPO, campaignId });
+  const item = buildClearedCustomerLogoMaterial({
+    campaignId,
+    skuId,
+    stagedRelativePath: staged,
+  });
+  await writeMaterialsEnvelope({
+    campaignId,
+    items: [item],
+    updatedAt: now,
+    syncedAt: now,
+    version: 1,
+  });
 }
 
 async function cleanup(campaignId: string): Promise<void> {
@@ -295,28 +319,7 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1", () => {
         routeMapIntakeSubmittedAt: now,
       });
       await upsertCampaignRecord(campaign);
-      const matNow = new Date().toISOString();
-      await writeMaterialsEnvelope({
-        campaignId,
-        items: [
-          {
-            id: `logo-${campaignId}`,
-            category: "logo-brand",
-            requirementLevel: "required",
-            reviewStatus: "approved_for_use",
-            contentKind: "file-metadata",
-            label: "Logo",
-            reason: "Brand mark",
-            relatedServiceIds: ["v2-rtu-business-card"],
-            uploadStatus: "stored",
-            useAuthorization: { basis: "customer_owns", attestedAt: matNow },
-          },
-        ],
-        updatedAt: matNow,
-        syncedAt: matNow,
-        version: 1,
-      });
-      stageLogo(campaignId);
+      await seedClearedObserverLogo(campaignId, "v2-rtu-business-card");
 
       const result = await ensureDispatchExecution(campaign);
       expect(result.ok).toBe(true);
@@ -420,28 +423,7 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1", () => {
         routeMapIntakeSubmittedAt: now,
       });
       await upsertCampaignRecord(campaign);
-      const matNow = new Date().toISOString();
-      await writeMaterialsEnvelope({
-        campaignId,
-        items: [
-          {
-            id: `logo-${campaignId}`,
-            category: "logo-brand",
-            requirementLevel: "required",
-            reviewStatus: "approved_for_use",
-            contentKind: "file-metadata",
-            label: "Logo",
-            reason: "Brand mark",
-            relatedServiceIds: ["v2-rtu-service-sheet"],
-            uploadStatus: "stored",
-            useAuthorization: { basis: "customer_owns", attestedAt: matNow },
-          },
-        ],
-        updatedAt: matNow,
-        syncedAt: matNow,
-        version: 1,
-      });
-      stageLogo(campaignId);
+      await seedClearedObserverLogo(campaignId, "v2-rtu-service-sheet");
 
       const first = await ensureDispatchExecution(campaign);
       expect(first.ok).toBe(true);
@@ -572,28 +554,7 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1", () => {
         routeMapIntakeSubmittedAt: now,
       });
       await upsertCampaignRecord(campaign);
-      const matNow = new Date().toISOString();
-      await writeMaterialsEnvelope({
-        campaignId,
-        items: [
-          {
-            id: `logo-${campaignId}`,
-            category: "logo-brand",
-            requirementLevel: "required",
-            reviewStatus: "approved_for_use",
-            contentKind: "file-metadata",
-            label: "Logo",
-            reason: "Brand mark",
-            relatedServiceIds: ["v2-rtu-menu"],
-            uploadStatus: "stored",
-            useAuthorization: { basis: "customer_owns", attestedAt: matNow },
-          },
-        ],
-        updatedAt: matNow,
-        syncedAt: matNow,
-        version: 1,
-      });
-      stageLogo(campaignId);
+      await seedClearedObserverLogo(campaignId, "v2-rtu-menu");
 
       const first = await ensureDispatchExecution(campaign);
       expect(first.ok).toBe(true);
@@ -659,6 +620,31 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1", () => {
       expect(obs?.failureCode).toMatch(
         /MISSING_REQUIRED_MATERIAL|BROKEN_ASSET_REFERENCE|INVALID_DESIGN_SPEC/,
       );
+    },
+    60_000,
+  );
+
+  it(
+    "skips flyer render when submitted Intake is missing production flyer fields",
+    async () => {
+      const campaignId = `obs-flyer-intake-gap-${Date.now()}`;
+      ids.push(campaignId);
+      const campaign = paidFlyerCampaign(campaignId, {
+        routeMapIntake: {
+          submittedAt: new Date().toISOString(),
+          answers: { "shared:materials": "I do not have this yet" },
+        },
+      });
+      await upsertCampaignRecord(campaign);
+
+      const result = await ensureDispatchExecution(campaign);
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      const obs = result.designRendererObserver?.results.find(
+        (r) => r.skuId === "v2-rtu-flyer",
+      );
+      expect(obs?.action).toBe("skipped");
+      expect(obs?.skipReason).toBe("flyer_intake_production_fields_missing");
     },
     60_000,
   );
@@ -731,28 +717,7 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1", () => {
         routeMapIntakeSubmittedAt: now,
       });
       await upsertCampaignRecord(campaign);
-      const matNow = new Date().toISOString();
-      await writeMaterialsEnvelope({
-        campaignId,
-        items: [
-          {
-            id: `logo-${campaignId}`,
-            category: "logo-brand",
-            requirementLevel: "required",
-            reviewStatus: "approved_for_use",
-            contentKind: "file-metadata",
-            label: "Logo",
-            reason: "Brand mark",
-            relatedServiceIds: ["v2-rtu-promotion-graphics"],
-            uploadStatus: "stored",
-            useAuthorization: { basis: "customer_owns", attestedAt: matNow },
-          },
-        ],
-        updatedAt: matNow,
-        syncedAt: matNow,
-        version: 1,
-      });
-      stageLogo(campaignId);
+      await seedClearedObserverLogo(campaignId, "v2-rtu-promotion-graphics");
 
       const first = await ensureDispatchExecution(campaign);
       expect(first.ok).toBe(true);
@@ -861,28 +826,7 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1", () => {
         routeMapIntakeSubmittedAt: now,
       });
       await upsertCampaignRecord(campaign);
-      const matNow = new Date().toISOString();
-      await writeMaterialsEnvelope({
-        campaignId,
-        items: [
-          {
-            id: `logo-${campaignId}`,
-            category: "logo-brand",
-            requirementLevel: "required",
-            reviewStatus: "approved_for_use",
-            contentKind: "file-metadata",
-            label: "Logo",
-            reason: "Brand mark",
-            relatedServiceIds: ["v2-rtu-social-posts"],
-            uploadStatus: "stored",
-            useAuthorization: { basis: "customer_owns", attestedAt: matNow },
-          },
-        ],
-        updatedAt: matNow,
-        syncedAt: matNow,
-        version: 1,
-      });
-      stageLogo(campaignId);
+      await seedClearedObserverLogo(campaignId, "v2-rtu-social-posts");
 
       const first = await ensureDispatchExecution(campaign);
       expect(first.ok).toBe(true);

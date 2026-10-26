@@ -4,6 +4,18 @@
 
 import { resolvePromoPlate } from "./promo-contracts";
 import {
+  PROMO_PORTRAIT_CANVAS_HEIGHT_PX,
+  PROMO_SQUARE_CANVAS_HEIGHT_PX,
+  PROMO_STACK_GAP_PX,
+  stackPromoTextLayersFromY,
+  textLayerBottomY,
+} from "./promo-stack-layout";
+import {
+  assertThemeLedPromoTruth,
+  isThemeLedPromoTruth,
+  reasonThemeLedPromoAsset,
+} from "./promo-theme-led";
+import {
   PROMO_DESIGN_SPEC_VERSION,
   type PromoAssetSpec,
   type PromoAssetTruth,
@@ -17,6 +29,101 @@ function textLayer(
   partial: Omit<PromoTextLayer, "type">,
 ): PromoTextLayer {
   return { type: "text", ...partial };
+}
+
+function resolvedPromoEditorialHeadline(
+  truth: Pick<PromoProjectTruth, "headline" | "offerName">,
+): string {
+  const headline = truth.headline.trim();
+  const offer = truth.offerName.trim();
+  if (!headline || headline === offer) return "";
+  return headline;
+}
+
+/** Paint headline only when intake supplied distinct editorial copy (not a repeat of offerName). */
+function promoEditorialHeadlineLayer(
+  truth: Pick<PromoProjectTruth, "headline" | "offerName">,
+  partial: Omit<PromoTextLayer, "type" | "role" | "content"> & { assetId: string },
+): PromoTextLayer[] {
+  const headline = resolvedPromoEditorialHeadline(truth);
+  if (!headline) return [];
+  return [
+    textLayer({
+      id: `${partial.assetId}-headline`,
+      role: "headline",
+      content: headline,
+      x: partial.x,
+      y: partial.y,
+      width: partial.width,
+      fontSizePx: partial.fontSizePx,
+      fontWeight: partial.fontWeight,
+      lineHeight: partial.lineHeight,
+      color: partial.color,
+      align: partial.align,
+      ...(partial.letterSpacingPx != null
+        ? { letterSpacingPx: partial.letterSpacingPx }
+        : {}),
+    }),
+  ];
+}
+
+function promoLogoLayers(
+  assetId: string,
+  logo: { materialId: string } | undefined,
+  layout: "compact_square" | "tall_portrait",
+): PromoDesignLayer[] {
+  if (!logo) return [];
+  if (layout === "compact_square") {
+    const W = 1024;
+    return [
+      {
+        type: "shape",
+        id: `${assetId}-logo-plate`,
+        role: "logo_plate",
+        x: (W - 148) / 2,
+        y: 36,
+        width: 148,
+        height: 148,
+        fill: "#FFFFFF",
+        borderRadiusPx: 74,
+      },
+      {
+        type: "image",
+        id: `${assetId}-logo`,
+        role: "logo",
+        materialId: logo.materialId,
+        x: (W - 116) / 2,
+        y: 52,
+        width: 116,
+        height: 116,
+        fit: "contain",
+      },
+    ];
+  }
+  return [
+    {
+      type: "shape",
+      id: `${assetId}-logo-plate`,
+      role: "logo_plate",
+      x: 392,
+      y: 64,
+      width: 240,
+      height: 240,
+      fill: "#FFFFFF",
+      borderRadiusPx: 120,
+    },
+    {
+      type: "image",
+      id: `${assetId}-logo`,
+      role: "logo",
+      materialId: logo.materialId,
+      x: 416,
+      y: 88,
+      width: 192,
+      height: 192,
+      fit: "contain",
+    },
+  ];
 }
 
 /** Purpose bars stay on identity JSON for production; never paint on customer art. */
@@ -33,11 +140,11 @@ export function assertPromoRequiredTruth(truth: PromoProjectTruth): void {
   if (!truth.businessName?.trim()) {
     throw new Error("MISSING_REQUIRED_TRUTH: businessName");
   }
-  if (!truth.offerName?.trim()) {
+  const themeLed = isThemeLedPromoTruth(truth);
+  if (themeLed) {
+    assertThemeLedPromoTruth(truth);
+  } else if (!truth.offerName?.trim()) {
     throw new Error("MISSING_REQUIRED_TRUTH: offerName");
-  }
-  if (!truth.priceDisplay?.trim()) {
-    throw new Error("MISSING_REQUIRED_TRUTH: priceDisplay");
   }
   if (!Array.isArray(truth.assets) || truth.assets.length !== 2) {
     throw new Error("MISSING_REQUIRED_TRUTH: exactly two assets required");
@@ -63,7 +170,8 @@ export function assertPromoRequiredTruth(truth: PromoProjectTruth): void {
       "MISSING_REQUIRED_TRUTH: assets must adapt to distinct layout/plate (coordinated, not cloned)",
     );
   }
-  if (!truth.materials.some((m) => m.role === "logo")) {
+  const wordmarkOnly = truth.approvedLogoVariantId === "wordmark-only";
+  if (!wordmarkOnly && !truth.materials.some((m) => m.role === "logo")) {
     throw new Error("MISSING_REQUIRED_MATERIAL: logo");
   }
   if (!truth.liveIntakePerAssetPurposeGap?.trim()) {
@@ -89,60 +197,48 @@ function reasonSquareAsset(
   asset: PromoAssetTruth,
 ): PromoAssetSpec {
   const c = truth.brandColors;
-  const logo = truth.materials.find((m) => m.role === "logo")!;
+  const logo = truth.materials.find((m) => m.role === "logo");
   const W = asset.canvas.widthPx;
+  const headerLift = logo ? 0 : 156;
   const priceLine = truth.wasPriceDisplay
     ? `${truth.priceDisplay} · ${truth.wasPriceDisplay}`
     : truth.priceDisplay;
+  const margin = 72;
+  const textWidth = W - margin * 2;
+  const compact = /\b(tighten|tighter|empty space|too much space|closer together)\b/i.test(
+    truth.revisionInstruction ?? "",
+  );
+  const place = (y: number) =>
+    !compact || y < 448 ? y : 448 + Math.round((y - 448) * 0.72);
+
+  const editorialHeadline = resolvedPromoEditorialHeadline(truth);
+  const descriptorText = truth.descriptor.trim();
+  const offerBandY = editorialHeadline
+    ? place(356 - headerLift)
+    : descriptorText
+      ? place(308 - headerLift)
+      : place(268 - headerLift);
+  const offerTextY = offerBandY + 16;
+  const priceY = offerBandY + 92;
+  const datesY = priceY + 68;
 
   const layers: PromoDesignLayer[] = [
-    {
-      type: "shape",
-      id: `${asset.assetId}-band`,
-      role: "offer_band",
-      x: 0,
-      y: 0,
-      width: W,
-      height: 120,
-      fill: c.primary,
-    },
-    {
-      type: "shape",
-      id: `${asset.assetId}-logo-plate`,
-      role: "logo_plate",
-      x: 48,
-      y: 148,
-      width: 160,
-      height: 160,
-      fill: "#FFFFFF",
-      borderRadiusPx: 24,
-    },
-    {
-      type: "image",
-      id: `${asset.assetId}-logo`,
-      role: "logo",
-      materialId: logo.materialId,
-      x: 64,
-      y: 164,
-      width: 128,
-      height: 128,
-      fit: "contain",
-    },
+    ...promoLogoLayers(asset.assetId, logo, "compact_square"),
     ...(shouldPaintPurposeLabel(truth)
       ? [
           textLayer({
             id: `${asset.assetId}-purpose`,
             role: "purpose_label",
             content: asset.authorizedPurpose,
-            x: 48,
-            y: 36,
-            width: W - 96,
-            fontSizePx: 18,
+            x: margin,
+            y: 8,
+            width: textWidth,
+            fontSizePx: 16,
             fontWeight: 600,
             lineHeight: 1.2,
             letterSpacingPx: 1,
-            color: "#F7F4EF",
-            align: "left",
+            color: c.secondary,
+            align: "center",
           }),
         ]
       : []),
@@ -150,120 +246,186 @@ function reasonSquareAsset(
       id: `${asset.assetId}-wordmark`,
       role: "wordmark",
       content: truth.wordmark,
-      x: 232,
-      y: 168,
-      width: W - 280,
-      fontSizePx: 34,
+      x: margin,
+      y: place(204 - headerLift),
+      width: textWidth,
+      fontSizePx: 40,
       fontWeight: 700,
-      lineHeight: 1.15,
+      lineHeight: 1.1,
       color: c.primary,
-      align: "left",
+      align: "center",
     }),
-    textLayer({
-      id: `${asset.assetId}-descriptor`,
-      role: "descriptor",
-      content: truth.descriptor,
-      x: 232,
-      y: 220,
-      width: W - 280,
-      fontSizePx: 18,
-      fontWeight: 500,
-      lineHeight: 1.25,
-      color: c.secondary,
-      align: "left",
-    }),
+    ...(descriptorText
+      ? [
+          textLayer({
+            id: `${asset.assetId}-descriptor`,
+            role: "descriptor",
+            content: descriptorText,
+            x: margin,
+            y: place(258 - headerLift),
+            width: textWidth,
+            fontSizePx: 18,
+            fontWeight: 500,
+            lineHeight: 1.2,
+            letterSpacingPx: 2,
+            color: c.primary,
+            align: "center",
+          }),
+        ]
+      : []),
+    ...(editorialHeadline
+      ? promoEditorialHeadlineLayer(truth, {
+          assetId: asset.assetId,
+          x: margin,
+          y: place(300 - headerLift),
+          width: textWidth,
+          fontSizePx: 28,
+          fontWeight: 600,
+          lineHeight: 1.2,
+          color: c.text,
+          align: "center",
+        })
+      : []),
+    {
+      type: "shape",
+      id: `${asset.assetId}-offer-band`,
+      role: "offer_band",
+      x: margin,
+      y: offerBandY,
+      width: textWidth,
+      height: 72,
+      fill: c.secondary,
+    },
     textLayer({
       id: `${asset.assetId}-offer`,
       role: "offer",
       content: truth.offerName,
-      x: 48,
-      y: 360,
-      width: W - 96,
-      fontSizePx: 36,
+      x: margin,
+      y: offerTextY,
+      width: textWidth,
+      fontSizePx: 28,
       fontWeight: 700,
       lineHeight: 1.2,
       color: c.primary,
-      align: "left",
+      align: "center",
     }),
     textLayer({
       id: `${asset.assetId}-price`,
       role: "price",
       content: priceLine,
-      x: 48,
-      y: 460,
-      width: W - 96,
-      fontSizePx: 52,
+      x: margin,
+      y: priceY,
+      width: textWidth,
+      fontSizePx: 48,
       fontWeight: 700,
       lineHeight: 1.05,
       color: c.text,
-      align: "left",
+      align: "center",
     }),
     textLayer({
       id: `${asset.assetId}-dates`,
       role: "dates",
       content: truth.dateWindow,
-      x: 48,
-      y: 540,
-      width: W - 96,
+      x: margin,
+      y: datesY,
+      width: textWidth,
       fontSizePx: 22,
       fontWeight: 500,
       lineHeight: 1.2,
       color: c.muted,
-      align: "left",
-    }),
-    textLayer({
-      id: `${asset.assetId}-cta`,
-      role: "cta",
-      content: truth.cta,
-      x: 48,
-      y: 720,
-      width: W - 96,
-      fontSizePx: 26,
-      fontWeight: 700,
-      lineHeight: 1.2,
-      color: c.primary,
-      align: "left",
-    }),
-    textLayer({
-      id: `${asset.assetId}-phone`,
-      role: "contact_phone",
-      content: truth.phone,
-      x: 48,
-      y: 780,
-      width: W - 96,
-      fontSizePx: 22,
-      fontWeight: 500,
-      lineHeight: 1.2,
-      color: c.text,
-      align: "left",
-    }),
-    textLayer({
-      id: `${asset.assetId}-web`,
-      role: "contact_web",
-      content: truth.webDisplay,
-      x: 48,
-      y: 820,
-      width: W - 96,
-      fontSizePx: 20,
-      fontWeight: 500,
-      lineHeight: 1.2,
-      color: c.secondary,
-      align: "left",
-    }),
-    textLayer({
-      id: `${asset.assetId}-disclaimer`,
-      role: "disclaimer",
-      content: truth.disclaimer,
-      x: 48,
-      y: 920,
-      width: W - 96,
-      fontSizePx: 14,
-      fontWeight: 400,
-      lineHeight: 1.3,
-      color: c.muted,
-      align: "left",
+      align: "center",
     }),
   ];
+
+  const datesLayer = layers[layers.length - 1]!;
+  if (datesLayer.type !== "text") {
+    throw new Error("INVALID_DESIGN_SPEC: expected dates text layer");
+  }
+  const footerStartY = textLayerBottomY(datesLayer, { maxLines: 2 }) + PROMO_STACK_GAP_PX;
+  const footerStack = stackPromoTextLayersFromY(
+    footerStartY,
+    [
+      {
+        id: `${asset.assetId}-body`,
+        role: "body",
+        content: truth.body,
+        skipWhenEmpty: true,
+        x: margin + 24,
+        y: footerStartY,
+        width: textWidth - 48,
+        fontSizePx: 22,
+        fontWeight: 400,
+        lineHeight: 1.35,
+        color: c.text,
+        align: "center",
+        maxLines: 4,
+      },
+      {
+        id: `${asset.assetId}-cta`,
+        role: "cta",
+        content: truth.cta,
+        x: margin,
+        y: footerStartY,
+        width: textWidth,
+        fontSizePx: 26,
+        fontWeight: 700,
+        lineHeight: 1.2,
+        color: c.primary,
+        align: "center",
+        maxLines: 1,
+      },
+      {
+        id: `${asset.assetId}-phone`,
+        role: "contact_phone",
+        content: truth.phone,
+        skipWhenEmpty: true,
+        x: margin,
+        y: footerStartY,
+        width: textWidth,
+        fontSizePx: 22,
+        fontWeight: 500,
+        lineHeight: 1.2,
+        color: c.text,
+        align: "center",
+        maxLines: 1,
+      },
+      {
+        id: `${asset.assetId}-web`,
+        role: "contact_web",
+        content: truth.webDisplay,
+        skipWhenEmpty: true,
+        x: margin,
+        y: footerStartY,
+        width: textWidth,
+        fontSizePx: 20,
+        fontWeight: 500,
+        lineHeight: 1.2,
+        color: c.secondary,
+        align: "center",
+        maxLines: 2,
+      },
+      {
+        id: `${asset.assetId}-disclaimer`,
+        role: "disclaimer",
+        content: truth.disclaimer,
+        skipWhenEmpty: true,
+        x: margin,
+        y: footerStartY,
+        width: textWidth,
+        fontSizePx: 14,
+        fontWeight: 400,
+        lineHeight: 1.3,
+        color: c.muted,
+        align: "center",
+        maxLines: 4,
+      },
+    ],
+    PROMO_SQUARE_CANVAS_HEIGHT_PX,
+  );
+  if (!("layers" in footerStack)) {
+    throw new Error(`MISSING_REQUIRED_TRUTH: ${footerStack.message}`);
+  }
+  layers.push(...footerStack.layers);
 
   return {
     assetId: asset.assetId,
@@ -277,16 +439,29 @@ function reasonSquareAsset(
   };
 }
 
+
 function reasonPortraitAsset(
   truth: PromoProjectTruth,
   asset: PromoAssetTruth,
 ): PromoAssetSpec {
   const c = truth.brandColors;
-  const logo = truth.materials.find((m) => m.role === "logo")!;
+  const logo = truth.materials.find((m) => m.role === "logo");
   const W = asset.canvas.widthPx;
+  const headerLift = logo ? 0 : 276;
   const priceLine = truth.wasPriceDisplay
     ? `${truth.priceDisplay} (${truth.wasPriceDisplay})`
     : truth.priceDisplay;
+
+  const editorialHeadline = resolvedPromoEditorialHeadline(truth);
+  const descriptorText = truth.descriptor.trim();
+  const ruleY = editorialHeadline
+    ? 560 - headerLift
+    : descriptorText
+      ? 480 - headerLift
+      : 420 - headerLift;
+  const offerY = ruleY + 36;
+  const priceY = offerY + 104;
+  const datesY = priceY + 90;
 
   const layers: PromoDesignLayer[] = [
     {
@@ -299,28 +474,7 @@ function reasonPortraitAsset(
       height: asset.canvas.heightPx,
       fill: c.primary,
     },
-    {
-      type: "shape",
-      id: `${asset.assetId}-logo-plate`,
-      role: "logo_plate",
-      x: 392,
-      y: 64,
-      width: 240,
-      height: 240,
-      fill: "#FFFFFF",
-      borderRadiusPx: 120,
-    },
-    {
-      type: "image",
-      id: `${asset.assetId}-logo`,
-      role: "logo",
-      materialId: logo.materialId,
-      x: 416,
-      y: 88,
-      width: 192,
-      height: 192,
-      fit: "contain",
-    },
+    ...promoLogoLayers(asset.assetId, logo, "tall_portrait"),
     ...(shouldPaintPurposeLabel(truth)
       ? [
           textLayer({
@@ -344,7 +498,7 @@ function reasonPortraitAsset(
       role: "wordmark",
       content: truth.wordmark,
       x: 72,
-      y: 340,
+      y: 340 - headerLift,
       width: 880,
       fontSizePx: 48,
       fontWeight: 700,
@@ -352,39 +506,43 @@ function reasonPortraitAsset(
       color: c.primary,
       align: "center",
     }),
-    textLayer({
-      id: `${asset.assetId}-descriptor`,
-      role: "descriptor",
-      content: truth.descriptor,
-      x: 72,
-      y: 408,
-      width: 880,
-      fontSizePx: 22,
-      fontWeight: 500,
-      lineHeight: 1.2,
-      letterSpacingPx: 2,
-      color: c.secondary,
-      align: "center",
-    }),
-    textLayer({
-      id: `${asset.assetId}-headline`,
-      role: "headline",
-      content: truth.headline,
-      x: 88,
-      y: 480,
-      width: 848,
-      fontSizePx: 38,
-      fontWeight: 600,
-      lineHeight: 1.2,
-      color: c.text,
-      align: "center",
-    }),
+    ...(descriptorText
+      ? [
+          textLayer({
+            id: `${asset.assetId}-descriptor`,
+            role: "descriptor",
+            content: descriptorText,
+            x: 72,
+            y: 408 - headerLift,
+            width: 880,
+            fontSizePx: 22,
+            fontWeight: 500,
+            lineHeight: 1.2,
+            letterSpacingPx: 2,
+            color: c.primary,
+            align: "center",
+          }),
+        ]
+      : []),
+    ...(editorialHeadline
+      ? promoEditorialHeadlineLayer(truth, {
+          assetId: asset.assetId,
+          x: 88,
+          y: 480 - headerLift,
+          width: 848,
+          fontSizePx: 38,
+          fontWeight: 600,
+          lineHeight: 1.2,
+          color: c.text,
+          align: "center",
+        })
+      : []),
     {
       type: "shape",
       id: `${asset.assetId}-rule`,
       role: "footer_rule",
       x: 360,
-      y: 560,
+      y: ruleY,
       width: 304,
       height: 3,
       fill: c.secondary,
@@ -394,7 +552,7 @@ function reasonPortraitAsset(
       role: "offer",
       content: truth.offerName,
       x: 72,
-      y: 596,
+      y: offerY,
       width: 880,
       fontSizePx: 34,
       fontWeight: 700,
@@ -407,7 +565,7 @@ function reasonPortraitAsset(
       role: "price",
       content: priceLine,
       x: 72,
-      y: 700,
+      y: priceY,
       width: 880,
       fontSizePx: 56,
       fontWeight: 700,
@@ -420,80 +578,106 @@ function reasonPortraitAsset(
       role: "dates",
       content: truth.dateWindow,
       x: 72,
-      y: 790,
+      y: datesY,
       width: 880,
       fontSizePx: 24,
       fontWeight: 500,
       lineHeight: 1.2,
-      color: c.muted,
-      align: "center",
-    }),
-    textLayer({
-      id: `${asset.assetId}-body`,
-      role: "body",
-      content: truth.body,
-      x: 100,
-      y: 880,
-      width: 824,
-      fontSizePx: 22,
-      fontWeight: 400,
-      lineHeight: 1.35,
-      color: c.text,
-      align: "center",
-    }),
-    textLayer({
-      id: `${asset.assetId}-cta`,
-      role: "cta",
-      content: truth.cta,
-      x: 72,
-      y: 1100,
-      width: 880,
-      fontSizePx: 28,
-      fontWeight: 700,
-      lineHeight: 1.2,
-      color: c.primary,
-      align: "center",
-    }),
-    textLayer({
-      id: `${asset.assetId}-phone`,
-      role: "contact_phone",
-      content: truth.phone,
-      x: 72,
-      y: 1180,
-      width: 880,
-      fontSizePx: 24,
-      fontWeight: 500,
-      lineHeight: 1.2,
-      color: c.text,
-      align: "center",
-    }),
-    textLayer({
-      id: `${asset.assetId}-web`,
-      role: "contact_web",
-      content: truth.webDisplay,
-      x: 72,
-      y: 1224,
-      width: 880,
-      fontSizePx: 22,
-      fontWeight: 500,
-      lineHeight: 1.2,
-      color: c.secondary,
-      align: "center",
-    }),
-    textLayer({
-      id: `${asset.assetId}-disclaimer`,
-      role: "disclaimer",
-      content: truth.disclaimer,
-      x: 72,
-      y: 1400,
-      width: 880,
-      fontSizePx: 14,
-      fontWeight: 400,
-      lineHeight: 1.3,
       color: c.muted,
       align: "center",
     }),
   ];
+
+  const portraitDates = layers[layers.length - 1]!;
+  if (portraitDates.type !== "text") {
+    throw new Error("INVALID_DESIGN_SPEC: expected dates text layer");
+  }
+  const portraitFooterStart =
+    textLayerBottomY(portraitDates, { maxLines: 2 }) + PROMO_STACK_GAP_PX;
+  const portraitFooter = stackPromoTextLayersFromY(
+    portraitFooterStart,
+    [
+      {
+        id: `${asset.assetId}-body`,
+        role: "body",
+        content: truth.body,
+        skipWhenEmpty: true,
+        x: 100,
+        y: portraitFooterStart,
+        width: 824,
+        fontSizePx: 22,
+        fontWeight: 400,
+        lineHeight: 1.35,
+        color: c.text,
+        align: "center",
+        maxLines: 4,
+      },
+      {
+        id: `${asset.assetId}-cta`,
+        role: "cta",
+        content: truth.cta,
+        x: 72,
+        y: portraitFooterStart,
+        width: 880,
+        fontSizePx: 28,
+        fontWeight: 700,
+        lineHeight: 1.2,
+        color: c.primary,
+        align: "center",
+        maxLines: 1,
+      },
+      {
+        id: `${asset.assetId}-phone`,
+        role: "contact_phone",
+        content: truth.phone,
+        skipWhenEmpty: true,
+        x: 72,
+        y: portraitFooterStart,
+        width: 880,
+        fontSizePx: 24,
+        fontWeight: 500,
+        lineHeight: 1.2,
+        color: c.text,
+        align: "center",
+        maxLines: 1,
+      },
+      {
+        id: `${asset.assetId}-web`,
+        role: "contact_web",
+        content: truth.webDisplay,
+        skipWhenEmpty: true,
+        x: 72,
+        y: portraitFooterStart,
+        width: 880,
+        fontSizePx: 22,
+        fontWeight: 500,
+        lineHeight: 1.2,
+        color: c.secondary,
+        align: "center",
+        maxLines: 2,
+      },
+      {
+        id: `${asset.assetId}-disclaimer`,
+        role: "disclaimer",
+        content: truth.disclaimer,
+        skipWhenEmpty: true,
+        x: 72,
+        y: portraitFooterStart,
+        width: 880,
+        fontSizePx: 14,
+        fontWeight: 400,
+        lineHeight: 1.3,
+        color: c.muted,
+        align: "center",
+        maxLines: 4,
+      },
+    ],
+    PROMO_PORTRAIT_CANVAS_HEIGHT_PX,
+  );
+  if (!("layers" in portraitFooter)) {
+    throw new Error(`MISSING_REQUIRED_TRUTH: ${portraitFooter.message}`);
+  }
+  layers.push(...portraitFooter.layers);
 
   return {
     assetId: asset.assetId,
@@ -516,6 +700,9 @@ export function reasonPromoGraphicAsset(
   truth: PromoProjectTruth,
   asset: PromoAssetTruth,
 ): PromoAssetSpec {
+  if (isThemeLedPromoTruth(truth)) {
+    return reasonThemeLedPromoAsset(truth, asset);
+  }
   if (asset.layoutVariant === "compact_square") {
     return reasonSquareAsset(truth, asset);
   }

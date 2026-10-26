@@ -314,10 +314,7 @@ function appendFooter(
   });
 
   let footerY = footerTop + 10;
-  const dietaryLines = Math.min(
-    2,
-    approxLines(dietary, CONTENT_WIDTH, scale.disclaimer),
-  );
+  const dietaryLines = approxLines(dietary, CONTENT_WIDTH, scale.disclaimer);
   const dietaryH = dietaryLines * scale.disclaimer * 1.3;
   layers.push(
     textLayer({
@@ -339,10 +336,7 @@ function appendFooter(
   footerY += dietaryH + 4;
 
   if (legal) {
-    const legalLines = Math.min(
-      2,
-      approxLines(legal, CONTENT_WIDTH, scale.disclaimer),
-    );
+    const legalLines = approxLines(legal, CONTENT_WIDTH, scale.disclaimer);
     const legalH = legalLines * scale.disclaimer * 1.25;
     layers.push(
       textLayer({
@@ -657,12 +651,9 @@ function packWithScale(
 
   const dietary = truth.dietaryLabels.trim();
   const legal = truth.legalDisclaimer?.trim() ?? "";
-  const dietaryLines = Math.min(
-    2,
-    approxLines(dietary, CONTENT_WIDTH, scale.disclaimer),
-  );
+  const dietaryLines = approxLines(dietary, CONTENT_WIDTH, scale.disclaimer);
   const legalLines = legal
-    ? Math.min(2, approxLines(legal, CONTENT_WIDTH, scale.disclaimer))
+    ? approxLines(legal, CONTENT_WIDTH, scale.disclaimer)
     : 0;
   const disclaimerH =
     dietaryLines * scale.disclaimer * 1.3 +

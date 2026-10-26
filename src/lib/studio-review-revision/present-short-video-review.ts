@@ -183,7 +183,7 @@ export async function presentShortVideoReviewProof(input: {
     requiredDefs.find((def) => /mp4|video|short-form/i.test(def.label)) ??
     requiredDefs[0];
   const deliverableLabel =
-    videoDef?.label ?? "Make Me a Short Video";
+    videoDef?.label ?? "Final vertical MP4 1080×1920 — still photos, captions, and CTA";
   const deliverableKey =
     videoDef?.key ?? studioReviewRevisionFullLoopV1.deliverableKey;
 

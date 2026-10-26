@@ -1,7 +1,10 @@
 import type { ServiceId } from "@/catalog/types";
 import type { ProductionRole } from "@/lib/campaign-tasks/types";
 
-import type { ACTIVE_CUSTOMER_FACING_SKUS } from "./active-set";
+import type {
+  ACTIVE_CUSTOMER_FACING_SKUS,
+  INTERNAL_STAGING_LAUNCH_SKUS,
+} from "./active-set";
 import {
   AI_VOICE_TOOL,
   CANVA_TOOL,
@@ -16,6 +19,8 @@ import type {
 } from "./types";
 
 type ActiveCapabilitySku = (typeof ACTIVE_CUSTOMER_FACING_SKUS)[number];
+type StagingCapabilitySku = (typeof INTERNAL_STAGING_LAUNCH_SKUS)[number];
+type OverrideSku = ActiveCapabilitySku | StagingCapabilitySku;
 
 /**
  * SKU-specific production method overrides over family baselines + catalog authority.
@@ -44,7 +49,7 @@ const copyFormats = (detail: string): readonly string[] => [
 ];
 
 export const SKU_PRODUCTION_OVERRIDES: Record<
-  ActiveCapabilitySku,
+  OverrideSku,
   SkuProductionOverride
 > = {
   "bf-001": {
@@ -696,9 +701,9 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
         "Owner-approved Machine path for v2-rtu-menu only (MENU-PROOF-1 + MENU-LAYOUT-1 PASS WITH LIMITS). Canva is not on the fulfillment spine for this SKU. Make not required. Max 5 sections / 30 items TOTAL.",
     },
     formatExportRequirements: [
-      "Final flattened digital export (PNG and/or PDF as appropriate)",
-      "Editable source files are not included unless separately authorized",
-      "One single-page menu — PDF + digital",
+      "Two digital files: PNG you can share and PDF you can print yourself",
+      "Digital CERT plate — not a certified 300 DPI print file",
+      "One single-page menu — up to 5 sections and 30 items. Customer prints.",
     ],
     readiness: "contract_ready",
     readinessNotes:
@@ -754,9 +759,9 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
         "Owner-approved Machine path for v2-rtu-social-posts only (SOCIAL-POSTS-PROOF-1 PASS WITH LIMITS + INTAKE-TRUTH-1). Canva is not on the fulfillment spine for this SKU. Make not required. Exactly four posts; square-only; Studio captions + posting order; Studio layout templates.",
     },
     formatExportRequirements: [
-      "Four coordinated static post graphics (PNG and/or PDF as appropriate)",
-      "Caption document or plain-text caption file for all posts",
-      "Simple recommended posting order (not a full calendar)",
+      "Four coordinated square static post graphics — digital PNG, 1024 × 1024 each",
+      "Caption file for all four posts (plain text)",
+      "Suggested posting order (not a calendar) — customer posts them",
       "Editable source files are not included unless separately authorized",
     ],
     extraQaItems: [
@@ -792,9 +797,9 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
         "Owner-approved Machine path for v2-rtu-promotion-graphics only (PROMOTION-GRAPHICS-PROOF-1 PASS WITH LIMITS + INTAKE-TRUTH-1). Canva is not on the fulfillment spine for this SKU. Make not required. Exactly two assets; Square+Portrait executable; Landscape fail-closed.",
     },
     formatExportRequirements: [
-      "Final flattened digital export (PNG and/or PDF as appropriate)",
+      "Final flattened digital PNG export for each graphic",
       "Editable source files are not included unless separately authorized",
-      "Two coordinated campaign graphics — one agreed format/use per graphic",
+      "Two coordinated digital campaign graphics — square 1024×1024 and portrait 1024×1536. Not a certified 300 DPI print file.",
     ],
     readiness: "contract_ready",
     readinessNotes:
@@ -819,10 +824,10 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
         "Owner-approved Machine path for v2-rtu-business-card only (DESIGN-BUSINESS-CARD-PROOF-1). Canva is not on the fulfillment spine for this SKU. Make not required. Double-sided front+back required.",
     },
     formatExportRequirements: [
-      "Final flattened digital export (PNG and/or PDF as appropriate)",
+      "Front digital PNG and back digital PNG — 1536×1024 each",
+      "PDF you can print yourself (digital CERT plate — not a certified 3.5×2 or 300 DPI print file)",
       "Editable source files are not included unless separately authorized",
-      "Business card design only (print excluded)",
-      "Double-sided design — front and back",
+      "Double-sided digital card — customer prints",
     ],
     extraLimitations: ["Printing/shipping not included — design-only."],
     readiness: "contract_ready",
@@ -831,7 +836,15 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   },
   "v2-rtu-email-kit": {
     producerRole: "copy",
-    primaryTool: TEXT_MODEL_TOOL,
+    primaryTool: {
+      toolId: "studio_copy_producer",
+      label: "Studio Copy Production (fact-bound assembler)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Machine-invoked fact-bound copy producer. Does not invent prices, claims, dates, or contact. Studio does not send email.",
+    },
     optionalTools: [],
     formatExportRequirements: copyFormats("Up to two RTU emails — client pastes into their platform"),
     readiness: "contract_ready",
@@ -839,7 +852,15 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   },
   "v2-rtu-sms-kit": {
     producerRole: "copy",
-    primaryTool: TEXT_MODEL_TOOL,
+    primaryTool: {
+      toolId: "studio_copy_producer",
+      label: "Studio Copy Production (fact-bound assembler)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Machine-invoked fact-bound copy producer. Does not invent prices, claims, dates, or contact. Studio does not send SMS.",
+    },
     optionalTools: [],
     formatExportRequirements: copyFormats(
       "Up to four RTU SMS messages — client pastes into their platform",
@@ -883,11 +904,11 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   "v2-rtu-short-video": {
     producerRole: "creative_production",
     primaryTool: SHOTSTACK_TOOL,
-    optionalTools: [AI_VOICE_TOOL, CANVA_TOOL],
+    optionalTools: [],
     formatExportRequirements: [
-      "One basic short-form MP4, 15–30 seconds (CUSTOMER READY WITH LIMITS — MP4)",
-      "One aspect ratio only (vertical, square, or landscape)",
-      "On-screen captions + CTA treatment",
+      "One 15–30 second vertical MP4 1080×1920 assembled from customer still photos",
+      "On-screen captions from the customer’s approved exact words plus one CTA",
+      "Customer posts the file — Studio does not post",
     ],
     extraQaItems: [
       {
@@ -898,8 +919,8 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
       },
       {
         id: "one_aspect_ratio",
-        label: "One format/aspect ratio only",
-        reason: "RTU short video promise",
+        label: "Vertical 1080×1920 only",
+        reason: "HARDEN #8 STANDARD sold plate",
         source: "deliverable_format",
       },
       {
@@ -910,8 +931,8 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
       },
       {
         id: "usable_footage",
-        label: "Customer footage/assets usable or approved Studio assets used",
-        reason: "Client responsibilities / production quality",
+        label: "1–4 customer-cleared still photos (PNG or JPG) — no footage, stock, or Studio substitute",
+        reason: "HARDEN #8 STANDARD stills-only offer",
         source: "service_contract",
       },
       {
@@ -923,23 +944,177 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
       },
     ],
     extraLimitations: [
-      "CUSTOMER READY WITH LIMITS — MP4 (KITCHEN-PRODUCTION-CERT-VIDEO-1).",
-      "Final A/V beat synchronization remains a mandatory per-artifact QA check before customer delivery; if sync QA fails, regenerate before delivery.",
+      "HARDEN #8 STANDARD 2026-09-24: stills + captions + CTA only. No narration, music, footage edit, stock, or extra sizes.",
+      "QA exhaust fail-closes. Owner does not finish the video.",
       "No customer artifact may inherit readiness from a prior video/hash (per-artifact gate).",
-      "Stock-media capability UNRESOLVED for jobs that need stock.",
-      "MUSIC CAPABILITY = UNRESOLVED — omit music until rights are certain.",
     ],
     readiness: "contract_ready",
     readinessNotes:
-      "CUSTOMER READY WITH LIMITS — MP4 (KITCHEN-PRODUCTION-CERT-VIDEO-1). Owner-independent Shotstack Production proven. Known limit: topic-card transitions can lag narration slightly — final A/V beat sync is mandatory per-artifact QA before delivery. CapCut CLOSED — OWNER-INDEPENDENCE FAIL. Stock + music UNRESOLVED.",
+      "HARDEN #8 STANDARD: $149 stills + captions vertical MP4. Shotstack stills hook. Captions-only. Fail-closed. Customer posts. CUSTOMER READY WITH LIMITS — MP4. CapCut CLOSED — OWNER-INDEPENDENCE FAIL. A/V beat synchronization remains a per-artifact watch-with-sound QA item. CapCut is not a success path.",
     specialNotes: [
-      "Client posts/distributes the finished video.",
-      "Customer must provide organized usable footage when using their own visuals.",
-      "Use SKU-appropriate narration (15–30s); do not force the 39s voice-cert fixture into short video.",
-      "Stock-media capability UNRESOLVED for jobs that need stock — unused in this package.",
-      "MUSIC CAPABILITY = UNRESOLVED — omit music until rights are certain (unused in this package).",
+      "Client posts the finished MP4.",
+      "1–4 customer-cleared still photos only.",
+      "Captions use the customer’s approved exact words.",
+      "Narration, Studio music, footage editing, stock, and extra sizes are not sold.",
       "Tagia/Owner CapCut click-export is NOT an acceptable production success path.",
-      "Primary producer: Shotstack Edit + Ingest API (Production/v1 for customer delivers; stage proofs under kitchen-video-integration-1).",
+      "Primary producer: Shotstack Edit + Ingest API.",
+    ],
+  },
+  "v2-rtu-short-form-video-edit": {
+    producerRole: "creative_production",
+    primaryTool: {
+      toolId: "footage_editing_pipeline",
+      label: "Frozen Short-Form Video Editing factory",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note: "Calls runFootageEditingPipeline. Not the $149 stills Shotstack hook.",
+    },
+    optionalTools: [],
+    formatExportRequirements: [
+      "One 15–30 second vertical MP4 1080×1920 edited from one native-vertical English talking-head",
+      "Spoken-word captions burned locally",
+      "Customer-supplied CTA on the end card",
+      "Customer posts the file — Studio does not post",
+    ],
+    extraQaItems: [
+      {
+        id: "runtime_15_30",
+        label: "Runtime 15–30 seconds",
+        reason: "Frozen $349 short-form editing promise",
+        source: "service_contract",
+      },
+      {
+        id: "one_aspect_ratio",
+        label: "Vertical 1080×1920 only",
+        reason: "Certified scope",
+        source: "deliverable_format",
+      },
+      {
+        id: "native_vertical_talking_head",
+        label: "One rights-cleared native-vertical English talking-head, 180 seconds or less",
+        reason: "Certified intake",
+        source: "service_contract",
+      },
+    ],
+    extraLimitations: [
+      "Unpublished staging. Not on the public Launch Now shelf.",
+      "No landscape reframe, B-roll, stock, music, AI footage, narration, or Studio posting.",
+    ],
+    readiness: "contract_ready",
+    readinessNotes:
+      "Frozen $349 talking-head factory. Local typography. Shotstack composite only. Exact-text QA fail-close.",
+    specialNotes: [
+      "Do not call the $149 stills short-video hook.",
+      "Do not typeset captions in Shotstack.",
+      "Customer posts the finished MP4.",
+    ],
+    customerReviewHandoff:
+      "Present the finished vertical MP4 for one included revision within certified scope.",
+    finalDeliveryCriteria: [
+      "One client-visible 1080×1920 MP4 matching the approved Review identity",
+    ],
+  },
+  "v2-rtu-clip-repurposing": {
+    producerRole: "creative_production",
+    primaryTool: {
+      toolId: "clip_repurposing_pipeline",
+      label: "Frozen Clip Repurposing set factory",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note: "Dedicated set lane. Not the $349 footage hook. Not the $149 stills Shotstack hook.",
+    },
+    optionalTools: [],
+    formatExportRequirements: [
+      "Three distinct 15–30 second vertical MP4s 1080×1920 from one 15–60 minute native-vertical English talking-head",
+      "Spoken-word captions burned locally",
+      "Shared customer-supplied CTA on the set",
+      "Customer posts the files — Studio does not post",
+    ],
+    extraQaItems: [
+      {
+        id: "three_distinct_shorts",
+        label: "Three professionally distinct publishable shorts, or a frozen <3 remedy",
+        reason: "Certified Clip Repurposing set promise",
+        source: "service_contract",
+      },
+      {
+        id: "one_aspect_ratio",
+        label: "Vertical 1080×1920 only",
+        reason: "Certified scope",
+        source: "deliverable_format",
+      },
+      {
+        id: "long_native_vertical_talking_head",
+        label: "One rights-cleared native-vertical English talking-head, 15–60 minutes",
+        reason: "Certified intake",
+        source: "service_contract",
+      },
+    ],
+    extraLimitations: [
+      "Unpublished staging. Not on the public Launch Now shelf.",
+      "Do not invent a filler third. Do not charge $549 and quietly deliver fewer than three clips.",
+      "No landscape reframe, B-roll, stock, music, AI footage, narration, or Studio posting.",
+    ],
+    readiness: "contract_ready",
+    readinessNotes:
+      "Frozen unpublished $549 set factory. Hitchhikes certified per-clip machinery. Dedicated dispatch identity.",
+    specialNotes: [
+      "Do not call the $149 stills short-video hook.",
+      "Do not call the $349 single-edit footage hook.",
+      "Customer posts the finished MP4s.",
+    ],
+    customerReviewHandoff:
+      "Present the three-clip set together for one included set revision.",
+    finalDeliveryCriteria: [
+      "Three client-visible 1080×1920 MP4s matching the approved set Review identity, or the truthful $349 / $449 / cannot-complete remedy",
+    ],
+  },
+  "v2-creative-qa-finish": {
+    producerRole: "creative_production",
+    supportingRoles: ["qa", "producer_dispatcher"],
+    primaryTool: {
+      toolId: "creative_qa_finish_pipeline",
+      label: "Creative QA finish of the customer's static file",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note: "Contain the supplied raster on a 1080 square with a margin. Do not redraw type, color, font, or layout, and do not call another design SKU.",
+    },
+    optionalTools: [],
+    formatExportRequirements: [
+      "One PNG per supplied static asset, one or two assets",
+      "1080 by 1080 canvas with the source fitted inside and a professional margin",
+      "Source proportions preserved and no new text burned into the file",
+    ],
+    extraQaItems: [
+      {
+        id: "source_contained",
+        label: "The customer's artwork is fully visible inside the margin",
+        reason: "Correct and polish without cropping",
+        source: "service_contract",
+      },
+      {
+        id: "facts_verbatim",
+        label: "Confirmed facts are unchanged",
+        reason: "The customer supplied the facts to preserve",
+        source: "service_contract",
+      },
+    ],
+    extraLimitations: [
+      "No video, net-new campaign, or printing coordination.",
+      "At most two static assets.",
+      "Three revision rounds. A revision may ask for more margin, less margin, or the same finish.",
+      "Do not route this package through flyer, social, menu, service sheet, or business card production.",
+    ],
+    readiness: "contract_ready",
+    readinessNotes:
+      "Dedicated contain-and-export path for an existing static file. Revisions change the margin only.",
+    customerReviewHandoff:
+      "Present the finished PNG in Review. A revision may ask for more margin, less margin, or the same finish.",
+    finalDeliveryCriteria: [
+      "The approved PNG for each supplied static asset, and no other package's file",
     ],
   },
 };

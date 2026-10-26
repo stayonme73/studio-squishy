@@ -2,7 +2,7 @@
  * Canonical launch truth — the single current authority for the customer-facing
  * launch menu, launch prices, publish state, and certification / freeze state.
  *
- * Owner ruling: Tagia, 2026-10-10.
+ * Owner ruling: Tagia, 2026-10-10 (menu enforcement); four-package menu count amended 2026-10-25.
  * Record: docs/launch/studio-canonical-launch-truth-1/STUDIO-CANONICAL-LAUNCH-TRUTH.md
  *
  * Leaf record: imports nothing. Other records may point here; they must not
@@ -18,10 +18,11 @@ export const studioCanonicalLaunchTruthV1 = {
   id: STUDIO_CANONICAL_LAUNCH_TRUTH_ID,
   ruledBy: "Tagia (owner)" as const,
   ruledAt: "2026-10-10" as const,
+  menuCountAmendedAt: "2026-10-25" as const,
   record: "docs/launch/studio-canonical-launch-truth-1/STUDIO-CANONICAL-LAUNCH-TRUTH.md" as const,
 
-  canonicalCustomerFacingMenu: "three_package_door" as const,
-  customerFacingLaunchPackageCount: 3 as const,
+  canonicalCustomerFacingMenu: "four_package_door" as const,
+  customerFacingLaunchPackageCount: 4 as const,
   deployedPublicly: false as const,
   publicationAuthorized: false as const,
   thankYouDiscountPercent: 20 as const,
@@ -31,9 +32,9 @@ export const studioCanonicalLaunchTruthV1 = {
       packageId: "clip_repurposing" as const,
       customerFacingName: "Clip Repurposing" as const,
       factorySku: "v2-rtu-clip-repurposing" as const,
-      listPriceCents: 39900 as const,
-      priceDisplay: "$399" as const,
-      amountDueAfterThankYouCents: 31920 as const,
+      listPriceCents: 37375 as const,
+      priceDisplay: "$373.75" as const,
+      amountDueAfterThankYouCents: 29900 as const,
       revisionRounds: 3 as const,
       launchPublishState: "UNPUBLISHED" as const,
       certificationState: "END_TO_END_PROVEN_IN_STRIPE_TEST_MODE_WITH_EXPLICIT_LIMITS" as const,
@@ -45,9 +46,9 @@ export const studioCanonicalLaunchTruthV1 = {
       packageId: "short_form_video_editing" as const,
       customerFacingName: "Short-Form Video Editing" as const,
       factorySku: "v2-rtu-short-form-video-edit" as const,
-      listPriceCents: 24900 as const,
-      priceDisplay: "$249" as const,
-      amountDueAfterThankYouCents: 19920 as const,
+      listPriceCents: 18625 as const,
+      priceDisplay: "$186.25" as const,
+      amountDueAfterThankYouCents: 14900 as const,
       revisionRounds: 3 as const,
       launchPublishState: "UNPUBLISHED" as const,
       certificationState: "END_TO_END_PROVEN_IN_STRIPE_TEST_MODE_WITH_EXPLICIT_LIMITS" as const,
@@ -68,6 +69,21 @@ export const studioCanonicalLaunchTruthV1 = {
       freezeState: "OWNER_FROZEN_2026-10-10_WITH_EXPLICIT_LIMITS" as const,
       provenProject: "route-proof-social-promo-1791620985041" as const,
       record: "docs/launch/studio-social-promo-signed-in-delivery-proof-1/STUDIO-SOCIAL-PROMO-GRAPHICS-CERTIFICATION-FREEZE.md" as const,
+    },
+    {
+      packageId: "campaign_launch_kit" as const,
+      customerFacingName: "Campaign Launch Kit" as const,
+      factorySku: "v2-campaign-launch-kit" as const,
+      listPriceCents: 34900 as const,
+      priceDisplay: "$349" as const,
+      amountDueAfterThankYouCents: 27920 as const,
+      revisionRounds: 3 as const,
+      launchPublishState: "UNPUBLISHED" as const,
+      certificationState: "ENGINEERING_AND_CONTRACT_EVIDENCED_WITH_EXPLICIT_GAPS" as const,
+      freezeState: "NO_SOCIAL_STYLE_PACKAGE_FREEZE_DOCUMENT_ON_FILE" as const,
+      provenProject: "harbor-oak-campaign-launch-kit" as const,
+      record:
+        "docs/launch/studio-canonical-launch-truth-1/FOUR-PACKAGE-CAMPAIGN-LAUNCH-KIT-349-RECORD.md" as const,
     },
   ],
 

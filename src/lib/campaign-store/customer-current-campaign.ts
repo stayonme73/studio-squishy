@@ -9,11 +9,14 @@
 import {
   isLocalCustomerOnePaidFlyerCampaign,
   pickLocalCustomerOnePaidFlyerCampaign,
+  pickOwnedPaidNonMayaCampaign,
 } from "@/lib/auth/local-customer-one-campaign";
 import { linkClientCampaign } from "@/lib/auth/users";
 import { isClientUser } from "@/lib/campaign-store/access";
 import {
   applyCustomerOneSubmittedIntake,
+  isProtectedMayaCampaign,
+  shouldBindOwnedPaidWhenCurrentMissing,
   shouldRedirectUnpaidCurrentToPaidSibling,
 } from "@/lib/campaign-store/customer-current-campaign-progress";
 import {
@@ -27,7 +30,10 @@ import { wakePaidCampaignEnvelope } from "@/lib/studio-paid-activation-recovery"
 export {
   applyCustomerOneSubmittedIntake,
   campaignProgressRank,
+  isFreshNonMayaCurrentCampaign,
+  isProtectedMayaCampaign,
   selectedServiceKey,
+  shouldBindOwnedPaidWhenCurrentMissing,
   shouldKeepLocalCampaignOverServer,
   shouldRedirectUnpaidCurrentToPaidSibling,
 } from "@/lib/campaign-store/customer-current-campaign-progress";
@@ -49,7 +55,10 @@ async function attachPaidEnvelopeToClient(
   const saved = await upsertCampaignRecord(withIntake, envelope.clientUserId);
   const linked = (await linkClientCampaign(user.id, saved.campaignId)) ?? null;
   const nextUser = linked ?? sessionUserWithCampaign(user, saved.campaignId);
-  const woken = await wakePaidCampaignEnvelope(saved);
+  const woken = await wakePaidCampaignEnvelope(saved, {
+    sessionCurrentCampaignId: saved.campaignId,
+    sessionClientUserId: nextUser.id,
+  });
   return { envelope: woken, user: nextUser };
 }
 
@@ -67,8 +76,38 @@ export async function resolveCustomerCurrentCampaign(user: StudioUser): Promise<
     return { envelope: currentEnvelope, user: workingUser };
   }
 
-  if (currentRecord && isLocalCustomerOnePaidFlyerCampaign(currentRecord)) {
-    const needsIntake = applyCustomerOneSubmittedIntake(currentRecord) !== currentRecord;
+  const envelopes = await listCampaignEnvelopes();
+  const ownedFreshPaid = pickOwnedPaidNonMayaCampaign(envelopes, workingUser.id);
+  if (ownedFreshPaid) {
+    const currentIsMaya = isProtectedMayaCampaign(currentRecord);
+    const currentMissing = !currentRecord;
+    const currentIsFresh =
+      currentRecord?.campaignId === ownedFreshPaid.campaignId;
+    if (currentMissing || currentIsMaya || currentIsFresh) {
+      const needsLink =
+        workingUser.currentCampaignId !== ownedFreshPaid.campaignId ||
+        !workingUser.clientCampaignIds?.includes(ownedFreshPaid.campaignId);
+      if (needsLink || currentIsMaya || currentMissing) {
+        return attachPaidEnvelopeToClient(workingUser, ownedFreshPaid);
+      }
+      return { envelope: ownedFreshPaid, user: workingUser };
+    }
+  }
+
+  if (
+    currentRecord?.paymentReceivedAt &&
+    !isLocalCustomerOnePaidFlyerCampaign(currentRecord)
+  ) {
+    return { envelope: currentEnvelope, user: workingUser };
+  }
+
+  if (
+    currentEnvelope &&
+    currentRecord &&
+    isLocalCustomerOnePaidFlyerCampaign(currentRecord)
+  ) {
+    const needsIntake =
+      applyCustomerOneSubmittedIntake(currentRecord) !== currentRecord;
     const needsLink =
       workingUser.currentCampaignId !== currentRecord.campaignId ||
       !workingUser.clientCampaignIds?.includes(currentRecord.campaignId);
@@ -78,10 +117,16 @@ export async function resolveCustomerCurrentCampaign(user: StudioUser): Promise<
     return { envelope: currentEnvelope, user: workingUser };
   }
 
-  const envelopes = await listCampaignEnvelopes();
   const paid = pickLocalCustomerOnePaidFlyerCampaign(envelopes, workingUser.id);
   if (paid && shouldRedirectUnpaidCurrentToPaidSibling(currentRecord, paid.record)) {
     return attachPaidEnvelopeToClient(workingUser, paid);
+  }
+
+  if (paid && shouldBindOwnedPaidWhenCurrentMissing(currentRecord, paid.record)) {
+    return {
+      envelope: paid,
+      user: sessionUserWithCampaign(workingUser, paid.campaignId),
+    };
   }
 
   return { envelope: currentEnvelope, user: workingUser };

@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 
+import LocalVisualSystemInspect from "@/components/dev/LocalVisualSystemInspect";
 import LocalTestFixturePageActions from "@/components/studio-board/LocalTestFixturePageActions";
 import StudioMobileLoungeShell from "@/components/shared/StudioMobileLoungeShell";
 import { isLocalAuthFixtureAvailable } from "@/lib/auth/local-auth-fixture-gate";
@@ -9,7 +11,7 @@ import {
 } from "@/lib/local-test-fixtures-copy";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
-import "../mobile-route-fixes.css";
+import "../studio-customer-last-paint.css";
 
 export const metadata = {
   title: "Studio test file",
@@ -44,6 +46,9 @@ export default function LocalTestFixturesPage() {
               height={240}
             />
             <LocalTestFixturePageActions />
+            <Suspense fallback={null}>
+              <LocalVisualSystemInspect />
+            </Suspense>
           </section>
         </div>
       </div>

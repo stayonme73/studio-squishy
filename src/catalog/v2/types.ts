@@ -67,6 +67,8 @@ export type CatalogV2DraftOnlySkuId =
   | "v2-rtu-sms-kit"
   | "v2-rtu-voice"
   | "v2-rtu-short-video"
+  | "v2-rtu-short-form-video-edit"
+  | "v2-rtu-clip-repurposing"
   | "v2-rtu-business-card"
   | "v2-addon-post-publish";
 

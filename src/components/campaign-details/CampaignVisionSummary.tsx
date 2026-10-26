@@ -14,7 +14,7 @@ export default function CampaignVisionSummary({ sections, useRecordEmptyCopy = f
   const emptyAnswer = useRecordEmptyCopy ? RECORD_EMPTY_ANSWER : review.emptyAnswer;
 
   if (sections.length === 0) {
-    return <p className="cd-vision__empty">{emptyAnswer}</p>;
+    return null;
   }
 
   return (

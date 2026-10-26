@@ -735,7 +735,7 @@
   .sb--v4 .sb-nav {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.25rem;
+    gap: 0.4rem;
     width: 100%;
     flex: 1 1 100%;
   }
@@ -744,11 +744,11 @@
     width: auto;
     max-width: 100%;
     min-width: 0;
-    min-height: 0;
+    min-height: 3rem;
     height: auto;
     max-height: none;
-    padding: 0.36rem 0.5rem;
-    font-size: 0.8125rem;
+    padding: 0.7rem 0.78rem;
+    font-size: 0.9375rem;
     justify-self: start;
   }
 
@@ -770,14 +770,14 @@
     width: auto;
     max-width: 100%;
     min-width: 0;
-    min-height: 0;
+    min-height: 3rem;
     height: auto;
     max-height: none;
     margin: 0;
-    padding: 0.36rem 0.5rem;
+    padding: 0.7rem 0.78rem;
     appearance: none;
     -webkit-appearance: none;
-    font-size: 0.8125rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     letter-spacing: 0.02em;
     white-space: nowrap;
@@ -1110,23 +1110,23 @@
    * A page · B card · C subsection · D field · E value · F support · G action
    */
   [data-mobile-customer-spine] .sb.sb--v4 {
-    --mc-board-type-page: 1.5rem;
-    --mc-board-type-card: 0.875rem;
-    --mc-board-type-sub: 0.875rem;
-    --mc-board-type-field: 0.875rem;
-    --mc-board-type-value: 1rem;
-    --mc-board-type-support: 0.875rem;
-    --mc-board-type-action: 0.94rem;
+    --mc-board-type-page: var(--studio-type-page, 1.35rem);
+    --mc-board-type-card: var(--studio-type-label, 0.75rem);
+    --mc-board-type-sub: var(--studio-type-label, 0.75rem);
+    --mc-board-type-field: var(--studio-type-label, 0.75rem);
+    --mc-board-type-value: var(--studio-type-body, 1rem);
+    --mc-board-type-support: var(--studio-type-helper, 0.95rem);
+    --mc-board-type-action: var(--studio-type-button, 0.95rem);
   }
 
   /* A — PAGE TITLE */
   [data-mobile-customer-spine] .sb--v4 .sb-header-v3__title {
-    font-size: var(--mc-board-type-page, 1.5rem);
-    font-weight: 700;
-    letter-spacing: var(--mc-board-track-page, 0.12em);
-    line-height: 1.15;
-    text-transform: uppercase;
-    color: var(--mc-board-color-page, var(--mc-denim, #547c92));
+    font-size: var(--studio-type-page, 1.35rem);
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.25;
+    text-transform: none;
+    color: var(--mc-board-color-page, #ffffff);
   }
 
   [data-mobile-customer-spine] .sb--v4 .sb-header-v3__greeting,
@@ -1249,6 +1249,7 @@
   [data-mobile-customer-spine] .sb--v4 .sb-project-communication__lead,
   [data-mobile-customer-spine] .sb--v4 .sb-project-communication__meta,
   [data-mobile-customer-spine] .sb--v4 .sb-project-communication__count,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__eligibility,
   [data-mobile-customer-spine] .sb--v4 .sb-refund-request__lead,
   [data-mobile-customer-spine] .sb--v4 .sb-refund-request__policy,
   [data-mobile-customer-spine] .sb--v4 .sb-refund-request__optional,
@@ -1404,12 +1405,13 @@
   /*
    * Samsung owner pass — Sign out, greeting, Current Project rhythm,
    * supporting coral (not Denim/Eucalyptus/yellow).
+   * Nav chips keep the accepted alignment; tap targets are 48px for fingers.
    */
   [data-mobile-customer-spine] .sb--v4 .sb-nav {
     display: grid;
     grid-template-columns: 1fr 1fr;
     justify-items: start;
-    gap: 0.25rem;
+    gap: 0.4rem;
     width: 100%;
   }
 
@@ -1417,15 +1419,15 @@
   [data-mobile-customer-spine] .sb--v4 .sb-nav .sb-sign-out {
     display: inline-flex !important;
     align-items: center;
-    gap: 0.48rem;
+    gap: 0.55rem;
     width: auto;
     max-width: 100%;
     min-width: 0;
-    min-height: 0;
+    min-height: 3rem;
     height: auto;
     max-height: none;
-    padding: 0.36rem 0.5rem !important;
-    font-size: 0.8125rem !important;
+    padding: 0.7rem 0.78rem !important;
+    font-size: 0.9375rem !important;
     line-height: 1.2;
     box-sizing: border-box;
     justify-self: start !important;
@@ -1435,8 +1437,8 @@
   }
 
   [data-mobile-customer-spine] .sb--v4 .sb-nav__icon {
-    width: 1.05rem;
-    height: 1.05rem;
+    width: 1.28rem;
+    height: 1.28rem;
   }
 
   [data-mobile-customer-spine] .sb--v4 .sb-nav__item--active,
@@ -1458,8 +1460,8 @@
     place-self: start !important;
     width: var(--sb-help-nav-width, max-content) !important;
     min-width: var(--sb-help-nav-width, max-content) !important;
-    min-height: 2.5rem !important;
-    padding: 0.36rem 0.5rem !important;
+    min-height: 3rem !important;
+    padding: 0.7rem 0.78rem !important;
     border-radius: 8px;
     opacity: 1;
   }
@@ -1505,10 +1507,27 @@
     padding: 0;
   }
 
+  [data-mobile-customer-spine] .sb--v4 .sb-card__tab,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__eyebrow,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance .sb-card__tab,
+  [data-mobile-customer-spine] .sb--v4 .sb-card--materials .sb-card__tab,
   [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__row dt,
-  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__label {
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__intent-legend,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__field-label,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__status,
+  [data-mobile-customer-spine] .sb--v4 .sb-account__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__status-heading,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__heading,
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__heading,
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action__status,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-panel__timeline-heading,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-panel__pipeline-summary,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__rights-title {
     padding-bottom: 0.28rem;
-    border-bottom: 2px solid color-mix(in srgb, #f7c900 72%, transparent);
+    border-bottom: 1px solid #c8b59b !important;
   }
 
   [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__notes {
@@ -1573,5 +1592,432 @@
     min-width: 100%;
     min-height: 100%;
     transform: none;
+  }
+
+  /* Phone Review Room — proof + three actions first; Studio machinery collapsed. */
+  [data-mobile-customer-spine] .fs-room {
+    overflow: visible;
+  }
+
+  [data-mobile-customer-spine] .fs-page--review,
+  [data-mobile-customer-spine] .fs-review--workspace {
+    padding-bottom: calc(var(--studio-review-mobile-bottom, 3.25rem) + 2.75rem);
+    scrollbar-width: none;
+  }
+
+  [data-mobile-customer-spine]:has(.fs-page--review),
+  main.journey-shell:has(.fs-page--review) {
+    scrollbar-width: none;
+  }
+
+  [data-mobile-customer-spine]:has(.fs-page--review)::-webkit-scrollbar,
+  main.journey-shell:has(.fs-page--review)::-webkit-scrollbar {
+    display: none;
+  }
+
+  [data-mobile-customer-spine] .rd-shell {
+    scrollbar-width: none;
+  }
+
+  [data-mobile-customer-spine] .fs-page--review::-webkit-scrollbar,
+  [data-mobile-customer-spine] .fs-review--workspace::-webkit-scrollbar,
+  [data-mobile-customer-spine] .rd-shell::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Keep Help Center in the room nav only — hide the duplicate topbar link. */
+  [data-mobile-customer-spine] .fs-page--review .utility-topbar__help,
+  [data-mobile-customer-spine] .fs-page--review .utility-topbar__end {
+    display: none !important;
+  }
+
+  [data-mobile-customer-spine] .fs-page--review .utility-topbar {
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  /*
+   * Mirror phone Studio Board: light Lounge glass on chrome, jean-blue
+   * primary. Same 46% ivory/cream frost as Board tiles — not brown slabs.
+   */
+  [data-mobile-customer-spine] .fs-page--review .utility-topbar__back,
+  [data-mobile-customer-spine] .fs-page--review .utility-subnav__link,
+  [data-mobile-customer-spine] .fs-phone-dock__btn--change,
+  [data-mobile-customer-spine] .fs-phone-dock__btn--ask,
+  [data-mobile-customer-spine] .fs-phone-dock__tools .fs-feedback-panel__btn,
+  [data-mobile-customer-spine] .fs-phone-dock__erase,
+  [data-mobile-customer-spine] .fs-phone-dock__send,
+  [data-mobile-customer-spine] .fs-phone-dock__field,
+  [data-mobile-customer-spine] .fs-phone-dock__status,
+  [data-mobile-customer-spine] .fs-review__phone-glance,
+  [data-mobile-customer-spine] .fs-review__phone-fold,
+  [data-mobile-customer-spine] .fs-proof-refs--phone {
+    position: relative;
+    isolation: auto;
+    overflow: visible;
+    mix-blend-mode: normal;
+    background: color-mix(
+      in srgb,
+      color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%,
+      transparent
+    ) !important;
+    background-color: color-mix(
+      in srgb,
+      color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%,
+      transparent
+    ) !important;
+    background-image: none !important;
+    backdrop-filter: blur(14px) saturate(1.04) brightness(1.1) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1) !important;
+    filter: none;
+    color: #2e2b28;
+    border: 1px solid color-mix(in srgb, #547c92 32%, #f7f4ee);
+    border-radius: 8px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  [data-mobile-customer-spine] .fs-page--review .utility-topbar__back {
+    color: #547c92;
+  }
+
+  /*
+   * Approve must match Let’s Get Started *as Samsung paints it*, not
+   * localhost `--mc-denim` (#547c92). Owner Galaxy photo 2026-09-12:
+   * LGS fill samples rgb(5, 23, 47) / #05172f. Review stays a dark lounge
+   * so Samsung does not auto-dark the same way; paint the navy directly.
+   */
+  [data-mobile-customer-spine] .fs-phone-dock__btn--approve,
+  [data-mobile-customer-spine] .fs-phone-dock__btn--approve.lobby-entry-film__cta,
+  [data-mobile-customer-spine] .fs-phone-dock__btn--approve.lobby-entry-film__cta:hover,
+  [data-mobile-customer-spine] .fs-phone-dock__btn--approve.lobby-entry-film__cta:focus-visible,
+  [data-mobile-customer-spine] .fs-phone-dock__btn--approve.lobby-entry-film__cta:active,
+  [data-mobile-customer-spine] .fs-phone-dock__btn--approve[aria-disabled="true"] {
+    isolation: isolate;
+    mix-blend-mode: normal;
+    appearance: none;
+    -webkit-appearance: none;
+    filter: none !important;
+    opacity: 1 !important;
+    width: 100%;
+    margin-top: 0;
+    justify-content: center;
+    background: #05172f !important;
+    background-color: #05172f !important;
+    background-image: none !important;
+    border: 1px solid #05172f !important;
+    color: var(--mc-ivory, #f7f4ee) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    font-weight: 800;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+    text-transform: none;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock__btn--change,
+  [data-mobile-customer-spine] .fs-phone-dock__btn--ask,
+  [data-mobile-customer-spine] .fs-phone-dock__btn--selected {
+    color: #547c92 !important;
+    font-weight: 800;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+  }
+
+  [data-mobile-customer-spine] .fs-page--review .utility-topbar__back {
+    min-height: 2.75rem;
+    padding: 0.55rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    border-radius: 8px;
+  }
+
+  [data-mobile-customer-spine] .fs-page--review .utility-subnav__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  [data-mobile-customer-spine] .fs-page--review .utility-subnav__link {
+    min-height: 3.25rem;
+    min-width: 0;
+    width: 100%;
+    padding: 0.45rem 0.3rem 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.2;
+    border-radius: 8px;
+  }
+
+  [data-mobile-customer-spine] .fs-page--review .utility-subnav__icon,
+  [data-mobile-customer-spine] .fs-page--review .utility-subnav__label,
+  [data-mobile-customer-spine] .fs-review__phone-fold-summary,
+  [data-mobile-customer-spine] .fs-proof-refs--phone .fs-proof-refs__summary {
+    position: relative;
+    z-index: 1;
+  }
+
+  [data-mobile-customer-spine] .fs-page--review .utility-subnav__icon {
+    width: 1.45rem;
+    height: 1.45rem;
+    color: #547c92;
+  }
+
+  [data-mobile-customer-spine] .fs-page--review .utility-subnav__label {
+    color: inherit;
+  }
+
+  [data-mobile-customer-spine] .fs-page--review .utility-subnav__link--active,
+  [data-mobile-customer-spine] .fs-page--review .utility-subnav__link[href="/studio-board"] {
+    background: color-mix(in srgb, #547c92 40%, #f7f4ee) !important;
+    background-color: #b6c4c9 !important;
+    border: 1px solid #f7c900 !important;
+    color: #f7c900 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  [data-mobile-customer-spine] .fs-page--review .utility-subnav__link--active .utility-subnav__icon,
+  [data-mobile-customer-spine] .fs-page--review .utility-subnav__link--active .utility-subnav__label,
+  [data-mobile-customer-spine] .fs-page--review .utility-subnav__link[href="/studio-board"] .utility-subnav__icon,
+  [data-mobile-customer-spine] .fs-page--review .utility-subnav__link[href="/studio-board"] .utility-subnav__label {
+    color: #f7c900 !important;
+  }
+
+  [data-mobile-customer-spine] .fs-page--review .utility-subnav__link--active::after {
+    background: #f7c900;
+    width: 1.35rem;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock,
+  [data-mobile-customer-spine] .fs-review__phone-glance,
+  [data-mobile-customer-spine] .fs-review__phone-fold,
+  [data-mobile-customer-spine] .fs-preview__phone-meta {
+    display: block;
+  }
+
+  [data-mobile-customer-spine] .fs-proof-refs--phone {
+    display: block;
+  }
+
+  [data-mobile-customer-spine] .fs-proof-refs--desktop,
+  [data-mobile-customer-spine] .fs-review__choose--job,
+  [data-mobile-customer-spine] .fs-review__desktop-rail,
+  [data-mobile-customer-spine] .fs-feedback-panel--job,
+  [data-mobile-customer-spine] .fs-preview__summary,
+  [data-mobile-customer-spine] .fs-preview__eyebrow--desktop,
+  [data-mobile-customer-spine] .fs-preview__section-head,
+  [data-mobile-customer-spine] .fs-mock__meta {
+    display: none !important;
+  }
+
+  [data-mobile-customer-spine] .fs-review__ask:not(.fs-review__ask--open) {
+    display: none;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock__actions {
+    gap: 0.55rem;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock__tools {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock__btn,
+  [data-mobile-customer-spine] .fs-phone-dock__send,
+  [data-mobile-customer-spine] .fs-phone-dock__tools .fs-feedback-panel__btn {
+    min-height: 3rem;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock__btn,
+  [data-mobile-customer-spine] .fs-phone-dock__send {
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    border-radius: 8px;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock__send,
+  [data-mobile-customer-spine] .fs-phone-dock__send.utility-btn,
+  [data-mobile-customer-spine] .fs-phone-dock__send.utility-btn--primary,
+  [data-mobile-customer-spine] .fs-phone-dock__send.utility-btn--primary:hover,
+  [data-mobile-customer-spine] .fs-phone-dock__send.utility-btn--primary:focus-visible,
+  [data-mobile-customer-spine] .fs-phone-dock__send.utility-btn--primary:active,
+  [data-mobile-customer-spine] .fs-phone-dock__send:disabled,
+  [data-mobile-customer-spine] .fs-phone-dock__send.utility-btn--primary:disabled {
+    isolation: auto;
+    mix-blend-mode: normal;
+    filter: none;
+    opacity: 1 !important;
+    color: var(--mc-board-color-card, var(--mc-eucalyptus, #456b5a)) !important;
+    font-weight: 800;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock__send::before {
+    content: none;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock__btn--selected {
+    border-color: #547c92 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  [data-mobile-customer-spine] .fs-page--review .fs-preview__title {
+    color: var(--mc-board-color-card, var(--mc-eucalyptus, #456b5a)) !important;
+  }
+
+  [data-mobile-customer-spine] .fs-proof-refs--phone .fs-proof-refs__summary {
+    background: transparent !important;
+    color: var(--mc-board-color-card, var(--mc-eucalyptus, #456b5a)) !important;
+  }
+
+  [data-mobile-customer-spine] .fs-review__phone-glance {
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.95rem;
+  }
+
+  [data-mobile-customer-spine] .fs-review__phone-fold {
+    padding: 0;
+  }
+
+  [data-mobile-customer-spine] .fs-review__phone-fold-summary,
+  [data-mobile-customer-spine] .fs-proof-refs--phone .fs-proof-refs__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 3rem;
+    padding: 0.7rem 0.9rem;
+    font-size: 1rem;
+    font-weight: 700;
+    list-style: none;
+  }
+
+  [data-mobile-customer-spine] .fs-review__phone-fold-summary {
+    color: #d94e2b !important;
+  }
+
+  [data-mobile-customer-spine] .fs-proof-refs--phone .fs-proof-refs__summary {
+    color: var(--mc-board-color-card, var(--mc-eucalyptus, #456b5a)) !important;
+  }
+
+  [data-mobile-customer-spine] .fs-review__phone-fold-summary::-webkit-details-marker,
+  [data-mobile-customer-spine] .fs-proof-refs--phone .fs-proof-refs__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  [data-mobile-customer-spine] .fs-review__phone-fold-summary::after {
+    content: "▸";
+    flex-shrink: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+    color: #d94e2b;
+  }
+
+  [data-mobile-customer-spine] .fs-proof-refs--phone .fs-proof-refs__summary::after {
+    content: "▸";
+    flex-shrink: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+    color: var(--mc-board-color-card, var(--mc-eucalyptus, #456b5a));
+  }
+
+  [data-mobile-customer-spine] .fs-review__phone-fold[open] .fs-review__phone-fold-summary::after,
+  [data-mobile-customer-spine] .fs-proof-refs--phone[open] .fs-proof-refs__summary::after {
+    content: "▾";
+  }
+
+  [data-mobile-customer-spine] .fs-review__phone-fold-body {
+    padding: 0 0.9rem 0.85rem;
+  }
+
+  [data-mobile-customer-spine] .rd-shell .rd-shell__jobs-heading {
+    color: var(--mc-eucalyptus, #456b5a);
+  }
+
+  [data-mobile-customer-spine] .rd-shell .rd-job-list__item {
+    background: color-mix(
+      in srgb,
+      color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%,
+      transparent
+    ) !important;
+    border: 1px solid color-mix(in srgb, #547c92 32%, #f7f4ee);
+    color: #2e2b28;
+    backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+    -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  }
+
+  [data-mobile-customer-spine] .fs-review-proof__image,
+  [data-mobile-customer-spine] .fs-review-proof__video {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  [data-mobile-customer-spine] .fs-highlighter,
+  [data-mobile-customer-spine] .fs-phone-dock__tools [data-highlight-tool] {
+    display: none !important;
+  }
+
+  [data-mobile-customer-spine] .fs-review-proof .fs-draw-layer {
+    z-index: 4;
+  }
+
+  /* Phone stores typed change text as an internal sticky. Do not paint that
+     card on the proof — it sits under the flyer (z-index 1) and reads as
+     hidden instructions behind the frame. */
+  [data-mobile-customer-spine] .fs-preview__section-body > .fs-sticky,
+  [data-mobile-customer-spine] .fs-review-proof .fs-sticky,
+  [data-mobile-customer-spine] .fs-sticky--pending,
+  [data-mobile-customer-spine] .fs-sticky--phone {
+    display: none !important;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock__field {
+    color: #2e2b28 !important;
+    font-weight: 700;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock__field::placeholder {
+    color: color-mix(in srgb, #2e2b28 58%, #f7f4ee) !important;
+    opacity: 1;
+    font-weight: 600;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock__field:focus,
+  [data-mobile-customer-spine] .fs-phone-dock__field--typed {
+    outline: 2px solid #547c92;
+    outline-offset: 2px;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock__erase,
+  [data-mobile-customer-spine] .fs-phone-dock__erase.utility-btn,
+  [data-mobile-customer-spine] .fs-phone-dock__erase.fs-feedback-panel__btn {
+    width: 100%;
+    min-height: 2.5rem;
+    margin-top: 0.45rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: #547c92 !important;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock__tools .fs-feedback-panel__btn {
+    color: #547c92 !important;
+    font-weight: 700;
+  }
+
+  [data-mobile-customer-spine] .fs-phone-dock__optional-label {
+    color: #547c92;
   }
 }

@@ -4,6 +4,11 @@ import {
 } from "@/config/studio-approved-delivery-v1";
 import type { PurchasedJobRecord } from "@/lib/job-control/types";
 
+import {
+  approvalIncludesContentSha256,
+  sameContentSha256Set,
+} from "@/lib/studio-review-revision/hash";
+
 import { qaPinMatchesCustomerApproval, setsEqual, sortedUnique } from "./pin";
 import type {
   DeliveryCandidateRef,
@@ -123,7 +128,7 @@ export function evaluateDeliveryEligibility(input: {
         push("superseded", studioApprovedDeliveryV1.staffCopy.superseded);
       } else if ((qa.workVersionId ?? null) !== (approval.workVersionId ?? null)) {
         push("version_mismatch", studioApprovedDeliveryV1.staffCopy.versionMismatch);
-      } else if (!setsEqual(qa.contentSha256s, approval.contentSha256s)) {
+      } else if (!sameContentSha256Set(qa.contentSha256s, approval.contentSha256s)) {
         push("hash_mismatch", studioApprovedDeliveryV1.staffCopy.hashMismatch);
       } else if (!setsEqual(qa.artifactIds, approval.artifactIds)) {
         push("artifact_mismatch", studioApprovedDeliveryV1.staffCopy.artifactMismatch);
@@ -148,7 +153,7 @@ export function evaluateDeliveryEligibility(input: {
       }
       if (
         candidate.contentSha256s &&
-        !setsEqual(candidate.contentSha256s, approval.contentSha256s)
+        !sameContentSha256Set(candidate.contentSha256s, approval.contentSha256s)
       ) {
         push("hash_mismatch", studioApprovedDeliveryV1.staffCopy.hashMismatch);
       }
@@ -162,8 +167,7 @@ export function evaluateDeliveryEligibility(input: {
 
       if (approval.contentSha256s.length > 0) {
         const unbound = files.filter((file) => {
-          const hash = file.contentSha256?.trim();
-          return !hash || !approval.contentSha256s.includes(hash);
+          return !approvalIncludesContentSha256(approval.contentSha256s, file.contentSha256);
         });
         if (unbound.length > 0) {
           push(
@@ -173,7 +177,10 @@ export function evaluateDeliveryEligibility(input: {
               : studioApprovedDeliveryV1.staffCopy.multiDeliverableMismatch,
           );
         }
-        if (fileHashes.length > 0 && !fileHashes.every((hash) => approval.contentSha256s.includes(hash))) {
+        if (
+          fileHashes.length > 0 &&
+          !fileHashes.every((hash) => approvalIncludesContentSha256(approval.contentSha256s, hash))
+        ) {
           push("hash_mismatch", studioApprovedDeliveryV1.staffCopy.hashMismatch);
         }
       } else if (approval.workVersionId) {

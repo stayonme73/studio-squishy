@@ -139,6 +139,44 @@ describe("resolveDeliverablesView — Honest Final Files", () => {
     expect(view.finalDelivery?.jobs[0]?.files).toHaveLength(1);
   });
 
+  it("completion date uses file release, not a stale campaign updatedAt", () => {
+    const campaign = campaignWithPlan(["v2-rtu-flyer"], {
+      updatedAt: "2026-09-15T18:31:35.766Z",
+    });
+    const view = resolveDeliverablesView(campaign, {
+      finalDelivery: delivery({
+        allJobsDelivered: true,
+        hasDeliveredJobs: true,
+        jobs: [
+          jobView({
+            jobId: "job-1",
+            serviceName: "Flyer",
+            spineStatus: "ready_for_delivery",
+            deliveredAt: null,
+            completedDeliverables: ["Print-ready PDF"],
+            files: [
+              {
+                id: "f1",
+                deliverableLabel: "Print-ready PDF",
+                fileName: "flyer-version-16.pdf",
+                fileType: "application/pdf",
+                url: "/files/pdf",
+                useInstructions: null,
+                addedAt: "2026-09-16T12:01:51.987Z",
+                versionLabel: "Version 16",
+                releasedAt: "2026-09-17T01:26:39.529Z",
+              },
+            ],
+          }),
+        ],
+      }),
+    });
+
+    expect(view.state).toBe("files-ready");
+    expect(view.completionDate).not.toBe("September 15, 2026");
+    expect(view.completionDate).toMatch(/September 1[67], 2026/);
+  });
+
   it("partial delivery uses truthful in-progress language when some jobs are not delivered", () => {
     const campaign = campaignWithPlan(["sm-001", "em-001"], {
       campaignStatus: "BUILDING_CONCEPTS",

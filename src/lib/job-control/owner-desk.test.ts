@@ -38,7 +38,7 @@ function refundInteraction(
       requestedOutcome: "Full refund",
       productionStarted: false,
       receivedConceptsOrFiles: false,
-      policyStatusLabel: "May be eligible per 14-day waiting-on-client policy — Owner approval required.",
+      policyStatusLabel: "Refund may be approved — production has not started for this job. Owner approval required.",
       timelineFacts: "Waiting on client since Jun 20, 2026.",
       recommendedNextAction: "Review client reason and timeline, then approve or deny — do not auto-refund.",
       submittedAt: NOW,

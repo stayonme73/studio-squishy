@@ -3,6 +3,7 @@
  * Mechanism only — does not invent prepress requirements.
  */
 
+import { BUSINESS_CARD_HONEST_PROMISED_OUTPUT } from "@/config/studio-business-card-light-harden-v1";
 import {
   BUSINESS_CARD_CANVAS,
   DESIGN_RENDERER_BUSINESS_CARD_SKU,
@@ -11,13 +12,19 @@ import {
 export const BUSINESS_CARD_PROOF_CONTRACT = {
   skuId: DESIGN_RENDERER_BUSINESS_CARD_SKU,
   name: "Make Me a Business Card",
-  promisedOutput:
-    "One double-sided business card design — design only; one person or version; one agreed size. Print-ready PDF + digital PNG or JPG preview. Printing/shipping excluded.",
+  promisedOutput: BUSINESS_CARD_HONEST_PROMISED_OUTPUT,
+  wholeCardVersionsTogether: true,
+  setIncompleteUnlessBothPass: true,
+  oneCardRevisionNotTwoSideRedesigns: true,
+  customerPrints: true,
+  certifiedPhysicalInches: false,
+  certified300DpiPrint: false,
   sidesRequired: ["front", "back"] as const,
   formatExportRequirements: [
-    "Final flattened digital export (PNG and/or PDF as appropriate)",
-    "Editable Canva source files are not included unless separately authorized",
-    "Business card design only (print excluded)",
+    "Front digital PNG and back digital PNG — 1536×1024 each",
+    "PDF you can print yourself (digital CERT plate — not a certified 3.5×2 or 300 DPI print file)",
+    "Editable source files are not included unless separately authorized",
+    "Double-sided digital card — customer prints",
   ] as const,
   /**
    * CERT-DESIGN plate used as the agreed Machine canvas for this proof.
@@ -25,7 +32,7 @@ export const BUSINESS_CARD_PROOF_CONTRACT = {
    */
   canvas: BUSINESS_CARD_CANVAS,
   canvasSemantics:
-    "1536×1024 landscape is the authoritative CERT-DESIGN preview/PDF plate for this SKU in-repo. Catalog promises one agreed size without fixed inches. This proof locks that CERT plate only — it does not certify physical trim size, bleed, or press color.",
+    "HARDEN #7 LIGHT 2026-09-24: 1536×1024 landscape is the sold digital CERT plate for both sides. Not a certified 3.5×2, 300 DPI, bleed, or CMYK file.",
   dimensionTolerancePx: 40,
   requiredDeliverableFormats: ["png", "pdf"] as const,
   /**
@@ -38,7 +45,7 @@ export const BUSINESS_CARD_PROOF_CONTRACT = {
    * Not professional prepress (no bleed/trim/CMYK/DPI certification in this package).
    */
   printReadyMeans:
-    "Flattened multi-page PDF (front then back) at the agreed CERT plate pixels, suitable for customer-managed print — not Studio print fulfillment and not prepress certification.",
+    "Flattened multi-page PDF (front then back) at the digital CERT plate. Customer prints. Not Studio print fulfillment and not a certified 3.5×2 or 300 DPI file.",
   canvaRequired: false,
   makeRequired: false,
   ownerRoutineProduction: "NONE" as const,

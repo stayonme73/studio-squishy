@@ -1,15 +1,9 @@
-import { JOB_CONTROL_POLICY } from "@/config/job-control";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 
 import { blockingMaterialsForSku } from "./resolve-jobs";
 import type { PurchasedJobRecord } from "./types";
 
-export type WaitingOnClientReminderStatus =
-  | "none"
-  | "reminder_due"
-  | "move_to_tray_due"
-  | "refund_eligible";
-
+/** `waitingSince` is operational history only — never a reminder or refund clock. */
 export type WaitingOnClientTrayItem = {
   jobId: string;
   campaignId: string;
@@ -17,43 +11,12 @@ export type WaitingOnClientTrayItem = {
   serviceName: string;
   missingItems: readonly string[];
   requestedAt: string;
-  reminderStatus: WaitingOnClientReminderStatus;
   lastClientResponseAt: string | null;
   returnLane: PurchasedJobRecord["productionLane"];
   waitingSince: string;
 };
 
-function hoursSince(iso: string, nowMs: number): number {
-  const ms = new Date(iso).getTime();
-  if (Number.isNaN(ms)) return 0;
-  return (nowMs - ms) / (60 * 60 * 1000);
-}
-
-function daysSince(iso: string, nowMs: number): number {
-  return hoursSince(iso, nowMs) / 24;
-}
-
-export function resolveWaitingOnClientReminderStatus(
-  waitingSince: string,
-  lastClientResponseAt: string | null,
-  nowMs = Date.now(),
-): WaitingOnClientReminderStatus {
-  const anchor = lastClientResponseAt ?? waitingSince;
-  const hours = hoursSince(anchor, nowMs);
-  const days = daysSince(anchor, nowMs);
-
-  if (days >= JOB_CONTROL_POLICY.refundEligibleDays) {
-    return "refund_eligible";
-  }
-  if (hours >= JOB_CONTROL_POLICY.moveToWaitingOnClientHours) {
-    return "move_to_tray_due";
-  }
-  if (hours >= JOB_CONTROL_POLICY.reminderDueHours) {
-    return "reminder_due";
-  }
-  return "none";
-}
-
+/** A job waits on the client as soon as required materials are missing. No threshold. */
 export function shouldMoveJobToWaitingOnClient(
   job: PurchasedJobRecord,
   materials: readonly CampaignMaterialItem[],
@@ -77,7 +40,7 @@ export function buildWaitingOnClientTrayItem(
   job: PurchasedJobRecord,
   campaignName: string,
   materials: readonly CampaignMaterialItem[],
-  nowMs = Date.now(),
+  _nowMs = Date.now(),
 ): WaitingOnClientTrayItem | null {
   if (job.spineStatus !== "waiting_on_client") return null;
 
@@ -98,11 +61,6 @@ export function buildWaitingOnClientTrayItem(
     serviceName: job.serviceName,
     missingItems,
     requestedAt,
-    reminderStatus: resolveWaitingOnClientReminderStatus(
-      requestedAt,
-      job.lastClientResponseAt ?? null,
-      nowMs,
-    ),
     lastClientResponseAt: job.lastClientResponseAt ?? null,
     returnLane: job.returnLane ?? job.productionLane,
     waitingSince: requestedAt,

@@ -2,6 +2,8 @@
  * Proof contract for v2-rtu-promotion-graphics — exactly two assets.
  */
 
+import { CAMPAIGN_GRAPHICS_HONEST_PROMISED_OUTPUT } from "@/config/studio-campaign-graphics-light-harden-v1";
+
 import {
   DESIGN_RENDERER_PROMO_SKU,
   PROMO_LANDSCAPE_PLATE,
@@ -13,6 +15,9 @@ import {
 
 export const PROMO_PROOF_CONTRACT = {
   skuId: DESIGN_RENDERER_PROMO_SKU,
+  name: "Make My Campaign Graphics",
+  promisedOutput: CAMPAIGN_GRAPHICS_HONEST_PROMISED_OUTPUT,
+  requiredDeliverableFormats: ["png"] as const,
   exactAssetCount: 2,
   captionsAllowed: false,
   squarePlateProvenThisPackage: {
@@ -30,13 +35,14 @@ export const PROMO_PROOF_CONTRACT = {
     widthPx: PROMO_LANDSCAPE_PLATE.widthPx,
     heightPx: PROMO_LANDSCAPE_PLATE.heightPx,
   },
+  landscapeSold: false,
   dimensionTolerancePx: 40,
   wholeSetVersionsTogether: true,
   setIncompleteUnlessBothPass: true,
   /** Closed by STUDIO-OPERATING-DESIGN-PROMOTION-GRAPHICS-INTAKE-TRUTH-1. */
   liveIntakePerAssetPurposeResolved: true,
   note:
-    "Live intake records per-graphic authorizedPurpose + agreedPlate (graphic A/B). Dispatch hook still not authorized until Owner opens that package.",
+    "HARDEN #4 LIGHT 2026-09-24: sold set is square + portrait digital CERT plates. Landscape stays fail-closed and is not sold. One campaign-set renderer. Owner does not finish the set.",
 } as const;
 
 export function isDesignRendererPromoSku(

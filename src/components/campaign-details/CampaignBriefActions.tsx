@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
 import { hasCampaignCreativeBrief } from "@/lib/campaign-brief-source";
-import { draftRoomEditHref, isIntakeEditable } from "@/lib/intake-edit";
+import { draftRoomEditHref, isIntakeEditableForCustomer } from "@/lib/intake-edit";
 
 const { campaignBrief, routes } = studioBoard;
 
@@ -21,6 +21,8 @@ type Props = {
    * control secondary so Next Action remains the unmistakable Board primary.
    */
   prominent?: boolean;
+  /** Live customer status overlay — locks pre-production hint after production starts. */
+  currentStatusLabel?: string | null;
 };
 
 /** View / edit campaign brief — intake editable until concepting begins. */
@@ -31,10 +33,11 @@ export default function CampaignBriefActions({
   className = "",
   layout = "row",
   prominent = false,
+  currentStatusLabel = null,
 }: Props) {
   if (!campaign || !hasCampaignCreativeBrief(campaign)) return null;
 
-  const editable = isIntakeEditable(campaign.campaignStatus);
+  const editable = isIntakeEditableForCustomer(campaign.campaignStatus, currentStatusLabel);
   const editHref = draftRoomEditHref(campaign.packageId, campaign);
   const viewButtonClass = prominent
     ? "utility-btn utility-btn--primary campaign-brief-actions__view"

@@ -157,6 +157,8 @@ export async function presentFlyerReviewProof(input: {
   pdfContentSha256?: string;
   renderVersion: number;
   artifactId: string;
+  /** Freeze / pin: re-present so this identity is current even if already in registry. */
+  forceRepresent?: boolean;
 }): Promise<{ envelope: ServerTasksEnvelope; presented: boolean }> {
   const job = input.envelope.jobRecords?.find(
     (entry) => entry.skuId === DESIGN_RENDERER_PROOF_SKU,
@@ -167,10 +169,14 @@ export async function presentFlyerReviewProof(input: {
   const pdfAbs = resolveAbsolutePath(input.pdfRelativePath);
   const pngReady = Boolean(pngAbs);
   const pdfReady = Boolean(pdfAbs && input.pdfContentSha256);
-  const pngPresented = reviewProofAlreadyPresented(job, input.pngContentSha256);
-  const pdfPresented = input.pdfContentSha256
-    ? registryHasHash(job, "internal_draft", input.pdfContentSha256)
-    : true;
+  const pngPresented =
+    !input.forceRepresent &&
+    reviewProofAlreadyPresented(job, input.pngContentSha256);
+  const pdfPresented =
+    !input.forceRepresent &&
+    (input.pdfContentSha256
+      ? registryHasHash(job, "internal_draft", input.pdfContentSha256)
+      : true);
   if (pngPresented && pdfPresented) {
     return { envelope: input.envelope, presented: false };
   }
@@ -231,7 +237,9 @@ export async function presentFlyerReviewProof(input: {
       visibility: "internal_only",
       status: "draft",
       deliverableKey: pdfDef?.key ?? "print_ready_pdf",
-      deliverableLabel: pdfDef?.label ?? "Print-ready PDF",
+      deliverableLabel:
+        pdfDef?.label ??
+        "PDF you can print yourself (digital CERT plate — not a certified 300 DPI print file)",
       idPrefix: "print-export",
       occurredAt,
     });

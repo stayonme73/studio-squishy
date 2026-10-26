@@ -48,13 +48,14 @@ describe("local test fixture surfaces", () => {
     expect(control).not.toContain("NEXT_PUBLIC_");
   });
 
-  it("Studio Board page gates the control from the local-only helper", () => {
+  it("hides the fixture control on the normal customer Board", () => {
     const source = readFileSync(
       join(process.cwd(), "src/app/(studio)/studio-board/page.tsx"),
       "utf8",
     );
-    expect(source).toContain("isLocalAuthFixtureAvailable()");
-    expect(source).toContain("showLocalTestFixture={isLocalAuthFixtureAvailable()}");
+    expect(source).not.toContain("isLocalAuthFixtureAvailable");
+    expect(source).not.toContain("showLocalTestFixture");
+    expect(source).toContain("<StudioBoardScene />");
     expect(source).not.toContain("NEXT_PUBLIC_");
   });
 

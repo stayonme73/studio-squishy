@@ -12,7 +12,14 @@ import {
   sweepPaidActivationRecovery,
 } from "@/lib/studio-paid-activation-recovery";
 
+import { deliverQueuedCustomerEmails } from "@/lib/studio-lifecycle-email/campaign";
+
 import { applyPaidTruthToCampaignRecord } from "./apply-paid-record";
+import { skipsProductionForDisposableKitTest } from "./disposable-kit-test-isolation";
+import {
+  disposableTestCampaignBlocksCustomerEmails,
+  disposableTestOperatingChainBlocked,
+} from "./disposable-test-isolation-guards";
 import {
   normalizeCurrency,
   skuSetsMatch,
@@ -36,11 +43,18 @@ import type { PaymentConfirmationInput, PaymentConfirmationResult } from "./type
  * Immediate retries run here; durable pending_retry remains if still stuck.
  * A best-effort sweep then wakes other already-paid stranded projects.
  */
-async function activateAfterPayment(
+export async function activateAfterPayment(
   campaign: CampaignRecord,
+  env: NodeJS.ProcessEnv = process.env,
 ): Promise<CampaignRecord> {
+  if (
+    disposableTestOperatingChainBlocked(campaign, env) ||
+    skipsProductionForDisposableKitTest(campaign, env)
+  ) {
+    return campaign;
+  }
   const recovered = await recoverPaidOperatingChain(campaign);
-  if (process.env.NODE_ENV !== "test") {
+  if (env.NODE_ENV !== "test") {
     void sweepPaidActivationRecovery({
       excludeCampaignId: campaign.campaignId,
     }).catch(() => undefined);
@@ -64,7 +78,8 @@ async function finalizeConfirmSuccess(input: {
 
   if (
     ownership.claimRawToken &&
-    input.binding?.customerEmail?.trim()
+    input.binding?.customerEmail?.trim() &&
+    !disposableTestCampaignBlocksCustomerEmails(ownership.campaign)
   ) {
     // Best-effort recovery mail — payment truth already written.
     void sendProjectClaimRecoveryEmail({
@@ -75,12 +90,20 @@ async function finalizeConfirmSuccess(input: {
   }
 
   const activated = await activateAfterPayment(ownership.campaign);
+  if (!disposableTestCampaignBlocksCustomerEmails(activated)) {
+    queuePaidCustomerEmail(activated.campaignId);
+  }
   return {
     ok: true,
     campaign: activated,
     alreadyPaid: input.alreadyPaid,
     claimRawToken: ownership.claimRawToken,
   };
+}
+
+function queuePaidCustomerEmail(campaignId: string): void {
+  if (process.env.NODE_ENV === "test") return;
+  void deliverQueuedCustomerEmails(campaignId).catch(() => undefined);
 }
 
 function alreadyConfirmed(campaign: CampaignRecord): boolean {
@@ -96,7 +119,11 @@ function confirmPaidCycleLedger(
   binding: NonNullable<Awaited<ReturnType<typeof readCheckoutSessionBinding>>>,
 ):
   | { ok: true; campaign: CampaignRecord; alreadyPaid: boolean }
-  | { ok: false; error: PaymentConfirmationResult extends { ok: false } ? PaymentConfirmationResult["error"] : never; message: string } {
+  | {
+      ok: false;
+      error: Extract<PaymentConfirmationResult, { ok: false }>["error"];
+      message: string;
+    } {
   const paidCyclePurchaseId = binding.paidCyclePurchaseId;
   if (!paidCyclePurchaseId) {
     return {
@@ -507,6 +534,9 @@ export async function confirmPaymentFromProcessor(
     const activated = alreadyConfirmed(campaign)
       ? await activateAfterPayment(campaign)
       : campaign;
+    if (!disposableTestCampaignBlocksCustomerEmails(activated)) {
+      queuePaidCustomerEmail(activated.campaignId);
+    }
     return {
       ok: true,
       campaign: activated,

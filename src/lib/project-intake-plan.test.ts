@@ -6,6 +6,7 @@ import {
   PROJECT_INTAKE_SHARED_MATERIALS_KEY,
   projectIntakeServiceFieldKey,
   projectIntakeSharedContactKey,
+  readProjectIntakeAnswer,
 } from "@/lib/project-intake-plan";
 import {
   isProjectIntakePlanReady,
@@ -84,6 +85,8 @@ describe("project intake multi-service plan", () => {
 
     answers[projectIntakeServiceFieldKey("v2-rtu-business-card", "cardNameTitle")] =
       "Tagia · Owner";
+    answers[projectIntakeServiceFieldKey("v2-rtu-business-card", "cardSize")] =
+      "Digital CERT 1536×1024 — I print it myself";
 
     expect(isProjectIntakePlanReady(plan, answers)).toBe(true);
     expect(countCompletedProjectIntakeSections(plan, answers)).toBeGreaterThan(0);
@@ -110,5 +113,29 @@ describe("project intake multi-service plan", () => {
       "disclaimers",
     ]);
     expect(countProjectIntakeSections(plan)).toBe(6);
+  });
+
+  it("reads live prefixed Intake keys before bare production keys", () => {
+    expect(
+      readProjectIntakeAnswer(
+        { "v2-rtu-flyer:flyerPurpose": "Weekend sale" },
+        "flyerPurpose",
+        "v2-rtu-flyer",
+      ),
+    ).toBe("Weekend sale");
+    expect(
+      readProjectIntakeAnswer(
+        { [PROJECT_INTAKE_SHARED_MATERIALS_KEY]: "I do not have this yet" },
+        "materials",
+        "v2-rtu-flyer",
+      ),
+    ).toBe("I do not have this yet");
+    expect(
+      readProjectIntakeAnswer(
+        { [PROJECT_INTAKE_SHARED_MATERIALS_KEY]: "I do not have this yet" },
+        "flyerPurpose",
+        "v2-rtu-flyer",
+      ),
+    ).toBe("");
   });
 });

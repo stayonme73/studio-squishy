@@ -41,7 +41,12 @@ describe("promotion-graphics intake truth (INTAKE-TRUTH-1)", () => {
     const plateField = schema.fields.find(
       (f) => f.id === PROMO_INTAKE_FIELD_IDS.graphicAPlate,
     );
-    expect(plateField?.options).toEqual([...PROMO_INTAKE_PLATE_OPTIONS]);
+    expect(plateField?.options).toEqual(["Square 1024×1024 (social / feed)"]);
+    const plateB = schema.fields.find(
+      (f) => f.id === PROMO_INTAKE_FIELD_IDS.graphicBPlate,
+    );
+    expect(plateB?.options).toEqual(["Portrait 1024×1536 (print / tall)"]);
+    expect(PROMO_INTAKE_PLATE_OPTIONS).not.toContain("Landscape 1536×1024 (wide)");
 
     expect(schema.fields.length).toBeLessThan(12);
     expect(PROMO_PROOF_CONTRACT.liveIntakePerAssetPurposeResolved).toBe(true);
@@ -52,7 +57,7 @@ describe("promotion-graphics intake truth (INTAKE-TRUTH-1)", () => {
       [PROMO_INTAKE_FIELD_IDS.graphicAPurpose]: "Social",
       [PROMO_INTAKE_FIELD_IDS.graphicAPlate]:
         "Square 1024×1024 (social / feed)",
-      [PROMO_INTAKE_FIELD_IDS.graphicBPurpose]: "Print",
+      [PROMO_INTAKE_FIELD_IDS.graphicBPurpose]: "Email",
       [PROMO_INTAKE_FIELD_IDS.graphicBPlate]:
         "Portrait 1024×1536 (print / tall)",
     });
@@ -71,12 +76,12 @@ describe("promotion-graphics intake truth (INTAKE-TRUTH-1)", () => {
       widthPx: 1024,
       heightPx: 1536,
     });
-    expect(mapped.assets[1]!.authorizedPurpose).toContain("Print");
+    expect(mapped.assets[1]!.authorizedPurpose).toContain("Email");
     expect(hasPromoPerGraphicIntakeTruth({
       [PROMO_INTAKE_FIELD_IDS.graphicAPurpose]: "Social",
       [PROMO_INTAKE_FIELD_IDS.graphicAPlate]:
         "Square 1024×1024 (social / feed)",
-      [PROMO_INTAKE_FIELD_IDS.graphicBPurpose]: "Print",
+      [PROMO_INTAKE_FIELD_IDS.graphicBPurpose]: "Email",
       [PROMO_INTAKE_FIELD_IDS.graphicBPlate]:
         "Portrait 1024×1536 (print / tall)",
     })).toBe(true);
@@ -86,7 +91,7 @@ describe("promotion-graphics intake truth (INTAKE-TRUTH-1)", () => {
     const mapped = mapPromoAssetsFromIntakeAnswers({
       [PROMO_INTAKE_FIELD_IDS.graphicAPlate]:
         "Square 1024×1024 (social / feed)",
-      [PROMO_INTAKE_FIELD_IDS.graphicBPurpose]: "Print",
+      [PROMO_INTAKE_FIELD_IDS.graphicBPurpose]: "Email",
       [PROMO_INTAKE_FIELD_IDS.graphicBPlate]:
         "Portrait 1024×1536 (print / tall)",
     });
@@ -101,7 +106,7 @@ describe("promotion-graphics intake truth (INTAKE-TRUTH-1)", () => {
       [PROMO_INTAKE_FIELD_IDS.graphicAPurpose]: "Social",
       [PROMO_INTAKE_FIELD_IDS.graphicAPlate]:
         "Square 1024×1024 (social / feed)",
-      [PROMO_INTAKE_FIELD_IDS.graphicBPurpose]: "Print",
+      [PROMO_INTAKE_FIELD_IDS.graphicBPurpose]: "Email",
     });
     expect(mapped.ok).toBe(false);
     if (mapped.ok) return;
@@ -113,7 +118,7 @@ describe("promotion-graphics intake truth (INTAKE-TRUTH-1)", () => {
     const badPlate = mapPromoAssetsFromIntakeAnswers({
       [PROMO_INTAKE_FIELD_IDS.graphicAPurpose]: "Social",
       [PROMO_INTAKE_FIELD_IDS.graphicAPlate]: "Instagram Story 1080x1920",
-      [PROMO_INTAKE_FIELD_IDS.graphicBPurpose]: "Print",
+      [PROMO_INTAKE_FIELD_IDS.graphicBPurpose]: "Email",
       [PROMO_INTAKE_FIELD_IDS.graphicBPlate]:
         "Portrait 1024×1536 (print / tall)",
     });
@@ -124,7 +129,7 @@ describe("promotion-graphics intake truth (INTAKE-TRUTH-1)", () => {
       [PROMO_INTAKE_FIELD_IDS.graphicAPurpose]: "Billboard",
       [PROMO_INTAKE_FIELD_IDS.graphicAPlate]:
         "Square 1024×1024 (social / feed)",
-      [PROMO_INTAKE_FIELD_IDS.graphicBPurpose]: "Print",
+      [PROMO_INTAKE_FIELD_IDS.graphicBPurpose]: "Email",
       [PROMO_INTAKE_FIELD_IDS.graphicBPlate]:
         "Portrait 1024×1536 (print / tall)",
     });

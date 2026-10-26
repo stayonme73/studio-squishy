@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
+import ClientAccessGlass from "@/components/auth/ClientAccessGlass";
 import { safeReturnPath } from "@/lib/auth/safe-return-path";
 import {
   hasTrustedProjectContextForVerificationPending,
@@ -62,7 +63,8 @@ export default function VerifyEmailPendingScene() {
   }
 
   return (
-    <div className="utility-page">
+    <div className="utility-page utility-page--client-access">
+      <ClientAccessGlass />
       <div className="utility-shell utility-shell--narrow">
         <section className="utility-card" aria-labelledby="verify-pending-title">
           <p className="utility-eyebrow">Client Access</p>

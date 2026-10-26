@@ -4,7 +4,7 @@ import type { StudioPaymentStatus } from "@/config/studio-payment-v1";
 import type { PreAcceptancePaymentAuthorization } from "@/lib/studio-pre-acceptance/authorization-binding";
 import type { PreAcceptanceProjectFacts } from "@/lib/studio-pre-acceptance/types";
 
-export type CheckoutPurchaseKind = "studio_plan" | "paid_cycle";
+export type CheckoutPurchaseKind = "studio_plan" | "paid_cycle" | "condensed_offer";
 
 export type CheckoutSessionCreateRequest = {
   campaignId: string;
@@ -30,6 +30,25 @@ export type CheckoutSessionCreateRequest = {
    * Default `studio_plan` preserves sealed Payment Truth checkout behavior.
    */
   purchaseKind?: CheckoutPurchaseKind;
+  /**
+   * Current three-package launch offer. The server prices this from trusted
+   * offer truth. A client-posted price is not part of this payload.
+   */
+  condensedOffer?: {
+    packageId: string;
+    customerName?: string;
+    company?: string;
+    projectNeed?: string;
+    materialsNote?: string;
+    support?: Readonly<Record<string, string>>;
+    /** Studio Extras ids (0–2). Server re-validates against `studioExtrasV1`. */
+    extras?: readonly string[];
+    /**
+     * Facts the customer already entered on the current door.
+     * Stored once on the intake record. Not a second factory copy.
+     */
+    customerAnswers?: import("@/lib/studio-dispatch/clip-door-facts").ClipDoorCustomerAnswers;
+  };
   /**
    * ma-001 Promotion Pack — locked composition required when ma-001 is selected.
    * Server re-validates; client cannot invent a default pack.
@@ -109,7 +128,10 @@ export type CheckoutSessionCreateResult =
         | "rmj002_kit_lock_required"
         | "rmj008_kit_lock_required"
         | "bf001_package_lock_required"
-        | "rmj007_update_lock_required";
+        | "rmj007_update_lock_required"
+        | "source_audio_preflight_required"
+        | "studio_at_capacity"
+        | "condensed_offer_invalid";
       message: string;
     };
 
@@ -191,6 +213,12 @@ export type ReconcileCheckoutResult =
       campaign: CampaignRecord | null;
       checkoutSessionId: string;
       message: string;
+      /**
+       * One-time guest claim token for this checkout session.
+       * Null when the campaign is already owned or the token was already
+       * delivered to the paying browser. Never a substitute for campaign id.
+       */
+      claimRawToken?: string | null;
     }
   | {
       ok: false;

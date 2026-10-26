@@ -1,4 +1,4 @@
-import type { StudioFileStorageReference } from "@/lib/file-registry/types";
+import type { StudioFileSupabaseStorageReference } from "@/lib/file-registry/types";
 
 import { buildFileRoomPrivateObjectPath, storageVisibilityStateForCategory } from "./paths";
 import type {
@@ -78,7 +78,7 @@ export function createSupabasePrivateStorageRef(input: {
   metadata: FileRoomObjectMetadata;
   objectPath?: string;
   objectVersion?: string;
-}): StudioFileStorageReference {
+}): StudioFileSupabaseStorageReference {
   const objectPath = input.objectPath ?? buildFileRoomPrivateObjectPath(input.scope, input.metadata);
 
   return {

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { isLeakedMaterialsBoardError } from "@/lib/studio-board-client-copy";
 import type { CustomerJobStatusSummary } from "@/lib/project-record-status";
 
 export function useProjectJobStatus(campaignId: string | undefined) {
@@ -19,9 +20,14 @@ export function useProjectJobStatus(campaignId: string | undefined) {
     setError(null);
 
     try {
-      const response = await fetch(`/api/campaigns/${campaignId}/project-status`, {
-        credentials: "include",
-      });
+      const request = () =>
+        fetch(`/api/campaigns/${campaignId}/project-status`, {
+          credentials: "include",
+        });
+      let response = await request();
+      if (response.status === 401 || response.status === 403) {
+        response = await request();
+      }
       if (!response.ok) {
         const payload = (await response.json().catch(() => ({}))) as { error?: string };
         throw new Error(payload.error ?? `Failed to load project status (${response.status})`);
@@ -29,7 +35,8 @@ export function useProjectJobStatus(campaignId: string | undefined) {
       const payload = (await response.json()) as { jobs: readonly CustomerJobStatusSummary[] };
       setJobs(payload.jobs);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load project status");
+      const raw = err instanceof Error ? err.message : "Failed to load project status";
+      setError(isLeakedMaterialsBoardError(raw) ? null : raw);
       setJobs([]);
     } finally {
       setLoading(false);

@@ -12,7 +12,7 @@ export type RouteMapIntakeField = {
   placeholder?: string;
   /** Short instructional sentence under the label (complete sentence, not truncated). */
   hint?: string;
-  type: "text" | "textarea" | "select";
+  type: "text" | "textarea" | "select" | "checkbox";
   required?: boolean;
   options?: readonly string[];
   /**
@@ -582,6 +582,7 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
         label: "Exact text, offer details, dates, prices, location, phone, website, or QR destination",
         type: "textarea",
         required: true,
+        hint: "If this flyer is meant to get someone to call, visit, book, or buy, include the phone number, website, address, or email they should use. We will never invent one, so if you leave it out we will come back and ask before we produce the flyer. If the piece is only meant to inform and needs no contact details, say that here and we will design it that way.",
       },
       {
         id: "materials",
@@ -628,7 +629,8 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       },
       {
         id: "dietaryLabels",
-        label: "Dietary/allergen labels and required wording (you supply and verify)",
+        label:
+          "Dietary/allergen labels and required wording (you supply and verify — The Studio typesets this exactly and does not verify it)",
         type: "textarea",
         required: true,
       },
@@ -647,6 +649,7 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
         type: "select",
         required: true,
         options: ["Print", "Digital", "Both print and digital"],
+        hint: "Print means you print the digital file yourself. The Studio does not print or ship a physical menu.",
       },
       { id: "sizeNotes", label: "Required menu size, if known", type: "text" },
       {
@@ -701,7 +704,7 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
   "rtu-social-posts": {
     type: "rtu-social-posts",
     title: "Social Media Posts Intake",
-    lead: "Four post graphics for one platform — share campaign details and material references.",
+    lead: "Four square 1024×1024 post graphics for one platform — captions and a suggested posting order included. You post them.",
     clientResponsibilityNote: RTU_SOCIAL_CLIENT_NOTE,
     fields: [
       { id: "postsAbout", label: "What are these posts about?", type: "textarea", required: true },
@@ -716,7 +719,8 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
         label: "Which one platform are these for?",
         type: "select",
         required: true,
-        options: ["Facebook", "Instagram", "TikTok"],
+        options: ["Facebook", "Instagram", "LinkedIn"],
+        hint: "Square 1024×1024 only. TikTok vertical, Stories, Reels, and extra sizes are not sold.",
       },
       {
         id: "materials",
@@ -778,40 +782,32 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
         label: "Graphic 1 — intended use",
         type: "select",
         required: true,
-        options: ["Print", "Social", "Email", "In-store", "Other"],
+        options: ["Social", "Email", "In-store", "Other"],
         hint: "Choose how Graphic 1 will be used. The Studio will not invent a use for this graphic.",
       },
       {
         id: "graphicA_agreedPlate",
-        label: "Graphic 1 — agreed format",
+        label: "Graphic 1 — sold format",
         type: "select",
         required: true,
-        options: [
-          "Square 1024×1024 (social / feed)",
-          "Portrait 1024×1536 (print / tall)",
-          "Landscape 1536×1024 (wide)",
-        ],
-        hint: "Choose one agreed Studio format for Graphic 1. Only these formats are available for this service.",
+        options: ["Square 1024×1024 (social / feed)"],
+        hint: "Graphic 1 is the sold square plate. Landscape is not sold on this service.",
       },
       {
         id: "graphicB_authorizedPurpose",
         label: "Graphic 2 — intended use",
         type: "select",
         required: true,
-        options: ["Print", "Social", "Email", "In-store", "Other"],
+        options: ["Social", "Email", "In-store", "Other"],
         hint: "Choose how Graphic 2 will be used. The Studio will not invent a use for this graphic.",
       },
       {
         id: "graphicB_agreedPlate",
-        label: "Graphic 2 — agreed format",
+        label: "Graphic 2 — sold format",
         type: "select",
         required: true,
-        options: [
-          "Square 1024×1024 (social / feed)",
-          "Portrait 1024×1536 (print / tall)",
-          "Landscape 1536×1024 (wide)",
-        ],
-        hint: "Choose one agreed Studio format for Graphic 2. Only these formats are available for this service.",
+        options: ["Portrait 1024×1536 (print / tall)"],
+        hint: "Graphic 2 is the sold portrait plate. Landscape is not sold on this service.",
       },
       {
         id: "disclaimers",
@@ -988,7 +984,7 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
   "rtu-short-video": {
     type: "rtu-short-video",
     title: "Short Video Intake",
-    lead: "One short video, 15–30 seconds — share purpose, format, and media references.",
+    lead: "One 15–30 second vertical video assembled from your still photos with on-screen captions and a CTA. Runtime is 15–30 seconds. You post it. Not footage editing, voice, or music.",
     clientResponsibilityNote: RTU_SOCIAL_CLIENT_NOTE,
     fields: [
       {
@@ -999,19 +995,20 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       },
       {
         id: "format",
-        label: "One format choice",
+        label: "Video format",
         type: "select",
         required: true,
-        options: ["Vertical", "Square", "Landscape"],
+        options: ["Vertical 1080×1920 — I post it myself"],
+        hint: "One size only. Square and landscape are not sold.",
       },
       {
         id: "footageMaterials",
-        label: "Footage, photos, logo, or approved visual sources",
+        label: "Still photos you own or have permission to use",
         type: "textarea",
         required: true,
         role: "materials",
-        hint: "Describe client footage, photos, logos, or note that Studio/stock/AI visuals are fine once approved. If you do not have media yet, choose that option. Files are not uploaded on this form.",
-        placeholder: "Example: phone clip named patio-tour.mp4, or use Studio-approved stock.",
+        hint: "Describe 1–4 still photos (PNG or JPG). Footage editing, stock, AI, and Studio-created visuals are not sold. If you do not have photos yet, say so. Files are not uploaded on this form.",
+        placeholder: "Example: storefront.jpg and team-photo.png. I own these photos.",
       },
       {
         id: "onScreenText",
@@ -1036,10 +1033,142 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       },
     ],
   },
+  "rtu-short-form-video-edit": {
+    type: "rtu-short-form-video-edit",
+    title: "Here is what you will need",
+    lead: "You point to each moment. Mark each clip, or mark a source segment of 45 seconds or less. The Studio may look around that mark, up to 4 minutes total surrounding your mark, only to make the edit clean. Do not send an unmarked long recording and ask The Studio to find the best moments. If you want The Studio to search a longer recording and find the moments for you, that is Clip Repurposing.",
+    clientResponsibilityNote: RTU_SOCIAL_CLIENT_NOTE,
+    fields: [
+      {
+        id: "videoPurpose",
+        label: "What should these shorts help your customer do or understand?",
+        type: "textarea",
+        required: true,
+        hint: "The Studio uses this to polish the moments you already marked. It does not search a long recording for the best moments.",
+      },
+      {
+        id: "talkingHeadConfirm",
+        label: "I am pointing to each clip. I am not asking The Studio to search a long recording for the best moments.",
+        type: "select",
+        required: true,
+        options: [
+          "I am pointing to each clip. I am not asking The Studio to search a long recording for the best moments.",
+        ],
+        hint: "Each desired clip must be a separate file or a clearly marked source segment.",
+      },
+      {
+        id: "segmentCapConfirm",
+        label: "Each marked segment is 45 seconds or less.",
+        type: "select",
+        required: true,
+        options: ["Each marked segment is 45 seconds or less."],
+        hint: "The 4-minute allowance is Studio lookaround around your mark, not permission to send unmarked four-minute clips.",
+      },
+      {
+        id: "rightsAcknowledgement",
+        label: "Rights and likeness",
+        type: "select",
+        required: true,
+        options: [
+          "I own this recording, or I have permission from everyone who appears in it",
+        ],
+        hint: "Guests, likeness, third-party clips, and music already in the source stay your responsibility.",
+      },
+      {
+        id: "sourceMaterials",
+        label: "The clips or marked segments you will upload",
+        type: "textarea",
+        required: true,
+        role: "materials",
+        hint: "Upload the files in Materials. Mark each clip, or mark each source segment at 45 seconds or less. This form does not store the file.",
+        placeholder: "Example: clip-01.mp4, clip-02 from 1:12 to 1:32. I own this recording.",
+      },
+      {
+        id: "ctaText",
+        label: "Exact CTA wording for the end card",
+        type: "textarea",
+        required: true,
+        hint: "The Studio burns the words you supply. It will not invent a marketing line.",
+        placeholder: "Example: Book at riverandreed.example",
+      },
+      {
+        id: "mustKeepLine",
+        label: "Any line that must stay in the finished edit, if you have one",
+        type: "textarea",
+      },
+      {
+        id: "mustNotInclude",
+        label: "Anything that must not be included",
+        type: "textarea",
+      },
+    ],
+  },
+  "rtu-clip-repurposing": {
+    type: "rtu-clip-repurposing",
+    title: "Clip Repurposing Intake",
+    lead: "One 15–60 minute native-vertical English talking-head. The Studio finds three distinct 15–30 second 1080×1920 shorts with spoken-word captions, finished audio, and your CTA. You post them. This is not stills-to-video, a single $349 edit, landscape reframing, B-roll, stock, music, narration, or Studio posting.",
+    clientResponsibilityNote: RTU_SOCIAL_CLIENT_NOTE,
+    fields: [
+      {
+        id: "videoPurpose",
+        label: "What should these shorts help your customer do or understand?",
+        type: "textarea",
+        required: true,
+        hint: "The Studio uses this while it searches the whole recording for three distinct publishable shorts.",
+      },
+      {
+        id: "talkingHeadConfirm",
+        label: "I am sending one 15–60 minute native-vertical English talking-head that I own or have permission to use",
+        type: "select",
+        required: true,
+        options: [
+          "Yes — one 15–60 minute native-vertical English talking-head I own or have permission to use",
+        ],
+        hint: "Landscape, multi-camera, B-roll, stock, and AI footage are not sold in this service.",
+      },
+      {
+        id: "rightsAcknowledgement",
+        label: "Rights and likeness",
+        type: "select",
+        required: true,
+        options: [
+          "I own this recording, or I have permission from everyone who appears in it",
+        ],
+        hint: "Guests, likeness, third-party clips, and music already in the source stay your responsibility.",
+      },
+      {
+        id: "sourceMaterials",
+        label: "Talking-head file you will upload",
+        type: "textarea",
+        required: true,
+        role: "materials",
+        hint: "Upload one MP4 or MOV in Materials. The file must be native vertical and 15–60 minutes. This form does not store the file.",
+        placeholder: "Example: workshop-talking-head.mp4. I own this recording.",
+      },
+      {
+        id: "ctaText",
+        label: "Exact CTA wording for the shared end cards",
+        type: "textarea",
+        required: true,
+        hint: "The Studio burns the words you supply on the set. It will not invent a marketing line.",
+        placeholder: "Example: Book at riverandreed.example",
+      },
+      {
+        id: "mustKeepLine",
+        label: "Any line that must stay in the finished set, if you have one",
+        type: "textarea",
+      },
+      {
+        id: "mustNotInclude",
+        label: "Anything that must not be included",
+        type: "textarea",
+      },
+    ],
+  },
   "rtu-business-card": {
     type: "rtu-business-card",
     title: "Business Card Intake",
-    lead: "Share the contact details and brand references for one finished business card design.",
+    lead: "Share the contact details for one double-sided digital card — 1536×1024 both sides. You print it. This is not a certified 3.5×2 or 300 DPI file.",
     clientResponsibilityNote: RTU_PRINT_CLIENT_NOTE,
     fields: [
       { id: "businessName", label: "Business name", type: "text", required: true },
@@ -1057,7 +1186,14 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
         hint: "Describe your logo filename, brand colors, or links. If you do not have a logo yet, choose that option. Files are not uploaded on this form.",
         placeholder: "Example: logo named smith-co.svg, navy and cream colors.",
       },
-      { id: "cardSize", label: "Preferred card size, if known", type: "text" },
+      {
+        id: "cardSize",
+        label: "Card size",
+        type: "select",
+        required: true,
+        options: ["Digital CERT 1536×1024 — I print it myself"],
+        hint: "One size only. This is not a certified 3.5×2 or 300 DPI print file.",
+      },
     ],
   },
 };

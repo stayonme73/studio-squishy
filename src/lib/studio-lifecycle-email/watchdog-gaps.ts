@@ -14,7 +14,15 @@ import {
   syncJobCommunicationRecords,
 } from "@/lib/job-control/communication";
 import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
-import type { JobCommunicationEventType } from "@/lib/job-control/types";
+import {
+  escalateRevisionReworkToOwner,
+  pendingCorrectionUseForJob,
+} from "@/lib/job-control/revision-rework-escalation";
+import type {
+  JobCommunicationEventType,
+  PurchasedJobRecord,
+} from "@/lib/job-control/types";
+import { latestSkuQaIsUnresolvedFail } from "@/lib/studio-work-supervision/evaluate";
 
 import { isAuthorizedLifecycleNotice } from "./deliver";
 
@@ -30,9 +38,13 @@ export type LifecycleWatchdogFinding = {
 function hasEvent(
   envelope: ServerTasksEnvelope,
   eventType: JobCommunicationEventType,
+  jobId?: string,
 ): boolean {
   return (envelope.jobCommunicationRecords ?? []).some(
-    (record) => record.eventType === eventType && record.deliveryStatus !== "cancelled",
+    (record) =>
+      record.eventType === eventType &&
+      record.deliveryStatus !== "cancelled" &&
+      (jobId == null || record.jobId === jobId),
   );
 }
 
@@ -97,6 +109,7 @@ export function evaluateLifecycleWatchdogFindings(input: {
   }
   if (
     flyer?.spineStatus === "ready_for_review" &&
+    flyer.ownerApprovalPending !== "before_review" &&
     !hasEvent(input.envelope, "ready_for_review") &&
     !hasEvent(input.envelope, "revision_ready_again")
   ) {
@@ -117,8 +130,44 @@ export function evaluateLifecycleWatchdogFindings(input: {
       recovery: "enqueue_authorized_notice",
     });
   }
+  // A customer waiting on a revision the Studio has not delivered, with no
+  // notice explaining why, is the silent stranding this watchdog exists to catch.
+  // Supervisor scope is every purchased job, not the flyer only.
+  for (const job of jobs) {
+    if (
+      strandedRevision({ campaign: input.campaign, envelope: input.envelope, job }) &&
+      !hasEvent(input.envelope, "revision_rework_in_progress", job.jobId)
+    ) {
+      findings.push({
+        kind: "expected_notice_missing",
+        campaignId,
+        eventType: "revision_rework_in_progress",
+        ownerActionRequired: false,
+        recovery: "enqueue_authorized_notice",
+      });
+    }
+  }
 
   return findings;
+}
+
+/**
+ * The customer asked for a change, the Studio's own quality check rejected the
+ * answer, and Review never reopened. Entitlement is safe under `on_review_open`
+ * consumption, but the customer must not be left in silence.
+ */
+function strandedRevision(input: {
+  campaign: CampaignRecord;
+  envelope: ServerTasksEnvelope;
+  job: PurchasedJobRecord;
+}): boolean {
+  const pending = pendingCorrectionUseForJob({
+    campaign: input.campaign,
+    envelope: input.envelope,
+    jobId: input.job.jobId,
+  });
+  if (!pending) return false;
+  return latestSkuQaIsUnresolvedFail(input.envelope.qaRecords ?? [], input.job.skuId);
 }
 
 export function recoverMissingAuthorizedNotices(input: {
@@ -149,6 +198,7 @@ export function recoverMissingAuthorizedNotices(input: {
   const decisionId = flyer?.internalQaReviewAuthorization?.decisionId;
   if (
     flyer?.spineStatus === "ready_for_review" &&
+    flyer.ownerApprovalPending !== "before_review" &&
     decisionId &&
     !hasEvent(envelope, "ready_for_review") &&
     !hasEvent(envelope, "revision_ready_again")
@@ -163,6 +213,16 @@ export function recoverMissingAuthorizedNotices(input: {
       eventType: "ready_for_review",
       idempotencyKey: decisionId,
     });
+  }
+  for (const job of synced.jobs) {
+    if (strandedRevision({ campaign: input.campaign, envelope, job })) {
+      envelope = escalateRevisionReworkToOwner({
+        campaign: input.campaign,
+        envelope,
+        job,
+        clientUserId: input.clientUserId,
+      }).envelope;
+    }
   }
   return envelope;
 }

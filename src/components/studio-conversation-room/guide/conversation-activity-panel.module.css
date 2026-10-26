@@ -56,6 +56,30 @@
   color: var(--mc-ink-muted, color-mix(in srgb, #2e2b28 64%, transparent));
 }
 
+.intakeTestNotice {
+  margin: 0.35rem 0 0;
+  font-size: var(--studio-type-small, 0.875rem);
+  font-weight: 500;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.intakeWelcomeDetail {
+  margin: 0.35rem 0 0;
+  font-size: var(--studio-type-subtitle, 1.125rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: #ffffff;
+}
+
+.intakeWelcomeNote {
+  margin: 0.85rem 0 0;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: #ffffff;
+}
+
 .routeChoiceNote {
   margin: 0.35rem 0 0;
   padding: 0;
@@ -188,12 +212,27 @@
   pointer-events: none;
 }
 
+.routeLane {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
+  min-width: 0;
+}
+
+.sheet[data-surface="tablet"] .routeLane {
+  min-width: 0;
+  height: 100%;
+}
+
 .sheet[data-surface="tablet"] .routeList {
   flex: 0 0 auto;
   order: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
+  grid-auto-rows: 1fr;
+  align-items: stretch;
+  gap: 0.5rem 0.75rem;
   overflow: visible;
   max-height: none;
   min-height: 0;
@@ -201,9 +240,9 @@
 }
 
 .sheet[data-surface="tablet"] .routeExpand {
-  flex: none;
-  min-height: 0;
-  height: auto;
+  flex: 1 1 auto;
+  min-height: 100%;
+  height: 100%;
   border-radius: 0.6rem;
 }
 
@@ -270,6 +309,8 @@
 .routeExpand {
   display: flex;
   flex-direction: column;
+  align-self: stretch;
+  width: 100%;
   border-radius: 0.75rem;
   border: 1px solid transparent;
   overflow: visible;
@@ -359,6 +400,41 @@
   font-size: 0.88rem;
   line-height: 1.4;
   color: var(--mc-ink-muted, color-mix(in srgb, #2e2b28 64%, transparent));
+}
+
+.routeIncludesLink {
+  appearance: none;
+  align-self: flex-start;
+  margin-top: auto;
+  margin-bottom: 0;
+  padding: 0 0.75rem 0.7rem;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+
+.routeIncludesList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.routeIncludesList li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.4;
 }
 
 .routeExpandEmpty {
@@ -1326,10 +1402,10 @@
 
 .checkoutScopeDisclosure {
   margin: 0;
-  padding: 0.85rem 0.95rem;
-  border-radius: 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--mc-yellow, #f7c900) 45%, var(--mc-denim, #547c92));
-  background: color-mix(in srgb, var(--mc-yellow, #f7c900) 14%, var(--mc-ivory, #f7f4ee));
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
   font-size: 1.12rem;
   line-height: 1.45;
   color: var(--mc-ink, #2e2b28);
@@ -1570,6 +1646,25 @@
   margin: 0;
 }
 
+.intakeCheck {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 0;
+  color: #ffffff;
+  font-size: var(--studio-type-copy);
+  line-height: 1.4;
+}
+
+.intakeCheck input {
+  width: 1.25rem;
+  height: 1.25rem;
+  min-width: 1.25rem;
+  margin: 0.2rem 0 0;
+  flex: 0 0 1.25rem;
+  accent-color: #c8b59b;
+}
+
 .intakeTypeLine {
   box-sizing: border-box;
   width: 100%;
@@ -1682,7 +1777,7 @@
  * data-surface="page" only. Desktop overlay Intake is unchanged.
  */
 .sheet[data-panel="intake"][data-surface="page"] {
-  gap: 0.5rem;
+  gap: 1.15rem;
 }
 
 .sheet[data-panel="intake"][data-surface="page"] .checkoutScopeDisclosure {
@@ -1740,7 +1835,7 @@
 .sheet[data-panel="intake"][data-surface="page"]
   .intakeHostSurface
   :global(.route-map-social-intake__form) {
-  gap: 0.85rem;
+  gap: 1.35rem;
 }
 
 .sheet[data-panel="intake"][data-surface="page"] .intakeSectionBlock {
@@ -1748,11 +1843,7 @@
 }
 
 .sheet[data-panel="intake"][data-surface="page"] .intakeSectionHeading {
-  margin: 0.55rem 0 0.1rem;
-  font-size: 0.78rem;
-  font-weight: 750;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  display: none;
 }
 
 .sheet[data-panel="intake"][data-surface="page"]
@@ -1766,13 +1857,12 @@
   min-width: 0;
   max-width: 100%;
   margin: 0;
-  padding: 0.85rem 0.15rem;
+  padding: 0;
   border: none;
-  border-bottom: 1px solid
-    var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
   border-radius: 0;
   background: transparent;
   box-shadow: none;
+  gap: 0.75rem;
 }
 
 .sheet[data-panel="intake"][data-surface="page"]
@@ -1789,11 +1879,7 @@
 .sheet[data-panel="intake"][data-surface="page"]
   .intakeHostSurface
   :global(.route-map-social-intake__step) {
-  grid-row: auto;
-  align-self: flex-start;
-  width: 1.65rem;
-  height: 1.65rem;
-  font-size: 0.8rem;
+  display: none;
 }
 
 .sheet[data-panel="intake"][data-surface="page"]
@@ -1806,10 +1892,10 @@
 .sheet[data-panel="intake"][data-surface="page"]
   .intakeHostSurface
   :global(.route-map-social-intake__card-copy h3) {
-  font-size: 1.02rem;
-  line-height: 1.35;
+  font-size: 1.125rem;
+  line-height: 1.4;
   overflow-wrap: break-word;
-  color: var(--mc-ink, #2e2b28);
+  color: #ffffff;
 }
 
 .sheet[data-panel="intake"][data-surface="page"]
@@ -1890,8 +1976,8 @@
 .sheet[data-panel="intake"][data-surface="page"] .intakeTypeLine {
   width: 100%;
   max-width: 100%;
-  min-height: 2.75rem;
-  padding: 0.75rem 0.85rem;
+  min-height: 3.25rem;
+  padding: 1rem 1.15rem;
   box-sizing: border-box;
 }
 

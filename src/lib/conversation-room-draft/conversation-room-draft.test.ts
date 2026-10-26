@@ -9,6 +9,7 @@ import {
 } from "@/config/conversation-room-stage-v1";
 import {
   bridgeConversationPlanToCampaign,
+  ensureConversationIntakeCampaign,
   openingFromGuideDraft,
   persistAddService,
   persistConversationStage,
@@ -27,6 +28,7 @@ import {
   createCampaignFromRouteMapJob,
 } from "@/lib/route-map-campaign";
 import { createEmptyGuideCaptureDraft } from "@/lib/studio-guide-capture";
+import type { CampaignRecord } from "@/config/studio-board";
 import {
   readCurrentCampaign,
   saveCurrentCampaign,
@@ -151,6 +153,76 @@ describe("conversation room stage + draft consolidation", () => {
       "v2-rtu-flyer",
       "v2-rtu-social-posts",
     ]);
+  });
+
+  it("rebuilds a missing campaign pointer from the working draft so Intake can continue", () => {
+    let draft = createEmptyWorkingDraft();
+    draft = persistSelectedRoute(draft, "i20");
+    draft = persistAddService(draft, "v2-rtu-flyer", "i20");
+    window.localStorage.removeItem("studio-squishy:current-campaign");
+    expect(readCurrentCampaign()).toBeNull();
+    const restored = ensureConversationIntakeCampaign();
+    expect(restored?.routeMapContext?.jobId).toBe("v2-rtu-flyer");
+    expect(restored?.routeMapContext?.roadId).toBe("i20");
+    expect(restored?.approvedStudioPlan?.selectedServiceIds).toEqual([
+      "v2-rtu-flyer",
+    ]);
+  });
+
+  it("keeps a paid condensed campaign when an older draft names another package", () => {
+    let draft = createEmptyWorkingDraft();
+    draft = persistSelectedRoute(draft, "i20");
+    draft = persistAddService(draft, "v2-rtu-flyer", "i20");
+    saveCurrentCampaign({
+      campaignId: "cert-social",
+      campaignName: "Cedar Lane",
+      campaignStatus: "PAYMENT_RECEIVED",
+      campaignDescription: "Paid",
+      estimatedCompletion: "After intake",
+      packageId: "custom-studio-plan",
+      packageLabel: "Social & Promo Graphics",
+      paymentReceivedAt: "2026-10-06T02:14:50.318Z",
+      createdAt: "2026-10-06T02:14:00.000Z",
+      updatedAt: "2026-10-06T02:14:50.318Z",
+      revisionRoundsIncluded: 3,
+      revisionRoundsUsed: 0,
+      deliverablesDelivered: {},
+      routeMapContext: {
+        roadId: "random-exit",
+        jobId: "social_and_promo_graphics",
+        selectedServiceIds: [],
+        selectedAt: "2026-10-06T02:14:00.000Z",
+        currentStep: "checkout",
+      },
+      condensedOffer: {
+        packageId: "social_and_promo_graphics",
+        name: "Social & Promo Graphics",
+        priceCents: 19900,
+        revisionRounds: 3,
+        customerName: "Ada Stone",
+        customerEmail: "ada.social@example.com",
+        company: "Cedar Lane",
+        projectNeed: "Promote the spring open house",
+        materialsNote: "Logo described",
+        support: {},
+      },
+      approvedStudioPlan: {
+        selectedServiceIds: [],
+        includedServiceIds: [],
+        additionalServiceIds: [],
+        additionalCostUsd: 0,
+        oneTimeTotalCents: 19900,
+        monthlyTotalCents: 0,
+        amountDueTodayCents: 19900,
+        lineItems: [],
+        approvedAt: "2026-10-06T02:14:00.000Z",
+      },
+    } as CampaignRecord);
+
+    const kept = ensureConversationIntakeCampaign();
+    expect(kept?.campaignId).toBe("cert-social");
+    expect(kept?.condensedOffer?.name).toBe("Social & Promo Graphics");
+    expect(kept?.routeMapContext?.jobId).toBe("social_and_promo_graphics");
   });
 
   it("prefills empty intake businessName from opening answers only", () => {

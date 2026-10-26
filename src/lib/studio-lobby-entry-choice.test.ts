@@ -164,6 +164,8 @@ describe("MJ-D11 phone Lobby after-film landing", () => {
     expect(scene).toContain("shouldForceLobbyEntryFilmOnPhone");
     expect(scene).toContain("shouldShowLobbyEntryReopen");
     expect(scene).toContain("markVoiceFirstEntryChoiceRequired");
+    expect(scene).toContain("canOpenIntakeForCampaign");
+    expect(scene).toContain("stage=intake");
     expect(scene).toContain(
       "const showEntryFilm = filmOpen || phoneFrontDoor || transitioning",
     );

@@ -33,7 +33,14 @@ export function validateShotstackWorkPacket(packet: ShotstackWorkPacket): {
     findings.push("must_be_vertical_1080x1920");
   }
   if (packet.stockAllowed !== false) findings.push("stock_not_allowed");
-  if (packet.musicAllowed === true) {
+  if (packet.audioMode === "captions_only") {
+    if (packet.voiceArtifact?.relativePath) {
+      findings.push("captions_only_must_not_include_voice");
+    }
+    if (packet.musicArtifact?.relativePath) {
+      findings.push("captions_only_must_not_include_music");
+    }
+  } else if (packet.musicAllowed === true) {
     if (packet.audioMode !== "music_led") {
       findings.push("music_led_requires_audio_mode_music_led");
     }
@@ -102,12 +109,14 @@ export function buildShotstackEditPayload(
   }
 
   const findings: string[] = [];
-  const soundtrackRel =
-    packet.musicAllowed === true
+  const captionsOnly = packet.audioMode === "captions_only";
+  const soundtrackRel = captionsOnly
+    ? null
+    : packet.musicAllowed === true
       ? packet.musicArtifact!.relativePath
       : packet.voiceArtifact!.relativePath;
-  const soundtrackUrl = assetUrls.get(soundtrackRel);
-  if (!soundtrackUrl) findings.push("missing_soundtrack_url");
+  const soundtrackUrl = soundtrackRel ? assetUrls.get(soundtrackRel) : undefined;
+  if (!captionsOnly && !soundtrackUrl) findings.push("missing_soundtrack_url");
 
   const scenes = [...packet.scenes].sort((a, b) => a.startSeconds - b.startSeconds);
   for (const scene of scenes) {
@@ -239,10 +248,14 @@ export function buildShotstackEditPayload(
 
   const payload: ShotstackEditPayload = {
     timeline: {
-      soundtrack: {
-        src: soundtrackUrl!,
-        volume: packet.musicAllowed === true ? 0.85 : 1,
-      },
+      ...(soundtrackUrl
+        ? {
+            soundtrack: {
+              src: soundtrackUrl,
+              volume: packet.musicAllowed === true ? 0.85 : 1,
+            },
+          }
+        : {}),
       background: "#000000",
       tracks,
     },

@@ -1,10 +1,14 @@
 /**
  * STUDIO-OPERATING-PROJECT-CLAIM-AND-CONTINUITY-1
  *
- * Authoritative claim: verified client + (receipt OR local possession of unowned paid project).
+ * Authoritative claim: signed-in client + (receipt OR same-browser possession
+ * of the session's current unowned paid project). A client-supplied possession
+ * flag is not proof. Inbox email verification is not a substitute, and must
+ * not block same-device claim while live Resend is parked.
  * Does not mutate payment / SKU / production / review / delivery truth.
  */
 
+import { MAYA_PROTECTED_CAMPAIGN_ID } from "@/config/studio-production-team-workforce-v1";
 import { linkClientCampaign } from "@/lib/auth/users";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import {
@@ -71,20 +75,48 @@ export function isEmailVerifiedForClaim(user: StudioUser): boolean {
   return Boolean(user.emailVerifiedAt);
 }
 
+/** Same-browser possession is the session's current campaign — not a client flag. */
+export function hasSameBrowserPossession(
+  user: StudioUser,
+  campaignId: string,
+): boolean {
+  const current = user.currentCampaignId?.trim();
+  return Boolean(current && current === campaignId);
+}
+
+function hasClaimProof(input: {
+  user: StudioUser;
+  campaignId: string;
+  rawClaimToken?: string | null;
+  allowLocalPossession?: boolean;
+}): boolean {
+  if (input.rawClaimToken?.trim()) return true;
+  return (
+    input.allowLocalPossession === true &&
+    hasSameBrowserPossession(input.user, input.campaignId)
+  );
+}
+
 /**
- * Bind a paid (or claimable) campaign to a verified client.
+ * Bind a paid (or claimable) campaign to a signed-in client.
+ *
+ * Ownership proof is the claim receipt and/or same-browser possession of the
+ * unowned paid project. That is a real Project Claim — not a fake clientUserId
+ * stamp. Live verification email is parked; inbox verify must not block the
+ * paying customer on the same Samsung from becoming the account owner.
  *
  * Paths:
  * - already owned by this user → idempotent link
  * - unowned + valid claim receipt → claim
- * - unowned + allowLocalPossession (same-browser soft path) → claim
+ * - unowned + session currentCampaignId matches (same-browser) → claim
  * - otherwise → claim_proof_required
+ * - no proof and unverified email → email_unverified
  */
 export async function claimCampaignForVerifiedClient(input: {
   user: StudioUser | null;
   campaignId: string;
   rawClaimToken?: string | null;
-  /** Same-browser path: caller already holds the local campaign record. */
+  /** Same-browser path: honored only when user.currentCampaignId matches. */
   allowLocalPossession?: boolean;
   /** When true, unpaid drafts may be claimed (pre-pay continuity). Default: require paid. */
   allowUnpaidDraft?: boolean;
@@ -96,7 +128,18 @@ export async function claimCampaignForVerifiedClient(input: {
   if (!isClientUser(user)) {
     return fail("not_client", "Only customer accounts can claim projects.");
   }
-  if (!isEmailVerifiedForClaim(user)) {
+  if (input.campaignId === MAYA_PROTECTED_CAMPAIGN_ID) {
+    return fail("invalid_campaign", "This project cannot be claimed.");
+  }
+  if (
+    !isEmailVerifiedForClaim(user) &&
+    !hasClaimProof({
+      user,
+      campaignId: input.campaignId,
+      rawClaimToken: input.rawClaimToken,
+      allowLocalPossession: input.allowLocalPossession,
+    })
+  ) {
     return fail(
       "email_unverified",
       "Verify your email before claiming a Studio project.",
@@ -156,12 +199,17 @@ export async function claimCampaignForVerifiedClient(input: {
       userId: user.id,
       expectedCampaignId: input.campaignId,
     });
-    if (!consumed.ok) {
+    if (consumed.ok) {
+      receiptUsed = true;
+    } else if (!hasSameBrowserPossession(user, input.campaignId)) {
       return fail("receipt_invalid", consumed.message);
     }
-    receiptUsed = true;
-  } else if (input.allowLocalPossession) {
-    // Same-browser possession of an unowned campaign — still requires verified email.
+    // Stale/superseded receipt on the paying device still yields to
+    // same-browser possession of this unowned paid campaign.
+  } else if (
+    input.allowLocalPossession &&
+    hasSameBrowserPossession(user, input.campaignId)
+  ) {
     receiptUsed = false;
   } else {
     return fail(

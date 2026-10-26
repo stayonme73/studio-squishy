@@ -32,7 +32,6 @@ import type {
   ProductionRole,
   ProductionTaskFamilyId,
   QaRecord,
-  TaskHandoffRecord,
   TaskWorkflowState,
 } from "./types";
 
@@ -48,6 +47,12 @@ export type {
   FileRoomTaskPermissions,
   ReassignCandidate,
 } from "./file-room-controls-types";
+
+export {
+  resolveLatestHandoffForTask,
+  resolveQaSummaryForTask,
+  type FileRoomTaskQaSummary,
+} from "./task-record-summary";
 
 const CLAIMABLE_WORKFLOW: readonly TaskWorkflowState[] = ["unstarted", "needs_revision"];
 const REASSIGNABLE_WORKFLOW: readonly TaskWorkflowState[] = [
@@ -223,21 +228,6 @@ export function resolveReassignCandidatesForCampaign(
   return candidates.sort((a, b) => a.displayName.localeCompare(b.displayName));
 }
 
-export function resolveLatestHandoffForTask(
-  handoffs: readonly TaskHandoffRecord[] | undefined,
-  taskId: string,
-): { count: number; latestSummary: string | null } {
-  const taskHandoffs = (handoffs ?? []).filter((entry) => entry.taskId === taskId);
-  if (taskHandoffs.length === 0) {
-    return { count: 0, latestSummary: null };
-  }
-  const latest = taskHandoffs[taskHandoffs.length - 1];
-  return {
-    count: taskHandoffs.length,
-    latestSummary: latest.completedSummary,
-  };
-}
-
 export type FileRoomQaHistoryEntry = {
   id: string;
   action: QaRecord["action"];
@@ -246,13 +236,6 @@ export type FileRoomQaHistoryEntry = {
   actorDisplayName: string;
   createdAt: string;
   notesPreview: string | null;
-};
-
-export type FileRoomTaskQaSummary = {
-  total: number;
-  passes: number;
-  fails: number;
-  blocks: number;
 };
 
 function qaCategoryLabel(record: QaRecord): string | null {
@@ -295,19 +278,6 @@ export function resolveLatestQaHistoryForTask(
 ): FileRoomQaHistoryEntry | null {
   const history = resolveQaHistoryForTask(qaRecords, taskId);
   return history.length > 0 ? history[history.length - 1] : null;
-}
-
-export function resolveQaSummaryForTask(
-  qaRecords: readonly QaRecord[] | undefined,
-  taskId: string,
-): FileRoomTaskQaSummary {
-  const records = qaRecordsForTask(qaRecords, taskId);
-  return {
-    total: records.length,
-    passes: records.filter((entry) => entry.action === "qa_pass").length,
-    fails: records.filter((entry) => entry.action === "qa_fail").length,
-    blocks: records.filter((entry) => entry.action === "qa_block").length,
-  };
 }
 
 export function resolveFileRoomTaskOperatorContext(

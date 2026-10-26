@@ -6,7 +6,9 @@ import { chromium } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-const BASE = process.env.VERIFY_BASE_URL ?? "http://localhost:3000";
+import { resolveVerifyBaseUrl, sessionCookiePlaywright } from "./review-room-v1-test-env.mjs";
+
+const BASE = resolveVerifyBaseUrl();
 const OUT = path.resolve("tmp/review-room-v1");
 const CAMPAIGN_ID = "review-room-v1";
 const JOB_ID = `${CAMPAIGN_ID}:sm-001`;
@@ -124,16 +126,7 @@ async function main() {
 
   const browser = await chromium.launch();
   const clientContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  await clientContext.addCookies([
-    {
-      name: "studio_session",
-      value: clientCookie,
-      domain: "localhost",
-      path: "/",
-      httpOnly: true,
-      sameSite: "Lax",
-    },
-  ]);
+  await clientContext.addCookies([sessionCookiePlaywright(BASE, clientCookie)]);
   const page = await clientContext.newPage();
 
   await page.goto(BASE);

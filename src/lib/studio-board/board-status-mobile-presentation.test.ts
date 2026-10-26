@@ -11,6 +11,7 @@ import {
   isDuplicateStatusAndStage,
   isDuplicateStatusNextStep,
   isEmptyStatusRisk,
+  isRepeatedRecoveryCopy,
 } from "@/lib/studio-board/board-status-mobile-presentation";
 
 describe("board status mobile presentation", () => {
@@ -21,6 +22,15 @@ describe("board status mobile presentation", () => {
     expect(isDuplicateStatusNextStep("Finish Project Intake", PROJECT_INTAKE_RECEIVED_LEAD)).toBe(
       false,
     );
+  });
+
+  it("treats the payment-ready paragraph as one leftover story", () => {
+    const lead =
+      "Your payment is confirmed. The Studio is still getting your project ready. This usually finishes on its own.";
+    const next = `${lead} You do not need to pay again.`;
+    expect(isDuplicateStatusNextStep(next, lead)).toBe(true);
+    expect(isRepeatedRecoveryCopy(lead)).toBe(true);
+    expect(isRepeatedRecoveryCopy("Finish Project Intake first.")).toBe(false);
   });
 
   it("treats the empty risk line as ceremonial phone copy", () => {

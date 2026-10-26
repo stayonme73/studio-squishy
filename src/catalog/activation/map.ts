@@ -19,6 +19,8 @@ import {
   CATALOG_V2_BATCH2_LAUNCH_CANDIDATE_SKUS,
   CATALOG_V2_BATCH2_READY_TO_USE,
 } from "@/catalog/v2/batch2-ready-to-use";
+import { CLIP_REPURPOSING_PUBLISH_DRAFTS } from "@/catalog/v2/clip-repurposing-publish";
+import { SHORT_FORM_VIDEO_EDIT_PUBLISH_DRAFTS } from "@/catalog/v2/short-form-video-edit-publish";
 import type { CatalogV2ServiceEntry } from "@/catalog/v2/types";
 
 /** Activation disposition — draft planning only; not a live catalog status. */
@@ -42,10 +44,12 @@ export interface CatalogV2ActivationMapEntry {
 
 /** Lookup draft V2 record by SKU — Batch 1 + Batch 2 held entries only. */
 const DRAFT_V2_BY_SKU: ReadonlyMap<CatalogV2DraftOnlySkuId, CatalogV2ServiceEntry> = new Map(
-  [...CATALOG_V2_BATCH1_READY_TO_USE, ...CATALOG_V2_BATCH2_READY_TO_USE].map((entry) => [
-    entry.sku as CatalogV2DraftOnlySkuId,
-    entry,
-  ]),
+  [
+    ...CATALOG_V2_BATCH1_READY_TO_USE,
+    ...CATALOG_V2_BATCH2_READY_TO_USE,
+    ...SHORT_FORM_VIDEO_EDIT_PUBLISH_DRAFTS,
+    ...CLIP_REPURPOSING_PUBLISH_DRAFTS,
+  ].map((entry) => [entry.sku as CatalogV2DraftOnlySkuId, entry]),
 );
 
 /** Lanes from draft record when populated; otherwise activation-map fallback (Batch 2 today). */
@@ -189,6 +193,36 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
     directExitEligible: directExitFromDraftOrFallback("v2-rtu-short-video", true),
     notes: `${SHORT_VIDEO_REPLACEMENT_NOTE} ${BATCH2_VOICE_VIDEO_LANE_BACKFILL_NOTE}`,
   },
+  {
+    v2Sku: "v2-rtu-short-form-video-edit",
+    clientFacingName: "Short-Form Content Pack",
+    status: "active_candidate",
+    laneEligibility: lanesFromDraftOrFallback(
+      "v2-rtu-short-form-video-edit",
+      BATCH2_SHORT_VIDEO_LANES,
+    ),
+    directExitEligible: directExitFromDraftOrFallback(
+      "v2-rtu-short-form-video-edit",
+      true,
+    ),
+    notes:
+      "Public $349 Short-Form Content Pack. Customer points to each clip. Not the $149 stills short video. Not Clip Repurposing.",
+  },
+  {
+    v2Sku: "v2-rtu-clip-repurposing",
+    clientFacingName: "Clip Repurposing",
+    status: "active_candidate",
+    laneEligibility: lanesFromDraftOrFallback(
+      "v2-rtu-clip-repurposing",
+      BATCH2_SHORT_VIDEO_LANES,
+    ),
+    directExitEligible: directExitFromDraftOrFallback(
+      "v2-rtu-clip-repurposing",
+      true,
+    ),
+    notes:
+      "Public $549 long-source set. Not the $349 single talking-head edit. Not the $149 stills short video.",
+  },
 
   // --- Held (not on Route Map shelf at activation) ---
   {
@@ -280,6 +314,8 @@ export const CATALOG_V2_ACTIVATION_LAUNCH_CANDIDATE_SKUS = [
   ...CATALOG_V2_BATCH1_LAUNCH_CANDIDATE_SKUS,
   ...CATALOG_V2_BATCH2_LAUNCH_CANDIDATE_SKUS,
   "v2-rtu-business-card",
+  "v2-rtu-short-form-video-edit",
+  "v2-rtu-clip-repurposing",
 ] as const;
 
 /** Route Map V1 jobs slated for retirement when V2 activates. */

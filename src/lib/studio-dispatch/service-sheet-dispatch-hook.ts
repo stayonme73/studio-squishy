@@ -16,7 +16,14 @@ import {
   SERVICE_SHEET_RENDERER_VERSION,
   reasonServiceSheetDesignSpecDeterministic,
   runServiceSheetJobPipeline,
+  validateServiceSheetDesignSpec,
 } from "@/lib/studio-design-renderer";
+import { unsupportedServiceSheetClaims } from "@/lib/studio-design-renderer/service-sheet-completeness";
+import { refineLaunchDesignSpecCreative } from "@/lib/studio-production-team-workforce";
+import {
+  appendGeneralDesignAttempt,
+  createGeneralDesignInternalLoop,
+} from "@/lib/studio-general-design-runtime/correction";
 import type {
   ServiceSheetArtifactIdentity,
   ServiceSheetDesignSpec,
@@ -67,6 +74,8 @@ export type ServiceSheetDispatchHookResult =
       ownerRoutineProduction: "NONE";
       canvaRequired: false;
       makeRequired: false;
+      ownerEscalationRequired?: boolean;
+      attempts?: number;
     };
 
 function baseMeta() {
@@ -208,7 +217,18 @@ export async function invokeServiceSheetDispatchHook(input: {
 
   let designSpec: ServiceSheetDesignSpec;
   try {
-    designSpec = reasonServiceSheetDesignSpecDeterministic(mapped.truth);
+    const seed = reasonServiceSheetDesignSpecDeterministic(mapped.truth);
+    designSpec = await refineLaunchDesignSpecCreative({
+      skuId: record.skuId,
+      seed,
+      authorizedFacts: mapped.truth,
+      validate: (spec) => {
+        if (unsupportedServiceSheetClaims(mapped.truth, spec).length > 0) {
+          return { ok: false };
+        }
+        return { ok: validateServiceSheetDesignSpec(input.repoRoot, spec, mapped.truth).ok };
+      },
+    });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return {
@@ -322,13 +342,48 @@ export async function invokeServiceSheetDispatchHook(input: {
       });
     }
 
-    const pipeline = await runServiceSheetJobPipeline({
-      repoRoot: input.repoRoot,
-      truth: mapped.truth,
-      artifactRootRel,
-      specOverride: designSpec,
-      forceQaFail: input.forceQaFail,
+    let loop = createGeneralDesignInternalLoop({
+      skuId: record.skuId,
+      campaignId: input.campaign.campaignId,
+      jobId: record.jobId,
+      dispatchId: record.dispatchId,
     });
+    const maxAttempts = input.forceQaFail ? 1 : loop.maxAttempts;
+    let pipeline: ServiceSheetRendererPipelineResult | null = null;
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      const startedAt = new Date().toISOString();
+      pipeline = await runServiceSheetJobPipeline({
+        repoRoot: input.repoRoot,
+        truth: mapped.truth,
+        artifactRootRel,
+        specOverride: designSpec,
+        forceQaFail: input.forceQaFail,
+      });
+      loop = appendGeneralDesignAttempt(loop, {
+        attemptNumber: attempt,
+        triggeredBy: attempt === 1 ? "initial_dispatch" : "qa_correction",
+        qaResult: pipeline.ok ? "pass" : "fail",
+        failureCode: pipeline.ok ? null : pipeline.failureCode,
+        message: pipeline.ok ? null : pipeline.message,
+        pngContentSha256: pipeline.identity?.pngContentSha256 ?? null,
+        startedAt,
+        completedAt: new Date().toISOString(),
+      });
+      if (pipeline.ok) break;
+      if (pipeline.failureCode !== "QA_FAILURE") break;
+    }
+    if (!pipeline) {
+      return {
+        ok: false,
+        ...baseMeta(),
+        dispatchId: record.dispatchId,
+        skuId: record.skuId,
+        failureCode: "RENDER_FAILURE",
+        message: "Service-sheet production did not run.",
+        ownerEscalationRequired: false,
+        attempts: loop.attempts.length,
+      };
+    }
 
     if (!pipeline.ok) {
       if (pipeline.identity) {
@@ -380,7 +435,12 @@ export async function invokeServiceSheetDispatchHook(input: {
         dispatchId: record.dispatchId,
         skuId: record.skuId,
         failureCode: pipeline.failureCode,
-        message: pipeline.message,
+        message:
+          loop.status === "fail_closed" && pipeline.failureCode === "QA_FAILURE"
+            ? "Internal service-sheet correction budget exhausted. Owner will not finish the service sheet. The honest next step is a refund or cannot-deliver close."
+            : pipeline.message,
+        ownerEscalationRequired: false,
+        attempts: loop.attempts.length,
       };
     }
 

@@ -130,7 +130,7 @@
 .cd-intake {
   margin: 0;
   display: grid;
-  gap: 0.65rem;
+  gap: 0.95rem;
 }
 
 .cd-overview__row,
@@ -171,6 +171,14 @@
 
 .cd-vision__header .utility-card__title {
   margin-bottom: 0;
+}
+
+.cd-vision__missing {
+  margin: 0;
+  font-size: 1rem;
+  font-style: normal;
+  line-height: 1.45;
+  color: var(--cd-text);
 }
 
 .cd-copy-brief {
@@ -430,11 +438,16 @@
   color: var(--cd-text-muted);
 }
 
-.cd-footer__hint {
+.cd-footer__hint,
+.cd-updates__help {
   margin: 0 0 0.35rem;
   font-size: 0.88rem;
   line-height: 1.5;
   color: var(--cd-text-muted);
+}
+
+.cd-updates__help {
+  margin-top: 1rem;
 }
 
 .cd-help-link--empty {
@@ -676,17 +689,20 @@
   .cd-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
-      "overview vision"
+      "overview status"
+      "vision vision"
       "revisions package"
-      "journey journey"
-      "timeline timeline"
       "deliverables deliverables"
-      "updates updates"
-      "footer footer";
+      "journey updates"
+      "ask ask";
   }
 
   .cd-card--overview {
     grid-area: overview;
+  }
+
+  .cd-card--project-status {
+    grid-area: status;
   }
 
   .cd-card--vision {
@@ -705,30 +721,41 @@
     grid-area: journey;
   }
 
-  .cd-card--timeline {
-    grid-area: timeline;
-  }
-
   .cd-card--deliverables {
     grid-area: deliverables;
   }
 
-  .cd-card--activity,
-  .cd-card--information-update,
   .cd-card--squishy {
-    grid-column: 1 / -1;
+    grid-area: ask;
   }
 
   .cd-card--updates {
     grid-area: updates;
   }
 
-  .cd-card--footer {
-    grid-area: footer;
+  .cd-card--project-details,
+  .cd-card--route-map-summary {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1025px) {
+  .cd-grid {
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    gap: 1.15rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas:
+      "overview status vision"
+      "revisions package deliverables"
+      "journey journey updates"
+      "ask ask .";
   }
 
   .cd-journey {
-    max-width: 32rem;
+    max-width: none;
   }
 }
 

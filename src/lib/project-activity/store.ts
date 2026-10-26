@@ -1,7 +1,13 @@
 import { promises as fs } from "fs";
 import path from "path";
 
+import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
 import { atomicReplaceFile, withCampaignWriteLock } from "@/lib/campaign-store/file-io";
+import {
+  pgMutateProjectActivityEnvelope,
+  pgReadProjectActivityEnvelope,
+  pgWriteProjectActivityEnvelope,
+} from "@/lib/studio-durable-persistence/postgres-activity-production";
 
 import type { ProjectActivityEnvelope } from "./types";
 
@@ -18,6 +24,9 @@ async function ensureActivityDir(): Promise<void> {
 export async function readProjectActivityEnvelope(
   campaignId: string,
 ): Promise<ProjectActivityEnvelope | null> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgReadProjectActivityEnvelope(campaignId);
+  }
   try {
     const raw = await fs.readFile(activityPath(campaignId), "utf8");
     return JSON.parse(raw) as ProjectActivityEnvelope;
@@ -30,6 +39,9 @@ export async function readProjectActivityEnvelope(
 export async function writeProjectActivityEnvelope(
   envelope: ProjectActivityEnvelope,
 ): Promise<ProjectActivityEnvelope> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgWriteProjectActivityEnvelope(envelope);
+  }
   return withCampaignWriteLock(envelope.campaignId, async () => {
     await ensureActivityDir();
     const target = activityPath(envelope.campaignId);
@@ -48,6 +60,29 @@ export function emptyProjectActivityEnvelope(campaignId: string): ProjectActivit
     updatedAt: now,
     version: 0,
   };
+}
+
+/** Read-modify-write under campaign lock (Postgres advisory or in-process FS lock). */
+export async function mutateProjectActivityEnvelope<T>(
+  campaignId: string,
+  mutate: (envelope: ProjectActivityEnvelope) => {
+    envelope: ProjectActivityEnvelope;
+    value: T;
+  },
+): Promise<T> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgMutateProjectActivityEnvelope(campaignId, () => emptyProjectActivityEnvelope(campaignId), mutate);
+  }
+
+  return withCampaignWriteLock(campaignId, async () => {
+    const current =
+      (await readProjectActivityEnvelope(campaignId)) ?? emptyProjectActivityEnvelope(campaignId);
+    const { envelope, value } = mutate(current);
+    await ensureActivityDir();
+    const target = activityPath(envelope.campaignId);
+    await atomicReplaceFile(target, JSON.stringify(envelope, null, 2));
+    return value;
+  });
 }
 
 export async function getOrInitializeProjectActivity(

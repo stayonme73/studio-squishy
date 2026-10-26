@@ -5,6 +5,11 @@ import { helpCenterHref } from "@/config/help-center";
 import { studioBoard } from "@/config/studio-board";
 import { utilityPageUsesSecondaryNav } from "@/config/studio-utility-standards";
 import type { UtilityNavId } from "@/config/utility-shell";
+import {
+  resolveHelpCenterOriginForUtilityNav,
+  resolveHelpCenterProtectedAriaLabel,
+  resolveHelpCenterProtectedHref,
+} from "@/lib/help-center-navigation";
 
 import UtilityNav from "./UtilityNav";
 
@@ -24,6 +29,8 @@ type Props = {
   helpLabel?: string;
   /** Stacked nav row + title block (Project Summary orientation strip). */
   layout?: "default" | "orientation";
+  /** Help Center public surface passes the session probe. Authenticated rooms omit this. */
+  signedIn?: boolean;
 };
 
 /** Approved utility top bar: Back | Title | Help Center (default) or orientation strip. */
@@ -36,12 +43,15 @@ export default function UtilityPageHeader({
   aside,
   helpCenterFrom,
   backLabel,
-  backVariant = "button",
+  backVariant = "link",
   helpLabel,
   layout = "default",
+  signedIn = true,
 }: Props) {
   const showSecondaryNav = utilityPageUsesSecondaryNav(activeNav);
   const onHelpCenter = activeNav === "help-center";
+  const resolvedBackHref = resolveHelpCenterProtectedHref(backHref, signedIn);
+  const helpOrigin = resolveHelpCenterOriginForUtilityNav(activeNav, helpCenterFrom);
   const isOrientation = layout === "orientation";
   const backClassName =
     backVariant === "link"
@@ -61,17 +71,33 @@ export default function UtilityPageHeader({
         : null;
 
   const backLink = (
-    <Link href={backHref} className={backClassName}>
+    <Link
+      href={resolvedBackHref}
+      className={backClassName}
+      aria-label={
+        onHelpCenter
+          ? resolveHelpCenterProtectedAriaLabel(backLabel ?? "Back", backHref, signedIn, "return")
+          : undefined
+      }
+    >
       {backLabel ?? "← Back"}
     </Link>
   );
 
   const helpLink = onHelpCenter ? (
-    <Link href={studioBoard.routes.studioBoard} className="utility-topbar__help">
+    <Link
+      href={resolveHelpCenterProtectedHref(studioBoard.routes.studioBoard, signedIn)}
+      className="utility-topbar__help"
+      aria-label={resolveHelpCenterProtectedAriaLabel(
+        "Studio Board",
+        studioBoard.routes.studioBoard,
+        signedIn,
+      )}
+    >
       Studio Board →
     </Link>
   ) : (
-    <Link href={helpCenterHref(undefined, helpCenterFrom)} className="utility-topbar__help">
+    <Link href={helpCenterHref(undefined, helpOrigin ?? helpCenterFrom)} className="utility-topbar__help">
       {helpLabel ?? "Help Center →"}
     </Link>
   );
@@ -82,7 +108,7 @@ export default function UtilityPageHeader({
         <div className="utility-topbar utility-topbar--orientation">
           <nav className="utility-topbar__nav" aria-label="Page navigation">
             {backLink}
-            {helpLink}
+            {showSecondaryNav ? null : helpLink}
           </nav>
           <div className="utility-topbar__intro">
             <h1 className="utility-topbar__title">{title}</h1>
@@ -92,7 +118,7 @@ export default function UtilityPageHeader({
 
         {showSecondaryNav ? (
           <div className="utility-subnav">
-            <UtilityNav activeId={activeNav} />
+            <UtilityNav activeId={activeNav} signedIn={signedIn} />
           </div>
         ) : null}
 
@@ -112,14 +138,14 @@ export default function UtilityPageHeader({
           {backLink}
         </div>
         <h1 className="utility-topbar__title">{title}</h1>
-        <div className="utility-topbar__end">
-          {helpLink}
-        </div>
+        {showSecondaryNav ? null : (
+          <div className="utility-topbar__end">{helpLink}</div>
+        )}
       </div>
 
       {showSecondaryNav ? (
         <div className="utility-subnav">
-          <UtilityNav activeId={activeNav} />
+          <UtilityNav activeId={activeNav} signedIn={signedIn} />
         </div>
       ) : null}
 

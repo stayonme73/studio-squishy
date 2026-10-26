@@ -192,12 +192,14 @@ describe("STUDIO-OPERATING-DISPATCH-1", () => {
     expect(flyer.requirements?.deliverables.length).toBeGreaterThan(0);
     // Identity still records tool refs; flyer observer may invoke after ensure (separate package).
     expect(flyer.requirements?.primaryTool.integrationState).toBeTruthy();
-    // Without Route Map flyer truth, observer invoke fails closed — identity remains ready.
+    // Without Route Map flyer truth the Intake production fields are missing, so the
+    // observer stops before Production rather than starting work that can only fail.
+    // Execution identity stays ready — the job is waiting on prerequisites, not broken.
     const flyerObs = result.designRendererObserver?.results.find(
       (r) => r.dispatchId === flyer.dispatchId,
     );
-    expect(flyerObs?.action).toBe("invoked");
-    expect(flyerObs?.ok).toBe(false);
+    expect(flyerObs?.action).toBe("skipped");
+    expect(flyerObs?.skipReason).toBe("flyer_intake_production_fields_missing");
   });
 
   it("duplicate evaluation is idempotent", async () => {

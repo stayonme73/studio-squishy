@@ -10,6 +10,9 @@ import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
 import { ensurePostPayActivation } from "@/lib/studio-post-pay-activation";
 
+import { socialPromoCompositeRoutingDecisions } from "@/lib/studio-dispatch/social-promo-composite-dispatch";
+import { campaignLaunchKitCompositeRoutingDecisions } from "@/lib/studio-dispatch/campaign-launch-kit-composite-dispatch";
+
 import { evaluateJobRoutingDecision } from "./evaluate";
 import type {
   JobRoutingDecision,
@@ -128,14 +131,30 @@ export async function ensureRoutingHandoff(
       });
     }
 
-    const decisions = jobRecords.map((job) =>
-      evaluateJobRoutingDecision({
+    const decisions = jobRecords.flatMap((job) => {
+      const composite = socialPromoCompositeRoutingDecisions({
         campaign: working,
         job,
         materials: materialsEnvelope.items,
         evaluatedAt: now,
-      }),
-    );
+      });
+      if (composite) return composite;
+      const campaignKit = campaignLaunchKitCompositeRoutingDecisions({
+        campaign: working,
+        job,
+        materials: materialsEnvelope.items,
+        evaluatedAt: now,
+      });
+      if (campaignKit) return campaignKit;
+      return [
+        evaluateJobRoutingDecision({
+          campaign: working,
+          job,
+          materials: materialsEnvelope.items,
+          evaluatedAt: now,
+        }),
+      ];
+    });
 
     const activationReady =
       working.postPayActivation.phase ===

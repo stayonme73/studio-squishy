@@ -2,6 +2,7 @@ import { getServiceById } from "@/catalog/accessors";
 import type { ServiceId } from "@/catalog/types";
 import { materialCategoryLabel } from "@/config/materials";
 import type { ApprovedStudioPlanLineItem, CampaignRecord } from "@/config/studio-board";
+import { isSocialPostsStandardHardenSku } from "@/config/studio-social-posts-standard-harden-v1";
 import {
   FLYER_PROOF_CONTRACT,
   isDesignRendererProofSku,
@@ -95,6 +96,18 @@ function resolveCategoriesForLineItem(lineItem: ApprovedStudioPlanLineItem): Mat
     categories.delete("factual-confirmation");
   }
 
+  /**
+   * Social Posts sold scope: customer posts the files. Photography, account
+   * access, and extra document slots are not intake prerequisites.
+   */
+  if (isSocialPostsStandardHardenSku(lineItem.skuId)) {
+    categories.delete("photo-video");
+    categories.delete("access-instructions");
+    categories.delete("url-link");
+    categories.delete("document-reference");
+    categories.delete("factual-confirmation");
+  }
+
   return ALL_CATEGORIES.filter((category) => categories.has(category));
 }
 
@@ -109,6 +122,9 @@ function requirementLevelForCategory(
     !FLYER_PROOF_CONTRACT.customerLogoRequired &&
     (category === "logo-brand" || category === "photo-video")
   ) {
+    return "optional";
+  }
+  if (isSocialPostsStandardHardenSku(skuId) && category === "logo-brand") {
     return "optional";
   }
   if (category === "access-instructions" && requiresAccess) return "required";

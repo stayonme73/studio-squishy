@@ -8,6 +8,7 @@ import {
   LOCAL_CUSTOMER_ONE_FIXTURE_ID,
   pickLocalCustomerOnePaidFlyerCampaign,
   pickLocalCustomerOneRecord,
+  pickOwnedPaidNonMayaCampaign,
   resolveLocalCustomerOneUser,
 } from "@/lib/auth/local-customer-one-fixture";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
@@ -127,7 +128,52 @@ describe("pickLocalCustomerOnePaidFlyerCampaign", () => {
   });
 });
 
+describe("pickOwnedPaidNonMayaCampaign", () => {
+  it("prefers the owned paid non-Maya campaign over frozen Maya", () => {
+    const maya = {
+      campaignId: "716a15b6-d8d6-436c-8f84-9e8b40d2f959",
+      clientUserId: "local-customer-one",
+      record: {
+        campaignId: "716a15b6-d8d6-436c-8f84-9e8b40d2f959",
+        campaignName: "Maya’s Mobile Boutique",
+        paymentReceivedAt: "2026-09-06T22:28:33.080Z",
+        approvedStudioPlan: { selectedServiceIds: ["v2-rtu-flyer"] },
+      },
+    };
+    const fresh = {
+      campaignId: "2577b971-d0f9-4f3f-a03c-7d73bbcbdc2b",
+      clientUserId: "local-customer-one",
+      record: {
+        campaignId: "2577b971-d0f9-4f3f-a03c-7d73bbcbdc2b",
+        campaignName: "Make Me a Flyer",
+        paymentReceivedAt: "2026-09-12T18:28:05.420Z",
+        approvedStudioPlan: { selectedServiceIds: ["v2-rtu-flyer"] },
+      },
+    };
+    expect(
+      pickOwnedPaidNonMayaCampaign([maya, fresh] as never, "local-customer-one")
+        ?.campaignId,
+    ).toBe("2577b971-d0f9-4f3f-a03c-7d73bbcbdc2b");
+    expect(
+      pickLocalCustomerOnePaidFlyerCampaign([maya, fresh] as never, "local-customer-one")
+        ?.campaignId,
+    ).toBe("716a15b6-d8d6-436c-8f84-9e8b40d2f959");
+  });
+});
+
 describe("resolveLocalCustomerOneUser", () => {
+  it("does not bind frozen Maya as the current Customer-One project", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/lib/auth/local-customer-one-fixture.ts"),
+      "utf8",
+    );
+    const start = source.indexOf("async function attachExistingLocalCustomerOneProject");
+    const end = source.indexOf("export async function resolveLocalCustomerOneUser");
+    const fn = source.slice(start, end);
+    expect(fn).toContain("pickOwnedPaidNonMayaCampaign");
+    expect(fn).not.toContain("pickLocalCustomerOnePaidFlyerCampaign");
+  });
+
   afterEach(() => {
     vi.unstubAllEnvs();
   });
@@ -176,6 +222,8 @@ describe("local auth fixture surfaces", () => {
     expect(source).toContain("/api/auth/local-customer-one");
     expect(source).not.toContain("NEXT_PUBLIC_");
     expect(source).not.toContain("process.env");
+    expect(source).toContain("LOCAL_CUSTOMER_ONE_FIXTURE_ID");
+    expect(source).toContain("showLocalAuthFixture &&");
   });
 
   it("Sign In page gates the fixture from the local-only helper", () => {

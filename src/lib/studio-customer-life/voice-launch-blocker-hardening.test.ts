@@ -57,7 +57,7 @@ describe("STUDIO-OPERATING-STUDIO-VOICE-LAUNCH-BLOCKER-HARDENING-1", () => {
 
   it("answers service-fit, price, and scope from canonical launch truth only", () => {
     const packages = listCanonicalLaunchPackages();
-    expect(packages).toHaveLength(3);
+    expect(packages).toHaveLength(4);
 
     const confused = answerCustomerLifeQuestion(
       "I just need something for Instagram, I don’t know which one.",

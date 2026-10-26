@@ -2,10 +2,17 @@ import { promises as fs } from "fs";
 import path from "path";
 
 import type { CampaignRecord } from "@/config/studio-board";
+import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
 import {
   atomicReplaceFile,
   withCampaignWriteLock,
 } from "@/lib/campaign-store/file-io";
+import {
+  pgListTasksEnvelopes,
+  pgReadTasksEnvelope,
+  pgWriteTasksEnvelope,
+} from "@/lib/studio-durable-persistence/postgres-spine";
+import { preserveProtectedCorrectionLedger } from "@/lib/campaign-store/protected-campaign-guard";
 import { readCampaignEnvelope } from "@/lib/campaign-store/store";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
 
@@ -29,6 +36,9 @@ async function ensureTasksDir(): Promise<void> {
 export async function readTasksEnvelope(
   campaignId: string,
 ): Promise<ServerTasksEnvelope | null> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgReadTasksEnvelope(campaignId);
+  }
   const file = tasksPath(campaignId);
   for (let attempt = 0; attempt < 5; attempt += 1) {
     try {
@@ -51,6 +61,9 @@ export async function readTasksEnvelope(
 }
 
 export async function listTasksEnvelopes(): Promise<ServerTasksEnvelope[]> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgListTasksEnvelopes();
+  }
   await ensureTasksDir();
   let files: string[];
   try {
@@ -73,13 +86,27 @@ export async function listTasksEnvelopes(): Promise<ServerTasksEnvelope[]> {
 export async function writeTasksEnvelope(
   envelope: ServerTasksEnvelope,
 ): Promise<ServerTasksEnvelope> {
-  return withCampaignWriteLock(envelope.campaignId, async () => {
+  const protectedLedger = preserveProtectedCorrectionLedger(envelope);
+  const guarded = protectedLedger.envelope;
+  if (protectedLedger.genuineRowMissing) {
+    // The stored ledger no longer backs the protected campaign's frozen counters.
+    // Not thrown — a refused write here would break unrelated flows — but it must
+    // not pass in silence either. Repair with
+    // `scripts/maya-revision-entitlement-repair.mts`.
+    console.warn(
+      `[protected-campaign-guard] ${guarded.campaignId}: genuine correction-use row absent from the ledger; frozen revision counters are unbacked.`,
+    );
+  }
+  return withCampaignWriteLock(guarded.campaignId, async () => {
+    if (isPostgresPersistenceEnabled()) {
+      return pgWriteTasksEnvelope(guarded);
+    }
     await ensureTasksDir();
     await atomicReplaceFile(
-      tasksPath(envelope.campaignId),
-      JSON.stringify(envelope, null, 2),
+      tasksPath(guarded.campaignId),
+      JSON.stringify(guarded, null, 2),
     );
-    return envelope;
+    return guarded;
   });
 }
 

@@ -89,10 +89,28 @@ export type DispatchExecutionRecord = {
   ownerActionRequired: false;
   lastError?: string | null;
   /**
+   * STUDIO-OPERATING-MACHINE-CUSTOMER-IDENTITY-SAFETY-GATE-1
+   * Fail-closed boarding pass. Not a production invocation.
+   */
+  customerIdentitySafety?: {
+    packageId: "STUDIO-OPERATING-MACHINE-CUSTOMER-IDENTITY-SAFETY-GATE-1";
+    status: "blocked";
+    blocker: "CUSTOMER_CONTEXT_MISMATCH";
+    mismatchKind: string;
+    recoveryPath: "engineering_system_recovery";
+    ownerActionRequired: false;
+    expectedCampaignId: string;
+    foundCampaignId: string | null;
+    evaluatedAt: string;
+  };
+  /**
    * STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1
    * Flyer-only post-identity observe pass. Not part of identity equality.
    */
   designRendererObserver?: import("./design-renderer-observer").DesignRendererObserverPass;
+  launchMenuProductionObserver?: import("./launch-menu-production-observer").LaunchMenuObserverPass;
+  /** Creative QA & Finish contain-and-export pass. Not a design-renderer result. */
+  creativeQaFinishObserver?: import("./creative-qa-finish-observer").CreativeQaFinishObserverPass;
 };
 
 export type DispatchExecutionResult =
@@ -110,6 +128,7 @@ export type DispatchExecutionResult =
       error:
         | "payment_not_confirmed"
         | "routing_incomplete"
-        | "dispatch_failed";
+        | "dispatch_failed"
+        | "customer_context_mismatch";
       message: string;
     };

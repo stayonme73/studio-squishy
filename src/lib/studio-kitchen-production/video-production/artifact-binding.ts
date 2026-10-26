@@ -156,7 +156,7 @@ export function registerBoundVideoArtifact(input: {
   campaignId: string;
   skuId: string;
   extension: string;
-  productionMethod?: "capcut" | "unknown";
+  productionMethod?: "shotstack" | "capcut" | "unknown";
   sourceAssetRefs?: readonly string[];
   voiceArtifactSha256?: string;
   declaredDurationSeconds?: number;

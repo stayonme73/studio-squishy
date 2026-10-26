@@ -431,6 +431,85 @@ describe("File Room Private Storage Adapter V1", () => {
     ).toBe(false);
   });
 
+  it("keeps approved review proofs viewable read-only after approval, never before Review or for superseded proofs", () => {
+    const proof = privateFileRef({
+      id: "file:proof-closed",
+      category: "review_proof",
+      filename: "proof.png",
+      fileType: "image/png",
+      visibility: "client_visible",
+      status: "approved_for_review",
+    });
+    const superseded = { ...proof, id: "file:proof-old", status: "superseded" as const };
+    const at = (spineStatus: string) =>
+      job({ spineStatus: spineStatus as never, fileRegistry: [proof, superseded] });
+
+    for (const spine of ["approved", "ready_for_delivery", "delivered"]) {
+      expect(canClientAccessReviewProofFile({ user: clientUser, job: at(spine), file: proof }).allowed).toBe(true);
+      expect(canClientAccessReviewProofFile({ user: clientUser, job: at(spine), file: superseded }).allowed).toBe(false);
+      expect(
+        canClientAccessReviewProofFile({
+          user: { ...clientUser, id: "other-client", currentCampaignId: "other-campaign" },
+          job: at(spine),
+          file: proof,
+        }).allowed,
+      ).toBe(false);
+    }
+    for (const spine of ["in_production", "ready_for_queue", "revision_requested"]) {
+      expect(canClientAccessReviewProofFile({ user: clientUser, job: at(spine), file: proof }).allowed).toBe(false);
+    }
+    expect(
+      canClientAccessReviewProofFile({
+        user: clientUser,
+        job: at("revision_requested"),
+        file: proof,
+        feedback: { submittedAt: "2026-10-10T00:00:00.000Z" } as never,
+      }).allowed,
+    ).toBe(true);
+  });
+
+  it("allows the campaign envelope owner to load an unclaimed-client review proof", () => {
+    const proof = privateFileRef({
+      id: "file:proof-unclaimed",
+      clientId: "unclaimed-client:private-storage-v1",
+      category: "review_proof",
+      filename: "proof.png",
+      fileType: "image/png",
+      visibility: "client_visible",
+      status: "approved_for_review",
+    });
+    const reviewJob = job({ spineStatus: "ready_for_review", fileRegistry: [proof] });
+    const envelopeOwner = {
+      ...clientUser,
+      currentCampaignId: undefined,
+      clientCampaignIds: [] as string[],
+    };
+
+    expect(
+      canClientAccessReviewProofFile({
+        user: envelopeOwner,
+        job: reviewJob,
+        file: proof,
+      }).allowed,
+    ).toBe(false);
+    expect(
+      canClientAccessReviewProofFile({
+        user: envelopeOwner,
+        job: reviewJob,
+        file: proof,
+        campaignClientUserId: CLIENT_ID,
+      }).allowed,
+    ).toBe(true);
+    expect(
+      canClientAccessReviewProofFile({
+        user: envelopeOwner,
+        job: reviewJob,
+        file: proof,
+        campaignClientUserId: "someone-else",
+      }).allowed,
+    ).toBe(false);
+  });
+
   it("allows assigned internal users to retrieve any File Room file through app checks", () => {
     const final = privateFileRef();
     const baseJob = job({ fileRegistry: [final] });

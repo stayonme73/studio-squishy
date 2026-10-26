@@ -1,0 +1,189 @@
+.sx-panel__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.sx-panel__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.sx-panel__lead,
+.sx-panel__courtesy,
+.sx-panel__notice,
+.sx-panel__error {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.sx-panel__courtesy {
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(232, 213, 163, 0.55);
+  border-radius: 0.6rem;
+}
+
+.sx-panel__error {
+  font-weight: 600;
+}
+
+.sx-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sx-extra {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.85rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 0.75rem;
+  min-width: 0;
+}
+
+.sx-extra__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+}
+
+.sx-extra__name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.sx-extra__status {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.sx-extra[data-studio-extra-state="ready_for_review"] .sx-extra__status,
+.sx-extra[data-studio-extra-state="delivered"] .sx-extra__status {
+  color: #8ff5c6;
+}
+
+.sx-extra__includes,
+.sx-extra__waiting ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.sx-extra__waiting p {
+  margin: 0 0 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.sx-extra__files {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
+  gap: 0.75rem;
+}
+
+.sx-file {
+  margin: 0;
+  min-width: 0;
+}
+
+.sx-file--text {
+  grid-column: 1 / -1;
+}
+
+.sx-file__label {
+  margin: 0 0 0.3rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.sx-file__text {
+  margin: 0;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 18rem;
+  overflow-y: auto;
+}
+
+.sx-file--image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+.sx-file--image figcaption {
+  margin-top: 0.3rem;
+}
+
+.sx-file--link a {
+  font-size: 0.9375rem;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.sx-extra__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.sx-extra__actions .utility-btn,
+.sx-extra__send {
+  min-height: 2.75rem;
+}
+
+.sx-extra__change-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.sx-extra__change-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.sx-extra__change-input {
+  width: 100%;
+  min-height: 5rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font: inherit;
+  font-size: 1rem;
+  resize: vertical;
+}
+
+.sx-extra__send {
+  align-self: flex-start;
+}
+
+@media (max-width: 640px) {
+  .sx-extra__actions .utility-btn {
+    flex: 1 1 0;
+  }
+
+  .sx-extra__send {
+    align-self: stretch;
+  }
+}

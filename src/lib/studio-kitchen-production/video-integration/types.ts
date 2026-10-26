@@ -83,7 +83,7 @@ export type ShotstackWorkPacket = {
     contentSha256: string;
     rightsRecordRelativePath: string;
   };
-  audioMode?: "voice_narration" | "music_led";
+  audioMode?: "voice_narration" | "music_led" | "captions_only";
   /** Studio-persisted MP4 relative path (not CapCut). */
   exportRelativePath: string;
   /** Last scene caption is the CTA for this fixture. */

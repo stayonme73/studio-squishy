@@ -30,6 +30,7 @@ describe("resolveCustomerVisibilityContinuityView", () => {
   it("shows empty campaign guidance without inventing dates or risks", () => {
     const view = resolveCustomerVisibilityContinuityView({ campaign: null });
     expect(view.hasCampaign).toBe(false);
+    expect(view.statusLabel).toBeNull();
     expect(view.targetOrCheckpoint).toBe(copy.empty.targetNotSet);
     expect(view.riskOrBlocker).toBe(copy.empty.noRisk);
     expect(view.whoActsNext).toBe("none");
@@ -43,6 +44,7 @@ describe("resolveCustomerVisibilityContinuityView", () => {
       }),
     });
     expect(view.neededItems).toContain("Finish Project Intake");
+    expect(view.statusLabel).toBeTruthy();
     expect(view.whoActsNext).toBe("customer");
     expect(view.whoActsNextLabel).toBe(copy.actors.customer);
     expect(view.riskOrBlocker).toMatch(/Project Intake is incomplete/i);

@@ -7,11 +7,36 @@ import {
 import type { ServerCampaignEnvelope } from "@/lib/campaign-store/types";
 import { readTasksEnvelope } from "@/lib/campaign-tasks/store";
 import { ensureFlyerMachineReviewBind, latestFlyerQaIsUnresolvedFail } from "@/lib/studio-customer-life/machine-review-bind";
+import { ensureSocialPromoCompositeReviewBind } from "@/lib/studio-customer-life/machine-social-promo-review-bind";
+import {
+  campaignIncludesFlyerSku,
+  isFlyerProductionIntakeReady,
+  needsFlyerProductionObserverRetry,
+} from "@/lib/project-intake-flyer-production";
 import { ensureDispatchExecution } from "@/lib/studio-dispatch";
-
+import { disposableTestOperatingChainBlocked } from "@/lib/studio-payment/disposable-test-isolation-guards";
+import {
+  isCustomerIdentityBlocked,
+  type CustomerIdentityDispatchSession,
+} from "@/lib/studio-customer-identity-safety-gate";
+import { recoverResolvedCustomerIdentityHold } from "@/lib/studio-customer-identity-safety-gate/recover-hold";
 import { applySealedPostPayStructures } from "./apply-sealed-structures";
 import { isPaymentConfirmedForRecovery, needsPaidOperatingRecovery } from "./needs-recovery";
 import type { PaidOperatingRecoveryResult } from "./types";
+
+function shouldWakeFlyerRenderer(campaign: CampaignRecord): boolean {
+  if (
+    campaign.productionFreeze?.status === "FROZEN" &&
+    campaign.productionFreeze.doNotRemint &&
+    campaign.productionFreeze.skuIds.includes("v2-rtu-flyer")
+  ) {
+    return false;
+  }
+  return (
+    needsFlyerProductionObserverRetry(campaign) ||
+    (campaignIncludesFlyerSku(campaign) && isFlyerProductionIntakeReady(campaign))
+  );
+}
 
 async function persistCampaign(
   campaign: CampaignRecord,
@@ -23,6 +48,7 @@ async function persistCampaign(
 
 async function runRecoveryAttempt(
   campaign: CampaignRecord,
+  identitySession?: CustomerIdentityDispatchSession,
 ): Promise<{ campaign: CampaignRecord; lastError: string | null }> {
   const structured = applySealedPostPayStructures(campaign);
   let working = structured.campaign;
@@ -32,7 +58,7 @@ async function runRecoveryAttempt(
     working = await persistCampaign(working);
   }
 
-  const dispatched = await ensureDispatchExecution(working);
+  const dispatched = await ensureDispatchExecution(working, identitySession);
   working = dispatched.campaign;
   if (!dispatched.ok) {
     lastError = dispatched.message ?? lastError;
@@ -48,8 +74,23 @@ async function runRecoveryAttempt(
  */
 export async function recoverPaidOperatingChain(
   campaign: CampaignRecord,
-  options?: { immediateRetries?: number },
+  options?: {
+    immediateRetries?: number;
+    identitySession?: CustomerIdentityDispatchSession;
+  },
 ): Promise<PaidOperatingRecoveryResult> {
+  if (disposableTestOperatingChainBlocked(campaign)) {
+    return {
+      ok: true,
+      recovered: false,
+      needsRecovery: false,
+      alreadyClear: true,
+      ownerActionRequired: false,
+      campaign,
+      reason: "already_clear",
+      attempts: 0,
+    };
+  }
   if (!isPaymentConfirmedForRecovery(campaign)) {
     return {
       ok: false,
@@ -64,6 +105,23 @@ export async function recoverPaidOperatingChain(
   }
 
   if (!needsPaidOperatingRecovery(campaign)) {
+    if (shouldWakeFlyerRenderer(campaign)) {
+      const dispatched = await ensureDispatchExecution(
+        campaign,
+        options?.identitySession,
+      );
+      return {
+        ok: dispatched.ok,
+        recovered: true,
+        needsRecovery: false,
+        alreadyClear: false,
+        ownerActionRequired: false,
+        campaign: dispatched.campaign,
+        reason: "recovered",
+        lastError: dispatched.ok ? null : dispatched.message,
+        attempts: 1,
+      };
+    }
     const tasks = await readTasksEnvelope(campaign.campaignId);
     if (latestFlyerQaIsUnresolvedFail(tasks)) {
       return {
@@ -97,7 +155,7 @@ export async function recoverPaidOperatingChain(
   let lastError: string | null = null;
 
   for (let i = 0; i < attempts; i += 1) {
-    const result = await runRecoveryAttempt(working);
+    const result = await runRecoveryAttempt(working, options?.identitySession);
     working = result.campaign;
     lastError = result.lastError;
 
@@ -133,18 +191,47 @@ export async function recoverPaidOperatingChain(
 /** Campaign GET/return path — durable wake without depending on Stripe replay. */
 export async function wakePaidCampaignEnvelope(
   envelope: ServerCampaignEnvelope,
+  identitySession?: CustomerIdentityDispatchSession,
 ): Promise<ServerCampaignEnvelope> {
-  if (!needsPaidOperatingRecovery(envelope.record)) {
-    const tasks = await readTasksEnvelope(envelope.campaignId);
-    if (latestFlyerQaIsUnresolvedFail(tasks)) {
-      return envelope;
+  if (disposableTestOperatingChainBlocked(envelope.record)) return envelope;
+  let current = envelope;
+  if (isCustomerIdentityBlocked(current.record)) {
+    const resolved = await recoverResolvedCustomerIdentityHold(
+      current.record,
+      identitySession,
+    );
+    const latestHold = await readCampaignEnvelope(current.campaignId);
+    current = latestHold ?? { ...current, record: resolved };
+    if (
+      !isCustomerIdentityBlocked(current.record) &&
+      !needsPaidOperatingRecovery(current.record)
+    ) {
+      const bound = await ensureFlyerMachineReviewBind(current.record);
+      if (bound === current.record) return current;
+      const afterBind = await readCampaignEnvelope(current.campaignId);
+      return afterBind ?? { ...current, record: bound };
     }
-    const bound = await ensureFlyerMachineReviewBind(envelope.record);
-    if (bound === envelope.record) return envelope;
-    const latest = await readCampaignEnvelope(envelope.campaignId);
-    return latest ?? { ...envelope, record: bound };
   }
-  const recovered = await recoverPaidOperatingChain(envelope.record);
-  const latest = await readCampaignEnvelope(envelope.campaignId);
-  return latest ?? { ...envelope, record: recovered.campaign };
+
+  if (!needsPaidOperatingRecovery(current.record)) {
+    if (shouldWakeFlyerRenderer(current.record)) {
+      await ensureDispatchExecution(current.record, identitySession);
+      const latest = await readCampaignEnvelope(current.campaignId);
+      return latest ?? current;
+    }
+    const tasks = await readTasksEnvelope(current.campaignId);
+    if (latestFlyerQaIsUnresolvedFail(tasks)) {
+      return current;
+    }
+    const boundFlyer = await ensureFlyerMachineReviewBind(current.record);
+    const bound = await ensureSocialPromoCompositeReviewBind(boundFlyer);
+    if (bound === current.record) return current;
+    const latest = await readCampaignEnvelope(current.campaignId);
+    return latest ?? { ...current, record: bound };
+  }
+  const recovered = await recoverPaidOperatingChain(current.record, {
+    identitySession,
+  });
+  const latest = await readCampaignEnvelope(current.campaignId);
+  return latest ?? { ...current, record: recovered.campaign };
 }

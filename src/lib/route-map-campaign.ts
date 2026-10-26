@@ -22,6 +22,11 @@ import {
 import { isRouteMapRetiredCommerceSku } from "@/config/route-map-guidance-v1";
 import type { RouteMapIntakeAnswers } from "@/config/route-map-intake-v1";
 import { CUSTOM_STUDIO_PLAN_LABEL, CUSTOM_STUDIO_PLAN_PACKAGE_ID } from "@/lib/approved-plan-display";
+import {
+  applyFlyerProductionIntakeCorrectionToRecord,
+  needsFlyerProductionIntakeCorrection,
+  pickFlyerProductionIntakeAnswers,
+} from "@/lib/project-intake-flyer-production";
 import { syncCampaignToServer } from "@/lib/campaign-store/sync-client";
 import { buildServiceScopeSnapshot, computePlanPricingTotals } from "@/lib/plan-pricing";
 import { resolveRouteMapServiceDisplayName } from "@/lib/project-builder-update-exit-copy";
@@ -624,11 +629,46 @@ export function submitRouteMapIntake(
     estimatedCompletion: studioBoard.statusContent.BUILDING_CONCEPTS.estimatedCompletion,
     studioNotes: [
       ...(updated.studioNotes ?? []),
-      { date: "Today", message: "Route Map intake received." },
+      { date: "Today", message: "Project Intake received." },
     ],
   };
 
   return persistRouteMapCampaign(updated);
+}
+
+/**
+ * Merge only missing flyer production fields into an already-submitted Intake.
+ * Preserves original submittedAt, materials, payment, and every other answer.
+ */
+export function mergeSubmittedFlyerIntakeCorrection(
+  answers: RouteMapIntakeAnswers,
+  correctedAt = new Date().toISOString(),
+): CampaignRecord | null {
+  const campaign = readCurrentCampaign();
+  if (!campaign?.paymentReceivedAt || !campaign.approvedStudioPlan) return null;
+  const updated = applyFlyerProductionIntakeCorrectionToRecord(
+    campaign,
+    answers,
+    correctedAt,
+  );
+  if (!updated) return null;
+  return persistRouteMapCampaign(updated);
+}
+
+export function saveSubmittedFlyerIntakeCorrectionDraft(
+  answers: RouteMapIntakeAnswers,
+  savedAt = new Date().toISOString(),
+): CampaignRecord | null {
+  const campaign = readCurrentCampaign();
+  if (!campaign?.paymentReceivedAt || !campaign.approvedStudioPlan) return null;
+  if (!needsFlyerProductionIntakeCorrection(campaign)) return null;
+
+  const allowed = pickFlyerProductionIntakeAnswers(answers);
+  return persistRouteMapCampaign({
+    ...campaign,
+    routeMapIntakeDraft: { answers: allowed, savedAt },
+    updatedAt: savedAt,
+  });
 }
 
 export function saveRouteMapIntakeDraft(

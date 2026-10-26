@@ -15,7 +15,9 @@ import {
 import {
   isCeremonialNextActionLead,
   isCeremonialNextUpdate,
+  isRepeatedRecoveryCopy,
 } from "@/lib/studio-board/board-status-mobile-presentation";
+import { withStudioPaymentSandboxQuery } from "@/lib/studio-payment/sandbox-query";
 
 const { campaignActions: copy } = studioBoard;
 
@@ -26,6 +28,9 @@ type Props = {
   nextUpdateLabel?: string | null;
   studioGuideHref: string;
   displayFacts?: StudioBoardDisplayFacts;
+  sourceSearch?: string;
+  /** Overview already shows the status once. */
+  showStatus?: boolean;
 };
 
 /** Primary next step on Studio Board — presentation from next-action SSoT. */
@@ -35,6 +40,8 @@ export default function CampaignNextAction({
   status,
   nextUpdateLabel,
   displayFacts,
+  sourceSearch,
+  showStatus = true,
 }: Props) {
   const [actionableMaterialKeys, setActionableMaterialKeys] = useState<readonly string[]>([]);
 
@@ -57,15 +64,33 @@ export default function CampaignNextAction({
     nextUpdateLabel,
   });
 
-  return <NextActionChrome presentation={presentation} nextUpdateLabel={nextUpdateLabel} />;
+  if (
+    presentation.action == null &&
+    (isRepeatedRecoveryCopy(presentation.lead) || isCeremonialNextActionLead(presentation.lead))
+  ) {
+    return null;
+  }
+
+  return (
+    <NextActionChrome
+      presentation={presentation}
+      nextUpdateLabel={nextUpdateLabel}
+      sourceSearch={sourceSearch}
+      showStatus={showStatus}
+    />
+  );
 }
 
 function NextActionChrome({
   presentation,
   nextUpdateLabel,
+  sourceSearch,
+  showStatus,
 }: {
   presentation: BoardNextActionPresentation;
   nextUpdateLabel?: string | null;
+  sourceSearch?: string;
+  showStatus: boolean;
 }) {
   const toneClass =
     presentation.tone === "review"
@@ -85,7 +110,7 @@ function NextActionChrome({
 
   return (
     <div className={`sb-next-action${toneClass}`} role="status" aria-live="polite">
-      {presentation.statusLabel ? (
+      {showStatus && presentation.statusLabel ? (
         <p
           className={`sb-next-action__status${
             isCeremonialNextActionLead(presentation.lead) ? " sb-status-copy-repeat" : ""
@@ -103,7 +128,10 @@ function NextActionChrome({
       </p>
       {presentation.action?.type === "navigate" ? (
         <Link
-          href={presentation.action.href}
+          href={withStudioPaymentSandboxQuery(
+            presentation.action.href,
+            sourceSearch,
+          )}
           className="utility-btn utility-btn--primary sb-next-action__cta"
         >
           {presentation.action.label}

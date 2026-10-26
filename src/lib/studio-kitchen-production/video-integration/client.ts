@@ -170,17 +170,25 @@ export async function shotstackGetRender(
         url?: string;
         error?: string;
         completed?: string;
+        credits?: number;
+        billedCredits?: number;
         data?: { credits?: number };
+        plan?: { credits?: number };
       };
     };
     const providerStatus = json.response?.status ?? "unknown";
+    const credits =
+      json.response?.data?.credits ??
+      json.response?.credits ??
+      json.response?.billedCredits ??
+      json.response?.plan?.credits;
     return {
       ok: true,
       status: mapProviderStatus(providerStatus),
       providerStatus,
       outputUrl: json.response?.url,
       error: json.response?.error,
-      credits: json.response?.data?.credits,
+      credits,
       completedAt: json.response?.completed,
     };
   } catch (e) {

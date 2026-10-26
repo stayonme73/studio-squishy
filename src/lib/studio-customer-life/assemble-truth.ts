@@ -5,7 +5,7 @@ import { needsPaidOperatingRecovery } from "@/lib/studio-paid-activation-recover
 import { studioReviewEligibilityV1 } from "@/config/studio-review-eligibility-v1";
 import { evaluateReviewEligibility } from "@/lib/studio-review-eligibility";
 import { deriveCorrectionAccounting } from "@/lib/job-control/correction-round-ledger";
-import { ownerAskCustomerStalls } from "@/lib/campaign-tasks/owner-decision-aftermath";
+import { ownerAskCustomerStalls } from "@/lib/campaign-tasks/owner-ask-customer-stalls";
 import { AUTHORIZED_LIFECYCLE_EMAIL_EVENT_TYPES } from "@/lib/job-control/communication";
 import { DESIGN_RENDERER_PROOF_SKU } from "@/lib/studio-design-renderer/types";
 
@@ -18,8 +18,25 @@ import type {
   CustomerLifeWaitingOn,
 } from "./types";
 
-function flyerJob(tasks: CustomerLifeInput["tasks"]) {
-  return tasks?.jobRecords?.find((job) => job.skuId === "v2-rtu-flyer") ?? null;
+const SPINE_PRIORITY: Record<string, number> = {
+  waiting_on_client: 100,
+  ready_for_review: 90,
+  revision_requested: 80,
+  approved: 70,
+  ready_for_delivery: 60,
+  building_concepts: 50,
+  ready_for_queue: 40,
+  delivered: 30,
+  refunded_cancelled: 10,
+};
+
+function primaryCustomerLifeJob(tasks: CustomerLifeInput["tasks"]) {
+  const jobs = tasks?.jobRecords ?? [];
+  if (jobs.length === 0) return null;
+  return [...jobs].sort(
+    (a, b) =>
+      (SPINE_PRIORITY[b.spineStatus] ?? 0) - (SPINE_PRIORITY[a.spineStatus] ?? 0),
+  )[0] ?? null;
 }
 
 /** Customer-visible Version N. Does not expose hashes, pins, or artifact ids. */
@@ -44,9 +61,7 @@ function countReceived(materials: CustomerLifeInput["materials"]): number {
 function countUnusable(materials: CustomerLifeInput["materials"]): number {
   if (!materials) return 0;
   return materials.filter(
-    (item) =>
-      item.reviewStatus === "rejected" ||
-      item.reviewStatus === "needs_clarification",
+    (item) => item.reviewStatus === "needs_clarification",
   ).length;
 }
 
@@ -84,9 +99,13 @@ function resolvePhase(input: {
   if (input.reviewEligible) return "ready_for_review";
   if (!input.intakeComplete) return "awaiting_intake";
   if (input.blockingMaterials > 0) return "awaiting_materials";
+  if (input.spineStatus === "waiting_on_client") return "awaiting_materials";
   if (input.qaFailedUnresolved) return "internal_qa";
   if (input.qaPassed && !input.reviewEligible) return "internal_qa";
-  if (input.productionStarted) return "producing";
+  if (input.spineStatus === "ready_for_queue") return "awaiting_production_slot";
+  if (input.productionStarted || input.spineStatus === "building_concepts") {
+    return "producing";
+  }
   if (input.recovering) return "recovering";
   return "producing";
 }
@@ -95,29 +114,30 @@ export function assembleCustomerLifeTruth(
   input: CustomerLifeInput,
 ): CustomerLifeTruth {
   const campaign = input.campaign;
-  const job = flyerJob(input.tasks);
+  const job = primaryCustomerLifeJob(input.tasks);
   const paymentConfirmed = Boolean(
     campaign?.paymentReceivedAt && campaign.paymentTruth?.status === "confirmed",
   );
   const recovering = campaign ? needsPaidOperatingRecovery(campaign) : false;
   const intakeComplete = campaign ? isIntakeComplete(campaign) : false;
   const blockingMaterialsCount =
-    campaign?.materialsSummary?.blockingRequiredCount ??
-    input.materials?.filter(
-      (item) =>
-        item.requirementLevel === "required" &&
-        item.reviewStatus !== "approved_for_use",
-    ).length ??
-    0;
+    input.materials !== undefined
+      ? input.materials.filter(
+          (item) =>
+            item.requirementLevel === "required" &&
+            item.reviewStatus !== "approved_for_use",
+        ).length
+      : (campaign?.materialsSummary?.blockingRequiredCount ?? 0);
   const productionStarted = Boolean(job?.productionStartedAt);
   const qaRecords = input.tasks?.qaRecords ?? [];
+  const qaSkuNeedle = job?.skuId ?? "v2-rtu-flyer";
   const qaPassed = qaRecords.some(
     (record) =>
-      record.action === "qa_pass" && record.taskId.includes("v2-rtu-flyer"),
+      record.action === "qa_pass" && record.taskId.includes(qaSkuNeedle),
   );
   const qaFailed = qaRecords.some(
     (record) =>
-      record.taskId.includes("v2-rtu-flyer") &&
+      record.taskId.includes(qaSkuNeedle) &&
       (record.action === "qa_fail" || record.action === "qa_block"),
   );
   let reviewEligible = false;
@@ -244,6 +264,20 @@ export function assembleCustomerLifeTruth(
       recoveryClass: "retryable",
     });
   }
+  if (
+    paymentConfirmed &&
+    intakeComplete &&
+    blockingMaterialsCount === 0 &&
+    job?.spineStatus === "ready_for_queue" &&
+    !productionStarted
+  ) {
+    stalls.push({
+      id: "waiting_for_production_slot",
+      summary:
+        "The project is safely in line for an available Studio production slot. Nothing is needed from the customer.",
+      recoveryClass: "automatic",
+    });
+  }
   const queuedNotices = (input.tasks?.jobCommunicationRecords ?? []).filter(
     (record) =>
       record.channel === "in_app_outbox" &&
@@ -269,7 +303,7 @@ export function assembleCustomerLifeTruth(
         packet.status === "assigned" || (packet.assignmentEvents?.length ?? 0) > 0,
     ),
   );
-  const flyerQa = qaRecords.filter((record) => record.taskId.includes("v2-rtu-flyer"));
+  const flyerQa = qaRecords.filter((record) => record.taskId.includes(qaSkuNeedle));
   const qaHappened = flyerQa.length > 0;
   let qaState: CustomerLifeQaState = "not_recorded";
   if (flyerQa.some((record) => record.action === "qa_block") && !qaPassed) {
@@ -303,6 +337,7 @@ export function assembleCustomerLifeTruth(
       stall.id === "activation_pending_retry" &&
       (reviewEligible ||
         productionStarted ||
+        phase === "awaiting_production_slot" ||
         phase === "ready_for_review" ||
         phase === "revision" ||
         phase === "approved" ||

@@ -34,7 +34,7 @@ function postSubmitCampaign(overrides: Partial<CampaignRecord> = {}): CampaignRe
     projectDetailsSubmittedAt: now,
     createdAt: now,
     updatedAt: now,
-    studioNotes: [{ date: "Today", message: "Route Map intake received." }],
+    studioNotes: [{ date: "Today", message: "Project Intake received." }],
     deliverablesDelivered: {},
     materialsSummary: {
       blockingRequiredCount: 0,

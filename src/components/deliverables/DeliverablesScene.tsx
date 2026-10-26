@@ -1,20 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 
+import DeliveryObservationForm from "@/components/deliverables/DeliveryObservationForm";
 import FinalDeliveryAtmosphere from "@/components/deliverables/FinalDeliveryAtmosphere";
 import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
 import NoActiveProjectPanel from "@/components/shared/NoActiveProjectPanel";
 import UtilityPageFrame from "@/components/shared/UtilityPageFrame";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
+import StudioExtrasPanel from "@/components/studio-extras/StudioExtrasPanel";
 import {
   deliverables,
   customerVisibleFileFormatLabel,
   type CampaignDeliverablesPackage,
 } from "@/config/deliverables";
+import { shortFormCustomerDeliveryFacts } from "@/lib/studio-dispatch/short-form-current-door-delivery-copy";
 import { copyTextToClipboard, downloadTextFile } from "@/lib/copy-download";
 import {
   HONEST_DELIVERY_COPY,
@@ -23,6 +26,8 @@ import {
 import type { ClientJobDeliveryView } from "@/lib/job-control/final-delivery-view";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 import { useFinalDelivery } from "@/lib/use-final-delivery";
+import { isPaidIncompleteIntake } from "@/lib/post-submit-customer-signals";
+import { studioCustomerCurrentStatusV1 } from "@/config/studio-customer-current-status-v1";
 
 const { summary, hero, sections, categories, footer, routes, jobDelivery } = deliverables;
 
@@ -107,12 +112,45 @@ function formatDeliveryWhen(iso: string) {
   });
 }
 
+function TextDeliveryBody({ url }: { url: string }) {
+  const [text, setText] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancel = false;
+    void fetch(url, { credentials: "include" })
+      .then((response) => (response.ok ? response.text() : ""))
+      .then((body) => {
+        if (!cancel) setText(body.trim() ? body : null);
+      })
+      .catch(() => {
+        if (!cancel) setText(null);
+      });
+    return () => {
+      cancel = true;
+    };
+  }, [url]);
+
+  if (!text) return null;
+  return (
+    <>
+      <p className="fd-item__text" style={{ whiteSpace: "pre-wrap" }}>
+        {text}
+      </p>
+      <CopyButton text={text} />
+    </>
+  );
+}
+
 function JobDeliveryGrid({
   jobs,
   emptyFilesCopy,
+  packageFacts,
+  campaignId,
 }: {
   jobs: readonly ClientJobDeliveryView[];
   emptyFilesCopy: string;
+  packageFacts?: { paidLabel: string; revisionLabel: string } | null;
+  campaignId?: string;
 }) {
   return (
     <div className="fd-deliverables__grid">
@@ -121,6 +159,11 @@ function JobDeliveryGrid({
           <header className="fd-block__head">
             <div className="fd-block__head-main">
               <h3>{job.serviceName}</h3>
+              {packageFacts ? (
+                <p className="fd-item__meta">
+                  Paid {packageFacts.paidLabel}. {packageFacts.revisionLabel}
+                </p>
+              ) : null}
               {job.deliveredAt ? (
                 <p className="fd-item__meta">
                   {jobDelivery.deliveryDateLabel}: {formatDeliveryWhen(job.deliveredAt)}
@@ -149,6 +192,16 @@ function JobDeliveryGrid({
                       {customerVisibleFileFormatLabel(file.fileType, file.fileName)}
                       {file.versionLabel ? ` · ${file.versionLabel}` : ""}
                     </p>
+                    {file.fileType.startsWith("video/") ? (
+                      <video controls playsInline preload="metadata" src={file.url} />
+                    ) : null}
+                    {file.fileType.startsWith("image/") ? (
+                      <a href={file.url} target="_blank" rel="noopener noreferrer">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={file.url} alt={file.deliverableLabel} style={{ width: "100%", maxWidth: 280 }} />
+                      </a>
+                    ) : null}
+                    {file.fileType.startsWith("text/") ? <TextDeliveryBody url={file.url} /> : null}
                     {file.useInstructions ? (
                       <p className="fd-item__text">
                         <strong>{jobDelivery.instructionsLabel}:</strong> {file.useInstructions}
@@ -165,6 +218,9 @@ function JobDeliveryGrid({
             ) : (
               <p className="fd-item__text">{emptyFilesCopy}</p>
             )}
+            {campaignId ? (
+              <DeliveryObservationForm campaignId={campaignId} jobId={job.jobId} />
+            ) : null}
           </div>
         </article>
       ))}
@@ -449,8 +505,15 @@ export default function DeliverablesScene({ embedded = false }: DeliverablesScen
   }
 
   if (view.state === "preparing") {
+    const waitingOnIntake = campaign ? isPaidIncompleteIntake(campaign) : false;
+    const notReady = waitingOnIntake
+      ? {
+          ...deliverables.clientAccess.notReady,
+          messageSecondary: `This project is still ${studioCustomerCurrentStatusV1.labels.intakeNeeded}. Nothing has been approved or released yet.`,
+        }
+      : deliverables.clientAccess.notReady;
     return wrap(
-      <NoActiveProjectPanel copy={deliverables.clientAccess.notReady} titleId="fd-access-title" />,
+      <NoActiveProjectPanel copy={notReady} titleId="fd-access-title" />,
     );
   }
 
@@ -586,15 +649,33 @@ export default function DeliverablesScene({ embedded = false }: DeliverablesScen
           </p>
 
           {view.useJobDelivery && view.finalDelivery ? (
-            <JobDeliveryGrid jobs={view.finalDelivery.jobs} emptyFilesCopy={emptyFilesCopy} />
+            <JobDeliveryGrid
+              jobs={view.finalDelivery.jobs}
+              emptyFilesCopy={emptyFilesCopy}
+              campaignId={campaign?.campaignId}
+              packageFacts={
+                campaign?.condensedOffer?.packageId === "short_form_video_editing" &&
+                campaign.condensedOffer.amountDueCents != null &&
+                campaign.revisionRoundsIncluded != null
+                  ? shortFormCustomerDeliveryFacts({
+                      paidAmountCents: campaign.condensedOffer.amountDueCents,
+                      revisionRounds: campaign.revisionRoundsIncluded,
+                    })
+                  : null
+              }
+            />
           ) : pkg ? (
             <PreviewPackageGrid pkg={pkg} />
+          ) : null}
+
+          {view.useJobDelivery && campaign?.campaignId ? (
+            <StudioExtrasPanel campaignId={campaign.campaignId} placement="delivery" bare />
           ) : null}
         </section>
       ) : null}
 
       <div className="fd-footer-actions">
-        <Link href={routes.draftRoom} className="fd-btn fd-btn--start">
+        <Link href={routes.newCampaign} className="fd-btn fd-btn--start">
           {footer.startNewCampaign}
         </Link>
         <Link href={routes.studioBoard} className="fd-btn fd-btn--return">

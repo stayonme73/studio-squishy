@@ -1,10 +1,33 @@
 import type { ServiceId } from "@/catalog/types";
 import type { RouteMapIntakeAnswers, RouteMapIntakeSchema } from "@/config/route-map-intake-v1";
-import type { RouteMapJobId, RouteMapRoadId } from "@/config/route-map-v1";
+import {
+  getRouteMapJob,
+  type RouteMapJobId,
+  type RouteMapRoadId,
+} from "@/config/route-map-v1";
 import { legacyRouteQuarantineV1 } from "@/config/legacy-route-quarantine-v1";
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
-import { resolveRouteMapRestoredJourney } from "@/lib/route-map-campaign";
+import {
+  resolveRouteMapRestoredJourney,
+  type RouteMapRestoredJourney,
+} from "@/lib/route-map-campaign";
 import { isIntakeComplete } from "@/lib/studio-board-campaign";
+import {
+  needsFlyerProductionIntakeCorrection,
+} from "@/lib/project-intake-flyer-production";
+import {
+  clipIntakeOptionalKeys,
+  clipIntakeVisibleGaps,
+  clipProductionFactsSaved,
+  kitIntakeOptionalKeys,
+  kitIntakeVisibleGaps,
+  shortFormIntakeOptionalKeys,
+  shortFormIntakeVisibleGaps,
+  socialIntakeOptionalKeys,
+  socialIntakeVisibleGaps,
+  projectIntakeServiceFieldKey,
+  withSavedIntakeContact,
+} from "@/lib/project-intake-plan";
 
 /** Customer-facing gate when Intake cannot (or should not) open as an editable form. */
 export type IntakeEntrySurface =
@@ -14,6 +37,26 @@ export type IntakeEntrySurface =
       roadId: RouteMapRoadId;
       selectedServiceIds: readonly ServiceId[];
       draftAnswers: RouteMapIntakeAnswers | null;
+      /** Submitted Intake that still needs flyer production fields only. */
+      flyerProductionCorrection?: boolean;
+      /** Current three-package offer. Intake uses this instead of a catalog schema. */
+      condensedPackageId?:
+        | "clip_repurposing"
+        | "short_form_video_editing"
+        | "social_and_promo_graphics"
+        | "creative_qa_finish"
+        | "campaign_launch_kit";
+      condensedPackageName?: string;
+      /** Clip only. Saved answers are not shown again. */
+      clipAskOnce?:
+        | { kind: "saved"; lead: string; action: string }
+        | {
+            kind: "gaps";
+            keys: readonly string[];
+            optionalKeys?: readonly string[];
+            lead?: string;
+          }
+        | { kind: "missing-confirmation"; lead: string };
     }
   | { kind: "already-submitted" }
   | { kind: "missing-payment" }
@@ -45,6 +88,175 @@ const EMPTY_SOCIAL: SocialPostsIntakeRestoredState = {
   fileName: "",
   fileMimeType: "",
 };
+
+function clipAskOnceForSavedAnswers(
+  answers: RouteMapIntakeAnswers | null | undefined,
+  contact: {
+    businessName?: string | null;
+    email?: string | null;
+    purpose?: string | null;
+  },
+):
+  | { kind: "saved"; lead: string; action: string }
+  | { kind: "gaps"; keys: readonly string[]; optionalKeys: readonly string[]; lead: string }
+  | { kind: "missing-confirmation"; lead: string } {
+  const saved = clipProductionFactsSaved(answers);
+  const gaps = clipIntakeVisibleGaps(answers, contact);
+  if (saved && gaps.length === 0) {
+    return {
+      kind: "saved",
+      lead: "Your answers are saved. Add the recording in My Studio.",
+      action: "Add the recording in My Studio",
+    };
+  }
+  if (gaps.length > 0) {
+    return {
+      kind: "gaps",
+      keys: gaps,
+      optionalKeys: clipIntakeOptionalKeys(answers),
+      lead: "Confirm the recording. Notes are optional. You add the file in My Studio.",
+    };
+  }
+  return {
+    kind: "missing-confirmation",
+    lead: "The source or audio confirmation from Build Your Project is missing. The Studio will not invent it.",
+  };
+}
+
+function socialAskOnceForSavedAnswers(
+  answers: RouteMapIntakeAnswers | null | undefined,
+  contact: {
+    businessName?: string | null;
+    email?: string | null;
+    purpose?: string | null;
+  },
+): { kind: "saved"; lead: string; action: string } | {
+  kind: "gaps";
+  keys: readonly string[];
+  optionalKeys: readonly string[];
+  lead: string;
+} {
+  const gaps = socialIntakeVisibleGaps(answers, contact);
+  if (gaps.length === 0) {
+    return {
+      kind: "saved",
+      lead: "Your answers are saved. Add your logo and photos in My Studio.",
+      action: "Add the files in My Studio",
+    };
+  }
+  return {
+    kind: "gaps",
+    keys: gaps,
+    optionalKeys: socialIntakeOptionalKeys(answers),
+    lead: "Confirm you can use the materials. Notes are optional. You add the files in My Studio.",
+  };
+}
+
+function shortFormAskOnceForSavedAnswers(
+  answers: RouteMapIntakeAnswers | null | undefined,
+  contact: {
+    businessName?: string | null;
+    email?: string | null;
+    purpose?: string | null;
+  },
+) {
+  const gaps = shortFormIntakeVisibleGaps(answers, contact);
+  if (gaps.length === 0) {
+    return {
+      kind: "saved" as const,
+      lead: "Your answers are saved. Add the clips in My Studio.",
+      action: "Add the clips in My Studio",
+    };
+  }
+  return {
+    kind: "gaps" as const,
+    keys: gaps,
+    optionalKeys: shortFormIntakeOptionalKeys(answers),
+    lead: "Confirm the clips. Notes are optional. You add the files in My Studio.",
+  };
+}
+
+/** Local look at the next page. No campaign and no payment. */
+export function intakeLookSurface(input: {
+  packageId: string;
+  packageName: string;
+  businessName: string;
+  email: string;
+  purpose: string;
+  answers?: RouteMapIntakeAnswers | null;
+}): Extract<IntakeEntrySurface, { kind: "form" }> | null {
+  const packageId = input.packageId;
+  if (
+    packageId !== "clip_repurposing" &&
+    packageId !== "short_form_video_editing" &&
+    packageId !== "social_and_promo_graphics" &&
+    packageId !== "campaign_launch_kit"
+  ) {
+    return null;
+  }
+  const contact = {
+    businessName: input.businessName,
+    email: input.email,
+    purpose: input.purpose,
+  };
+  const storedAnswers = withSavedIntakeContact(input.answers ?? null, packageId, contact);
+  const clipAskOnce =
+    packageId === "clip_repurposing"
+      ? clipAskOnceForSavedAnswers(storedAnswers, contact)
+      : packageId === "social_and_promo_graphics"
+        ? socialAskOnceForSavedAnswers(null, contact)
+        : packageId === "short_form_video_editing"
+          ? shortFormAskOnceForSavedAnswers(null, contact)
+          : kitAskOnceForSavedAnswers(null, contact);
+  const previewAskOnce =
+    packageId === "clip_repurposing" && clipAskOnce.kind === "saved"
+      ? {
+          kind: "gaps" as const,
+          keys: ["qualifyingSource", "intelligible", "rights"].map((fieldId) =>
+            projectIntakeServiceFieldKey(packageId, fieldId),
+          ),
+          optionalKeys: ["context", "cta", "mustKeep", "mustNot"].map((fieldId) =>
+            projectIntakeServiceFieldKey(packageId, fieldId),
+          ),
+          lead: "Confirm the recording. Notes are optional. You add the file in My Studio after payment.",
+        }
+      : clipAskOnce;
+  if (packageId !== "clip_repurposing" && previewAskOnce.kind !== "gaps") return null;
+  return {
+    kind: "form",
+    jobId: packageId as RouteMapJobId,
+    roadId: "random-exit",
+    selectedServiceIds: [],
+    draftAnswers: storedAnswers,
+    condensedPackageId: packageId,
+    condensedPackageName: input.packageName,
+    clipAskOnce: previewAskOnce,
+  };
+}
+
+function kitAskOnceForSavedAnswers(
+  answers: RouteMapIntakeAnswers | null | undefined,
+  contact: {
+    businessName?: string | null;
+    email?: string | null;
+    purpose?: string | null;
+  },
+) {
+  const gaps = kitIntakeVisibleGaps(answers, contact);
+  if (gaps.length === 0) {
+    return {
+      kind: "saved" as const,
+      lead: "Your answers are saved. Add your logo and photos in My Studio.",
+      action: "Add the files in My Studio",
+    };
+  }
+  return {
+    kind: "gaps" as const,
+    keys: gaps,
+    optionalKeys: kitIntakeOptionalKeys(answers),
+    lead: "Add the offer details for this campaign. Notes are optional. You add the files in My Studio.",
+  };
+}
 
 function firstLineAfterPrefix(block: string, prefix: RegExp): string {
   const match = block.match(prefix);
@@ -176,6 +388,33 @@ export function mergeCampaignPreferLocalIntakeDraft(
   return server;
 }
 
+function isRouteMapRoadId(value: unknown): value is RouteMapRoadId {
+  return (
+    value === "i75" ||
+    value === "i20" ||
+    value === "update" ||
+    value === "random-exit" ||
+    value === "i285"
+  );
+}
+
+function restoreIntakeJourneyFromApprovedPlan(
+  campaign: CampaignRecord,
+): RouteMapRestoredJourney | null {
+  const selectedServiceIds = campaign.approvedStudioPlan?.selectedServiceIds ?? [];
+  if (selectedServiceIds.length === 0) return null;
+  const jobId = selectedServiceIds[0] as RouteMapJobId;
+  if (!getRouteMapJob(jobId)) return null;
+  const roadId = campaign.routeMapContext?.roadId;
+  if (!isRouteMapRoadId(roadId)) return null;
+  return {
+    step: "intake",
+    jobId,
+    roadId,
+    selectedServiceIds,
+  };
+}
+
 /**
  * Resolve what the customer should see when opening Project Intake (`?step=intake`
  * or restored currentStep intake).
@@ -188,7 +427,23 @@ export function resolveIntakeEntrySurface(
     requestedStep === "intake" || campaign?.routeMapContext?.currentStep === "intake";
   if (!wantsIntake) return null;
 
-  if (isIntakeComplete(campaign)) {
+  if (campaign && isIntakeComplete(campaign)) {
+    if (needsFlyerProductionIntakeCorrection(campaign)) {
+      const restored = resolveRouteMapRestoredJourney(campaign.routeMapContext, "intake");
+      if (restored) {
+        return {
+          kind: "form",
+          jobId: restored.jobId,
+          roadId: restored.roadId,
+          selectedServiceIds: restored.selectedServiceIds,
+          draftAnswers: {
+            ...(campaign.routeMapIntake?.answers ?? {}),
+            ...(readUsableIntakeDraftAnswers(campaign) ?? {}),
+          },
+          flyerProductionCorrection: true,
+        };
+      }
+    }
     return { kind: "already-submitted" };
   }
 
@@ -202,6 +457,49 @@ export function resolveIntakeEntrySurface(
 
   if (!campaign.paymentReceivedAt) {
     return { kind: "missing-payment" };
+  }
+
+  if (campaign.condensedOffer) {
+    const roadId = campaign.routeMapContext?.roadId;
+    const packageId = campaign.condensedOffer.packageId;
+    const storedDraft = readUsableIntakeDraftAnswers(campaign);
+    const savedContact = {
+      businessName: campaign.condensedOffer.company,
+      purpose: campaign.condensedOffer.projectNeed,
+    };
+    const draftAnswers = withSavedIntakeContact(
+      packageId === "clip_repurposing" ||
+        packageId === "social_and_promo_graphics" ||
+        packageId === "short_form_video_editing" ||
+        packageId === "campaign_launch_kit"
+        ? {
+            ...(storedDraft ?? {}),
+            ...(campaign.routeMapIntake?.answers ?? {}),
+          }
+        : storedDraft,
+      packageId,
+      savedContact,
+    );
+    const clipAskOnce =
+      packageId === "clip_repurposing"
+        ? clipAskOnceForSavedAnswers(draftAnswers, savedContact)
+        : packageId === "social_and_promo_graphics"
+          ? socialAskOnceForSavedAnswers(draftAnswers, savedContact)
+          : packageId === "short_form_video_editing"
+            ? shortFormAskOnceForSavedAnswers(draftAnswers, savedContact)
+            : packageId === "campaign_launch_kit"
+              ? kitAskOnceForSavedAnswers(draftAnswers, savedContact)
+              : undefined;
+    return {
+      kind: "form",
+      jobId: packageId as RouteMapJobId,
+      roadId: isRouteMapRoadId(roadId) ? roadId : "random-exit",
+      selectedServiceIds: [],
+      draftAnswers,
+      condensedPackageId: packageId,
+      condensedPackageName: campaign.condensedOffer.name,
+      ...(clipAskOnce ? { clipAskOnce } : {}),
+    };
   }
 
   if (!campaign.approvedStudioPlan) {
@@ -220,7 +518,9 @@ export function resolveIntakeEntrySurface(
     };
   }
 
-  const restored = resolveRouteMapRestoredJourney(campaign.routeMapContext, "intake");
+  const restored =
+    resolveRouteMapRestoredJourney(campaign.routeMapContext, "intake") ??
+    restoreIntakeJourneyFromApprovedPlan(campaign);
   if (!restored) {
     return {
       kind: "missing-context",
@@ -243,6 +543,9 @@ export const INTAKE_CONTINUITY_COPY = {
   alreadySubmittedLead:
     "Your answers are on record. Open Studio Board to see your project home.",
   alreadySubmittedCta: "Return to Studio Board",
+  flyerCorrectionTitle: "A few flyer details are still needed.",
+  flyerCorrectionLead:
+    "Your Project Intake is already on record. Please add only the flyer details below so the Studio can start this work.",
   missingPaymentTitle: "Payment is still needed before Project Intake.",
   missingPaymentLead:
     "Complete Review and Confirm for this project, then Project Intake will open.",

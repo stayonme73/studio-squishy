@@ -3,8 +3,10 @@
  * v2-rtu-short-video — same Board → QA → Review spine as flyer. No CapCut.
  */
 
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import path from "path";
+
+import { LIVE_SHOTSTACK_CERT_SKU } from "@/config/studio-live-shotstack-certification-v1";
 
 import type { CampaignRecord } from "@/config/studio-board";
 import {
@@ -23,6 +25,7 @@ import {
   enqueueJobCommunicationRecord,
   resolveCampaignCommunicationClientId,
 } from "@/lib/job-control/communication";
+import { escalateRevisionReworkToOwner } from "@/lib/job-control/revision-rework-escalation";
 import type { PurchasedJobRecord } from "@/lib/job-control/types";
 import {
   buildInternalQaReviewAuthorization,
@@ -36,6 +39,9 @@ import type { VideoQualityEvidence } from "@/lib/studio-kitchen-production/video
 import { presentShortVideoReviewProof } from "@/lib/studio-review-revision/present-short-video-review";
 import { normalizeContentSha256, sameContentSha256 } from "@/lib/studio-review-revision/hash";
 import { deliverLifecycleNoticesForCampaign } from "@/lib/studio-lifecycle-email/campaign";
+
+import { customerArtifactRootRel } from "@/lib/studio-dispatch/map-flyer-job-truth";
+import type { ShortVideoHookReceipt } from "@/lib/studio-dispatch/short-video-dispatch-hook";
 
 import { assembleCustomerLifeTruth } from "./assemble-truth";
 
@@ -226,15 +232,23 @@ export function bindShortVideoIdentityToQaRecords(input: {
       nextJob = moved.job;
       events = moved.events;
     }
+    let failedEnvelope: ServerTasksEnvelope = {
+      ...envelope,
+      jobRecords: (envelope.jobRecords ?? []).map((entry) =>
+        entry.jobId === job.jobId ? nextJob : entry,
+      ),
+      jobActivityEvents: events,
+      updatedAt: new Date().toISOString(),
+    };
+    // The customer is waiting on a change they asked for. Do not go quiet.
+    failedEnvelope = escalateRevisionReworkToOwner({
+      campaign: input.campaign,
+      envelope: failedEnvelope,
+      job: nextJob,
+      clientUserId: input.clientUserId,
+    }).envelope;
     return {
-      envelope: {
-        ...envelope,
-        jobRecords: (envelope.jobRecords ?? []).map((entry) =>
-          entry.jobId === job.jobId ? nextJob : entry,
-        ),
-        jobActivityEvents: events,
-        updatedAt: new Date().toISOString(),
-      },
+      envelope: failedEnvelope,
       bound: true,
       alreadyBound: false,
       qaAction,
@@ -471,5 +485,177 @@ export async function attachShortVideoArtifactToCustomerJob(input: {
     message: eligible
       ? "Short video bound and Review-ready with playable MP4 proof."
       : "Short video attach ran but Review eligibility did not open — check QA tasks and intake.",
+  };
+}
+
+export function readShortVideoHookReceipt(input: {
+  repoRoot?: string;
+  campaignId: string;
+  dispatchId: string;
+}): ShortVideoHookReceipt | null {
+  const repoRoot = input.repoRoot ?? process.cwd();
+  const receiptRel = `${customerArtifactRootRel(input.campaignId, input.dispatchId)}/short-video-hook-receipt.json`;
+  const receiptAbs = path.join(repoRoot, receiptRel);
+  if (!existsSync(receiptAbs)) return null;
+  try {
+    return JSON.parse(readFileSync(receiptAbs, "utf8")) as ShortVideoHookReceipt;
+  } catch {
+    return null;
+  }
+}
+
+function retractShortVideoReviewEligibility(
+  envelope: ServerTasksEnvelope,
+): { envelope: ServerTasksEnvelope; changed: boolean } {
+  const job = envelope.jobRecords?.find(
+    (entry) => entry.skuId === SHORT_VIDEO_MACHINE_REVIEW_SKU,
+  );
+  if (!job) return { envelope, changed: false };
+  const hasAuth = Boolean(job.internalQaReviewAuthorization);
+  const isReady = job.spineStatus === "ready_for_review";
+  if (!hasAuth && !isReady) return { envelope, changed: false };
+
+  let nextJob: PurchasedJobRecord = {
+    ...job,
+    internalQaReviewAuthorization: undefined,
+  };
+  let events = envelope.jobActivityEvents ?? [];
+  if (isReady) {
+    const moved = applyJobSpineStatusChange(nextJob, events, {
+      job: nextJob,
+      nextStatus: "building_concepts",
+      actor: { role: "system", displayName: "Studio Machine" },
+      reason:
+        "Short-video production did not pass. Review is not open.",
+    });
+    nextJob = moved.job;
+    events = moved.events;
+  }
+  return {
+    envelope: {
+      ...envelope,
+      jobRecords: (envelope.jobRecords ?? []).map((entry) =>
+        entry.jobId === job.jobId ? nextJob : entry,
+      ),
+      jobActivityEvents: events,
+      updatedAt: new Date().toISOString(),
+    },
+    changed: true,
+  };
+}
+
+/**
+ * Bind a Machine-produced Shotstack MP4 from the launch-menu observer
+ * receipt. Observer failure does not open Review. Scout must not attach
+ * a replacement file as the production mechanism.
+ */
+export async function ensureShortVideoMachineReviewBindFromCampaign(
+  campaign: CampaignRecord,
+): Promise<CampaignRecord> {
+  const observer = campaign.dispatchExecution?.launchMenuProductionObserver;
+  const result = (observer?.results ?? []).find(
+    (entry) => entry.skuId === LIVE_SHOTSTACK_CERT_SKU,
+  );
+  if (!result) return campaign;
+
+  const envelope = await readTasksEnvelope(campaign.campaignId);
+  if (!envelope) return campaign;
+
+  const receipt = readShortVideoHookReceipt({
+    campaignId: campaign.campaignId,
+    dispatchId: result.dispatchId,
+  });
+  const passed =
+    result.ok === true &&
+    result.action === "invoked" &&
+    Boolean(receipt?.ok) &&
+    receipt?.evidence?.gatePassed === true &&
+    Boolean(receipt?.mp4RelativePath) &&
+    Boolean(receipt?.mp4ContentSha256);
+
+  if (passed && receipt?.mp4RelativePath && receipt.mp4ContentSha256) {
+    return ensureShortVideoMachineReviewBind({
+      campaignId: campaign.campaignId,
+      mp4Path: receipt.mp4RelativePath,
+      contentSha256: receipt.mp4ContentSha256,
+      durationSeconds: receipt.durationSeconds,
+      scriptVersionId: receipt.scriptVersionId,
+      artifactId: receipt.providerRenderId
+        ? `shotstack-${receipt.providerRenderId}`
+        : `${SHORT_VIDEO_MACHINE_REVIEW_SKU}-v1`,
+      videoQualityEvidence: receipt.evidence,
+    });
+  }
+
+  if (
+    receipt?.mp4RelativePath &&
+    receipt.mp4ContentSha256 &&
+    receipt.evidence &&
+    receipt.evidence.gatePassed !== true
+  ) {
+    return ensureShortVideoMachineReviewBind({
+      campaignId: campaign.campaignId,
+      mp4Path: receipt.mp4RelativePath,
+      contentSha256: receipt.mp4ContentSha256,
+      durationSeconds: receipt.durationSeconds,
+      scriptVersionId: receipt.scriptVersionId,
+      artifactId: receipt.providerRenderId
+        ? `shotstack-${receipt.providerRenderId}`
+        : `${SHORT_VIDEO_MACHINE_REVIEW_SKU}-qa-fail`,
+      videoQualityEvidence: receipt.evidence,
+    });
+  }
+
+  const retracted = retractShortVideoReviewEligibility(envelope);
+  let nextEnvelope = retracted.envelope;
+  const blocked = applyShortVideoCustomerWaitIfNeeded(nextEnvelope, result);
+  if (retracted.changed || blocked.changed) {
+    await writeTasksEnvelope(blocked.envelope);
+  }
+  return campaign;
+}
+
+function applyShortVideoCustomerWaitIfNeeded(
+  envelope: ServerTasksEnvelope,
+  result: { ok: boolean; failureCode?: string },
+): { envelope: ServerTasksEnvelope; changed: boolean } {
+  const customerBlock =
+    result.failureCode === "MISSING_USABLE_FOOTAGE" ||
+    result.failureCode === "MISSING_REQUIRED_FACTS";
+  if (result.ok || !customerBlock) {
+    return { envelope, changed: false };
+  }
+  const job = envelope.jobRecords?.find(
+    (entry) => entry.skuId === SHORT_VIDEO_MACHINE_REVIEW_SKU,
+  );
+  if (!job) return { envelope, changed: false };
+  if (
+    job.spineStatus === "waiting_on_client" ||
+    job.spineStatus === "ready_for_review" ||
+    job.spineStatus === "approved" ||
+    job.spineStatus === "delivered" ||
+    job.spineStatus === "refunded_cancelled"
+  ) {
+    return { envelope, changed: false };
+  }
+  const moved = applyJobSpineStatusChange(job, envelope.jobActivityEvents ?? [], {
+    job,
+    nextStatus: "waiting_on_client",
+    actor: { role: "system", displayName: "Studio Machine" },
+    reason:
+      result.failureCode === "MISSING_USABLE_FOOTAGE"
+        ? "Short video cannot continue until the customer provides usable photos or footage."
+        : "Short video cannot continue until required intake facts are provided.",
+  });
+  return {
+    envelope: {
+      ...envelope,
+      jobRecords: (envelope.jobRecords ?? []).map((entry) =>
+        entry.jobId === job.jobId ? moved.job : entry,
+      ),
+      jobActivityEvents: moved.events,
+      updatedAt: new Date().toISOString(),
+    },
+    changed: true,
   };
 }

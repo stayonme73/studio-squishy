@@ -166,16 +166,23 @@ describe("STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1", () =>
   });
 
   it("customer email uses locked Review Room / Studio Board links and does not leak internals", () => {
-    const composed = composeCustomerEmail(notice());
-    expect(composed.subject).toBe("Ready for review");
-    expect(composed.text).toContain("Open Review Room");
-    expect(composed.text).toContain("Studio Board:");
-    expect(composed.text).toContain("/studio-board");
-    expect(composed.text).toContain("Review Room:");
-    expect(composed.text).toContain("/feedback-studio");
-    expect(composed.text).toContain("— The Studio");
-    expect(composed.text).not.toMatch(/Tagia|Owner Console|pending_owner_send|job-control/i);
-    expect(composed.html).toContain('href="');
+    const prior = process.env.NEXT_PUBLIC_SITE_URL;
+    process.env.NEXT_PUBLIC_SITE_URL = "https://thestudiocompany7.com";
+    try {
+      const composed = composeCustomerEmail(notice());
+      expect(composed.subject).toBe("Ready for review");
+      expect(composed.text).toContain("Open Review Room");
+      expect(composed.text).toContain("Studio Board:");
+      expect(composed.text).toContain("/studio-board");
+      expect(composed.text).toContain("Review Room:");
+      expect(composed.text).toContain("/feedback-studio");
+      expect(composed.text).toContain("— The Studio");
+      expect(composed.text).not.toMatch(/Tagia|Owner Console|pending_owner_send|job-control/i);
+      expect(composed.html).toContain('href="https://thestudiocompany7.com/');
+    } finally {
+      if (prior === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
+      else process.env.NEXT_PUBLIC_SITE_URL = prior;
+    }
   });
 
   it("records send/fail/retry receipt without inventing open tracking", async () => {

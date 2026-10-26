@@ -35,7 +35,10 @@ export async function fetchJobReview(
 export async function patchJobReview(
   campaignId: string,
   jobId: string,
-  body: ReviewRoomPatchBody,
+  body: ReviewRoomPatchBody & {
+    /** Extra changes that ride this package revision round. */
+    studioExtraChanges?: readonly { id: string; note: string }[];
+  },
 ): Promise<JobReviewPatchResponse> {
   const res = await fetch(
     `/api/campaigns/${encodeURIComponent(campaignId)}/jobs/${encodeURIComponent(jobId)}/review`,
@@ -97,6 +100,8 @@ export function jobReviewFeedbackToFeedbackSession(
       color: note.color,
       text: note.text,
       createdAt: note.createdAt,
+      anchorX: note.anchorX,
+      anchorY: note.anchorY,
     })),
     voiceNotes: review.feedback.voiceNotes.map((note) => ({
       id: note.id,
@@ -155,6 +160,9 @@ export function feedbackSessionToJobReviewFeedback(
       color: note.color,
       text: note.text,
       createdAt: note.createdAt,
+      ...(typeof note.anchorX === "number" && typeof note.anchorY === "number"
+        ? { anchorX: note.anchorX, anchorY: note.anchorY }
+        : {}),
     })),
     voiceNotes: session.voiceNotes.map((note) => ({
       id: note.id,

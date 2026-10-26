@@ -20,10 +20,12 @@ import { describe, expect, it } from "vitest";
 import type { OwnerDecisionFolderPatchBody } from "@/lib/campaign-tasks/owner-decision-folder-dispatch";
 import {
   resolveOwnerDeadlinePostDecisionBriefing,
+  resolveOwnerPricingPostDecisionBriefing,
   resolveOwnerRevisionPostDecisionBriefing,
   resolveOwnerScopePostDecisionBriefing,
   type OwnerDeadlineDecisionAction,
   type OwnerPostDecisionBriefing,
+  type OwnerPricingDecisionAction,
   type OwnerRevisionDecisionAction,
   type OwnerScopeDecisionAction,
 } from "@/studio-coordinator";
@@ -31,7 +33,8 @@ import {
 type OwnerFolderBriefingAction =
   | OwnerDeadlineDecisionAction
   | OwnerRevisionDecisionAction
-  | OwnerScopeDecisionAction;
+  | OwnerScopeDecisionAction
+  | OwnerPricingDecisionAction;
 
 type OwnerFolderBriefingBody = Extract<
   OwnerDecisionFolderPatchBody,
@@ -60,9 +63,15 @@ describe("owner decision folder briefing contract", () => {
       resolveOwnerScopePostDecisionBriefing,
     );
 
+    const pricing = applyFolderBriefingResolver(
+      { action: "owner_approve_pricing_exception", exceptionId: "ex-pricing" },
+      resolveOwnerPricingPostDecisionBriefing,
+    );
+
     expect(deadline.message).toContain("Timeline committed");
     expect(revision.message).toContain("Business exception approved");
     expect(scope.message).toContain("Scope change approved");
+    expect(pricing.message).toContain("Pricing exception approved");
   });
 
   it("rejects cross-family resolvers and keeps inferred action family-narrow", () => {
@@ -81,6 +90,12 @@ describe("owner decision folder briefing contract", () => {
     applyFolderBriefingResolver(
       { action: "owner_approve_scope_change", exceptionId: "ex-scope" },
       // @ts-expect-error — deadline resolver cannot accept a scope action
+      resolveOwnerDeadlinePostDecisionBriefing,
+    );
+
+    applyFolderBriefingResolver(
+      { action: "owner_approve_pricing_exception", exceptionId: "ex-pricing" },
+      // @ts-expect-error — deadline resolver cannot accept a pricing action
       resolveOwnerDeadlinePostDecisionBriefing,
     );
 

@@ -8,6 +8,10 @@ import { copyFileSync, mkdirSync, writeFileSync } from "fs";
 import path from "path";
 
 import { nextRenderVersion, sha256Bytes, sha256File } from "./bind";
+import {
+  formatSocialPostsCustomerCaptionFile,
+  formatSocialPostsCustomerOrderFile,
+} from "./social-posts-captions";
 import { SOCIAL_POSTS_PROOF_PACKAGE_ID } from "./social-posts-fixtures";
 import {
   SOCIAL_POSTS_DESIGN_SPEC_VERSION,
@@ -101,6 +105,7 @@ export function resolveSocialPostsRenderPaths(input: {
   captionsRel: string;
   captionsTextRel: string;
   postingOrderRel: string;
+  postingOrderTextRel: string;
   identityRel: string;
   qaRel: string;
 } {
@@ -115,6 +120,7 @@ export function resolveSocialPostsRenderPaths(input: {
     captionsRel: `${dirRel}/captions.json`,
     captionsTextRel: `${dirRel}/captions.txt`,
     postingOrderRel: `${dirRel}/posting-order.json`,
+    postingOrderTextRel: `${dirRel}/posting-order.txt`,
     identityRel: `${dirRel}/artifact-identity.json`,
     qaRel: `${dirRel}/campaign-set.design-qa.json`,
   };
@@ -260,12 +266,14 @@ export function persistSocialPostsSetArtifacts(input: {
     "utf8",
   );
 
-  const captionLines = captions.map(
-    (c) => `Post ${c.orderIndex} / ${c.assetId} / ${c.captionId}: ${c.text}`,
-  );
   writeFileSync(
     path.join(input.repoRoot, sharedPaths.captionsTextRel),
-    `${captionLines.join("\n")}\n`,
+    formatSocialPostsCustomerCaptionFile(captions),
+    "utf8",
+  );
+  writeFileSync(
+    path.join(input.repoRoot, sharedPaths.postingOrderTextRel),
+    formatSocialPostsCustomerOrderFile(captions, input.truth.platformLabel),
     "utf8",
   );
 

@@ -1,15 +1,20 @@
 /**
- * Seed Review Room V1 demo — job in ready_for_review with prepared deliverables.
+ * Seed Review Room V1 demo — job in ready_for_review with QA authorization pin.
  * Usage: node scripts/seed-review-room-v1.mjs
+ *
+ * Optional: node -e "import('./scripts/seed-review-room-v1.mjs').then(m => m.resubmitReviewRoomV1AfterRevision(2))"
  */
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
+import { resolveVerifyBaseUrl } from "./review-room-v1-test-env.mjs";
 
-const CAMPAIGN_ID = "review-room-v1";
-const JOB_ID = `${CAMPAIGN_ID}:sm-001`;
-const NOW = "2026-07-03T18:00:00.000Z";
-const CLIENT_ID = "client-verify";
+export const CAMPAIGN_ID = "review-room-v1";
+export const JOB_ID = `${CAMPAIGN_ID}:sm-001`;
+export const CLIENT_ID = "client-verify";
+export const QA_PACKAGE_ID = "PRODUCTION-ASSURANCE-QA-BEFORE-REVIEW-1";
+export const DEMO_CONTENT_SHA = "sha256:review-room-v1-disposable-demo";
 
 const PATHS = {
   campaigns: path.join(process.cwd(), "data", "campaigns"),
@@ -29,143 +34,197 @@ function lineItem(skuId, name, priceCents, deliverables) {
     deliverables,
     exclusions: [],
     timingWindowLabel: "3–5 business days",
-    revisionRule: "1 revision round",
+    revisionRule: "2 revision rounds",
     clientResponsibilities: ["Provide brand assets"],
     executionResponsibility: "The Studio creates and delivers",
   };
 }
 
-const campaignEnvelope = {
-  campaignId: CAMPAIGN_ID,
-  clientUserId: CLIENT_ID,
-  syncVersion: 1,
-  syncedAt: NOW,
-  record: {
+/** Mirrors vitest / final-delivery.test.ts QA pin shape — not a gate bypass. */
+export function buildInternalQaReviewAuthorization(workVersionId, decisionSuffix) {
+  const authorizedAt = new Date().toISOString();
+  return {
+    status: "ELIGIBLE_FOR_REVIEW",
+    decisionId: `qa-rrv1-${decisionSuffix}`,
+    packageId: QA_PACKAGE_ID,
+    skuId: "sm-001",
+    qaRecordIds: ["qa-sm-001-disposable"],
+    workVersionId,
+    contentSha256s: [DEMO_CONTENT_SHA],
+    artifactIds: ["artifact:sm-001-disposable"],
+    authorizedAt,
+  };
+}
+
+/** Review proof bytes referenced by the QA authorization pin (routine assembly path). */
+export function buildDisposableReviewProofRegistry(clientId, occurredAt) {
+  return [
+    {
+      id: "file:review-proof:deliverable-0",
+      clientId,
+      category: "review_proof",
+      filename: "social-concepts.png",
+      fileType: "image/png",
+      visibility: "client_visible",
+      status: "approved_for_review",
+      deliverableKey: "deliverable-0",
+      deliverableLabel: "3 social post concepts",
+      versionLabel: "Version 1",
+      addedAt: occurredAt,
+      storageRef: {
+        provider: "supabase_storage",
+        bucket: "studio-disposable-fixtures",
+        objectPath: `${CAMPAIGN_ID}/social-concepts.png`,
+        contentType: "image/png",
+        checksumSha256: DEMO_CONTENT_SHA,
+        visibilityState: "client-review",
+      },
+    },
+  ];
+}
+
+function buildJobRecord(now, qaAuth, fileRegistry) {
+  return {
+    jobId: JOB_ID,
     campaignId: CAMPAIGN_ID,
-    campaignName: "Harbor Cafe — Summer Social",
-    campaignStatus: "BUILDING_CONCEPTS",
-    campaignDescription: "Review Room V1 demo.",
-    estimatedCompletion: "July 18, 2026",
-    packageId: "custom-studio-plan",
-    packageLabel: "Custom Studio Plan",
-    paymentReceivedAt: "2026-07-02T10:00:00.000Z",
-    projectDetailsSubmittedAt: "2026-07-02T11:00:00.000Z",
-    approvedStudioPlan: {
-      selectedServiceIds: ["sm-001"],
-      includedServiceIds: ["sm-001"],
-      additionalServiceIds: [],
-      additionalCostUsd: 0,
-      oneTimeTotalCents: 30000,
-      monthlyTotalCents: 0,
-      amountDueTodayCents: 30000,
-      lineItems: [
-        lineItem("sm-001", "Social Media Launch Set", 30000, [
-          "3 social post concepts",
-          "Caption copy set",
-          "Export-ready files",
-        ]),
-      ],
-      approvedAt: "2026-07-02T09:30:00.000Z",
-    },
-    revisionRoundsIncluded: 1,
-    revisionRoundsUsed: 0,
-    createdAt: "2026-07-02T08:00:00.000Z",
-    updatedAt: NOW,
-  },
-};
+    skuId: "sm-001",
+    serviceName: "Social Media Launch Set",
+    spineStatus: "ready_for_review",
+    productionLane: "quick",
+    intakeComplete: true,
+    productionStartedAt: "2026-07-03T10:00:00.000Z",
+    ownerApprovalPending: null,
+    spineStatusSetAt: now,
+    spineStatusSetBy: { role: "staff", displayName: "Producer" },
+    spineStatusReason: "Production submitted client-ready work to Review Room",
+    clientDeadline: "July 18, 2026",
+    deliverablePrep: [
+      {
+        deliverableKey: "deliverable-0",
+        label: "3 social post concepts",
+        preparedAt: "2026-07-03T14:00:00.000Z",
+        preparedBy: { role: "staff", displayName: "Producer" },
+      },
+      {
+        deliverableKey: "deliverable-1",
+        label: "Caption copy set",
+        preparedAt: "2026-07-03T14:30:00.000Z",
+        preparedBy: { role: "staff", displayName: "Producer" },
+      },
+      {
+        deliverableKey: "deliverable-2",
+        label: "Export-ready files",
+        preparedAt: "2026-07-03T15:00:00.000Z",
+        preparedBy: { role: "staff", displayName: "Producer" },
+      },
+    ],
+    internalQaReviewAuthorization: qaAuth,
+    fileRegistry,
+    internalNotes: [
+      {
+        id: "note:internal",
+        content: "Internal only — client must not see this.",
+        createdAt: now,
+        author: { role: "staff", displayName: "Producer" },
+      },
+    ],
+    laneQueuedAt: "2026-07-03T10:00:00.000Z",
+    updatedAt: now,
+  };
+}
 
-const tasksEnvelope = {
-  campaignId: CAMPAIGN_ID,
-  planFingerprint: "sm-001:one_time",
-  tasks: [
-    {
-      id: "sm-001:creative_production",
-      title: "sm-001 — creative_production",
-      phase: "creative_production",
-      status: "in_progress",
-      relatedServiceIds: ["sm-001"],
-      familyId: "social",
-      catalogFamilyId: "social_media",
-      serviceName: "sm-001",
-      dependsOn: [],
-      workflowState: "in_progress",
-      responsibleRole: "creative_production",
-    },
-  ],
-  exceptionRecords: [],
-  exceptionEvents: [],
-  jobRecords: [
-    {
-      jobId: JOB_ID,
-      campaignId: CAMPAIGN_ID,
-      skuId: "sm-001",
-      serviceName: "Social Media Launch Set",
-      spineStatus: "ready_for_review",
-      productionLane: "quick",
-      intakeComplete: true,
-      productionStartedAt: "2026-07-03T10:00:00.000Z",
-      ownerApprovalPending: null,
-      spineStatusSetAt: NOW,
-      spineStatusSetBy: { role: "staff", displayName: "Producer" },
-      spineStatusReason: "Production submitted client-ready work to Review Room",
-      clientDeadline: "July 18, 2026",
-      deliverablePrep: [
-        {
-          deliverableKey: "deliverable-0",
-          label: "3 social post concepts",
-          preparedAt: "2026-07-03T14:00:00.000Z",
-          preparedBy: { role: "staff", displayName: "Producer" },
-        },
-        {
-          deliverableKey: "deliverable-1",
-          label: "Caption copy set",
-          preparedAt: "2026-07-03T14:30:00.000Z",
-          preparedBy: { role: "staff", displayName: "Producer" },
-        },
-        {
-          deliverableKey: "deliverable-2",
-          label: "Export-ready files",
-          preparedAt: "2026-07-03T15:00:00.000Z",
-          preparedBy: { role: "staff", displayName: "Producer" },
-        },
-      ],
-      internalNotes: [
-        {
-          id: "note:internal",
-          content: "Internal only — client must not see this.",
-          createdAt: NOW,
-          author: { role: "staff", displayName: "Producer" },
-        },
-      ],
-      laneQueuedAt: "2026-07-03T10:00:00.000Z",
-      updatedAt: NOW,
-    },
-  ],
-  jobActivityEvents: [
-    {
-      id: "status_change:review-room-v1:sm-001:ready",
-      campaignId: CAMPAIGN_ID,
-      jobId: JOB_ID,
-      kind: "status_change",
-      occurredAt: NOW,
-      actor: { role: "staff", displayName: "Producer" },
-      spineStatus: "ready_for_review",
-      reason: "Production submitted client-ready work to Review Room",
-    },
-  ],
-  jobReviewFeedback: [],
-  updatedAt: NOW,
-  version: 8,
-  syncedAt: NOW,
-};
+function buildInitialEnvelopes(now) {
+  const qaAuth = buildInternalQaReviewAuthorization("work:review-room-v1:v1", "cycle-1");
+  const fileRegistry = buildDisposableReviewProofRegistry(CLIENT_ID, now);
 
-const materialsEnvelope = {
-  campaignId: CAMPAIGN_ID,
-  items: [],
-  updatedAt: NOW,
-  version: 1,
-  syncedAt: NOW,
-};
+  const campaignEnvelope = {
+    campaignId: CAMPAIGN_ID,
+    clientUserId: CLIENT_ID,
+    syncVersion: 1,
+    syncedAt: now,
+    record: {
+      campaignId: CAMPAIGN_ID,
+      campaignName: "Harbor Cafe — Summer Social",
+      campaignStatus: "BUILDING_CONCEPTS",
+      campaignDescription: "Review Room V1 demo.",
+      estimatedCompletion: "July 18, 2026",
+      packageId: "custom-studio-plan",
+      packageLabel: "Custom Studio Plan",
+      paymentReceivedAt: "2026-07-02T10:00:00.000Z",
+      projectDetailsSubmittedAt: "2026-07-02T11:00:00.000Z",
+      approvedStudioPlan: {
+        selectedServiceIds: ["sm-001"],
+        includedServiceIds: ["sm-001"],
+        additionalServiceIds: [],
+        additionalCostUsd: 0,
+        oneTimeTotalCents: 30000,
+        monthlyTotalCents: 0,
+        amountDueTodayCents: 30000,
+        lineItems: [
+          lineItem("sm-001", "Social Media Launch Set", 30000, [
+            "3 social post concepts",
+            "Caption copy set",
+            "Export-ready files",
+          ]),
+        ],
+        approvedAt: "2026-07-02T09:30:00.000Z",
+      },
+      revisionRoundsIncluded: 2,
+      revisionRoundsUsed: 0,
+      createdAt: "2026-07-02T08:00:00.000Z",
+      updatedAt: now,
+    },
+  };
+
+  const tasksEnvelope = {
+    campaignId: CAMPAIGN_ID,
+    planFingerprint: "sm-001:one_time",
+    tasks: [
+      {
+        id: "sm-001:creative_production",
+        title: "sm-001 — creative_production",
+        phase: "creative_production",
+        status: "in_progress",
+        relatedServiceIds: ["sm-001"],
+        familyId: "social",
+        catalogFamilyId: "social_media",
+        serviceName: "sm-001",
+        dependsOn: [],
+        workflowState: "in_progress",
+        responsibleRole: "creative_production",
+      },
+    ],
+    exceptionRecords: [],
+    exceptionEvents: [],
+    jobRecords: [buildJobRecord(now, qaAuth, fileRegistry)],
+    jobActivityEvents: [
+      {
+        id: "status_change:review-room-v1:sm-001:ready:cycle-1",
+        campaignId: CAMPAIGN_ID,
+        jobId: JOB_ID,
+        kind: "status_change",
+        occurredAt: now,
+        actor: { role: "staff", displayName: "Producer" },
+        spineStatus: "ready_for_review",
+        reason: "Production submitted client-ready work to Review Room",
+      },
+    ],
+    jobReviewFeedback: [],
+    updatedAt: now,
+    version: 8,
+    syncedAt: now,
+  };
+
+  const materialsEnvelope = {
+    campaignId: CAMPAIGN_ID,
+    items: [],
+    updatedAt: now,
+    version: 1,
+    syncedAt: now,
+  };
+
+  return { campaignEnvelope, tasksEnvelope, materialsEnvelope };
+}
 
 async function ensureClientUser() {
   let users = [];
@@ -196,7 +255,10 @@ async function ensureClientUser() {
   await writeFile(PATHS.users, JSON.stringify(users, null, 2));
 }
 
-async function main() {
+export async function writeReviewRoomV1SeedFiles() {
+  const now = new Date().toISOString();
+  const { campaignEnvelope, tasksEnvelope, materialsEnvelope } = buildInitialEnvelopes(now);
+
   await mkdir(PATHS.campaigns, { recursive: true });
   await mkdir(PATHS.tasks, { recursive: true });
   await mkdir(PATHS.materials, { recursive: true });
@@ -215,14 +277,70 @@ async function main() {
   );
 
   await ensureClientUser();
+}
 
+/**
+ * Simulates production returning revised work to Review (disposable campaign only).
+ */
+export async function resubmitReviewRoomV1AfterRevision(cycle = 2) {
+  const tasksPath = path.join(PATHS.tasks, `${CAMPAIGN_ID}.json`);
+  const tasks = JSON.parse(await readFile(tasksPath, "utf8"));
+  const now = new Date().toISOString();
+  const workVersionId = `work:review-room-v1:v${cycle}`;
+  const qaAuth = buildInternalQaReviewAuthorization(workVersionId, `cycle-${cycle}`);
+  const fileRegistry = buildDisposableReviewProofRegistry(CLIENT_ID, now);
+
+  const jobIndex = (tasks.jobRecords ?? []).findIndex((row) => row.jobId === JOB_ID);
+  if (jobIndex < 0) {
+    throw new Error("review-room-v1 job record missing — run seed first");
+  }
+
+  tasks.jobRecords[jobIndex] = {
+    ...tasks.jobRecords[jobIndex],
+    spineStatus: "ready_for_review",
+    ownerApprovalPending: null,
+    internalQaReviewAuthorization: qaAuth,
+    fileRegistry,
+    spineStatusSetAt: now,
+    spineStatusReason: `Revised work resubmitted to Review Room (cycle ${cycle})`,
+    updatedAt: now,
+  };
+
+  tasks.jobActivityEvents = tasks.jobActivityEvents ?? [];
+  tasks.jobActivityEvents.push({
+    id: `status_change:review-room-v1:sm-001:ready:cycle-${cycle}`,
+    campaignId: CAMPAIGN_ID,
+    jobId: JOB_ID,
+    kind: "status_change",
+    occurredAt: now,
+    actor: { role: "staff", displayName: "Producer" },
+    spineStatus: "ready_for_review",
+    reason: `Revised work resubmitted to Review Room (cycle ${cycle})`,
+  });
+
+  tasks.updatedAt = now;
+  tasks.syncedAt = now;
+  await writeFile(tasksPath, JSON.stringify(tasks, null, 2));
+}
+
+async function main() {
+  await writeReviewRoomV1SeedFiles();
+  const base = resolveVerifyBaseUrl();
   console.log(`Seeded Review Room V1 demo: ${CAMPAIGN_ID}`);
-  console.log(`  Review Room: http://localhost:3000/feedback-studio?jobId=${encodeURIComponent(JOB_ID)}`);
-  console.log(`  Production: http://localhost:3000/file-room/${CAMPAIGN_ID}/production/${encodeURIComponent(JOB_ID)}`);
+  console.log(`  Review Room: ${base}/feedback-studio?jobId=${encodeURIComponent(JOB_ID)}`);
+  console.log(
+    `  Production: ${base}/file-room/${CAMPAIGN_ID}/production/${encodeURIComponent(JOB_ID)}`,
+  );
   console.log("  Client login: client@local.dev / dev-only");
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+const isMain =
+  Boolean(process.argv[1]) &&
+  import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+
+if (isMain) {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

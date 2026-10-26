@@ -14,6 +14,7 @@ import { createEmptyJobReviewFeedback } from "@/lib/job-control/review-feedback-
 import type { PurchasedJobRecord } from "@/lib/job-control/types";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import { releaseMessageRef } from "@/lib/job-control/review-handoff-receipts";
+import { generalDesignReviewDeliverableKey } from "@/lib/studio-general-design-review-bind/customer-facing";
 
 function campaign(overrides: Partial<CampaignRecord> = {}): CampaignRecord {
   return {
@@ -221,6 +222,53 @@ describe("review-room gates", () => {
     expect(clientRevisionRoundRequiresReserveHandling(3)).toBe(false);
   });
 
+  it("treats a written laptop message as revision intent", () => {
+    const feedback = createEmptyJobReviewFeedback("review-v1", job().jobId, [
+      "deliverable-0",
+      "deliverable-1",
+    ]);
+    feedback.textComments = [
+      {
+        id: "message-1",
+        jobId: job().jobId,
+        deliverableKey: "deliverable-0",
+        proofFileId: "proof-1",
+        versionLabel: "Set version 1",
+        text: "Please change the end card to say Book a River & Reed table tonight.",
+        createdAt: "2026-10-02T22:00:00.000Z",
+        updatedAt: "2026-10-02T22:00:00.000Z",
+      },
+    ];
+    const result = canRequestJobRevision({
+      job: job(),
+      feedback,
+      revisionRoundsRemaining: 1,
+      allDeliverablesPrepared: true,
+    });
+    expect(result.allowed).toBe(true);
+  });
+
+  it("treats a typed yellow change note as revision intent", () => {
+    const feedback = createEmptyJobReviewFeedback("review-v1", job().jobId, [
+      "deliverable-0",
+      "deliverable-1",
+    ]);
+    feedback.stickyNotes.push({
+      id: "sticky-yellow-1",
+      deliverableKey: "deliverable-0",
+      color: "yellow",
+      text: "Please change the end card to say Book a River & Reed table tonight.",
+      createdAt: "2026-10-02T22:00:00.000Z",
+    });
+    const result = canRequestJobRevision({
+      job: job(),
+      feedback,
+      revisionRoundsRemaining: 1,
+      allDeliverablesPrepared: true,
+    });
+    expect(result.allowed).toBe(true);
+  });
+
   it("blocks request_revision when remaining is zero", () => {
     const feedback = createEmptyJobReviewFeedback("review-v1", job().jobId, [
       "deliverable-0",
@@ -299,7 +347,68 @@ describe("review-room actions", () => {
     if (result.ok) {
       expect(result.job.spineStatus).toBe("revision_requested");
       expect(result.feedback.submissionType).toBe("revision_requested");
-      expect(result.updatedCampaign?.revisionRoundsUsed).toBe(1);
+      // REVISION-TO-REVIEW-ROUND-TRIP-1 — the round is charged when the revised
+      // work reaches Review, so asking leaves the counter alone.
+      expect(result.updatedCampaign?.revisionRoundsUsed).toBe(0);
+    }
+  });
+
+  it("accepts included revision when general-design proofs are prepared instead of catalog deliverable-N keys", () => {
+    const now = "2026-07-03T12:00:00.000Z";
+    const keys = (["post-1", "post-2", "post-3", "post-4"] as const).map((id) =>
+      generalDesignReviewDeliverableKey(id),
+    );
+    const jobRecord = job({
+      jobId: buildJobId("review-v1", "v2-rtu-social-posts"),
+      skuId: "v2-rtu-social-posts",
+      serviceName: "Make My Social Media Posts",
+      deliverablePrep: keys.map((key, index) => ({
+        deliverableKey: key,
+        label: `Post ${index + 1}`,
+        preparedAt: now,
+      })),
+    });
+    const feedback = createEmptyJobReviewFeedback("review-v1", jobRecord.jobId, keys);
+    feedback.sectionStatuses[keys[0]] = "revision";
+    const basePlan = campaign().approvedStudioPlan!;
+    const result = applyReviewRoomPatch(
+      envelope(jobRecord),
+      campaign({
+        approvedStudioPlan: {
+          ...basePlan,
+          selectedServiceIds: ["v2-rtu-social-posts"],
+          includedServiceIds: ["v2-rtu-social-posts"],
+          lineItems: [
+            {
+              skuId: "v2-rtu-social-posts",
+              serviceId: "v2-rtu-social-posts",
+              serviceName: "Make My Social Media Posts",
+              billingType: "one_time",
+              exactPriceCents: 9900,
+              priceDisplay: "$99",
+              deliverables: [
+                "Four social posts",
+                "Captions",
+                "Posting order",
+                "Files you can download",
+              ],
+              exclusions: [],
+              timingWindowLabel: "When a production slot is available",
+              revisionRule: "1 round",
+              clientResponsibilities: [],
+              executionResponsibility: "Studio",
+            },
+          ],
+        },
+      }),
+      jobRecord,
+      { action: "request_revision", feedback },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+    expect(result.ok, result.ok ? "ok" : result.error).toBe(true);
+    if (result.ok) {
+      expect(result.job.spineStatus).toBe("revision_requested");
     }
   });
 
@@ -356,7 +465,9 @@ describe("review-room actions", () => {
     if (!first.ok) return;
     expect(first.correctionUseCreated).toBe(true);
     expect(first.envelope.jobCorrectionUses).toHaveLength(1);
-    expect(first.updatedCampaign?.revisionRoundsUsed).toBe(1);
+    // REVISION-TO-REVIEW-ROUND-TRIP-1 — the row is recorded, but the round is not
+    // charged until the revised work reaches Review.
+    expect(first.updatedCampaign?.revisionRoundsUsed).toBe(0);
 
     const secondFeedback = createEmptyJobReviewFeedback(
       "review-v1",
@@ -378,9 +489,65 @@ describe("review-room actions", () => {
       { staffByUserId: {}, staffCapabilities: {} },
     );
 
+    // Still refused, but for the honest reason: the first revision has not been
+    // delivered yet, so a second ask cannot stack on top of it.
+    expect(second.ok).toBe(false);
+    if (!second.ok) {
+      expect(second.revisionAlreadyInFlight).toBe(true);
+    }
+  });
+
+  it("refuses a further revision once the delivered round exhausts the allowance", () => {
+    const jobRecord = job();
+    const feedback = createEmptyJobReviewFeedback("review-v1", jobRecord.jobId, [
+      "deliverable-0",
+      "deliverable-1",
+    ]);
+    feedback.sectionStatuses["deliverable-0"] = "revision";
+
+    const first = applyReviewRoomPatch(
+      envelope(jobRecord),
+      campaign({ revisionRoundsIncluded: 1, revisionRoundsUsed: 0 }),
+      jobRecord,
+      { action: "request_revision", feedback },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+    expect(first.ok).toBe(true);
+    if (!first.ok) return;
+
+    // The revised work reaches Review: spine reopens and a fresh QA pin is set.
+    const deliveredJob: PurchasedJobRecord = {
+      ...first.job,
+      spineStatus: "ready_for_review",
+      internalQaReviewAuthorization: {
+        ...jobRecord.internalQaReviewAuthorization!,
+        decisionId: "re-delivered",
+        authorizedAt: new Date(Date.now() + 60_000).toISOString(),
+      },
+    };
+
+    const secondFeedback = createEmptyJobReviewFeedback(
+      "review-v1",
+      jobRecord.jobId,
+      ["deliverable-0", "deliverable-1"],
+      { packageId: "pkg:third-cycle" },
+    );
+    secondFeedback.sectionStatuses["deliverable-0"] = "revision";
+
+    const second = applyReviewRoomPatch(
+      { ...first.envelope, jobRecords: [deliveredJob] },
+      first.updatedCampaign ?? campaign({ revisionRoundsIncluded: 1 }),
+      deliveredJob,
+      { action: "request_revision", feedback: secondFeedback },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+
     expect(second.ok).toBe(false);
     if (!second.ok) {
       expect(second.revisionLimitReached).toBe(true);
+      expect(second.revisionAlreadyInFlight).toBeFalsy();
     }
   });
 

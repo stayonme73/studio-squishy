@@ -14,7 +14,7 @@ import {
   landingPublishCredentialSnapshot,
   loadAuthoritativeRmJ005Contract,
   runLandingPageProductionPipeline,
-} from "../src/lib/studio-kitchen-production/landing-page";
+} from "../src/lib/studio-kitchen-production/landing-page/server";
 
 function loadEnvLocal(repoRoot: string) {
   const envPath = path.join(repoRoot, ".env.local");

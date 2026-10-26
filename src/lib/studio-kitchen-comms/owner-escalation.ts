@@ -50,3 +50,13 @@ export function ownerEscalationForOwnerInteraction(
 export function ownerEscalationForRoutineOperationalEvent(): KitchenOwnerEscalationVerdict {
   return "owner_not_required";
 }
+
+/** Same Quality categories already used by the kitchen communications ledger. */
+export function ownerEscalationForQualityCategory(
+  category: string | null | undefined,
+): KitchenOwnerEscalationVerdict {
+  if (category === "direction_disagreement" || category === "compliance_concern") {
+    return "owner_required";
+  }
+  return ownerEscalationForRoutineOperationalEvent();
+}

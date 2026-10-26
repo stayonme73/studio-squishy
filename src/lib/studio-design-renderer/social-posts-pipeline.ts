@@ -19,6 +19,8 @@ import type {
   DesignQualitySubmission,
 } from "@/lib/studio-kitchen-production/design-quality";
 
+import { applySharedLiveLaneEntryGate, sourcePxFromPlate } from "@/lib/studio-static-creative-lane/shared-live-gates";
+
 import { captureFlyerExports } from "./capture";
 import {
   assertCaptionsBoundToPosts,
@@ -40,6 +42,8 @@ import {
   renderSocialPostAssetHtml,
 } from "./social-posts-render-html";
 import { evaluateSocialPostsSetConsistency } from "./social-posts-set-qa";
+import { isThemeLedSocialPostsTruth } from "./social-posts-theme-led";
+import { THEME_LED_IMAGERY_THEME } from "./theme-led-campaign";
 import {
   SOCIAL_POSTS_EXACT_COUNT,
   SOCIAL_POSTS_SQUARE_PLATE,
@@ -97,6 +101,49 @@ function buildSocialPostsBrief(
 ): DesignQualityBrief {
   const base = briefForSku("v2-rtu-social-posts", "a");
   const host = webHostToken(truth.webDisplay);
+  if (isThemeLedSocialPostsTruth(truth)) {
+    // Call to action is optional on theme-led packages: required only when the customer supplied one.
+    return {
+      ...base,
+      skuId: truth.skuId,
+      fixtureId: truth.fixtureId,
+      requiredTextTokens: [...truth.requiredTextTokens],
+      prohibitedClaimPatterns: [...truth.prohibitedClaimPatterns],
+      ctaTokens: [truth.cta, truth.phone, host].filter((token) => Boolean(token?.trim())),
+      requireCta: Boolean(truth.cta.trim()),
+      minAssets: SOCIAL_POSTS_EXACT_COUNT,
+      maxAssets: SOCIAL_POSTS_EXACT_COUNT,
+      allowedExtensions: ["png", "jpg", "jpeg", "pdf"],
+      expectedWidthPx: SOCIAL_POSTS_SQUARE_PLATE.widthPx,
+      expectedHeightPx: SOCIAL_POSTS_SQUARE_PLATE.heightPx,
+      dimensionTolerancePx: 40,
+      brandIdentity: {
+        businessName: truth.businessName,
+        requiredWordmark: truth.wordmark,
+        approvedDescriptors: [truth.descriptor],
+        prohibitedDescriptors: [],
+        approvedLogoVariantIds: [truth.approvedLogoVariantId],
+      },
+      campaignTruth: {
+        offerName: truth.themeLed!.coreMessage,
+        offerNameRequiredTokens: [],
+        priceToken: truth.priceDisplay,
+        dateTokens: [],
+        phone: truth.phone,
+        urlTokens: [host].filter(Boolean),
+        prohibitedOfferAliases: [],
+      },
+      contactSemantics: [
+        ...(truth.phone.trim() ? [{ value: truth.phone, expectedKind: "phone" as const }] : []),
+        ...(host ? [{ value: host, expectedKind: "web" as const }] : []),
+      ],
+      prohibitedImageryThemes: [],
+      requireLogoVariant: truth.approvedLogoVariantId !== "wordmark-only",
+      requireMultiAssetConsistency: true,
+      requireArtifactBinding: true,
+      artifactRepoRoot: repoRoot,
+    };
+  }
   const dateTokens =
     truth.outputMode === "certification_fixture"
       ? ["March 10", "April 15", "2026"]
@@ -110,7 +157,7 @@ function buildSocialPostsBrief(
     fixtureId: truth.fixtureId,
     requiredTextTokens: [...truth.requiredTextTokens],
     prohibitedClaimPatterns: [...truth.prohibitedClaimPatterns],
-    ctaTokens: [truth.phone, host, truth.cta].filter(Boolean),
+    ctaTokens: [truth.phone, host, truth.cta].filter((token) => Boolean(token?.trim())),
     requireCta: true,
     minAssets: SOCIAL_POSTS_EXACT_COUNT,
     maxAssets: SOCIAL_POSTS_EXACT_COUNT,
@@ -123,7 +170,9 @@ function buildSocialPostsBrief(
       requiredWordmark: truth.wordmark,
       approvedDescriptors: [truth.descriptor],
       prohibitedDescriptors: [],
-      approvedLogoVariantIds: [truth.approvedLogoVariantId],
+      approvedLogoVariantIds: truth.approvedLogoVariantId
+        ? [truth.approvedLogoVariantId]
+        : [],
     },
     campaignTruth: {
       offerName: truth.offerName,
@@ -135,10 +184,12 @@ function buildSocialPostsBrief(
       prohibitedOfferAliases: [],
     },
     contactSemantics: [
-      { value: truth.phone, expectedKind: "phone" as const },
+      ...(truth.phone.trim()
+        ? [{ value: truth.phone, expectedKind: "phone" as const }]
+        : []),
       ...(host ? [{ value: host, expectedKind: "web" as const }] : []),
     ],
-    requireLogoVariant: true,
+    requireLogoVariant: Boolean(truth.approvedLogoVariantId && truth.approvedLogoVariantId !== "wordmark-only"),
     requireMultiAssetConsistency: true,
     requireArtifactBinding: true,
     artifactRepoRoot: repoRoot,
@@ -169,6 +220,14 @@ export async function runSocialPostsRendererPipeline(input: {
       "SKU_NOT_SUPPORTED",
       `SKU ${input.truth.skuId} not in social-posts renderer scope`,
     );
+  }
+
+  const laneGate = applySharedLiveLaneEntryGate({
+    repoRoot: input.repoRoot,
+    sourcePx: sourcePxFromPlate(SOCIAL_POSTS_SQUARE_PLATE),
+  });
+  if (!laneGate.ok) {
+    return fail(mode, laneGate.code, laneGate.message);
   }
 
   try {
@@ -386,10 +445,16 @@ export async function runSocialPostsRendererPipeline(input: {
       // Brand-trust post carries no campaign offer facts by design.
       isCampaignOfferAsset: a.roleAngle !== SOCIAL_POST_TRUST_ROLE_ANGLE,
       declaredContactPresentations: [
-        { value: input.truth.phone, presentedAs: "phone" as const },
+        ...(input.truth.phone.trim()
+          ? [{ value: input.truth.phone, presentedAs: "phone" as const }]
+          : []),
         ...(host ? [{ value: host, presentedAs: "web" as const }] : []),
       ],
-      declaredImageryTheme: "hvac_home_services",
+      declaredImageryTheme: isThemeLedSocialPostsTruth(input.truth)
+        ? THEME_LED_IMAGERY_THEME
+        : input.truth.outputMode === "certification_fixture"
+          ? "hvac_home_services"
+          : "customer_job_social",
     })),
   };
 

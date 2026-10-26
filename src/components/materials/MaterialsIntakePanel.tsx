@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { materialsConfig } from "@/config/materials";
 import {
   isAllowedCustomerMaterialFile,
+  isCustomerTalkingHeadVideoFile,
+  maxBytesForCustomerMaterialFile,
   studioMaterialsUploadV1,
 } from "@/config/studio-materials-upload-v1";
 import type { CampaignRecord } from "@/config/studio-board";
@@ -12,9 +14,15 @@ import type {
   ClientConsolidatedRequest,
   ClientOptionalRequest,
 } from "@/lib/materials/client-requests";
-import type { ClientSubmitPayload } from "@/lib/materials/payload-validation";
+import {
+  clientSubmitTextFieldValue,
+  clientSubmitTextFieldsForKind,
+  type ClientSubmitPayload,
+  type ClientSubmitTextField,
+} from "@/lib/materials/payload-validation";
 import {
   appendFileRightsToFormData,
+  fileRightsFieldsAreRelevant,
   fileUploadRequiresRightsCertification,
   validateFileRightsDraft,
 } from "@/lib/materials/materials-intake-rights-form";
@@ -48,7 +56,10 @@ type MaterialsIntakePanelProps = {
   onSubmitted?: () => void;
 };
 
-const MATERIALS_IMAGE_PREVIEW_MAX_BYTES = 5 * 1024 * 1024;
+const CUSTOMER_MATERIAL_FILE_ACCEPT = [
+  ...studioMaterialsUploadV1.allowedMimeTypes,
+  ...studioMaterialsUploadV1.allowedExtensions,
+].join(",");
 
 function readFileAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -62,33 +73,18 @@ function readFileAsDataUrl(file: File): Promise<string> {
   });
 }
 
-function payloadFieldsForKind(contentKind: MaterialContentKind): Array<keyof ClientSubmitPayload> {
-  switch (contentKind) {
-    case "url":
-      return ["url", "note"];
-    case "file-metadata":
-      return ["note"];
-    case "confirmation":
-    case "text":
-    default:
-      return ["text", "note"];
-  }
-}
-
-function fieldLabel(field: keyof ClientSubmitPayload): string {
+function fieldLabel(field: ClientSubmitTextField): string {
   switch (field) {
     case "url":
       return "URL";
-    case "fileName":
-      return "File name or description";
-    case "mimeType":
-      return "File type (optional)";
     case "text":
       return "Details";
     case "note":
       return "Note (optional)";
-    default:
-      return field;
+    default: {
+      const exhaustive: never = field;
+      return exhaustive;
+    }
   }
 }
 
@@ -134,7 +130,7 @@ function SubmitFields({
   onFileSelect: (file: File | null) => void;
   disabled: boolean;
 }) {
-  const fields = payloadFieldsForKind(contentKind);
+  const fields = clientSubmitTextFieldsForKind(contentKind);
   return (
     <div className="sb-materials-intake__fields">
       {contentKind === "file-metadata" ? (
@@ -144,7 +140,7 @@ function SubmitFields({
             <input
               className="sb-materials-intake__file-input"
               type="file"
-              accept="image/png,image/jpeg,.png,.jpg,.jpeg,.pdf,.doc,.docx,.txt,.mp3,.wav,.mp4"
+              accept={CUSTOMER_MATERIAL_FILE_ACCEPT}
               disabled={disabled}
               onChange={(event) => {
                 const file = event.target.files?.[0] ?? null;
@@ -185,7 +181,7 @@ function SubmitFields({
             <textarea
               className="sb-materials-intake__input"
               rows={field === "text" ? 3 : 2}
-              value={values[field] ?? ""}
+              value={clientSubmitTextFieldValue(values, field)}
               disabled={disabled}
               onChange={(event) => onChange(field, event.target.value)}
             />
@@ -193,7 +189,7 @@ function SubmitFields({
             <input
               className="sb-materials-intake__input"
               type={field === "url" ? "url" : "text"}
-              value={values[field] ?? ""}
+              value={clientSubmitTextFieldValue(values, field)}
               disabled={disabled}
               onChange={(event) => onChange(field, event.target.value)}
             />
@@ -320,7 +316,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
       return;
     }
 
-    if (file.size > MATERIALS_IMAGE_PREVIEW_MAX_BYTES) {
+    if (file.size > maxBytesForCustomerMaterialFile(file.name, file.type)) {
       setChosenFiles((current) => {
         const next = { ...current };
         delete next[id];
@@ -332,7 +328,9 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
           kind: "error",
           fileName: file.name,
           mimeType: file.type || "application/octet-stream",
-          message: studioMaterialsUploadV1.customerCopy.tooLarge,
+          message: isCustomerTalkingHeadVideoFile(file.name, file.type)
+            ? studioMaterialsUploadV1.customerCopy.videoTooLarge
+            : studioMaterialsUploadV1.customerCopy.tooLarge,
         },
       }));
       return;
@@ -387,17 +385,16 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
     category: MaterialCategory;
     contentKind: MaterialContentKind;
   }) => {
-    if (fileUploadRequiresRightsCertification(input.category)) {
-      const rightsCheck = validateFileRightsDraft(drafts[input.id], input.category);
-      if (!rightsCheck.ok) {
-        throw new Error(rightsCheck.error);
-      }
-    }
-
     if (input.contentKind === "file-metadata") {
       const file = chosenFiles[input.id];
       if (!file) {
         throw new Error(studioMaterialsUploadV1.customerCopy.missingFile);
+      }
+      if (fileUploadRequiresRightsCertification(input.category)) {
+        const rightsCheck = validateFileRightsDraft(drafts[input.id], input.category);
+        if (!rightsCheck.ok) {
+          throw new Error(rightsCheck.error);
+        }
       }
       const form = new FormData();
       form.set("action", input.action);
@@ -422,6 +419,13 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
       const json = (await res.json()) as MaterialsClientResponse;
       if (!res.ok) throw new Error(json.error ?? `Submit failed (${res.status})`);
       return json;
+    }
+
+    if (fileUploadRequiresRightsCertification(input.category)) {
+      const rightsCheck = validateFileRightsDraft(drafts[input.id], input.category);
+      if (!rightsCheck.ok) {
+        throw new Error(rightsCheck.error);
+      }
     }
 
     const res = await fetch(materialsEndpoint, {
@@ -462,7 +466,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
     try {
       const json = await postMaterialsSubmit({
         id: request.id,
-        action: "client_submit_consolidated",
+        action: request.isolateSlot ? "client_submit" : "client_submit_consolidated",
         category: request.category,
         contentKind: request.contentKind,
       });
@@ -526,7 +530,17 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
     return request.label;
   };
 
+  const requestStaysOpen = (request: ClientConsolidatedRequest) =>
+    request.isBlocking ||
+    request.reviewStatus === "needs_clarification" ||
+    request.isPendingReview ||
+    successId === request.id;
+
   if (!showPanel) return null;
+
+  const orderedConsolidated = [...consolidated].sort(
+    (a, b) => Number(requestStaysOpen(b)) - Number(requestStaysOpen(a)),
+  );
 
   const panelTitle =
     blockingCount > 0 ? materialsConfig.intakePanelTitle : materialsConfig.intakePanelCompleteTitle;
@@ -582,8 +596,29 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
               {materialsConfig.intakePanelBody}
             </p>
             <ul className="sb-materials-intake__list">
-              {consolidated.map((request) => {
-                return (
+              {orderedConsolidated.map((request, index) => {
+                const staysOpen = requestStaysOpen(request);
+                const firstDeferred = orderedConsolidated.findIndex((item) => !requestStaysOpen(item));
+                const rows: ReactNode[] = [];
+                if (index === firstDeferred) {
+                  rows.push(
+                    <li
+                      key="sb-materials-optional-toggle"
+                      className="sb-materials-intake__item sb-materials-intake__item--toggle"
+                    >
+                      <button
+                        type="button"
+                        className="sb-materials-intake__toggle"
+                        aria-expanded={showOptional}
+                        onClick={() => setShowOptional((open) => !open)}
+                      >
+                        {materialsConfig.addMoreLabel}
+                      </button>
+                    </li>,
+                  );
+                }
+                if (!staysOpen && !showOptional) return rows;
+                rows.push(
                   <li key={request.id} className="sb-materials-intake__item">
                     <div className="sb-materials-intake__item-head">
                       <div className="sb-materials-intake__item-title-row">
@@ -642,13 +677,18 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           type="button"
                           className="utility-btn sb-materials-intake__withdraw"
                           disabled={submittingId === request.id}
-                          onClick={() => void withdrawStoredFile({ id: request.id, kind: "consolidated" })}
+                          onClick={() =>
+                            void withdrawStoredFile({
+                              id: request.id,
+                              kind: request.isolateSlot ? "optional" : "consolidated",
+                            })
+                          }
                         >
                           Withdraw this file
                         </button>
                       ) : null}
                     </div>
-                    {request.canSubmit ? (
+                    {request.canSubmit && !request.isPendingReview ? (
                       <>
                         <SubmitFields
                           contentKind={request.contentKind}
@@ -659,7 +699,11 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           disabled={submittingId === request.id}
                         />
                         {request.contentKind === "file-metadata" &&
-                        fileUploadRequiresRightsCertification(request.category) ? (
+                        fileUploadRequiresRightsCertification(request.category) &&
+                        fileRightsFieldsAreRelevant({
+                          selectionKind: fileSelections[request.id]?.kind,
+                          storedFileName: request.fileName,
+                        }) ? (
                           <FileRightsCertificationFields
                             namePrefix={request.id}
                             values={drafts[request.id] ?? {}}
@@ -682,8 +726,9 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                         ) : null}
                       </>
                     ) : null}
-                  </li>
+                  </li>,
                 );
+                return rows;
               })}
             </ul>
           </>
@@ -691,14 +736,16 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
 
         {!loading && optional.length > 0 ? (
           <div className="sb-materials-intake__optional">
-            <button
-              type="button"
-              className="sb-materials-intake__toggle"
-              aria-expanded={showOptional}
-              onClick={() => setShowOptional((open) => !open)}
-            >
-              {materialsConfig.addMoreLabel}
-            </button>
+            {consolidated.some((item) => !requestStaysOpen(item)) ? null : (
+              <button
+                type="button"
+                className="sb-materials-intake__toggle"
+                aria-expanded={showOptional}
+                onClick={() => setShowOptional((open) => !open)}
+              >
+                {materialsConfig.addMoreLabel}
+              </button>
+            )}
             {showOptional ? (
               <ul className="sb-materials-intake__list">
                 {optional.map((request) => (
@@ -768,7 +815,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                         </button>
                       ) : null}
                     </div>
-                    {request.canSubmit ? (
+                    {request.canSubmit && !request.isPendingReview ? (
                       <>
                         <SubmitFields
                           contentKind={request.contentKind}
@@ -779,7 +826,11 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           disabled={submittingId === request.id}
                         />
                         {request.contentKind === "file-metadata" &&
-                        fileUploadRequiresRightsCertification(request.category) ? (
+                        fileUploadRequiresRightsCertification(request.category) &&
+                        fileRightsFieldsAreRelevant({
+                          selectionKind: fileSelections[request.id]?.kind,
+                          storedFileName: request.fileName,
+                        }) ? (
                           <FileRightsCertificationFields
                             namePrefix={request.id}
                             values={drafts[request.id] ?? {}}

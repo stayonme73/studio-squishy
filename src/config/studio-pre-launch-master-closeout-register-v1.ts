@@ -21,6 +21,52 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
   doNotExpandLaunchMenu: true as const,
   carousel: "NOT ON LAUNCH MENU" as const,
 
+  ownerAdditions20261008: {
+    internationalCommerceTestMode: {
+      classification: "COMPLETE_WITH_EXPLICIT_LIMITS" as const,
+      ownerStatus: "PASS_WITH_LIMITS" as const,
+      internationalCustomerPath: "PROVEN_IN_STRIPE_TEST_MODE" as const,
+      liveInternationalSelling: "NOT_YET_ACTIVE" as const,
+      acceptedAt: "2026-10-08" as const,
+      countries: ["CA", "GB", "AU", "DE"] as const,
+      doNotRerunUnlessGenuineRegression: true as const,
+      doNotStartWithoutOwnerAuthorization: true as const,
+    },
+    worldwideService: {
+      classification: "PARTIALLY_PROVEN" as const,
+      ownerStatus: "NOT_APPROVED_YET" as const,
+      acceptedAt: "2026-10-08" as const,
+      doNotAddPublicWorldwideWording: true as const,
+      doNotStartWithoutOwnerAuthorization: true as const,
+    },
+    liveStripe: {
+      classification: "BLOCKED_OWNER_DECISION" as const,
+      ownerStatus: "WAITING_ON_OWNER" as const,
+      doNotActivateFromRegister: true as const,
+      doNotStartWithoutOwnerAuthorization: true as const,
+    },
+    tax: {
+      classification: "BLOCKED_OWNER_DECISION" as const,
+      ownerStatus: "WAITING_ON_OWNER_PROFESSIONAL_DECISION" as const,
+      doNotInventTaxConclusion: true as const,
+      doNotStartWithoutOwnerAuthorization: true as const,
+    },
+    localCurrencyPresentment: {
+      classification: "PARKED_BY_SEQUENCE" as const,
+      ownerStatus: "NOT_PROVEN_NOT_REQUIRED_FOR_USD_SALES" as const,
+      doNotChangeNow: true as const,
+      doNotStartWithoutOwnerAuthorization: true as const,
+    },
+    shortFormLanguageTruth: {
+      classification: "COMPLETE_WITH_EXPLICIT_LIMITS" as const,
+      verified: "english_only" as const,
+      customerDoorStatesEnglish: true as const,
+      historicalShelfNotRewritten: true as const,
+      closedAt: "2026-10-08" as const,
+      doNotStartWithoutOwnerAuthorization: true as const,
+    },
+  },
+
   protectedControlPoint: {
     room4b: "CLOSED" as const,
     room4c: "CLOSED WITH EXPLICIT LIMITS" as const,
@@ -69,9 +115,11 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
     },
     fullMobileCustomerJourneyCertification: {
       id: 2 as const,
-      classification: "REQUIRED_NOT_STARTED" as const,
-      executionPackageStatus: "OPEN" as const,
+      classification: "COMPLETE_WITH_EXPLICIT_LIMITS" as const,
+      executionPackageStatus: "CLOSED WITH EXPLICIT LIMITS" as const,
       openedAt: "2026-08-22" as const,
+      closedAt: "2026-09-21" as const,
+      ownerDecision: "ACCEPTED" as const,
       doNotStartWithoutOwnerAuthorization: true as const,
       dependsOnExternalContentRights: true as const,
       requiredBeforeRoom4Close: true as const,
@@ -114,8 +162,14 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
     studioVoiceCustomerServiceCertification: {
       id: 6 as const,
       classification: "PARTIALLY_PROVEN" as const,
+      ownerStatus: "PASS_WITH_ONE_OPEN_LIMIT" as const,
+      ownerClassification: "WAITING_ON_SYSTEM_REAL_DEVICE" as const,
+      acceptedAt: "2026-10-08" as const,
+      openLimit: "actual_handset_spoken_loop_on_https" as const,
+      doNotEngineerThisLimit: true as const,
       doNotStartWithoutOwnerAuthorization: true as const,
       requiredBeforeOwnerAsCustomerCampaign: true as const,
+      requiredBeforeFinalPublicLaunch: true as const,
     },
     machineFullFunctionWithinLaunchNowLimits: {
       id: 7 as const,
@@ -125,7 +179,7 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
     },
     voiceMachineTeamStressTesting: {
       id: 8 as const,
-      classification: "PARTIALLY_PROVEN" as const,
+      classification: "COMPLETE_WITH_EXPLICIT_LIMITS" as const,
       doNotStartWithoutOwnerAuthorization: true as const,
       requiredBeforeOwnerAsCustomerCampaign: true as const,
     },
@@ -149,11 +203,14 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
     },
     securityDataBackupRecovery: {
       id: 12 as const,
-      classification: "REQUIRED_NOT_STARTED" as const,
+      classification: "COMPLETE_WITH_EXPLICIT_LIMITS" as const,
       doNotStartWithoutOwnerAuthorization: true as const,
       launchMinimumBeforeOwnerAsCustomer: true as const,
       requiredBeforeOutsideCustomerTrial: true as const,
       broaderMaturityIsPostLaunch: true as const,
+      closedAt: "2026-09-27" as const,
+      packageId:
+        "STUDIO-OPERATING-SECURITY-DATA-BACKUP-LAUNCH-MINIMUM-1" as const,
     },
     termsPrivacyIpOperationalPolicies: {
       id: 13 as const,
@@ -170,9 +227,12 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
     },
     capacityQueueDeadlineOverloadRules: {
       id: 15 as const,
-      classification: "PARTIALLY_PROVEN" as const,
+      classification: "COMPLETE_WITH_EXPLICIT_LIMITS" as const,
       doNotStartWithoutOwnerAuthorization: true as const,
       requiredBeforeOutsideCustomerTrial: true as const,
+      closedAt: "2026-09-27" as const,
+      packageId:
+        "STUDIO-OPERATING-CAPACITY-QUEUE-DEADLINE-OVERLOAD-1" as const,
     },
     /** Frozen journey baseline — do not reopen or relabel incomplete. */
     customerOneE2e: {
@@ -189,7 +249,7 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
     ownerAsCustomerRealStudioCampaign: {
       id: "16b" as const,
       title: "Owner-as-Customer Real Studio Campaign" as const,
-      classification: "REQUIRED_NOT_STARTED" as const,
+      classification: "COMPLETE_WITH_EXPLICIT_LIMITS" as const,
       doNotStartWithoutOwnerAuthorization: true as const,
       notAReplacementForCustomerOneE2e: true as const,
       proposedPackageId:
@@ -227,12 +287,12 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
 
   recommendedNextSinglePackage: {
     packageId:
-      "STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1" as const,
-    status: "OPEN" as const,
-    doNotStartInThisPackage: false as const,
+      "STUDIO-OPERATING-FAILURE-RECOVERY-ESCALATION-CERTIFICATION-1" as const,
+    status: "NOT_STARTED" as const,
+    doNotStartInThisPackage: true as const,
     doNotOpenNextPackage: true as const,
     reason:
-      "Register area 2. Required before Room 4 closes. Owner authorized opening from Gate X close tip 15ee699c. Live phone certification is not stamped in opening. Do not assign Room 4D/4E. Do not start Room 5." as const,
+      "Capacity / queue / deadline / overload is PASS WITH EXPLICIT LIMITS. Guide §T next unfinished step remains the controlled outside-customer trial, but register C still has other PARTIALLY_PROVEN items. Next internally actionable package is failure / recovery / escalation. Do not start it from this stamp. Do not remint Maya. Do not start Room 5." as const,
   },
 
   sequenceGates: {

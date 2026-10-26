@@ -1,10 +1,10 @@
 /**
  * REFUND-STATUS — truthful, customer-safe refund-request status.
- * Uses OwnerDecisionInteractionRecord + job spine only. No money-returned,
- * amount, provider, settlement, or internal-note exposure.
+ * Refund stage comes only from the recorded provider execution. Completion is claimed
+ * only when Stripe reported success. No amount, provider id, or internal-note exposure.
  */
 
-import type { PurchasedJobRecord } from "@/lib/job-control/types";
+import type { JobRefundExecutionStage, PurchasedJobRecord } from "@/lib/job-control/types";
 
 import type { OwnerDecisionInteractionRecord } from "./owner-decision-interaction-types";
 
@@ -20,6 +20,7 @@ export type RefundRequestCustomerView = {
   statusLabel: string;
   /** Present only when status is decision_recorded — from job spine, not owner notes. */
   decisionOutcome: RefundRequestDecisionOutcome | null;
+  refundStage: JobRefundExecutionStage | null;
   submittedAt: string;
   updatedAt: string;
   jobId: string;
@@ -60,19 +61,36 @@ export function toRefundRequestDecisionOutcome(
   return "not_approved";
 }
 
+export const REFUND_STAGE_LABELS: Record<JobRefundExecutionStage, string> = {
+  approved: "Refund approved.",
+  processing: "Refund processing.",
+  completed: "Refund completed.",
+  failed: "Refund could not be completed. The Studio is reviewing it.",
+};
+
 export function toRefundRequestCustomerView(
   interaction: OwnerDecisionInteractionRecord,
   job: PurchasedJobRecord | undefined,
 ): RefundRequestCustomerView {
   const status = toRefundRequestCustomerStatus(interaction.status);
-  const decisionOutcome = toRefundRequestDecisionOutcome(interaction, job);
-  const statusLabel =
-    decisionOutcome != null ? DECISION_LABELS[decisionOutcome] : STATUS_LABELS[status];
+  const refundStage = job?.refundExecution?.stage ?? null;
+  const decisionOutcome =
+    refundStage === "processing" || refundStage === "completed"
+      ? "approved"
+      : refundStage
+        ? null
+        : toRefundRequestDecisionOutcome(interaction, job);
+  const statusLabel = refundStage
+    ? REFUND_STAGE_LABELS[refundStage]
+    : decisionOutcome != null
+      ? DECISION_LABELS[decisionOutcome]
+      : STATUS_LABELS[status];
 
   return {
     status,
     statusLabel,
     decisionOutcome,
+    refundStage,
     submittedAt: interaction.createdAt,
     updatedAt: interaction.updatedAt,
     jobId: interaction.jobId ?? job?.jobId ?? "",

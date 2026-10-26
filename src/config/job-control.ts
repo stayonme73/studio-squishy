@@ -15,9 +15,11 @@ export const OWNER_CONTROL_ROOM_SECTION = {
   needsCommunicationTestSendLabel: "Mark test-sent",
   needsCommunicationTestSentLabel: "Test sent",
   lanesTitle: "Production lanes",
-  lanesLead: "Active capacity by lane. Paid jobs with incomplete intake do not occupy slots.",
+  lanesLead:
+    "Active capacity by lane. A slot is occupied only after production has started or been reserved. Payment, intake, and a copied Building Concepts label do not occupy a slot.",
   waitingTrayTitle: "Waiting on Client",
-  waitingTrayLead: "Per-job client holds — reminders at 48h, move to tray at 72h without response.",
+  waitingTrayLead:
+    "Per-job client holds. A service waits here as soon as required materials are missing and returns to its lane when they arrive. No reminder clock, no refund clock.",
   activityTitle: "Activity timeline",
   activityLead: "Immutable audit trail — no silent manual status changes.",
   activityEmpty: "No activity recorded for this scope yet.",
@@ -50,24 +52,24 @@ export const OWNER_CONTROL_ROOM_SECTION = {
     revision_limit_reached: "Client boundary review",
     at_risk_job: "At-risk deadline",
     heavy_lane_full: "Heavy lane full",
-    refund_eligible: "14-day refund eligible",
+    refund_eligible: "Refund request",
     client_complaint: "Client complaint",
   } satisfies Record<OwnerDeskReason, string>,
   activeCountLabel: "Active",
   availableSlotsLabel: "Available",
   nextUpLabel: "Next Up",
-  reminderDueLabel: "48h reminder due",
-  moveToTrayLabel: "72h → Waiting on Client",
-  refundEligibleLabel: "14-day refund eligible",
+  waitingOnMaterialsLabel: "Waiting on materials",
   returnLaneLabel: "Return lane",
   missingItemsLabel: "Missing items",
   lastResponseLabel: "Last client response",
   requestedLabel: "Requested",
 } as const;
 
-/** Policy windows — calendar hours / days for waiting-on-client automation. */
-export const JOB_CONTROL_POLICY = {
-  reminderDueHours: 48,
-  moveToWaitingOnClientHours: 72,
-  refundEligibleDays: 14,
-} as const;
+/**
+ * Owner decision 2026-10-10 (lifecycle truth, Option A): no customer-facing clock.
+ * A job waits on the client as soon as required materials are missing. There is no
+ * reminder clock, no Waiting on Client threshold, and no refund waiting period.
+ * A refund may be approved before production starts; after production starts the
+ * service is non-refundable. Refunds are never automatic.
+ */
+export const JOB_CONTROL_POLICY = {} as const;

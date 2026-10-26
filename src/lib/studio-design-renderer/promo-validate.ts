@@ -92,7 +92,8 @@ export function validatePromoCampaignSetSpec(
         message: e instanceof Error ? e.message : String(e),
       };
     }
-    if (!asset.layers.some((l) => l.type === "image" && l.role === "logo")) {
+    const wordmarkOnly = truth.approvedLogoVariantId === "wordmark-only";
+    if (!wordmarkOnly && !asset.layers.some((l) => l.type === "image" && l.role === "logo")) {
       return {
         ok: false,
         code: "INVALID_DESIGN_SPEC",

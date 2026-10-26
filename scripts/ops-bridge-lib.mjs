@@ -3,10 +3,13 @@
  * Pulse writes the outbound snapshot. Scout consumes only authorized inbound lines.
  * Does not grant merge/push. Does not become customer job truth.
  */
-import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from "node:fs";
+import { execFileSync, spawnSync } from "node:child_process";
+import { randomBytes } from "node:crypto";
+import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, renameSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { readSharedLaunchControlSummary } from "./studio-shared-launch-control-lib.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BRIDGE_DIR = path.join(ROOT, "docs/launch/owner-bridge");
@@ -18,6 +21,11 @@ const HEARTBEAT_JSON = path.join(ROOT, "docs/launch/project-alpha-work-heartbeat
 const ATTENTION_JSON = path.join(ROOT, "docs/launch/project-alpha-attention-state.json");
 const DAILY_BRIDGE = path.join(ROOT, "docs/launch/PROJECT-ALPHA-DAILY-OPERATING-BRIDGE.md");
 const CONSUMED_PATH = path.join(BRIDGE_DIR, "consumed-decision-ids.json");
+const DEFAULT_ACTIVE_TASK_PATH = path.join(ROOT, ".ops-bridge-active-task.json");
+const WORKER_SCRIPT = path.join(ROOT, "scripts/ops-bridge-readonly-worker.mjs");
+const ENGINEERING_WORKER_SCRIPT = path.join(ROOT, "scripts/ops-bridge-synthetic-engineering-worker.mjs");
+const DEFAULT_WORKER_RESULT_PATH = path.join(os.tmpdir(), "studio-ops-bridge-worker-result.json");
+const STALE_LOCK_GRACE_MS = 200;
 
 export const OPS_BRIDGE_STALE_MS = 14_400_000;
 export const OPS_BRIDGE_AUTHORIZER = "OWNER_TAGIA";
@@ -32,7 +40,15 @@ export const OPS_BRIDGE_ACTIONS = [
   "merge_authorization",
   "push_authorization",
   "acknowledge",
+  "report_local_status",
+  "run_readonly_task",
+  "run_synthetic_engineering_handoff",
 ];
+export const OPS_BRIDGE_READONLY_TASKS = [
+  "local_test_readiness",
+  "synthetic_machine_quality_status",
+];
+export const OPS_BRIDGE_ENGINEERING_TASKS = ["synthetic_assignment_receipt"];
 export const OPS_BRIDGE_PROTECTED_ACTIONS = [
   "publish_authorization",
   "merge_authorization",
@@ -108,8 +124,8 @@ function listChangedFiles() {
 /** Launch truth mirrors src/config/studio-canonical-launch-truth-v1.ts. The legacy counts describe the old shelf only. */
 function publicCounts() {
   return {
-    canonicalLaunchMenu: "three_package_door",
-    launchPackageCount: 3,
+    canonicalLaunchMenu: "four_package_door",
+    launchPackageCount: 4,
     publishedPubliclyCount: 0,
     launchAuthority: "docs/launch/studio-canonical-launch-truth-1/STUDIO-CANONICAL-LAUNCH-TRUTH.md",
     publicLaunchNowPublishedCount: 11,
@@ -176,6 +192,7 @@ export function buildOutboundSnapshot(now = new Date().toISOString(), extras = {
     },
     lastInboundAcknowledgement: extras.lastInboundAcknowledgement ?? null,
     consumedDecisionIds: consumed.ids ?? [],
+    sharedLaunchControl: readSharedLaunchControlSummary(),
   });
   return snapshot;
 }
@@ -261,34 +278,67 @@ Owner attention: **${snapshot.attentionState ?? "—"}.** ${snapshot.currentTask
 
 export function writeDailyBridgeLiveBlock(snapshot) {
   if (!existsSync(DAILY_BRIDGE)) return;
-  const existing = readFileSync(DAILY_BRIDGE, "utf8");
-  const begin = "<!-- OPS-BRIDGE-LIVE:BEGIN -->";
-  const end = "<!-- OPS-BRIDGE-LIVE:END -->";
-  const block = `${begin}\n${dailyBridgeLiveBlock(snapshot)}\n${end}`;
-  if (existing.includes(begin) && existing.includes(end)) {
-    const next = existing.replace(
-      new RegExp(`${begin}[\\s\\S]*?${end}`),
-      block.replace(/\$/g, "$$$$"),
+  try {
+    const existing = readFileSync(DAILY_BRIDGE, "utf8");
+    const begin = "<!-- OPS-BRIDGE-LIVE:BEGIN -->";
+    const end = "<!-- OPS-BRIDGE-LIVE:END -->";
+    const block = `${begin}\n${dailyBridgeLiveBlock(snapshot)}\n${end}`;
+    if (existing.includes(begin) && existing.includes(end)) {
+      const next = existing.replace(
+        new RegExp(`${begin}[\\s\\S]*?${end}`),
+        block.replace(/\$/g, "$$$$"),
+      );
+      writeFileSync(DAILY_BRIDGE, next, "utf8");
+      return;
+    }
+    writeFileSync(
+      DAILY_BRIDGE,
+      `${block}\n\n${existing.replace(/^# PROJECT ALPHA — DAILY OPERATING BRIDGE\s*\n+/, "# PROJECT ALPHA — DAILY OPERATING BRIDGE\n\n")}`,
+      "utf8",
     );
-    writeFileSync(DAILY_BRIDGE, next, "utf8");
-    return;
+  } catch {
+    // A locked daily-bridge file must not hide an acknowledgement.
   }
-  writeFileSync(
-    DAILY_BRIDGE,
-    `${block}\n\n${existing.replace(/^# PROJECT ALPHA — DAILY OPERATING BRIDGE\s*\n+/, "# PROJECT ALPHA — DAILY OPERATING BRIDGE\n\n")}`,
-    "utf8",
-  );
+}
+
+function withSnapshotLock(work) {
+  const lockPath = path.join(os.tmpdir(), "studio-ops-bridge-snapshot.lock");
+  const started = Date.now();
+  let fd = null;
+  while (fd === null) {
+    try {
+      fd = openSync(lockPath, "wx");
+    } catch {
+      try {
+        if (Date.now() - statSync(lockPath).mtimeMs > 5000) unlinkSync(lockPath);
+      } catch {
+        /* another writer owns the lock */
+      }
+      if (Date.now() - started > 2000) break;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20);
+    }
+  }
+  try {
+    return work();
+  } finally {
+    if (fd !== null) {
+      closeSync(fd);
+      try { unlinkSync(lockPath); } catch { /* already released */ }
+    }
+  }
 }
 
 export function writeOutboundSnapshot(extras = {}, now = new Date().toISOString()) {
-  mkdirSync(BRIDGE_DIR, { recursive: true });
-  const snapshot = buildOutboundSnapshot(now, extras);
-  writeFileSync(SNAPSHOT_JSON, `${JSON.stringify(snapshot, null, 2)}\n`, "utf8");
-  writeFileSync(SNAPSHOT_MD, `${renderOutboundMarkdown(snapshot)}\n`, "utf8");
-  writeDailyBridgeLiveBlock(snapshot);
-  if (!existsSync(INBOUND_JSONL)) writeFileSync(INBOUND_JSONL, "", "utf8");
-  if (!existsSync(ACK_JSONL)) writeFileSync(ACK_JSONL, "", "utf8");
-  return snapshot;
+  return withSnapshotLock(() => {
+    mkdirSync(BRIDGE_DIR, { recursive: true });
+    const snapshot = buildOutboundSnapshot(now, extras);
+    writeFileSync(SNAPSHOT_JSON, `${JSON.stringify(snapshot, null, 2)}\n`, "utf8");
+    writeFileSync(SNAPSHOT_MD, `${renderOutboundMarkdown(snapshot)}\n`, "utf8");
+    writeDailyBridgeLiveBlock(snapshot);
+    if (!existsSync(INBOUND_JSONL)) writeFileSync(INBOUND_JSONL, "", "utf8");
+    if (!existsSync(ACK_JSONL)) writeFileSync(ACK_JSONL, "", "utf8");
+    return snapshot;
+  });
 }
 
 function isIsoDate(value) {
@@ -316,6 +366,46 @@ export function validateInboundDecision(decision, nowMs = Date.now(), expectedPa
   }
   if (typeof decision.permittedAction !== "string" || !decision.permittedAction.trim()) {
     return { ok: false, reason: "scope_expansion", detail: "permittedAction is required." };
+  }
+  if (
+    decision.action === "run_readonly_task" &&
+    !OPS_BRIDGE_READONLY_TASKS.includes(decision.taskId)
+  ) {
+    return {
+      ok: false,
+      reason: "scope_expansion",
+      detail: `Unknown task: ${decision.taskId ?? "missing"}`,
+    };
+  }
+  if (decision.action === "run_synthetic_engineering_handoff") {
+    if (decision.command != null || decision.shell != null || decision.prompt != null) {
+      return {
+        ok: false,
+        reason: "scope_expansion",
+        detail: "Permission boundary: a prompt or command is not an assignment.",
+      };
+    }
+    if (!OPS_BRIDGE_ENGINEERING_TASKS.includes(decision.taskId)) {
+      return {
+        ok: false,
+        reason: "scope_expansion",
+        detail: `Unknown task: ${decision.taskId ?? "missing"}`,
+      };
+    }
+    const title = typeof decision.assignmentTitle === "string" ? decision.assignmentTitle.trim() : "";
+    if (
+      !title ||
+      title.length > 120 ||
+      /[\0\r\n\\/]/.test(title) ||
+      /[;&|`$<>]/.test(title) ||
+      title.startsWith("-")
+    ) {
+      return {
+        ok: false,
+        reason: "scope_expansion",
+        detail: "assignmentTitle must be one plain line of at most 120 characters.",
+      };
+    }
   }
   if (
     expectedPackageId &&
@@ -408,6 +498,501 @@ export function readLastAcknowledgement(decisionId = null) {
   return parsed.findLast((item) => item.decisionId === decisionId) ?? null;
 }
 
+function readLocalWorkStatus(nowMs) {
+  const heartbeat = readJson(HEARTBEAT_JSON, {});
+  let branch = null;
+  let dirtyFileCount = null;
+  try {
+    branch = execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
+      cwd: ROOT,
+      encoding: "utf8",
+    }).trim();
+    const porcelain = execFileSync("git", ["status", "--porcelain"], {
+      cwd: ROOT,
+      encoding: "utf8",
+    });
+    dirtyFileCount = porcelain.split(/\r?\n/).filter(Boolean).length;
+  } catch {
+    branch = null;
+    dirtyFileCount = null;
+  }
+  return {
+    ok: true,
+    kind: "local_work_status",
+    readAt: new Date(nowMs).toISOString(),
+    workState: heartbeat.workState ?? null,
+    currentTask: heartbeat.currentTask ?? null,
+    packageId: heartbeat.packageId ?? null,
+    lastActivityAt: heartbeat.lastActivityAt ?? null,
+    branch,
+    dirtyFileCount,
+  };
+}
+
+function envPath(name, fallback) {
+  const override = process.env[name];
+  if (typeof override === "string" && override.trim()) return path.resolve(override.trim());
+  return fallback;
+}
+
+export function opsBridgeActiveTaskPath() {
+  return envPath("OPS_BRIDGE_ACTIVE_TASK", DEFAULT_ACTIVE_TASK_PATH);
+}
+
+function workerResultPath() {
+  return envPath("OPS_BRIDGE_WORKER_RESULT", DEFAULT_WORKER_RESULT_PATH);
+}
+
+function processIsAlive(pid) {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function holderAlive(lock) {
+  if (!lock || typeof lock !== "object") return false;
+  return processIsAlive(lock.pid) || processIsAlive(lock.workerPid);
+}
+
+function readActiveTask() {
+  const lock = readJson(opsBridgeActiveTaskPath(), null);
+  return lock?.decisionId ? lock : null;
+}
+
+function waitForLockGrace() {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, STALE_LOCK_GRACE_MS);
+}
+
+function moveLockAside(target) {
+  const grave = path.join(os.tmpdir(), `studio-ops-bridge-lock-${randomBytes(8).toString("hex")}.stale`);
+  renameSync(target, grave);
+  return grave;
+}
+
+function restoreLock(grave, target) {
+  try {
+    renameSync(grave, target);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function createExclusiveLock(record) {
+  const target = opsBridgeActiveTaskPath();
+  let fd;
+  try {
+    fd = openSync(target, "wx");
+  } catch (error) {
+    if (error && error.code === "EEXIST") return false;
+    throw error;
+  }
+  try {
+    writeFileSync(fd, `${JSON.stringify(record)}\n`);
+  } catch (error) {
+    closeSync(fd);
+    try { unlinkSync(target); } catch { /* the exclusive file is left for recovery */ }
+    throw error;
+  }
+  closeSync(fd);
+  return true;
+}
+
+function releaseOwnLock(token) {
+  if (!token) return;
+  const target = opsBridgeActiveTaskPath();
+  const lock = readActiveTask();
+  if (!lock || lock.token !== token) return;
+  let grave;
+  try {
+    grave = moveLockAside(target);
+  } catch {
+    return;
+  }
+  const removed = readJson(grave, null);
+  if (!removed || removed.token !== token) {
+    restoreLock(grave, target);
+    return;
+  }
+  try { unlinkSync(grave); } catch { /* already gone */ }
+}
+
+function discardWorkerResult() {
+  const resultPath = workerResultPath();
+  if (existsSync(resultPath)) unlinkSync(resultPath);
+}
+
+function workerEnv() {
+  const env = {};
+  for (const key of [
+    "PATH",
+    "Path",
+    "PATHEXT",
+    "SYSTEMROOT",
+    "SystemRoot",
+    "WINDIR",
+    "COMSPEC",
+    "HOME",
+    "USERPROFILE",
+    "HOMEDRIVE",
+    "HOMEPATH",
+    "APPDATA",
+    "LOCALAPPDATA",
+    "PROGRAMFILES",
+    "PROGRAMFILES(X86)",
+    "TEMP",
+    "TMP",
+    "OPS_BRIDGE_ACTIVE_TASK",
+    "OPS_BRIDGE_WORKER_RESULT",
+    "OPS_BRIDGE_WORKER_HOLD_MS",
+  ]) {
+    if (process.env[key]) env[key] = process.env[key];
+  }
+  return env;
+}
+
+function workerLaunch(script, args, token) {
+  const resultPath = workerResultPath();
+  discardWorkerResult();
+  const launchArgs = [script, ...args, "--out", resultPath];
+  if (token) launchArgs.push("--lock-token", token);
+  return spawnSync(process.execPath, launchArgs, {
+    cwd: ROOT,
+    env: workerEnv(),
+    timeout: 20_000,
+    windowsHide: true,
+    encoding: "utf8",
+  });
+}
+
+function runReadonlyWorker(decision, token) {
+  const resultPath = workerResultPath();
+  const run = workerLaunch(
+    WORKER_SCRIPT,
+    ["--task", decision.taskId, "--decision", decision.decisionId],
+    token,
+  );
+  if (run.error || run.status !== 0 || !existsSync(resultPath)) {
+    discardWorkerResult();
+    return { ok: false, detail: "Local worker did not complete the inspection." };
+  }
+  const evidence = readJson(resultPath, null);
+  discardWorkerResult();
+  const leaked =
+    evidence &&
+    (/@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(JSON.stringify(evidence)) ||
+      /\bsk_(?:live|test)_/.test(JSON.stringify(evidence)));
+  const syntheticSafe =
+    decision.taskId !== "synthetic_machine_quality_status" ||
+    (evidence?.syntheticCampaignId === "messy-customer-social-promo-recovery" &&
+      evidence?.scoutClaim == null &&
+      evidence?.completionClaim == null &&
+      evidence?.customerCommunicationsSent === 0 &&
+      evidence?.handoffChangedJobs === false);
+  const accepted =
+    evidence &&
+    !leaked &&
+    syntheticSafe &&
+    evidence.source === "ops-bridge-readonly-worker" &&
+    evidence.kind === decision.taskId &&
+    OPS_BRIDGE_READONLY_TASKS.includes(evidence.kind) &&
+    evidence.decisionId === decision.decisionId &&
+    typeof evidence.workerPid === "number" &&
+    evidence.workerPid !== process.pid &&
+    evidence.ok === true &&
+    evidence.filesChangedByTask === false;
+  if (!accepted) {
+    return {
+      ok: false,
+      detail: evidence?.filesChangedByTask
+        ? "Read-only task changed the worktree. Result not accepted."
+        : "Local worker evidence was not accepted.",
+    };
+  }
+  return {
+    ok: true,
+    evidence: {
+      ...evidence,
+      workerExitCode: run.status,
+    },
+  };
+}
+
+function runEngineeringWorker(decision, token) {
+  const resultPath = workerResultPath();
+  const run = workerLaunch(
+    ENGINEERING_WORKER_SCRIPT,
+    [
+      "--task",
+      decision.taskId,
+      "--decision",
+      decision.decisionId,
+      "--title",
+      decision.assignmentTitle.trim(),
+    ],
+    token,
+  );
+  if (run.error || run.status !== 0 || !existsSync(resultPath)) {
+    discardWorkerResult();
+    return { ok: false, detail: "Synthetic engineering worker did not complete." };
+  }
+  const evidence = readJson(resultPath, null);
+  discardWorkerResult();
+  const checks = Array.isArray(evidence?.checks) ? evidence.checks : [];
+  const accepted =
+    evidence &&
+    evidence.source === "ops-bridge-synthetic-engineering-worker" &&
+    evidence.kind === decision.taskId &&
+    evidence.executor === "local-node-worker" &&
+    evidence.decisionId === decision.decisionId &&
+    evidence.assignmentTitle === decision.assignmentTitle.trim() &&
+    evidence.cursorAgentExecuted === false &&
+    evidence.continuesAfterResponse === false &&
+    evidence.scheduledContinuation === false &&
+    evidence.shellFromAssignment === false &&
+    evidence.repositoryWrites === false &&
+    evidence.filesChangedByTask === false &&
+    evidence.independentQuality === false &&
+    checks.length >= 3 &&
+    checks.every((check) => check && check.pass === true) &&
+    typeof evidence.workerPid === "number" &&
+    evidence.workerPid !== process.pid &&
+    evidence.ok === true;
+  if (!accepted) {
+    return { ok: false, detail: "Synthetic engineering evidence was not accepted." };
+  }
+  return { ok: true, evidence: { ...evidence, workerExitCode: run.status } };
+}
+
+function taskAcknowledgement(decision, nowMs, fields) {
+  return {
+    at: new Date(nowMs).toISOString(),
+    decisionId: decision.decisionId ?? null,
+    action: decision.action ?? "run_readonly_task",
+    packageId: decision.packageId ?? null,
+    taskId: decision.taskId ?? null,
+    assignmentTitle: typeof decision.assignmentTitle === "string" ? decision.assignmentTitle.trim() : null,
+    ...fields,
+  };
+}
+
+function storeAcknowledgement(acknowledgement, options, consumeId) {
+  mkdirSync(BRIDGE_DIR, { recursive: true });
+  appendFileSync(ACK_JSONL, `${JSON.stringify(acknowledgement)}\n`, "utf8");
+  if (consumeId) {
+    const consumed = readJson(CONSUMED_PATH, { ids: [] });
+    const ids = new Set(consumed.ids ?? []);
+    ids.add(consumeId);
+    writeFileSync(CONSUMED_PATH, `${JSON.stringify({ ids: [...ids] }, null, 2)}\n`, "utf8");
+  }
+  try {
+    writeOutboundSnapshot({
+      lastInboundAcknowledgement: acknowledgement,
+      testsResults: options.testsResults,
+      defectsBlockers: options.defectsBlockers,
+      nextDecisionRequired: options.nextDecisionRequired,
+    });
+  } catch {
+    // The acknowledgement file is the completion record. A locked daily-bridge
+    // snapshot must not fail the task or hide its evidence.
+  }
+}
+
+function recordInterruptedTask(lock, nowMs) {
+  const prior = readLastAcknowledgement(lock.decisionId);
+  if (prior?.state === "completed" && prior.ok === true) return;
+  discardWorkerResult();
+  storeAcknowledgement(
+    taskAcknowledgement(lock, nowMs, {
+      ok: false,
+      state: "failed",
+      reason: "failed",
+      detail: "Task interrupted before completion. The same decisionId may be sent again.",
+      scoutActed: false,
+    }),
+    {},
+  );
+}
+
+function resolveActiveLock(nowMs) {
+  const target = opsBridgeActiveTaskPath();
+  let waited = false;
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    if (!existsSync(target)) return null;
+    const lock = readActiveTask();
+    if (!lock) {
+      let age = 0;
+      try {
+        age = Date.now() - statSync(target).mtimeMs;
+      } catch {
+        age = 0;
+      }
+      if (age < STALE_LOCK_GRACE_MS) {
+        return { decisionId: "lock-unreadable", pid: process.pid, state: "running" };
+      }
+      try {
+        unlinkSync(moveLockAside(target));
+      } catch {
+        return { decisionId: "lock-unreadable", pid: process.pid, state: "running" };
+      }
+      return null;
+    }
+    if (holderAlive(lock)) return lock;
+    if (!waited && lock.workerPid == null) {
+      waited = true;
+      waitForLockGrace();
+      continue;
+    }
+    let grave;
+    try {
+      grave = moveLockAside(target);
+    } catch {
+      continue;
+    }
+    const removed = readJson(grave, null);
+    if (removed && holderAlive(removed)) {
+      restoreLock(grave, target);
+      return readActiveTask() ?? removed;
+    }
+    try { unlinkSync(grave); } catch { /* already gone */ }
+    if (removed?.decisionId) recordInterruptedTask(removed, nowMs);
+    return null;
+  }
+  return readActiveTask() ?? { decisionId: "lock-contended", pid: process.pid, state: "running" };
+}
+
+function runningAcknowledgement(decision, nowMs, prior) {
+  return prior?.state === "running" || prior?.state === "accepted"
+    ? prior
+    : taskAcknowledgement(decision, nowMs, {
+      ok: true,
+      state: "running",
+      reason: "accepted",
+      detail: decision.permittedAction,
+      scoutActed: false,
+    });
+}
+
+function blockedAcknowledgement(decision, nowMs, options) {
+  const blocked = taskAcknowledgement(decision, nowMs, {
+    ok: false,
+    state: "blocked",
+    reason: "blocked",
+    detail: "Another bridge task is already running.",
+    scoutActed: false,
+  });
+  storeAcknowledgement(blocked, options);
+  return { ok: false, reason: "blocked", acknowledgement: blocked };
+}
+
+function consumeReadonlyTask(decision, nowMs, options) {
+  return consumeTrackedTask(decision, nowMs, options, runReadonlyWorker);
+}
+
+function consumeTrackedTask(decision, nowMs, options, runWorker) {
+  const completed = readLastAcknowledgement(decision.decisionId);
+  if (completed?.state === "completed" && completed.ok === true) {
+    const leftover = readActiveTask();
+    if (leftover && leftover.decisionId === decision.decisionId && !holderAlive(leftover)) {
+      resolveActiveLock(nowMs);
+    }
+    return { ok: true, reason: "accepted", acknowledgement: completed, idempotent: true };
+  }
+
+  const token = randomBytes(16).toString("hex");
+  const record = {
+    decisionId: decision.decisionId,
+    taskId: decision.taskId,
+    packageId: decision.packageId,
+    action: decision.action,
+    assignmentTitle: typeof decision.assignmentTitle === "string" ? decision.assignmentTitle.trim() : null,
+    executor: decision.action === "run_synthetic_engineering_handoff" ? "local-node-worker" : "readonly-worker",
+    pid: process.pid,
+    workerPid: null,
+    token,
+    state: "running",
+    startedAt: new Date(nowMs).toISOString(),
+  };
+
+  let acquired = false;
+  for (let attempt = 0; attempt < 2 && !acquired; attempt += 1) {
+    const live = resolveActiveLock(nowMs);
+    const prior = readLastAcknowledgement(decision.decisionId);
+    if (prior?.state === "completed" && prior.ok === true) {
+      return { ok: true, reason: "accepted", acknowledgement: prior, idempotent: true };
+    }
+    if (live && live.decisionId === decision.decisionId) {
+      return {
+        ok: true,
+        reason: "accepted",
+        acknowledgement: runningAcknowledgement(decision, nowMs, prior),
+        idempotent: true,
+      };
+    }
+    if (live) return blockedAcknowledgement(decision, nowMs, options);
+    acquired = createExclusiveLock(record);
+  }
+  if (!acquired) return blockedAcknowledgement(decision, nowMs, options);
+
+  const accepted = taskAcknowledgement(decision, nowMs, {
+    ok: true,
+    state: "accepted",
+    reason: "accepted",
+    detail: decision.permittedAction,
+    scoutActed: false,
+  });
+  storeAcknowledgement(accepted, options);
+  const running = taskAcknowledgement(decision, nowMs, {
+    ok: true,
+    state: "running",
+    reason: "accepted",
+    detail: decision.permittedAction,
+    scoutActed: false,
+  });
+  storeAcknowledgement(running, options);
+
+  let finished;
+  try {
+    const worker = runWorker(decision, token);
+    finished = worker.ok
+      ? taskAcknowledgement(decision, nowMs, {
+        ok: true,
+        state: "completed",
+        reason: "accepted",
+        detail: decision.permittedAction,
+        scoutActed: true,
+        evidence: worker.evidence,
+      })
+      : taskAcknowledgement(decision, nowMs, {
+        ok: false,
+        state: "failed",
+        reason: "failed",
+        detail: worker.detail,
+        scoutActed: false,
+      });
+  } catch {
+    discardWorkerResult();
+    finished = taskAcknowledgement(decision, nowMs, {
+      ok: false,
+      state: "failed",
+      reason: "failed",
+      detail: "Local worker did not complete the inspection.",
+      scoutActed: false,
+    });
+  }
+  storeAcknowledgement(finished, options, finished.state === "completed" ? decision.decisionId : null);
+  releaseOwnLock(token);
+  return {
+    ok: finished.ok,
+    reason: finished.reason,
+    acknowledgement: finished,
+  };
+}
+
 function persistInboundDecision(decision) {
   mkdirSync(BRIDGE_DIR, { recursive: true });
   appendFileSync(INBOUND_JSONL, `${JSON.stringify(redactSecrets(decision))}\n`, "utf8");
@@ -420,9 +1005,23 @@ export function consumeInboundDecision(decision, options = {}) {
   const validation = validateInboundDecision(decision, nowMs, expectedPackageId);
   const consumed = readJson(CONSUMED_PATH, { ids: [] });
   const ids = new Set(consumed.ids ?? []);
+  if (validation.ok && decision.action === "run_readonly_task") {
+    return consumeReadonlyTask(decision, nowMs, options);
+  }
+  if (validation.ok && decision.action === "run_synthetic_engineering_handoff") {
+    return consumeTrackedTask(decision, nowMs, options, runEngineeringWorker);
+  }
   if (validation.ok && ids.has(decision.decisionId)) {
     return { ok: false, reason: "stale_decision", detail: "Decision was already consumed." };
   }
+  const statusReport =
+    validation.ok && decision.action === "report_local_status" && options.act !== false
+      ? readLocalWorkStatus(nowMs)
+      : null;
+  const scoutActed =
+    decision?.action === "report_local_status"
+      ? Boolean(statusReport?.ok)
+      : Boolean(validation.ok && options.act !== false);
   const acknowledgement = {
     at: new Date(nowMs).toISOString(),
     decisionId: decision?.decisionId ?? null,
@@ -431,7 +1030,8 @@ export function consumeInboundDecision(decision, options = {}) {
     ok: validation.ok,
     reason: validation.ok ? "accepted" : validation.reason,
     detail: validation.ok ? decision.permittedAction : validation.detail,
-    scoutActed: Boolean(validation.ok && options.act !== false),
+    scoutActed,
+    ...(statusReport ? { evidence: statusReport } : {}),
   };
   mkdirSync(BRIDGE_DIR, { recursive: true });
   appendFileSync(ACK_JSONL, `${JSON.stringify(acknowledgement)}\n`, "utf8");

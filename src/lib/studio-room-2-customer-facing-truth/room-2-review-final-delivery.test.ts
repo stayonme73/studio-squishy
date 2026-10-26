@@ -126,8 +126,18 @@ describe("STUDIO-OPERATING-ROOM-2-REVIEW-FINAL-DELIVERY-TRUTH-AND-FRICTION-1", (
     );
     expect(deliverables.eyebrow).toBe("Final Delivery");
     expect(deliverables.footer.startNewCampaign).toBe("START NEW PROJECT");
+    expect(deliverables.routes.newCampaign).toBe("/studio-conversation-room");
     expect(deliverables.pageSubtitle).not.toMatch(/marketing campaign/i);
     expect(C8D_ROOM_STATE_COPY.delivery.pageLead).not.toMatch(/truthful/i);
+    expect(C8D_ROOM_STATE_COPY.delivery.pageLead).not.toMatch(/approved/i);
+    expect(deliverables.clientAccess.notReady.message).toBe(
+      "There are no released files for this project yet.",
+    );
+    expect(deliverables.clientAccess.notReady.messageSecondary).toMatch(
+      /Project Intake Received/,
+    );
+    expect(deliverables.clientAccess.notReady.messageSecondary).not.toMatch(/check back soon/i);
+    expect(deliverables.clientAccess.notReady.message).not.toMatch(/preparing your final/i);
     expect(C8D_ROOM_STATE_COPY.final.pageLead).toMatch(/Review is complete/i);
   });
 

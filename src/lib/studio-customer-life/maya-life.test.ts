@@ -457,6 +457,9 @@ describe("STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1", () => {
       "Did you receive my file?": "received_upload",
       "Has work started?": "work_started",
       "Has work started yet?": "work_started",
+      "Has anyone started my project?": "work_started",
+      "When will you start?": "when_start",
+      "Why is it still waiting?": "holding_up",
       "What is happening with my flyer?": "flyer_status",
       "What is happening with my project?": "flyer_status",
       "Is anything holding it up?": "holding_up",
@@ -475,6 +478,18 @@ describe("STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1", () => {
       "Which version did I approve?": "which_version_approved",
       "Did you keep my approval?": "which_version_approved",
       "Where are my final files?": "final_files",
+      "I still don’t have the photos.": "need_anything",
+      "What's going on with my order?": "flyer_status",
+      "Can I change something?": "can_changes",
+      "I need a revision.": "can_changes",
+      "Where are my files?": "final_files",
+      "How much is this going to cost me?": "pricing",
+      "So what exactly am I getting?": "scope",
+      "I just need something for Instagram, I don’t know which one.": "service_fit",
+      "This isn’t what I asked for.": "dissatisfaction",
+      "I want a refund.": "refund",
+      "I want to file a complaint.": "complaint",
+      "I am a returning customer.": "returning_customer",
     };
     for (const [question, intent] of Object.entries(questions)) {
       expect(classifyCustomerLifeQuestion(question), question).toBe(intent);

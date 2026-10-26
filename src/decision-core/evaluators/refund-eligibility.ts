@@ -1,16 +1,19 @@
-import { JOB_CONTROL_POLICY } from "@/config/job-control";
-import { resolveWaitingOnClientReminderStatus } from "@/lib/job-control/waiting-on-client";
 import type { PurchasedJobRecord } from "@/lib/job-control/types";
 
 import type { DecisionContext, DecisionOutcome } from "../types";
 
 export type RefundEligibilityFacts = {
   job: PurchasedJobRecord;
-  waitingSince: string;
+  /** Operational history only — not a refund clock. */
+  waitingSince?: string;
   lastClientResponseAt?: string | null;
   nowMs?: number;
 };
 
+/**
+ * Before production starts a refund may be approved; after production starts the job is
+ * non-refundable. There is no waiting period, and the outcome is never an automatic refund.
+ */
 export function evaluateRefundEligibility(context: DecisionContext): DecisionOutcome {
   const facts = context.facts as unknown as RefundEligibilityFacts;
   const job = facts.job;
@@ -25,33 +28,20 @@ export function evaluateRefundEligibility(context: DecisionContext): DecisionOut
     };
   }
 
-  const nowMs = facts.nowMs ?? Date.now();
-  const reminderStatus = resolveWaitingOnClientReminderStatus(
-    facts.waitingSince,
-    facts.lastClientResponseAt ?? job.lastClientResponseAt ?? null,
-    nowMs,
-  );
-
   const productionStarted = Boolean(job.productionStartedAt);
   const nonRefundable = Boolean(job.nonRefundable);
-  const mayBeEligible =
-    reminderStatus === "refund_eligible" && !productionStarted && !nonRefundable;
+  const mayBeEligible = !productionStarted && !nonRefundable;
 
   const matchedRules = [
-    {
-      ruleId: "job-control:waiting-on-client:resolveWaitingOnClientReminderStatus",
-      matchedValue: reminderStatus,
-      source: "lib/job-control/waiting-on-client.ts",
-    },
     {
       ruleId: "help-center:refund-policy:production-not-started",
       matchedValue: String(!productionStarted),
       source: "docs/help-center-v1-locked.md",
     },
     {
-      ruleId: `job-control:JOB_CONTROL_POLICY.refundEligibleDays`,
-      matchedValue: String(JOB_CONTROL_POLICY.refundEligibleDays),
-      source: "config/job-control.ts",
+      ruleId: "job-control:non-refundable-after-production-start",
+      matchedValue: String(nonRefundable),
+      source: "lib/job-control/communication.ts",
     },
   ];
 
@@ -60,26 +50,18 @@ export function evaluateRefundEligibility(context: DecisionContext): DecisionOut
     determination: mayBeEligible ? "defer" : "deny",
     matchedRules,
     humanReviewRequired: mayBeEligible,
-    effects: mayBeEligible
-      ? [
-          {
-            kind: "enqueue_communication",
-            eventType: "refund_eligibility_14_day",
-          },
-        ]
-      : [],
+    effects: [],
     warnings: mayBeEligible
       ? []
       : [
           {
             code: "refund_not_eligible",
-            message: "Refund may be eligible only when policy conditions are met per job.",
+            message: "Non-refundable — production has started for this job.",
           },
         ],
     payload: {
       mayBeEligible,
-      reminderStatus,
-      wording: "may be eligible",
+      wording: "may be approved",
     },
   };
 }

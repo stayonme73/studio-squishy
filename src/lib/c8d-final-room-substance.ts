@@ -168,19 +168,6 @@ function resolveDeliveryAvailability(options: {
   const copy = c8dFinalSubstanceV1;
   const { deliveryInput, focusedJobId } = options;
 
-  if (deliveryInput.status === "loading" || deliveryInput.status === "idle") {
-    return {
-      deliveryAvailability: {
-        kind: "loading",
-        message: copy.deliveryAvailability.loading,
-      },
-      openDelivery: {
-        label: copy.openDelivery.loading,
-        enabled: false,
-        emphasize: false,
-      },
-    };
-  }
   if (deliveryInput.status === "error") {
     return {
       deliveryAvailability: {
@@ -190,6 +177,19 @@ function resolveDeliveryAvailability(options: {
       openDelivery: {
         label: copy.openDelivery.error,
         enabled: true,
+        emphasize: false,
+      },
+    };
+  }
+  if (deliveryInput.status !== "ready") {
+    return {
+      deliveryAvailability: {
+        kind: "loading",
+        message: copy.deliveryAvailability.loading,
+      },
+      openDelivery: {
+        label: copy.openDelivery.loading,
+        enabled: false,
         emphasize: false,
       },
     };
@@ -409,7 +409,7 @@ export function resolveFinalRoomSubstance(input: {
     input.stages.summary.explanation ??
     copy.status.preparingGeneric;
 
-  let workDetail = copy.workReference.none;
+  let workDetail: string = copy.workReference.none;
   if (focused) {
     workDetail = versionLabel
       ? `${focused.serviceName} · ${focused.label} · ${versionLabel}`

@@ -68,6 +68,10 @@ function resolveRaiseExceptionTitle(
   exceptionKind: CampaignExceptionKind,
   interactionKind?: string,
 ): string {
+  const byInteraction = INTERACTION_EXCEPTION_MAPPINGS.find(
+    (entry) => entry.interactionKind === interactionKind,
+  );
+  if (byInteraction) return byInteraction.title;
   const mapped = INTERACTION_EXCEPTION_MAPPINGS.find(
     (entry) => entry.exceptionKind === exceptionKind,
   );

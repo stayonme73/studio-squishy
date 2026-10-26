@@ -390,7 +390,8 @@
 }
 
 .utility-page--help-center .utility-subnav__link--active::after {
-  width: 1.6rem;
+  content: none;
+  display: none;
 }
 
 .utility-page--help-center .utility-card {
@@ -431,7 +432,8 @@
   }
 
   .utility-page--help-center .utility-subnav__link--active::after {
-    width: 1.75rem;
+    content: none;
+    display: none;
   }
 
   .utility-page--help-center .hc-grid .utility-card__title {
@@ -454,8 +456,24 @@
     font-size: max(1rem, 16px);
   }
 
+  .utility-page--help-center .hc-qpg-table .pkg-compare__table {
+    min-width: 0;
+  }
+
+  .utility-page--help-center .hc-qpg-table th:last-child,
+  .utility-page--help-center .hc-qpg-table td:last-child {
+    width: 16rem;
+    min-width: 14rem;
+  }
+
   .utility-page--help-center .hc-card--packages .pkg-compare__pkg-head {
     font-size: max(0.875rem, 14px);
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .utility-page--help-center .utility-subnav__list {
+    flex-wrap: nowrap !important;
   }
 }
 

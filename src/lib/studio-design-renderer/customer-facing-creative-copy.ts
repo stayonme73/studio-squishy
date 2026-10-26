@@ -3,6 +3,8 @@
  * Strips / detects production chrome before body/CTA/PNG text is released.
  */
 
+import { resolveCustomerOfferHeadlineFromFacts } from "./flyer-creative-quality";
+
 /** Patterns that must not appear in customer-declared PNG / body / CTA text. */
 export const INTERNAL_FIELD_LEAK_PATTERNS: readonly RegExp[] = [
   /\bDestination:\s*/i,
@@ -100,6 +102,9 @@ export function shortenCustomerFacingCta(
   const max = options?.maxLen ?? 36;
   let s = stripCustomerFacingCta(cta);
   if (!s) return "";
+  if (s.length <= max && !/\bDestination:/i.test(cta) && !/\bor call\b/i.test(s)) {
+    return s;
+  }
   const enroll = s.match(
     /^(Enroll(?:\s+in\s+[A-Za-z0-9 &'’-]{1,40})?|Book now|Learn more|Get started|Join us)/i,
   );
@@ -151,36 +156,10 @@ export function resolveCustomerOfferHeadline(input: {
   campaignFocus?: string;
   postsAbout?: string;
   mustInclude?: string;
+  businessName?: string;
   fallback?: string;
 }): string {
-  const purpose = String(input.flyerPurpose ?? "").trim();
-  const purposeTail = purpose.replace(/^promotional flyer for\s+/i, "").trim();
-  if (purposeTail && !/^promotional flyer/i.test(purposeTail)) {
-    return purposeTail.slice(0, 48);
-  }
-
-  const focus = String(input.campaignFocus ?? "").trim();
-  if (focus) {
-    const noIso = focus
-      .replace(/\bstarting\s+\d{4}-\d{2}-\d{2}\b/gi, "")
-      .replace(/\s+[—–-]\s+six-week.*$/i, "")
-      .replace(/\s+launch\s*$/i, "")
-      .trim();
-    const head = (noIso || focus).split(/[.\n]/)[0]?.trim() ?? "";
-    if (head && !/^promotional flyer/i.test(head)) return head.slice(0, 48);
-  }
-
-  const posts = String(input.postsAbout ?? "").trim();
-  const fall = posts.match(/\b([A-Z][A-Za-z0-9 &'’-]{2,40}\s+Reset)\b/);
-  if (fall?.[1]) return fall[1].slice(0, 48);
-
-  const must = String(input.mustInclude ?? "");
-  const mustOffer = must.match(
-    /\b([A-Z][A-Za-z0-9 &'’-]{2,40}\s+(?:Reset|Launch|Tune-Up|Bundle))\b/,
-  );
-  if (mustOffer?.[1]) return mustOffer[1].slice(0, 48);
-
-  return String(input.fallback ?? "Your offer").slice(0, 48);
+  return resolveCustomerOfferHeadlineFromFacts(input);
 }
 
 /**
@@ -331,4 +310,23 @@ export function customerArtContainsForbiddenFragment(text: string): string | nul
     }
   }
   return null;
+}
+
+/**
+ * Strip production-chrome fragments from a customer disclaimer.
+ * Does not invent a replacement legal line. Empty after sanitizing is valid.
+ */
+export function sanitizeCustomerDisclaimer(text: string): string {
+  let out = String(text ?? "").trim();
+  if (!out) return "";
+
+  const sentences = out.split(/(?<=[.!?])\s+/);
+  const kept = sentences.filter((sentence) => {
+    if (isInternalProductionChromeText(sentence)) return false;
+    return customerArtContainsForbiddenFragment(sentence) == null;
+  });
+  out = kept.join(" ").replace(/\s{2,}/g, " ").trim();
+  if (!out || isInternalProductionChromeText(out)) return "";
+  if (customerArtContainsForbiddenFragment(out)) return "";
+  return out;
 }

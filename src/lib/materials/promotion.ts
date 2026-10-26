@@ -216,7 +216,9 @@ function findMatchingSlots(
     if (item.category !== payload.category || item.contentKind !== contentKind) return false;
     if (item.sourceExceptionId && item.sourceExceptionId !== payload.exceptionId) return false;
     if (serviceSet.size === 0) return true;
-    return item.relatedServiceIds.some((serviceId) => serviceSet.has(serviceId));
+    return item.relatedServiceIds.some((serviceId) =>
+      (payload.relatedServiceIds ?? []).some((id) => id === serviceId),
+    );
   });
 }
 

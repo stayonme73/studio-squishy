@@ -130,7 +130,7 @@ describe("KITCHEN-PRODUCTION-CAPABILITY-1", () => {
     expect(video.contract.readiness).toBe("contract_ready");
     expect(profile.contract.readiness).toBe("contract_ready");
     expect(profile.contract.readinessNotes).toMatch(
-      /CUSTOMER READY WITH LIMITS — PROFILE KIT/i,
+      /PROFILE KIT|Studio Design Renderer/i,
     );
     expect(page.contract.readiness).toBe("contract_ready");
     expect(page.contract.readinessNotes).toMatch(/CUSTOMER READY WITH LIMITS/i);
@@ -160,7 +160,11 @@ describe("KITCHEN-PRODUCTION-CAPABILITY-1", () => {
       if (result.status !== "resolved") continue;
       const tools = [result.contract.primaryTool, ...result.contract.optionalTools];
       for (const tool of tools) {
-        expect(tool.integrationState).not.toBe("integrated");
+        expect(
+          tool.toolId === "studio_design_renderer" ||
+            tool.toolId === "studio_copy_producer" ||
+            tool.integrationState !== "integrated",
+        ).toBe(true);
         if (tool.toolId === "canva" || tool.toolId === "capcut") {
           expect(["not_integrated", "manual_operational", "partial_adapter"]).toContain(
             tool.integrationState,

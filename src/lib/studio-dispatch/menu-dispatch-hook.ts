@@ -16,7 +16,10 @@ import {
   MENU_RENDERER_VERSION,
   reasonMenuDesignSpecDeterministic,
   runMenuJobPipeline,
+  validateMenuDesignSpec,
 } from "@/lib/studio-design-renderer";
+import { unsupportedMenuClaims } from "@/lib/studio-design-renderer/menu-completeness";
+import { refineLaunchDesignSpecCreative } from "@/lib/studio-production-team-workforce";
 import type {
   MenuArtifactIdentity,
   MenuDesignSpec,
@@ -208,7 +211,18 @@ export async function invokeMenuDispatchHook(input: {
 
   let designSpec: MenuDesignSpec;
   try {
-    designSpec = reasonMenuDesignSpecDeterministic(mapped.truth);
+    const seed = reasonMenuDesignSpecDeterministic(mapped.truth);
+    designSpec = await refineLaunchDesignSpecCreative({
+      skuId: record.skuId,
+      seed,
+      authorizedFacts: mapped.truth,
+      validate: (spec) => {
+        if (unsupportedMenuClaims(mapped.truth, spec).length > 0) {
+          return { ok: false };
+        }
+        return { ok: validateMenuDesignSpec(input.repoRoot, spec, mapped.truth).ok };
+      },
+    });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return {

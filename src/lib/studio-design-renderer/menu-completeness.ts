@@ -8,6 +8,53 @@ export type MenuCompletenessResult =
   | { ok: true; itemCount: number }
   | { ok: false; message: string };
 
+function foldMenuText(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[✓•●▪]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Customer-supplied menu facts. Section titles match after case folding. */
+export function menuAuthorizedCorpus(truth: MenuProjectTruth): string {
+  return foldMenuText(
+    [
+      truth.businessName,
+      truth.wordmark,
+      truth.descriptor ?? "",
+      truth.dietaryLabels,
+      truth.legalDisclaimer ?? "",
+      ...truth.sections.flatMap((section) => [
+        section.title,
+        ...section.items.flatMap((item) => [
+          item.name,
+          item.description ?? "",
+          item.priceDisplay,
+        ]),
+      ]),
+    ].join("\n"),
+  );
+}
+
+/** Menu text the customer did not supply. */
+export function unsupportedMenuClaims(
+  truth: MenuProjectTruth,
+  spec: MenuDesignSpec,
+): string[] {
+  const corpus = menuAuthorizedCorpus(truth);
+  const hits: string[] = [];
+  for (const layer of spec.layers) {
+    if (layer.type !== "text") continue;
+    const content = layer.content.trim();
+    if (!content) continue;
+    const folded = foldMenuText(content);
+    if (!folded || corpus.includes(folded)) continue;
+    hits.push(content);
+  }
+  return hits;
+}
+
 export function verifyMenuItemCompletenessAndPrices(
   truth: MenuProjectTruth,
   spec: MenuDesignSpec,
@@ -116,19 +163,44 @@ export function verifyMenuItemCompletenessAndPrices(
     }
   }
 
-  if (!declaredText.includes(truth.dietaryLabels.trim())) {
-    return {
-      ok: false,
-      message: "Client dietary/allergen wording not preserved in declared text",
-    };
-  }
+  const dietaryExact = truth.dietaryLabels.trim();
+  const dietaryLayer = spec.layers.find(
+    (l) => l.type === "text" && l.role === "dietary_disclaimer",
+  );
   if (
-    truth.legalDisclaimer?.trim() &&
-    !declaredText.includes(truth.legalDisclaimer.trim())
+    !dietaryLayer ||
+    dietaryLayer.type !== "text" ||
+    dietaryLayer.content !== dietaryExact ||
+    !declaredText.includes(dietaryExact)
   ) {
     return {
       ok: false,
-      message: "Client legal disclaimer not preserved in declared text",
+      message: "Client dietary/allergen wording not preserved exactly",
+    };
+  }
+  const legalExact = truth.legalDisclaimer?.trim() ?? "";
+  if (legalExact) {
+    const legalLayer = spec.layers.find(
+      (l) => l.type === "text" && l.role === "legal_disclaimer",
+    );
+    if (
+      !legalLayer ||
+      legalLayer.type !== "text" ||
+      legalLayer.content !== legalExact ||
+      !declaredText.includes(legalExact)
+    ) {
+      return {
+        ok: false,
+        message: "Client legal disclaimer not preserved exactly",
+      };
+    }
+  }
+
+  const unsupported = unsupportedMenuClaims(truth, spec);
+  if (unsupported.length > 0) {
+    return {
+      ok: false,
+      message: `Quality rejected unsupported wording: ${unsupported.join(" | ")}`,
     };
   }
 

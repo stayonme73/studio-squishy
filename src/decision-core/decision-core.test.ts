@@ -353,8 +353,8 @@ describe("evaluateEscalation parity", () => {
 });
 
 describe("evaluateRefundEligibility", () => {
-  it("defers with may-be-eligible when 14-day window met and production not started", () => {
-    const waitingSince = new Date("2026-06-01T10:00:00.000Z").toISOString();
+  it("defers to the Owner on the same day waiting began when production has not started", () => {
+    const waitingSince = new Date("2026-06-20T09:00:00.000Z").toISOString();
     const nowMs = new Date("2026-06-20T10:00:00.000Z").getTime();
 
     const outcome = evaluateRefundEligibility({
@@ -374,6 +374,27 @@ describe("evaluateRefundEligibility", () => {
     expect(outcome.determination).toBe("defer");
     expect(outcome.humanReviewRequired).toBe(true);
     expect(outcome.payload?.mayBeEligible).toBe(true);
+    expect(outcome.effects).toEqual([]);
+  });
+
+  it("denies once production has started, however long the job waited", () => {
+    const nowMs = new Date("2026-08-20T10:00:00.000Z").getTime();
+    const outcome = evaluateRefundEligibility({
+      domain: "refund",
+      campaignId: "dc-camp",
+      jobId: "dc-camp:ma-flyer-v2",
+      actor: "system",
+      trigger: { type: "refund_eligibility_check", nowMs },
+      occurredAt: new Date(nowMs).toISOString(),
+      facts: {
+        job: job({ productionStartedAt: "2026-06-02T10:00:00.000Z", nonRefundable: true }),
+        waitingSince: new Date("2026-06-01T10:00:00.000Z").toISOString(),
+        nowMs,
+      },
+    });
+
+    expect(outcome.determination).toBe("deny");
+    expect(outcome.payload?.mayBeEligible).toBe(false);
   });
 });
 

@@ -8,6 +8,14 @@ import type {
   StudioUserRecord,
 } from "@/lib/campaign-store/types";
 import { isPlausibleEmail, normalizeEmail } from "@/lib/auth/email-normalize";
+import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
+import {
+  pgFindUserByEmail,
+  pgFindUserById,
+  pgInsertStudioUserIfAbsent,
+  pgListStudioUsers,
+  pgWriteStudioUser,
+} from "@/lib/studio-durable-persistence/postgres-identity";
 import {
   hashPassword,
   isPasswordHash,
@@ -17,7 +25,9 @@ import {
 
 import seedUsers from "./studio-users.seed.json";
 
-const USERS_PATH = path.join(process.cwd(), "data", "studio-users.json");
+function usersFilePath(): string {
+  return path.join(process.cwd(), "data", "studio-users.json");
+}
 
 type SeedUserJson = StudioUserRecord & {
   accountClass?: StudioUserAccountClass;
@@ -35,19 +45,22 @@ function seedAccountClass(user: SeedUserJson): StudioUserAccountClass {
   return "test";
 }
 
-/** Seeds allowed to merge into the runtime user file. */
+/**
+ * Repository seed accounts are for local development and tests.
+ * Production never merges them. `next start` sets NODE_ENV=production
+ * itself, so this does not depend on a second flag.
+ */
 function allowedSeedUsers(): SeedUserJson[] {
-  const all = seedUsers as SeedUserJson[];
-  if (!isProductionRuntime()) return all;
-  // Production: staff only — never customer/test seeds from the repository.
-  return all.filter((user) => seedAccountClass(user) === "staff");
+  if (isProductionRuntime()) return [];
+  return seedUsers as SeedUserJson[];
 }
 
 async function ensureUsersFile(): Promise<void> {
-  await fs.mkdir(path.dirname(USERS_PATH), { recursive: true });
+  const usersPath = usersFilePath();
+  await fs.mkdir(path.dirname(usersPath), { recursive: true });
   const seeds = allowedSeedUsers();
   try {
-    const raw = await fs.readFile(USERS_PATH, "utf8");
+    const raw = await fs.readFile(usersPath, "utf8");
     const existing = JSON.parse(raw) as StudioUserRecord[];
     const usersById = new Map(existing.map((user) => [user.id, user]));
     let changed = false;
@@ -60,11 +73,11 @@ async function ensureUsersFile(): Promise<void> {
       changed = true;
     }
     if (changed) {
-      await fs.writeFile(USERS_PATH, JSON.stringify(existing, null, 2), "utf8");
+      await fs.writeFile(usersPath, JSON.stringify(existing, null, 2), "utf8");
     }
   } catch {
     await fs.writeFile(
-      USERS_PATH,
+      usersPath,
       JSON.stringify(
         seeds.map((user) => ({
           ...user,
@@ -78,15 +91,40 @@ async function ensureUsersFile(): Promise<void> {
   }
 }
 
+async function mergeSeedUsers(users: StudioUserRecord[]): Promise<StudioUserRecord[]> {
+  const usersById = new Map(users.map((user) => [user.id, user]));
+  let changed = false;
+  for (const seedUser of allowedSeedUsers()) {
+    if (usersById.has(seedUser.id)) continue;
+    const seeded = {
+      ...seedUser,
+      accountClass: seedAccountClass(seedUser),
+    };
+    users.push(seeded);
+    if (isPostgresPersistenceEnabled()) {
+      await pgInsertStudioUserIfAbsent(seeded);
+    }
+    changed = true;
+  }
+  if (changed && !isPostgresPersistenceEnabled()) {
+    await writeStudioUsers(users);
+  }
+  return users;
+}
+
 export async function listStudioUsers(): Promise<StudioUserRecord[]> {
+  if (isPostgresPersistenceEnabled()) {
+    return mergeSeedUsers(await pgListStudioUsers());
+  }
   await ensureUsersFile();
-  const raw = await fs.readFile(USERS_PATH, "utf8");
-  return JSON.parse(raw) as StudioUserRecord[];
+  const raw = await fs.readFile(usersFilePath(), "utf8");
+  return mergeSeedUsers(JSON.parse(raw) as StudioUserRecord[]);
 }
 
 async function writeStudioUsers(users: StudioUserRecord[]): Promise<void> {
-  await fs.mkdir(path.dirname(USERS_PATH), { recursive: true });
-  await fs.writeFile(USERS_PATH, JSON.stringify(users, null, 2), "utf8");
+  const usersPath = usersFilePath();
+  await fs.mkdir(path.dirname(usersPath), { recursive: true });
+  await fs.writeFile(usersPath, JSON.stringify(users, null, 2), "utf8");
 }
 
 /**
@@ -103,6 +141,14 @@ export async function insertStudioUserRecordIfMissing(
     (user) => normalizeEmail(user.email) === normalizeEmail(record.email),
   );
   if (byEmail) return toPublicUser(byEmail);
+  if (isPostgresPersistenceEnabled()) {
+    const inserted = await pgInsertStudioUserIfAbsent(record);
+    if (!inserted) {
+      const byEmail = await pgFindUserByEmail(record.email);
+      return toPublicUser(byEmail ?? record);
+    }
+    return toPublicUser(record);
+  }
   users.push(record);
   await writeStudioUsers(users);
   return toPublicUser(record);
@@ -111,6 +157,9 @@ export async function insertStudioUserRecordIfMissing(
 export async function findUserByEmail(
   email: string,
 ): Promise<StudioUserRecord | null> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgFindUserByEmail(email);
+  }
   const normalized = normalizeEmail(email);
   const users = await listStudioUsers();
   return (
@@ -119,6 +168,9 @@ export async function findUserByEmail(
 }
 
 export async function findUserById(id: string): Promise<StudioUserRecord | null> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgFindUserById(id);
+  }
   const users = await listStudioUsers();
   return users.find((user) => user.id === id) ?? null;
 }
@@ -157,15 +209,19 @@ async function upgradeLegacyPassword(
   userId: string,
   password: string,
 ): Promise<void> {
-  const users = await listStudioUsers();
-  const index = users.findIndex((user) => user.id === userId);
-  if (index === -1) return;
+  const user = await findUserById(userId);
+  if (!user) return;
   const passwordHash = await hashPassword(password);
-  const { password: _removed, ...rest } = users[index];
-  users[index] = {
-    ...rest,
-    passwordHash,
-  };
+  const { password: _removed, ...rest } = user;
+  const next = { ...rest, passwordHash };
+  if (isPostgresPersistenceEnabled()) {
+    await pgWriteStudioUser(next);
+    return;
+  }
+  const users = await listStudioUsers();
+  const index = users.findIndex((entry) => entry.id === userId);
+  if (index === -1) return;
+  users[index] = next;
   await writeStudioUsers(users);
 }
 
@@ -258,6 +314,18 @@ export async function createClientAccount(
     emailVerifiedAt: null,
   };
 
+  if (isPostgresPersistenceEnabled()) {
+    const created = await pgInsertStudioUserIfAbsent(record);
+    if (!created) {
+      return {
+        ok: false,
+        code: "email_taken",
+        message:
+          "An account with this email already exists. Sign in instead.",
+      };
+    }
+    return { ok: true, user: toPublicUser(record) };
+  }
   const users = await listStudioUsers();
   users.push(record);
   await writeStudioUsers(users);
@@ -268,19 +336,20 @@ export async function markEmailVerified(
   userId: string,
   verifiedAt: string = new Date().toISOString(),
 ): Promise<StudioUser | null> {
-  const users = await listStudioUsers();
-  const index = users.findIndex((user) => user.id === userId);
-  if (index === -1) return null;
-
-  // Idempotent — keep the first verification timestamp.
-  if (users[index].emailVerifiedAt) {
-    return toPublicUser(users[index]);
+  const user = await findUserById(userId);
+  if (!user) return null;
+  if (user.emailVerifiedAt) {
+    return toPublicUser(user);
   }
-
-  users[index] = {
-    ...users[index],
-    emailVerifiedAt: verifiedAt,
-  };
+  const next = { ...user, emailVerifiedAt: verifiedAt };
+  if (isPostgresPersistenceEnabled()) {
+    await pgWriteStudioUser(next);
+    return toPublicUser(next);
+  }
+  const users = await listStudioUsers();
+  const index = users.findIndex((entry) => entry.id === userId);
+  if (index === -1) return null;
+  users[index] = next;
   await writeStudioUsers(users);
   return toPublicUser(users[index]);
 }
@@ -310,9 +379,8 @@ export async function updatePasswordAfterReset(
     };
   }
 
-  const users = await listStudioUsers();
-  const index = users.findIndex((user) => user.id === userId);
-  if (index === -1) {
+  const user = await findUserById(userId);
+  if (!user) {
     return {
       ok: false,
       code: "unknown_user",
@@ -322,12 +390,30 @@ export async function updatePasswordAfterReset(
 
   const passwordHash = await hashPassword(newPassword);
   const passwordChangedAtMs = Date.now();
-  const { password: _removed, ...rest } = users[index];
-  users[index] = {
+  const { password: _removed, ...rest } = user;
+  const next = {
     ...rest,
     passwordHash,
     passwordChangedAtMs,
   };
+  if (isPostgresPersistenceEnabled()) {
+    await pgWriteStudioUser(next);
+    return {
+      ok: true,
+      user: toPublicUser(next),
+      passwordChangedAtMs,
+    };
+  }
+  const users = await listStudioUsers();
+  const index = users.findIndex((entry) => entry.id === userId);
+  if (index === -1) {
+    return {
+      ok: false,
+      code: "unknown_user",
+      message: "This reset link is not valid. Request a new email to continue.",
+    };
+  }
+  users[index] = next;
   await writeStudioUsers(users);
   return {
     ok: true,
@@ -340,15 +426,17 @@ export async function updateUserCurrentCampaign(
   userId: string,
   campaignId: string | undefined,
 ): Promise<StudioUser | null> {
+  const user = await findUserById(userId);
+  if (!user) return null;
+  const next = { ...user, currentCampaignId: campaignId };
+  if (isPostgresPersistenceEnabled()) {
+    await pgWriteStudioUser(next);
+    return toPublicUser(next);
+  }
   const users = await listStudioUsers();
-  const index = users.findIndex((user) => user.id === userId);
+  const index = users.findIndex((entry) => entry.id === userId);
   if (index === -1) return null;
-
-  users[index] = {
-    ...users[index],
-    currentCampaignId: campaignId,
-  };
-
+  users[index] = next;
   await writeStudioUsers(users);
   return toPublicUser(users[index]);
 }
@@ -357,21 +445,25 @@ export async function linkClientCampaign(
   userId: string,
   campaignId: string,
 ): Promise<StudioUser | null> {
-  const users = await listStudioUsers();
-  const index = users.findIndex((user) => user.id === userId);
-  if (index === -1) return null;
-
-  const existing = users[index].clientCampaignIds ?? [];
+  const user = await findUserById(userId);
+  if (!user) return null;
+  const existing = user.clientCampaignIds ?? [];
   const clientCampaignIds = existing.includes(campaignId)
     ? existing
     : [...existing, campaignId];
-
-  users[index] = {
-    ...users[index],
+  const next = {
+    ...user,
     currentCampaignId: campaignId,
     clientCampaignIds,
   };
-
+  if (isPostgresPersistenceEnabled()) {
+    await pgWriteStudioUser(next);
+    return toPublicUser(next);
+  }
+  const users = await listStudioUsers();
+  const index = users.findIndex((entry) => entry.id === userId);
+  if (index === -1) return null;
+  users[index] = next;
   await writeStudioUsers(users);
   return toPublicUser(users[index]);
 }

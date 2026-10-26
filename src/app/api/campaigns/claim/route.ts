@@ -8,6 +8,9 @@ import {
 import { isNextResponse, requireSession } from "@/lib/auth/require-session";
 import { findUserById, toPublicUser } from "@/lib/auth/users";
 import { claimCampaignForVerifiedClient } from "@/lib/studio-project-claim/claim";
+import { recoverPaidOperatingChain } from "@/lib/studio-paid-activation-recovery";
+import { identitySessionFromRequest } from "@/lib/studio-customer-identity-safety-gate/session";
+import { readCampaignEnvelope } from "@/lib/campaign-store/store";
 import { logAccessEvent } from "@/lib/security/access-log";
 
 export async function POST(request: Request) {
@@ -17,7 +20,6 @@ export async function POST(request: Request) {
   let body: {
     campaignId?: string;
     claimToken?: string;
-    allowLocalPossession?: boolean;
   };
   try {
     body = (await request.json()) as typeof body;
@@ -48,7 +50,7 @@ export async function POST(request: Request) {
     user,
     campaignId,
     rawClaimToken: body.claimToken ?? null,
-    allowLocalPossession: body.allowLocalPossession === true,
+    allowLocalPossession: user.currentCampaignId === campaignId,
   });
 
   if (!result.ok) {
@@ -78,6 +80,16 @@ export async function POST(request: Request) {
   }
 
   const refreshed = await findUserById(user.id);
+  const claimedEnvelope = await readCampaignEnvelope(result.campaignId);
+  if (claimedEnvelope?.record.paymentTruth?.status === "confirmed") {
+    await recoverPaidOperatingChain(claimedEnvelope.record, {
+      identitySession: identitySessionFromRequest(
+        request,
+        user.id,
+        result.campaignId,
+      ),
+    });
+  }
   const response = NextResponse.json({
     ok: true,
     campaignId: result.campaignId,

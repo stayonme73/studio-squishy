@@ -40,6 +40,8 @@ export type CustomerVisibilityContinuityInput = {
 
 export type CustomerVisibilityContinuityView = {
   hasCampaign: boolean;
+  /** Campaign status that belongs under the Project status label. Null = omit the label. */
+  statusLabel: string | null;
   whatWeNeedFromYou: string;
   whatStudioIsDoing: string;
   nextStep: string;
@@ -135,6 +137,7 @@ export function resolveCustomerVisibilityContinuityView(
   if (!campaign) {
     return {
       hasCampaign: false,
+      statusLabel: null,
       whatWeNeedFromYou: copy.empty.noCampaign,
       whatStudioIsDoing: copy.empty.noCampaign,
       nextStep: copy.empty.noCampaign,
@@ -173,6 +176,7 @@ export function resolveCustomerVisibilityContinuityView(
   if (overlay?.kind === "cancelled") {
     return {
       hasCampaign: true,
+      statusLabel: overlay.statusLabel.trim() || null,
       whatWeNeedFromYou: copy.empty.nothingNeeded,
       whatStudioIsDoing: overlay.lead,
       nextStep: overlay.lead,
@@ -198,6 +202,7 @@ export function resolveCustomerVisibilityContinuityView(
     });
     return {
       hasCampaign: true,
+      statusLabel: overlay.statusLabel.trim() || null,
       whatWeNeedFromYou:
         neededItems.length > 0 ? neededItems.join("; ") : overlay.hint ?? overlay.lead,
       whatStudioIsDoing: overlay.lead,
@@ -289,6 +294,8 @@ export function resolveCustomerVisibilityContinuityView(
 
   return {
     hasCampaign: true,
+    statusLabel:
+      overlay?.statusLabel?.trim() || nextAction.statusLabel?.trim() || null,
     whatWeNeedFromYou,
     whatStudioIsDoing,
     nextStep,

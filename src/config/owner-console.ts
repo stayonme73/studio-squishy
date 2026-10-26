@@ -559,7 +559,7 @@ export const ownerConsole = {
     conceptsReceivedYes: "Yes — client received concepts or files",
     conceptsReceivedNo: "No — no concepts or files delivered yet",
     confirmApprove:
-      "Approve this refund and close this work? The client will receive the approved template.",
+      "Approve this refund? The Studio sends a full refund of the amount paid to Stripe. The work closes once Stripe accepts it.",
     confirmDeny:
       "Deny this refund? The work continues under policy and the client will be notified.",
     confirmHold:

@@ -607,6 +607,8 @@
   text-transform: uppercase;
   text-decoration: none;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition:
     background 0.15s ease,
     border-color 0.15s ease,

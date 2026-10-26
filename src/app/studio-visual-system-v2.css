@@ -211,7 +211,7 @@ html:has(.studio-environment-app) body {
   color: #ffffff !important;
 }
 
-.studio-environment-app :is(dt, label, .sb-card__tab, .fd-hero__badge, [class*="eyebrow"], [class*="__label"]) {
+.studio-environment-app :is(dt, label, .sb-card__tab, .fd-hero__badge, [class*="eyebrow"], [class*="__label"]):not([class*="intakeCheck"]):not([data-intake-type-well]) {
   color: var(--studio-label) !important;
   font-size: var(--studio-type-label) !important;
   font-weight: 600;
@@ -295,7 +295,7 @@ html:has(.studio-environment-app) body {
   .cd-card--journey,
   .cd-card--updates,
   .cd-card--activity
-):not(.owner-qa):not(.owner-qa *) {
+):not(.owner-qa):not(.owner-qa *):not(.fdr__feedback .fd-block) {
   background: var(--studio-glass-fill-strong) !important;
   border: var(--studio-border-width) solid var(--studio-glass-border) !important;
   border-radius: var(--studio-radius) !important;
@@ -364,7 +364,7 @@ html:has(.studio-environment-app) body {
 }
 
 /* Buttons — primary ink, secondary glass, danger only when destructive */
-.studio-environment-app :is(button, .utility-btn, .fd-btn, .lobby-entry-film__cta, [type="submit"], [type="button"]):not(.owner-qa *) {
+.studio-environment-app :is(button, .utility-btn, .fd-btn, .lobby-entry-film__cta, [type="submit"], [type="button"]):not(.owner-qa *):not([class*="planMoreDetails"]):not([data-plan-extras-cta]):not([data-route-includes-cta]):not([class*="routeIncludes"]) {
   font-family: inherit;
   font-size: var(--studio-type-button);
   font-weight: 500;
@@ -386,7 +386,7 @@ html:has(.studio-environment-app) body {
   border: var(--studio-border-width) solid var(--studio-glass-border) !important;
 }
 
-.studio-environment-app :is(button, .utility-btn, .fd-btn):not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(.owner-qa *):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-selected="true"]):not([aria-pressed="true"]):not([data-skip-action]):not([class*="btnSkip"]) {
+.studio-environment-app :is(button, .utility-btn, .fd-btn):not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(.owner-qa *):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-selected="true"]):not([aria-pressed="true"]):not([data-skip-action]):not([class*="btnSkip"]):not([class*="planMoreDetails"]):not([class*="planExtras"]):not([data-route-includes-cta]):not([class*="routeIncludes"]):not(.fs-preview__section-head):not(.fdr__feedback .utility-btn) {
   background: var(--studio-glass-fill) !important;
   color: #ffffff !important;
 }
@@ -517,7 +517,7 @@ html:has(.studio-environment-app) :is(
   [class*="primary-btn"],
   label:has(input[type="radio"]),
   label:has(input[type="checkbox"])
-):not(.owner-qa):not(.owner-qa *):not(:has(:is(button, a, [role="button"], [role="tab"], [type="button"], [type="submit"], .studio-tile, [class*="chip"]:not([class*="chipRow"]), label):active)):is(:active, .is-pressed, [data-pressed="true"]) {
+):not(.pay-acknowledgment__checkbox):not(.owner-qa):not(.owner-qa *):not([class*="intakeCheck"]):not([data-panel="intake"] .route-map-social-intake__chip):not(:has(:is(button, a, [role="button"], [role="tab"], [type="button"], [type="submit"], .studio-tile, [class*="chip"]:not([class*="chipRow"]), label):active)):is(:active, .is-pressed, [data-pressed="true"]) {
   background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
   border-color: #bfd8f2 !important;
   color: #ffffff !important;
@@ -535,7 +535,7 @@ html:has(.studio-environment-app) :is(
   .studio-tile--selected,
   .sb-nav__item--active,
   .utility-subnav__link--active
-):not(.owner-qa):not(.owner-qa *):not([class*="routeCard"]) {
+):not(.owner-qa):not(.owner-qa *):not([class*="routeCard"]):not(.studio-homepage__text-current) {
   background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
   border-color: #bfd8f2 !important;
   color: #ffffff !important;
@@ -657,9 +657,7 @@ html:has(.studio-environment-app) :is(
   .rd-job-list__item--selected,
   .fs-handoff-chain__step--current,
   .fs-feedback-panel__btn--active,
-  .fs-status-card__value,
-  .rd-job-list__stage,
-  .rd-stage-card__service
+  .fs-status-card__value
 ):not(.owner-qa):not(.owner-qa *) {
   background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
   border-color: #bfd8f2 !important;
@@ -803,7 +801,8 @@ html:has(.studio-environment-app) :is(
   .sb-current-campaign__label,
   .sb-account__label,
   .sb-next-action__status,
-  .sb-project-snapshot__heading
+  .sb-project-snapshot__heading,
+  .utility-page[aria-label="Campaign Details"] .utility-card__title
 ):not(.owner-qa):not(.owner-qa *) {
   border-bottom: 1px solid #c8b59b !important;
   border-bottom-color: #c8b59b !important;
@@ -1781,7 +1780,7 @@ html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake
   border: var(--studio-border-width) solid #c8b59b !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
-  caret-color: #ffffff;
+  caret-color: #f5e27a;
   box-shadow: none !important;
 }
 
@@ -1812,7 +1811,7 @@ html:has(.studio-environment-app) [data-panel="intake"] [data-intake-type-line] 
   border: var(--studio-border-width) solid #c8b59b !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
-  caret-color: #ffffff;
+  caret-color: #f5e27a;
   box-shadow: none !important;
 }
 
@@ -1830,7 +1829,7 @@ html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake
 ):-webkit-autofill:focus,
 html:has(.studio-environment-app) [data-panel="intake"] [data-intake-type-line]:-webkit-autofill {
   -webkit-text-fill-color: #ffffff !important;
-  caret-color: #ffffff;
+  caret-color: #f5e27a;
   border: var(--studio-border-width) solid #c8b59b !important;
   background-image: none !important;
   -webkit-box-shadow: 0 0 0 1000px #20262d inset !important;
@@ -1964,19 +1963,22 @@ html:has(.studio-environment-app) .utility-subnav__list {
   gap: 0.45rem !important;
 }
 
+/* Room buttons size to the label, on one line. */
 html:has(.studio-environment-app) .utility-subnav__item {
-  flex: 0 0 7.85rem !important;
-  width: 7.85rem !important;
+  flex: 0 1 auto !important;
+  width: auto !important;
+  max-width: 100% !important;
 }
 
 html:has(.studio-environment-app) .utility-subnav__link {
-  width: 100% !important;
-  height: 4.55rem !important;
-  min-height: 4.55rem !important;
-  padding: 0.4rem 0.3rem !important;
+  width: auto !important;
+  height: auto !important;
+  min-height: 2.75rem !important;
+  padding: 0.55rem 0.9rem !important;
   box-sizing: border-box !important;
   display: flex !important;
-  flex-direction: column !important;
+  flex-direction: row !important;
+  gap: 0.4rem !important;
   justify-content: center !important;
   align-items: center !important;
   font-size: var(--studio-type-small) !important;
@@ -2385,6 +2387,21 @@ html:has(.studio-environment-app) :is(
   font-size: var(--studio-type-title) !important;
 }
 
+/* Review Room leftover: waiting group heading is a mint label, not a white title. */
+html:has(.studio-environment-app) .studio-environment-app h2.rd-shell__jobs-heading:not(.owner-qa):not(.owner-qa *):not(.studio-tile--selected):not(.studio-tile--selected *),
+html:has(.studio-environment-app) .studio-environment-app .rd-shell__jobs-heading:not(.owner-qa):not(.owner-qa *) {
+  color: #8ff5c6 !important;
+  -webkit-text-fill-color: #8ff5c6 !important;
+  font-size: var(--studio-type-label, 0.875rem) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border-bottom: 1px solid #c8b59b !important;
+  padding-bottom: 0.2rem !important;
+}
+
 /* Help Center on-this-page links are words, not bubbles. */
 html:has(.studio-environment-app) .hc-toc__link:not(.owner-qa):not(.owner-qa *):not(:active):not(.is-pressed):not([data-pressed="true"]) {
   background: transparent !important;
@@ -2423,12 +2440,21 @@ html:has(.studio-environment-app) :is(
   grid-template-columns: auto 1fr !important;
 }
 
+@media (max-width: 720px) {
+  html:has(.studio-environment-app) .cd-overview__row {
+    grid-template-columns: 1fr !important;
+    row-gap: 0.2rem !important;
+  }
+}
+
 html:has(.studio-environment-app) .cd-timeline__date {
   white-space: nowrap !important;
 }
 
-/* Information update type must be a usable field, not a tiny bubble. */
-html:has(.studio-environment-app) .cd-information-update__select {
+/* Information update type must be a usable field, not a tiny bubble.
+   Leftover Windows gray dump: ink letters on ivory, not the system gray screen. */
+html:has(.studio-environment-app) .cd-information-update__select,
+html:has(.studio-environment-app) .cd-information-update__select option {
   display: block !important;
   width: 100% !important;
   min-width: 100% !important;
@@ -2436,6 +2462,11 @@ html:has(.studio-environment-app) .cd-information-update__select {
   padding: 0.85rem 1rem !important;
   font-size: var(--studio-type-copy) !important;
   font-weight: 600 !important;
+  color: #20262d !important;
+  -webkit-text-fill-color: #20262d !important;
+  background: #f7f4ee !important;
+  background-color: #f7f4ee !important;
+  color-scheme: light;
 }
 
 /* Add more is a text control, not a bubble. */
@@ -2462,4 +2493,3652 @@ html:has(.studio-environment-app) :is(
 ) {
   color: var(--studio-label, #8ff5c6) !important;
   -webkit-text-fill-color: var(--studio-label, #8ff5c6) !important;
+}
+
+/*
+ * LAPTOP DESK — min-width 1025 only.
+ * Do not copy into the phone max-width 960 fence.
+ * Paint stays shared. This is layout: one desk, no phone chrome, no cutoff.
+ */
+@media (min-width: 1025px) {
+  html:has(.studio-environment-app) [data-layout="one-tablet"] {
+    --side-width: 0px !important;
+    --activity-reserve: 0px !important;
+    --tablet-width: min(56rem, calc(100% - 3rem)) !important;
+    --max-tablet-height: none !important;
+    --stage-width: 100% !important;
+    --slide-width: min(56rem, calc(100% - 3rem)) !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    overflow-x: clip !important;
+    overflow-y: scroll !important;
+    padding: 1.75rem 2.25rem 2.5rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="roomStage"] {
+    width: 100% !important;
+    max-width: min(56rem, 100%) !important;
+    margin: 0 auto !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="workRow"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-studio-surface="navigation"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="sideCaption"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="surfaceCaption"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-studio-surface="presence-rail"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-studio-surface="side-rail"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-studio-surface="communication"] {
+    display: none !important;
+    pointer-events: none !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-studio-surface="tablet"] {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-studio-surface="tablet"] > :first-child,
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="sideRailBody"] {
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"][data-name-question="true"] [data-studio-surface="side-rail"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"][data-name-question="true"] [data-studio-surface="presence-rail"] {
+    display: none !important;
+    pointer-events: none !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"][data-slide-open="true"] {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"][data-slide-open="true"] [class*="roomStage"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"][data-slide-open="true"] [data-studio-surface="tablet"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"][data-slide-open="true"] [data-studio-surface="side-rail"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"][data-slide-open="true"] [class*="slideScrim"] {
+    display: none !important;
+    pointer-events: none !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] :is(
+    [class*="aluminumEdge"],
+    [class*="glassChrome"],
+    [class*="notch"]
+  ) {
+    display: none !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="frame"] {
+    padding: 0 !important;
+    border-radius: var(--studio-radius) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="chipRow"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="choiceGrid"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="optionGrid"] {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="chip"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-choice] {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="requiredBadge"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-required="true"] {
+    color: #d94e2b !important;
+    -webkit-text-fill-color: #d94e2b !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="studio-plan"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="studio-plan"] [class*="planVoiceFacts"] {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="studio-plan"] [class*="planServiceList"] li,
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="planFactRow"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="planActions"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="planTabletActions"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="studio-plan"] [class*="actions"] {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.85rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-studio-surface="activity-panel"][data-open="true"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="slideHost"][data-open="true"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="slideHost"][data-panel="checkout"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="slideHost"][data-panel="intake"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="slideHost"][data-panel="builder"] {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    inset: auto !important;
+    width: min(56rem, calc(100% - 3rem)) !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 auto !important;
+    padding: 1.75rem 2.25rem 2.25rem !important;
+    overflow: visible !important;
+    transform: none !important;
+    border: none !important;
+    border-left: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-studio-surface="activity-panel"][data-open="true"] > :not([class*="srOnly"]) {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Services / Checkout / Intake: same desk inset, same Lounge film. */
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-studio-surface="activity-panel"][data-open="true"] [class*="sheet"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"][class*="sheet"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"][class*="sheet"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="builder"][class*="sheet"] {
+    padding: 0.25rem 0.15rem 0.5rem !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="builder"] [class*="header"] {
+    margin-bottom: 0.85rem !important;
+    gap: 1rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="builder"] [class*="intro"] {
+    margin: 0 0 1rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="builder"] [class*="builderToolbar"] {
+    margin: 0 0 1.15rem !important;
+    padding: 0.25rem 0 0.35rem !important;
+    align-items: flex-start !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="builder"] [class*="jobList"] {
+    gap: 1rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="builder"] [class*="jobCard"] {
+    background: var(--studio-glass-fill) !important;
+    background-color: var(--studio-glass-fill) !important;
+    border: var(--studio-border-width) solid #c8b59b !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="builder"] [class*="jobCard"][data-selected="true"] {
+    background: color-mix(in srgb, #bfd8f2 48%, transparent) !important;
+    background-color: color-mix(in srgb, #bfd8f2 48%, transparent) !important;
+    border: var(--studio-border-width) solid #bfd8f2 !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="builder"] [class*="builderFooter"] {
+    border: none !important;
+    border-top: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding-top: 0.85rem !important;
+    margin-top: 0.35rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="closeBtn"] {
+    display: none !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-pre-checkout-deck-back] {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-size: var(--studio-type-back) !important;
+    font-weight: 650 !important;
+    padding: 0.35rem 0 !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="checkoutRouteLabel"] {
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Laptop Conversation: phone film does not apply. One smoke on the question desk. */
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-stage="opening"][data-surface="tablet"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-step="summary"][data-surface="tablet"] {
+    background: var(--studio-glass-fill) !important;
+    background-color: var(--studio-glass-fill) !important;
+    padding: 1.25rem 1.5rem 1.5rem !important;
+    box-sizing: border-box !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-answer-dock="pinned"] {
+    padding-bottom: 0 !important;
+  }
+
+  /* Start typing dock stays off Plan. */
+  html:has(.studio-environment-app) [data-layout="one-tablet"]:has([data-stage="plan"]) [data-studio-surface="side-rail"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"]:has([data-stage="plan"]) [data-studio-surface="communication"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"]:has([data-stage="plan"]) [data-permanent-communication],
+  html:has(.studio-environment-app) [data-layout="one-tablet"]:has([data-stage="plan"]) [data-answer-dock],
+  html:has(.studio-environment-app) [data-layout="one-tablet"]:has([data-stage="checkout"]) [data-studio-surface="side-rail"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"]:has([data-stage="checkout"]) [data-permanent-communication],
+  html:has(.studio-environment-app) [data-layout="one-tablet"]:has([data-stage="intake"]) [data-studio-surface="side-rail"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"]:has([data-stage="intake"]) [data-permanent-communication],
+  html:has(.studio-environment-app) [data-layout="one-tablet"]:has([data-stage="services"]) [data-studio-surface="side-rail"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"]:has([data-stage="services"]) [data-permanent-communication] {
+    display: none !important;
+    pointer-events: none !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-answer-dock],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-permanent-communication] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-tablet-continue],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-summary-outer-actions],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-summary-outer-actions] :is(button, .lobby-entry-film__cta, [role="button"]),
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="actions"] [data-tablet-continue],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="actions"] .lobby-entry-film__cta,
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-answer-dock] :is([class*="cta"], [class*="sendBtn"], .lobby-entry-film__cta),
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-permanent-communication] :is([class*="cta"], [class*="sendBtn"], .lobby-entry-film__cta) {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Checkout: Your Studio Plan / investment / confirm leave the edge. */
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] [data-checkout-surface="host"]:not(.owner-qa):not(.owner-qa *),
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] [class*="checkoutHostSurface"]:not(.owner-qa):not(.owner-qa *),
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] [class*="checkoutPageSurface"]:not(.owner-qa):not(.owner-qa *) {
+    padding: 0.85rem 1.15rem 1.25rem !important;
+    box-sizing: border-box !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] :is(
+    .co-card,
+    .co-panel,
+    .pay-paper-card
+  ):not(.owner-qa):not(.owner-qa *) {
+    padding-left: 0.35rem !important;
+    padding-right: 0.35rem !important;
+  }
+
+  /* Back sits above I-20. Revisions is a text link, not a bubble. */
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="builder"] [data-tablet-journey-chrome],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] [data-tablet-journey-chrome] {
+    margin: 0 0 1rem !important;
+    padding: 0 !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="planExtrasLinkWrap"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-plan-extras-link] :is(button, [class*="planMoreDetailsLink"], [data-plan-extras-cta]):not(.owner-qa):not(.owner-qa *):not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-selected="true"]):not([aria-pressed="true"]) {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0.25rem 0 0.15rem !important;
+    min-height: 0 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    text-decoration: underline !important;
+    text-underline-offset: 0.15em !important;
+  }
+
+  /* Services on this route sits inside the card, not its own bubble. */
+  html:has(.studio-environment-app) [data-layout="one-tablet"] button[data-route-includes-cta]:not(.owner-qa):not(.owner-qa *):not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-selected="true"]):not([aria-pressed="true"]),
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-route-includes-cta]:not(.owner-qa):not(.owner-qa *):not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-selected="true"]):not([aria-pressed="true"]) {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 0.75rem 0.65rem !important;
+    margin-top: auto !important;
+    min-height: 0 !important;
+    text-decoration: underline !important;
+    text-underline-offset: 0.15em !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+
+  /* Plan Voice quote: no champagne bar. Two lines share one left edge. */
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="studio-plan"] [class*="voiceSays"]:not(.owner-qa):not(.owner-qa *),
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="studio-plan"] [class*="voiceSaysQuote"]:not(.owner-qa):not(.owner-qa *),
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="studio-plan"] [class*="voiceSaysLine"]:not(.owner-qa):not(.owner-qa *),
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="studio-plan"] [class*="voiceSaysLabel"]:not(.owner-qa):not(.owner-qa *) {
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    border-color: transparent !important;
+    border-top: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    box-shadow: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    text-indent: 0 !important;
+    text-align: left !important;
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="studio-plan"] section[class*="beforeCheckout"]:not(.owner-qa):not(.owner-qa *) {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Voice On/Off: same two pills on every Conversation desk. No tray line. */
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-tablet-journey-chrome] [class*="toggle"]:not([class*="toggleOn"]):not([class*="toggleOff"]):not([class*="filmToggle"]) {
+    gap: 0.5rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-tablet-journey-chrome] :is([class*="toggleOn"], [class*="toggleOff"], [data-voice-pref]) {
+    text-decoration: none !important;
+    box-shadow: none !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] button[data-route-includes-cta]:not(.owner-qa):not(.owner-qa *):not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-selected="true"]):not([aria-pressed="true"]) {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 0.75rem 0.65rem !important;
+    margin-top: auto !important;
+    min-height: 0 !important;
+    text-decoration: underline !important;
+    text-underline-offset: 0.15em !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="routeList"] {
+    grid-auto-rows: 1fr !important;
+    align-items: stretch !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="routeLane"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="routeExpand"] {
+    height: 100% !important;
+    min-height: 100% !important;
+    align-items: stretch !important;
+  }
+
+  /* Laptop Intake: close the leftover air. */
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="intro"] {
+    margin-bottom: 0.35rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="checkoutScopeDisclosure"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeDraftStatus"] {
+    margin-top: 0.15rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__header {
+    gap: 0.35rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__lead {
+    margin-top: 0.2rem !important;
+    margin-bottom: 0 !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__progress {
+    margin: 0.25rem 0 0.35rem !important;
+    gap: 0.15rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeMaterialsNote"] {
+    margin: 0.25rem 0 0.35rem !important;
+    padding: 0 !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeSectionHeading"] {
+    margin-top: 0.35rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__form,
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeSectionBlock"] {
+    gap: 1.25rem !important;
+  }
+
+  /* Shared for this project numbers: white on ink. */
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__step:not(.owner-qa):not(.owner-qa *),
+  html:has(.studio-environment-app) [data-layout="one-tablet"] .route-map-social-intake__step:not(.owner-qa):not(.owner-qa *) {
+    background: #20262d !important;
+    background-color: #20262d !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border: var(--studio-border-width) solid #c8b59b !important;
+    font-size: var(--studio-type-copy) !important;
+    font-weight: 800 !important;
+    width: 1.85rem !important;
+    height: 1.85rem !important;
+    min-width: 1.85rem !important;
+    min-height: 1.85rem !important;
+    opacity: 1 !important;
+  }
+
+  /* Project Change line is original coral — same as Required. */
+  html:has(.studio-environment-app) [data-layout="one-tablet"] :is(p, span, blockquote, [class*="intro"], [class*="checkoutScopeDisclosure"], [class*="voiceSaysQuote"], [class*="voiceSaysLine"]) [data-project-change-note],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] span[data-project-change-note]:not(.owner-qa):not(.owner-qa *):not(.studio-tile--selected):not(.studio-tile--selected *) {
+    color: #d94e2b !important;
+    -webkit-text-fill-color: #d94e2b !important;
+    font-weight: 800 !important;
+  }
+
+  /* Checkout disclosure sits with the lead — no bubble. */
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] [class*="intro"]:not(.owner-qa):not(.owner-qa *),
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] [class*="checkoutScopeDisclosure"]:not(.owner-qa):not(.owner-qa *) {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    font-size: var(--studio-type-copy) !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Developer Sandbox: white words, not mint wash. */
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] .pay-sandbox__head {
+    background: var(--studio-glass-fill) !important;
+    border: var(--studio-border-width) solid #c8b59b !important;
+    border-radius: 999px !important;
+    padding: 0.45rem 0.7rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] .pay-sandbox__label {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-size: var(--studio-type-label) !important;
+    font-weight: 800 !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] .pay-sandbox__badge {
+    background: #20262d !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border: var(--studio-border-width) solid #c8b59b !important;
+    font-weight: 800 !important;
+  }
+
+  /* What Happens Next numbers: white on ink. */
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] .co-next-steps__num:not(.owner-qa):not(.owner-qa *) {
+    background: #20262d !important;
+    background-color: #20262d !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border: var(--studio-border-width) solid #c8b59b !important;
+    font-size: var(--studio-type-copy) !important;
+    font-weight: 800 !important;
+    width: 1.85rem !important;
+    height: 1.85rem !important;
+    min-width: 1.85rem !important;
+    min-height: 1.85rem !important;
+    opacity: 1 !important;
+  }
+
+  /* Board: left desk, page scroll, no 50% zoom. */
+  html:has(.studio-environment-app) .utility-header,
+  html:has(.studio-environment-app) .utility-topbar,
+  html:has(.studio-environment-app) .sb-header-v3 {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    text-align: left !important;
+    align-items: flex-start !important;
+  }
+
+  html:has(.studio-environment-app) .utility-topbar__title,
+  html:has(.studio-environment-app) .utility-lead,
+  html:has(.studio-environment-app) .sb-header-v3__title,
+  html:has(.studio-environment-app) .sb-header-v3__greeting {
+    text-align: left !important;
+    justify-self: start !important;
+  }
+
+  html:has(.studio-environment-app) .utility-subnav,
+  html:has(.studio-environment-app) .utility-subnav__list {
+    justify-content: flex-start !important;
+    margin-left: 0 !important;
+  }
+
+  html:has(.studio-environment-app) .sb.sb--v4,
+  html:has(.studio-environment-app) .sb--v4 .sb-main {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    align-items: stretch !important;
+  }
+
+  html:has(.studio-environment-app) .sb--v4 .sb-board-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    grid-template-rows: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    align-items: start !important;
+  }
+
+  html:has(.studio-environment-app) .sb--v4 .sb-board-layout > .sb-card,
+  html:has(.studio-environment-app) .sb--v4 .sb-board-layout > .sb-materials-tile,
+  html:has(.studio-environment-app) .sb--v4 .sb-grid--v4,
+  html:has(.studio-environment-app) .sb--v4 .sb-grid--v4 .sb-card {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Delivery / Board communication: one column, no scrollbar arrows. */
+  html:has(.studio-environment-app) :is(
+    .sb-project-communication__body,
+    .fs-project-communication .sb-project-communication__body
+  ) {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    gap: 1rem !important;
+    overflow: visible !important;
+  }
+
+  html:has(.studio-environment-app) :is(
+    .sb-project-communication__composer,
+    .fs-project-communication .sb-project-communication__composer
+  ) {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  html:has(.studio-environment-app) :is(
+    .sb-project-communication__intent-options
+  ) {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  html:has(.studio-environment-app) :is(
+    .sb-project-communication__textarea,
+    .fs-project-communication .sb-project-communication__textarea
+  ) {
+    overflow: hidden !important;
+    resize: none !important;
+    min-height: 8rem !important;
+    scrollbar-width: none !important;
+  }
+
+  html:has(.studio-environment-app) :is(
+    .sb-project-communication__textarea,
+    .fs-project-communication .sb-project-communication__textarea
+  )::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"][data-slide-open="true"] [data-studio-surface="activity-panel"][data-open="true"][data-panel] {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    border-color: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Voice Choice audio notice: one line per sentence. Do not wrap "audio." */
+  html:has(.studio-environment-app) [data-voice-choice-film] [class*="privacy"] {
+    max-width: none !important;
+    width: max-content !important;
+    white-space: nowrap !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+  }
+}
+
+/* Last fence — beat stacked button glass after the laptop desk. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] button[data-route-includes-cta]:not(.owner-qa):not(.owner-qa *):not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-selected="true"]):not([aria-pressed="true"]),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="routeIncludesLink"]:not(.owner-qa):not(.owner-qa *) {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 0 0.75rem 0.65rem !important;
+  margin-top: auto !important;
+  min-height: 0 !important;
+  width: auto !important;
+  max-width: 100% !important;
+  align-self: flex-start !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-decoration: underline !important;
+  text-underline-offset: 0.15em !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="studio-plan"] :is(
+  [class*="voiceSays"],
+  [class*="voiceSaysQuote"],
+  [class*="voiceSaysLine"],
+  [class*="voiceSaysLabel"]
+):not(.owner-qa):not(.owner-qa *) {
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-top: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+  border-left: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  text-indent: 0 !important;
+  text-align: left !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="studio-plan"] [class*="voiceSaysQuote"]:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="studio-plan"] [class*="voiceSaysLine"]:not(.owner-qa):not(.owner-qa *) {
+  display: block !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="studio-plan"] section[class*="beforeCheckout"]:not(.owner-qa):not(.owner-qa *) {
+  border: none !important;
+  border-width: 0 !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] span[data-project-change-note]:not(.owner-qa):not(.owner-qa *) {
+  color: #d94e2b !important;
+  -webkit-text-fill-color: #d94e2b !important;
+  font-weight: 800 !important;
+}
+
+/* Laptop Board leftovers: header air, journey marks, Send like Continue, coral empty comm, Ask a question no frost, one champagne submitted view. */
+@media (min-width: 1025px) {
+  html:has(.studio-environment-app) .utility-header,
+  html:has(.studio-environment-app) .utility-topbar,
+  html:has(.studio-environment-app) .utility-subnav,
+  html:has(.studio-environment-app) .utility-subnav__list,
+  html:has(.studio-environment-app) .sb-header-v3 {
+    margin-left: 0 !important;
+    text-align: left !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+  }
+
+  html:has(.studio-environment-app) .utility-topbar__title,
+  html:has(.studio-environment-app) .utility-lead {
+    margin: 0 !important;
+    text-align: left !important;
+    justify-self: start !important;
+  }
+
+  html:has(.studio-environment-app) .studio-utility-scene--studio-board .utility-header {
+    margin-bottom: 1.15rem !important;
+  }
+
+  html:has(.studio-environment-app) .studio-utility-scene--studio-board .utility-topbar {
+    gap: 1rem !important;
+  }
+
+  html:has(.studio-environment-app) .studio-utility-scene--studio-board .utility-topbar__title {
+    font-size: var(--studio-type-title, 1.25rem) !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+    max-width: 36rem !important;
+    margin-top: 0.35rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  html:has(.studio-environment-app) .studio-utility-scene--studio-board .utility-subnav {
+    margin-top: 0.35rem !important;
+    margin-bottom: 0.85rem !important;
+  }
+
+  html:has(.studio-environment-app) .studio-utility-scene--studio-board .utility-subnav__item:has([aria-current="page"]) {
+    display: none !important;
+  }
+
+  html:has(.studio-environment-app) .sb-page-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    gap: 0.35rem !important;
+    margin: 0 0 1.25rem !important;
+  }
+
+  html:has(.studio-environment-app) .studio-utility-scene--studio-board a.sb-page-actions__new.utility-topbar__back--link,
+  html:has(.studio-environment-app) .studio-environment-app .sb-page-actions__new {
+    font-size: var(--studio-type-subtitle, 1.125rem) !important;
+    font-weight: 800 !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .sb-page-actions .sb-sign-out .sb-nav__label:not(.owner-qa *):not(.studio-tile--selected) {
+    font-size: var(--studio-type-small, 0.875rem) !important;
+    font-weight: 650 !important;
+  }
+
+  html:has(.studio-environment-app) .sb-page-actions .sb-sign-out {
+    width: auto !important;
+    max-width: max-content !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    justify-content: flex-start !important;
+    align-self: flex-start !important;
+  }
+
+  html:has(.studio-environment-app) .sb--v4 .sb-board-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    grid-template-rows: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    align-items: start !important;
+    gap: 0.85rem !important;
+  }
+
+  html:has(.studio-environment-app) .sb--v4 .sb-board-stack {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.85rem !important;
+    min-width: 0 !important;
+  }
+
+  html:has(.studio-environment-app) .sb-visibility-continuity__notes,
+  html:has(.studio-environment-app) .sb-visibility-continuity__notes li,
+  html:has(.studio-environment-app) .sb-visibility-continuity__row dd {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    text-align: left !important;
+    list-style: none !important;
+  }
+
+  html:has(.studio-environment-app) .sb-current-campaign__metric {
+    display: grid !important;
+    grid-template-columns: max-content minmax(0, 1fr) !important;
+    align-items: baseline !important;
+    white-space: nowrap !important;
+  }
+
+  html:has(.studio-environment-app) .sb-current-campaign__label,
+  html:has(.studio-environment-app) .sb-current-campaign__value {
+    white-space: nowrap !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .sb-journey__marker--complete:not(.owner-qa *):not(.studio-tile--selected):not(.studio-tile--selected *),
+  html:has(.studio-environment-app) .studio-environment-app span.sb-journey__marker--complete:not(.owner-qa *):not(.studio-tile--selected):not(.studio-tile--selected *) {
+    background: #bfd8f2 !important;
+    background-color: #bfd8f2 !important;
+    color: #20262d !important;
+    -webkit-text-fill-color: #20262d !important;
+    border: 1px solid #c8b59b !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .sb-journey__marker--current:not(.owner-qa *):not(.studio-tile--selected):not(.studio-tile--selected *),
+  html:has(.studio-environment-app) .studio-environment-app span.sb-journey__marker--current:not(.owner-qa *):not(.studio-tile--selected):not(.studio-tile--selected *) {
+    background: #c8b59b !important;
+    background-color: #c8b59b !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    border: 1px solid #c8b59b !important;
+    font-size: 0 !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .sb-journey__marker--upcoming:not(.owner-qa *):not(.studio-tile--selected):not(.studio-tile--selected *),
+  html:has(.studio-environment-app) .studio-environment-app span.sb-journey__marker--upcoming:not(.owner-qa *):not(.studio-tile--selected):not(.studio-tile--selected *) {
+    background: color-mix(in srgb, #20262d 28%, transparent) !important;
+    background-color: color-mix(in srgb, #20262d 28%, transparent) !important;
+    border: 1px solid #c8b59b !important;
+  }
+
+  html:has(.studio-environment-app) .sb-visibility-continuity {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  html:has(.studio-environment-app) .sb-materials-glance {
+    display: contents !important;
+  }
+
+  html:has(.studio-environment-app) .sb-project-communication__intent {
+    gap: 0.85rem !important;
+    margin-bottom: 0.85rem !important;
+  }
+
+  html:has(.studio-environment-app) .sb-project-communication__intent-legend {
+    margin: 0 0 0.75rem !important;
+    padding-bottom: 0.15rem !important;
+  }
+
+  html:has(.studio-environment-app) .sb-project-communication__intent-options {
+    gap: 0.75rem !important;
+  }
+
+  html:has(.studio-environment-app) .sb-project-communication__composer-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+    margin-top: 0.75rem !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app button.sb-project-communication__submit:not(.owner-qa *):not(.studio-tile--selected),
+  html:has(.studio-environment-app) .studio-environment-app [type="submit"].sb-project-communication__submit:not(.owner-qa *) {
+    width: 100% !important;
+    min-height: 2.75rem !important;
+    background: #20262d !important;
+    background-color: #20262d !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border: 1px solid #c8b59b !important;
+    border-radius: var(--studio-radius) !important;
+    box-shadow: none !important;
+    font-size: var(--studio-type-copy, 1rem) !important;
+    font-weight: 700 !important;
+  }
+
+  html:has(.studio-environment-app) .sb-status-copy-repeat {
+    display: none !important;
+  }
+
+  html:has(.studio-environment-app) .sb-visibility-continuity__list {
+    gap: 1.05rem !important;
+  }
+
+  html:has(.studio-environment-app) .sb-visibility-continuity__row {
+    gap: 0.35rem !important;
+    padding: 0.15rem 0 0.4rem !important;
+  }
+
+  html:has(.studio-environment-app) .sb-progress-panel__update {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+  }
+
+  html:has(.studio-environment-app) .sb-progress-panel__update-date {
+    white-space: nowrap !important;
+    min-width: max-content !important;
+    overflow: visible !important;
+  }
+
+  html:has(.studio-environment-app) .sb-progress-timeline__step {
+    background: var(--studio-veil-fill) !important;
+    border: 1px solid #c8b59b !important;
+    box-shadow: none !important;
+    grid-template-columns: 1.25rem minmax(0, 1fr) !important;
+    padding: 0.45rem 0.7rem !important;
+  }
+
+  html:has(.studio-environment-app) .sb-progress-timeline__icon {
+    width: 1.15rem !important;
+    height: 1.15rem !important;
+    color: #fff8e7 !important;
+    opacity: 1 !important;
+  }
+
+  html:has(.studio-environment-app) .sb-progress-timeline__label {
+    color: #8ff5c6 !important;
+    -webkit-text-fill-color: #8ff5c6 !important;
+    text-shadow: var(--studio-text-support) !important;
+    font-size: var(--studio-type-copy) !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .sb-progress-timeline__step--summary-ready .sb-progress-timeline__label:not(.owner-qa *):not(.studio-tile--selected):not(.studio-tile--selected *),
+  html:has(.studio-environment-app) .studio-environment-app .sb-progress-timeline__step--summary-ready span.sb-progress-timeline__label:not(.owner-qa *):not(.studio-tile--selected):not(.studio-tile--selected *) {
+    color: #c8b59b !important;
+    -webkit-text-fill-color: #c8b59b !important;
+  }
+
+  html:has(.studio-environment-app) .sb-progress-timeline__detail {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    text-shadow: var(--studio-text-support) !important;
+    font-size: var(--studio-type-copy) !important;
+  }
+
+  html:has(.studio-environment-app) .sb-card--project-communication {
+    padding: 0.75rem 0.85rem 0.85rem !important;
+  }
+
+  html:has(.studio-environment-app) .sb-project-communication__lead,
+  html:has(.studio-environment-app) .sb-project-communication__meta {
+    margin: 0 0 0.45rem !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .sb-project-communication__lead:not(.owner-qa *):not(.studio-tile--selected) {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 400 !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .sb-project-communication__meta[data-empty="true"]:not(.owner-qa *):not(.studio-tile--selected) {
+    color: #d94e2b !important;
+    -webkit-text-fill-color: #d94e2b !important;
+    font-weight: 700 !important;
+  }
+
+  html:has(.studio-environment-app) .sb-project-communication__textarea {
+    min-height: 5rem !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app :is(button, .utility-btn, a).campaign-brief-actions__view:not([class*="danger"]):not([class*="destructive"]):not(.owner-qa *):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-selected="true"]):not([aria-pressed="true"]):not([data-skip-action]):not([class*="btnSkip"]):not([class*="planMoreDetails"]):not([class*="planExtras"]):not([data-route-includes-cta]):not([class*="routeIncludes"]):not(.studio-tile--selected) {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: 2px solid #c8b59b !important;
+    outline: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .sb-project-communication__intent-option:not(.owner-qa *):not(.studio-tile--selected) {
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 2px solid transparent !important;
+    box-shadow: none !important;
+    filter: none !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .sb-project-communication__intent-option:not(.owner-qa *) span {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background: transparent !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .sb-project-communication__intent-option[data-selected="true"]:not(.owner-qa *):not(.studio-tile--selected),
+  html:has(.studio-environment-app) .studio-environment-app .sb-project-communication__intent-option:has(input:checked):not(.owner-qa *):not(.studio-tile--selected) {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: 2px solid #bfd8f2 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .sb-project-communication__intent-option:not(.owner-qa *) input {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    clip-path: inset(50%) !important;
+    border: 0 !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  html:has(.studio-environment-app) .sb--v4 .sb-card--refund-request {
+    margin-top: 0 !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app :is(button, [type="submit"]).sb-project-communication__submit:not(.owner-qa *):not([class*="planMoreDetails"]):not([data-plan-extras-cta]):not([data-route-includes-cta]):not([class*="routeIncludes"]) {
+    width: 100% !important;
+    min-height: 2.75rem !important;
+    background: #20262d !important;
+    background-color: #20262d !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border: 1px solid #c8b59b !important;
+    border-radius: var(--studio-radius) !important;
+    box-shadow: none !important;
+    font-size: var(--studio-type-copy, 1rem) !important;
+    font-weight: 700 !important;
+  }
+
+  /* Project Record laptop: three tiles across. Sit on the left like Board. */
+  html:has(.studio-environment-app) .utility-page[aria-label="Campaign Details"] .utility-header,
+  html:has(.studio-environment-app) .utility-page[aria-label="Campaign Details"] .cd-grid {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    justify-self: start !important;
+  }
+
+  html:has(.studio-environment-app) .utility-page[aria-label="Campaign Details"] .cd-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-areas:
+      "overview status vision"
+      "revisions package deliverables"
+      "journey journey updates"
+      "ask ask ." !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .cd-card--squishy .cd-squishy__ask:not(.owner-qa *):not(.studio-tile--selected),
+  html:has(.studio-environment-app) .studio-environment-app .cd-card--squishy .cd-squishy__ask:disabled:not(.owner-qa *) {
+    width: 100% !important;
+    min-height: 2.75rem !important;
+    background: #20262d !important;
+    background-color: #20262d !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border: 1px solid #c8b59b !important;
+    border-radius: var(--studio-radius) !important;
+    box-shadow: none !important;
+    font-size: var(--studio-type-copy, 1rem) !important;
+    font-weight: 700 !important;
+  }
+
+  /* Review Room laptop leftover: sit on the left like Board. Inactive stage is not selected. */
+  html:has(.studio-environment-app) .rd-shell .rd-shell__body,
+  html:has(.studio-environment-app) .rd-shell .rd-shell__layout {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    justify-self: start !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .rd-job-list__item--inactive .rd-job-list__stage:not(.owner-qa):not(.owner-qa *):not(.studio-tile--selected) {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+
+  /* Review Room laptop leftover: empty-state tools and Submit stay in place but muted. They do not look active. */
+  html:has(.studio-environment-app) .rd-shell .rd-shell__layout--room,
+  html:has(.studio-environment-app) .fs-page--review .rd-shell__layout--room {
+    display: grid !important;
+    grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr) !important;
+    align-items: start !important;
+    gap: 1rem 1.15rem !important;
+    width: 100% !important;
+  }
+
+  html:has(.studio-environment-app) .rd-shell .rd-shell__side,
+  html:has(.studio-environment-app) .fs-page--review .rd-shell__side {
+    min-width: 0 !important;
+  }
+
+  html:has(.studio-environment-app) .rd-shell .rd-shell__desk,
+  html:has(.studio-environment-app) .fs-page--review .rd-shell__desk {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.7rem !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  html:has(.studio-environment-app) .rd-shell .rd-shell__tools,
+  html:has(.studio-environment-app) .fs-page--review .rd-shell__tools {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.45rem !important;
+  }
+
+  html:has(.studio-environment-app) .rd-shell .rd-shell__tool,
+  html:has(.studio-environment-app) .fs-page--review .rd-shell__tool {
+    min-height: 2.5rem !important;
+    padding: 0.45rem 0.95rem !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: 2px solid #c8b59b !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-size: var(--studio-type-copy, 1rem) !important;
+    border-radius: var(--studio-radius) !important;
+  }
+
+  html:has(.studio-environment-app) .rd-shell .rd-shell__tool.is-selected,
+  html:has(.studio-environment-app) .fs-page--review .rd-shell__tool.is-selected {
+    background: #bfd8f2 !important;
+    background-color: #bfd8f2 !important;
+    border-color: #bfd8f2 !important;
+    color: #20262d !important;
+    -webkit-text-fill-color: #20262d !important;
+  }
+
+  html:has(.studio-environment-app) .rd-shell .rd-shell__message-label,
+  html:has(.studio-environment-app) .fs-page--review .rd-shell__message-label {
+    color: #8ff5c6 !important;
+    -webkit-text-fill-color: #8ff5c6 !important;
+    font-size: var(--studio-type-small, 0.875rem) !important;
+  }
+
+  html:has(.studio-environment-app) .rd-shell .rd-shell__message-input,
+  html:has(.studio-environment-app) .fs-page--review .rd-shell__message-input {
+    min-height: 5.5rem !important;
+    padding: 0.7rem 0.8rem !important;
+    color: #20262d !important;
+    -webkit-text-fill-color: #20262d !important;
+    background: #ffffff !important;
+    border: 2px solid #c8b59b !important;
+    border-radius: var(--studio-radius) !important;
+    font-size: var(--studio-type-copy, 1rem) !important;
+  }
+
+  html:has(.studio-environment-app) .rd-shell .rd-shell__desk > .rd-shell__jobs-heading,
+  html:has(.studio-environment-app) .fs-page--review .rd-shell__desk > .rd-shell__jobs-heading {
+    margin: 0 !important;
+  }
+
+  html:has(.studio-environment-app) .rd-shell .rd-shell__submit,
+  html:has(.studio-environment-app) .fs-page--review .rd-shell__submit {
+    min-height: 2.5rem !important;
+    width: fit-content !important;
+    padding: 0.45rem 1.15rem !important;
+    background: #bfd8f2 !important;
+    background-color: #bfd8f2 !important;
+    border: 2px solid #bfd8f2 !important;
+    color: #20262d !important;
+    -webkit-text-fill-color: #20262d !important;
+    font-size: var(--studio-type-copy, 1rem) !important;
+    border-radius: var(--studio-radius) !important;
+  }
+
+  html:has(.studio-environment-app) .rd-shell .rd-shell__tool.is-muted,
+  html:has(.studio-environment-app) .fs-page--review .rd-shell__tool.is-muted,
+  html:has(.studio-environment-app) .rd-shell .rd-shell__submit.is-muted,
+  html:has(.studio-environment-app) .fs-page--review .rd-shell__submit.is-muted {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-color: color-mix(in srgb, #c8b59b 42%, transparent) !important;
+    color: color-mix(in srgb, #ffffff 46%, transparent) !important;
+    -webkit-text-fill-color: color-mix(in srgb, #ffffff 46%, transparent) !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+    cursor: default !important;
+    box-shadow: none !important;
+  }
+
+  html:has(.studio-environment-app) .fs-page--review .fs-review__choose--job {
+    display: none !important;
+  }
+
+  html:has(.studio-environment-app) .rd-shell .rd-shell__stage {
+    min-height: 32rem !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding: 1.75rem 1.85rem !important;
+    background: color-mix(in srgb, #20262d 28%, transparent) !important;
+    border: 2px solid #c8b59b !important;
+    border-radius: var(--studio-radius) !important;
+  }
+
+  html:has(.studio-environment-app) .rd-shell .rd-shell__stage-copy {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-size: var(--studio-type-copy, 1rem) !important;
+  }
+
+  html:has(.studio-environment-app) .fs-page--review .fs-review {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  html:has(.studio-environment-app) .fs-page--review .fs-review__layout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+  }
+
+  html:has(.studio-environment-app) .fs-page--review .fs-review__stage {
+    width: 100% !important;
+  }
+
+  html:has(.studio-environment-app) .fs-page--review .fs-phone-dock,
+  html:has(.studio-environment-app) .fs-page--review .fs-feedback-panel--job,
+  html:has(.studio-environment-app) .fs-page--review .fs-preview__header,
+  html:has(.studio-environment-app) .fs-page--review .fs-text-comment {
+    display: none !important;
+  }
+
+  html:has(.studio-environment-app) .fs-page--review .fs-review-proof {
+    min-height: 32rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: color-mix(in srgb, #20262d 28%, transparent) !important;
+    border: 2px solid #c8b59b !important;
+  }
+
+  html:has(.studio-environment-app) .fs-page--review :is(.fs-review-proof__image, .fs-review-proof__video, .fs-review-proof__copy) {
+    max-height: min(78vh, 48rem) !important;
+    width: auto !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    object-fit: contain !important;
+  }
+
+  html:has(.studio-environment-app) .fs-page--review .rd-shell__message-save {
+    min-height: 2.5rem !important;
+    width: fit-content !important;
+    padding: 0.45rem 0.95rem !important;
+    background: transparent !important;
+    border: 2px solid #c8b59b !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border-radius: var(--studio-radius) !important;
+  }
+}
+
+@media (max-width: 960px) {
+  /* Review Room phone: laptop leftover tools stay off the accepted phone desk. */
+  html:has(.studio-environment-app) .rd-shell__tools,
+  html:has(.studio-environment-app) .rd-shell__message,
+  html:has(.studio-environment-app) .rd-shell__submit,
+  html:has(.studio-environment-app) .rd-shell__submit-row,
+  html:has(.studio-environment-app) .fs-page--review .rd-shell__tools {
+    display: none !important;
+  }
+}
+
+/* Record / Review / Delivery / Help: same header layout as Board. Back, then space, then the title. */
+html:has(.studio-environment-app) :is(
+  .utility-page[aria-label="Campaign Details"],
+  .utility-page[aria-label="Review Room"],
+  .fs-page--review,
+  .rd-shell,
+  .utility-page--delivery,
+  .utility-page--help-center
+) .utility-header {
+  margin-bottom: 1.15rem !important;
+}
+
+html:has(.studio-environment-app) :is(
+  .utility-page[aria-label="Campaign Details"],
+  .utility-page[aria-label="Review Room"],
+  .fs-page--review,
+  .rd-shell,
+  .utility-page--delivery,
+  .utility-page--help-center
+) .utility-topbar {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 1rem !important;
+}
+
+html:has(.studio-environment-app) :is(
+  .utility-page[aria-label="Campaign Details"],
+  .utility-page[aria-label="Review Room"],
+  .fs-page--review,
+  .rd-shell,
+  .utility-page--delivery,
+  .utility-page--help-center
+) .utility-topbar__title {
+  margin-top: 0.35rem !important;
+  margin-bottom: 0.35rem !important;
+}
+
+/* Type fields: flashing yellow caret so the customer knows where to type. */
+html:has(.studio-environment-app) .studio-environment-app :is(
+  input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+  textarea
+):not(.owner-qa):not(.owner-qa *) {
+  caret-color: #f5e27a !important;
+}
+
+/* Final Delivery leftover: leaked Review Room chrome stays off every viewport. */
+html:has(.studio-environment-app) [data-room-state="delivery"] .fs-review__rail,
+html:has(.studio-environment-app) [aria-label="Final Delivery"] .fs-review__rail {
+  display: none !important;
+}
+
+/* Homepage cleanup only — do not restyle other rooms. */
+html:has(.studio-environment-app) .studio-homepage :is(
+  .studio-homepage__text-link,
+  .studio-homepage__brand
+) {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  min-height: 0 !important;
+  padding: 0.15rem 0 !important;
+  color: #ffffff !important;
+}
+
+/* Current Home is a seagreen word. No wash, no border, no shadow. */
+html:has(.studio-environment-app) .studio-homepage .studio-homepage__text-current {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  color: #8FF5C6 !important;
+  -webkit-text-fill-color: #8FF5C6 !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage button.studio-homepage__demo-open,
+html:has(.studio-environment-app) .studio-homepage button.studio-homepage__tile-open {
+  background: transparent !important;
+  color: inherit !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  min-height: 0 !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage .studio-homepage__demo-open-label {
+  background: color-mix(in srgb, #20262d 72%, transparent) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border: 1px solid color-mix(in srgb, #c8b59b 75%, transparent) !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage .studio-homepage__demo-ended button.studio-homepage__btn-primary {
+  background: #c8b59b !important;
+  color: #20262d !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage button.studio-homepage__demo-close {
+  background: color-mix(in srgb, #20262d 42%, transparent) !important;
+  color: #ffffff !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage a.studio-homepage__btn-primary {
+  background: #c8b59b !important;
+  color: #20262d !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage a.studio-homepage__choose.studio-homepage__btn-primary {
+  min-height: 3.35rem !important;
+  padding: 0.32rem 0.32rem 0.32rem 1.35rem !important;
+  border: 1px solid color-mix(in srgb, #c8b59b 48%, #20262d) !important;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, #fff8e7 34%, #c8b59b),
+    #c8b59b 46%,
+    color-mix(in srgb, #c8b59b 72%, #20262d)
+  ) !important;
+  color: #20262d !important;
+  -webkit-text-fill-color: #20262d !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff8e7 72%, transparent),
+    0 10px 22px color-mix(in srgb, #20262d 24%, transparent) !important;
+  font-weight: 650 !important;
+  letter-spacing: 0.015em !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage h1.studio-homepage__hero-title:not(.owner-qa) {
+  font-size: clamp(2.35rem, 3.4vw, 3.35rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.05 !important;
+  max-width: none !important;
+  white-space: normal !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage h1.studio-homepage__hero-title:not(.owner-qa) .studio-homepage__hero-accent {
+  color: #c8b59b !important;
+  -webkit-text-fill-color: #c8b59b !important;
+  font-size: clamp(2.35rem, 3.4vw, 3.35rem) !important;
+  line-height: 1.05 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.025em !important;
+}
+
+@media (min-width: 1025px) {
+  html:has(.studio-environment-app) .studio-environment-app .studio-homepage h1.studio-homepage__hero-title:not(.owner-qa) {
+    white-space: normal !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .studio-homepage h2.studio-homepage__section-title:not(.owner-qa) {
+    max-width: none !important;
+    white-space: nowrap !important;
+  }
+
+  html:has(.studio-environment-app) .studio-homepage .studio-homepage__support {
+    color: #bfd8f2 !important;
+    -webkit-text-fill-color: #bfd8f2 !important;
+    font-size: var(--studio-type-subtitle) !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+  }
+
+  html:has(.studio-environment-app) .studio-homepage .studio-homepage__step h3 {
+    white-space: nowrap !important;
+  }
+
+  html:has(.studio-environment-app) .studio-homepage .studio-homepage__card h3 {
+    white-space: nowrap !important;
+  }
+
+  html:has(.studio-environment-app) .studio-homepage .studio-homepage__tile p {
+    white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  html:has(.studio-environment-app) .studio-environment-app .studio-homepage h1.studio-homepage__hero-title:not(.owner-qa) {
+    white-space: normal !important;
+  }
+
+  html:has(.studio-environment-app) .studio-environment-app .studio-homepage h2.studio-homepage__section-title:not(.owner-qa) {
+    white-space: normal !important;
+  }
+
+  html:has(.studio-environment-app) .studio-homepage .studio-homepage__support {
+    color: #bfd8f2 !important;
+    -webkit-text-fill-color: #bfd8f2 !important;
+    font-size: var(--studio-type-subtitle) !important;
+    font-weight: 600 !important;
+    white-space: normal !important;
+  }
+
+  html:has(.studio-environment-app) .studio-homepage .studio-homepage__step h3 {
+    white-space: normal !important;
+  }
+
+  html:has(.studio-environment-app) .studio-homepage .studio-homepage__card h3 {
+    white-space: normal !important;
+  }
+
+  html:has(.studio-environment-app) .studio-homepage .studio-homepage__tile p {
+    white-space: normal !important;
+  }
+}
+
+html:has(.studio-environment-app) .studio-homepage .studio-homepage__contact-action {
+  margin-top: 1.25rem !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage a.studio-homepage__voice-entry {
+  background: color-mix(in srgb, #20262d 42%, transparent) !important;
+  color: #ffffff !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage #our-work .studio-homepage__section-head {
+  margin-bottom: 1.15rem !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage #our-work .studio-homepage__carousel-nav {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1.35rem !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage #our-work .studio-homepage__carousel-btn {
+  display: grid !important;
+  place-items: center !important;
+  width: 2.55rem !important;
+  height: 2.55rem !important;
+  min-width: 2.55rem !important;
+  min-height: 2.55rem !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  background: #20262d !important;
+  color: #f3ead7 !important;
+  -webkit-text-fill-color: #f3ead7 !important;
+  border: 1px solid color-mix(in srgb, #c8b59b 72%, #20262d) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff8e7 28%, transparent),
+    0 8px 16px color-mix(in srgb, #20262d 28%, transparent) !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage .studio-homepage__mark,
+html:has(.studio-environment-app) .studio-homepage .studio-homepage__mark svg {
+  width: 1.4rem !important;
+  height: 1.4rem !important;
+  min-height: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #c8b59b !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage button.studio-homepage__play {
+  width: 4.25rem !important;
+  height: 4.25rem !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, #20262d 42%, transparent) !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+/* Home View Details and Open stay underlines. Back uses the arrow, with no line. */
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage :is(
+  a.studio-homepage__card-link,
+  button.studio-homepage__card-link
+):not(.owner-qa):not(.owner-qa *) {
+  margin-top: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 2.75rem !important;
+  padding: 0.35rem 0.1rem !important;
+  border: none !important;
+  border-bottom: 1px solid #c8b59b !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  font-size: var(--studio-type-copy) !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage a.studio-homepage__card-link.studio-journey__back:not(.owner-qa):not(.owner-qa *) {
+  border: none !important;
+  border-bottom: none !important;
+  text-decoration: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage :is(
+  a.studio-homepage__card-link,
+  button.studio-homepage__card-link
+)[data-selected="true"]:not(.owner-qa):not(.owner-qa *) {
+  border-bottom-color: #bfd8f2 !important;
+}
+
+/* Package prompt is coral, with air before the cards. */
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage p.studio-homepage__package-prompt:not(.owner-qa):not(.owner-qa *) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 600 !important;
+  margin: 0 0 2rem !important;
+}
+
+/* Package price is a cost, not a mint label. */
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage p.studio-journey__price:not(.owner-qa):not(.owner-qa *) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.2 !important;
+  margin: 0 0 1rem !important;
+}
+
+/* Home kickers stay mint small type. Last-paint p must not upsize them. */
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage p.studio-homepage__kicker:not(.owner-qa):not(.owner-qa *) {
+  color: var(--studio-label, #8ff5c6) !important;
+  -webkit-text-fill-color: var(--studio-label, #8ff5c6) !important;
+  font-size: var(--studio-type-small) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  line-height: 1.3 !important;
+}
+
+/* Learn More headings are small labels, not 18/20 uppercase titles. */
+html:has(.studio-environment-app) .studio-environment-app :is(
+  h2.pb-drawer-details__heading,
+  h3.pb-drawer-details__heading
+):not(.owner-qa):not(.owner-qa *) {
+  color: var(--studio-label, #8ff5c6) !important;
+  -webkit-text-fill-color: var(--studio-label, #8ff5c6) !important;
+  font-size: var(--studio-type-small) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  line-height: 1.3 !important;
+}
+
+/* Condensed builder fields are sentences, not mint eyebrows. */
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage .studio-journey label:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey .studio-journey__confirm label:not(.owner-qa):not(.owner-qa *) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: var(--studio-type-body) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.45 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage .studio-journey__fields h3:not(.owner-qa):not(.owner-qa *) {
+  white-space: normal !important;
+  max-width: none !important;
+  font-size: var(--studio-type-subtitle) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  margin: 0 0 0.9rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage h3.studio-journey__qualifying:not(.owner-qa):not(.owner-qa *) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage p.studio-journey__materials-summary:not(.owner-qa):not(.owner-qa *) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage p.studio-journey__included:not(.owner-qa):not(.owner-qa *) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-journey :is(input, textarea)::placeholder {
+  color: color-mix(in srgb, #ffffff 42%, transparent) !important;
+  -webkit-text-fill-color: color-mix(in srgb, #ffffff 42%, transparent) !important;
+}
+
+/* Type-in wells stay dark enough for white writing. The 42% smoke disappears on the bright lounge. */
+html:has(.studio-environment-app) .studio-journey :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
+  textarea
+) {
+  background: #20262d !important;
+  background-color: #20262d !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  font-weight: 700 !important;
+  color-scheme: dark;
+}
+
+/* Journey type-in only. The site-wide gold caret stays off these boxes. */
+html:has(.studio-environment-app) .studio-environment-app .studio-journey :is(
+  input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+  textarea
+):not(.owner-qa):not(.owner-qa *) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+/* Browser fill paints a pale well. Keep every journey text box on the smoke with white writing. */
+html:has(.studio-environment-app) .studio-journey :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
+  textarea
+):-webkit-autofill,
+html:has(.studio-environment-app) .studio-journey :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
+  textarea
+):-webkit-autofill:hover,
+html:has(.studio-environment-app) .studio-journey :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
+  textarea
+):-webkit-autofill:focus,
+html:has(.studio-environment-app) .studio-journey :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
+  textarea
+):-webkit-autofill:active,
+html:has(.studio-environment-app) .studio-journey :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
+  textarea
+):autofill {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  font-weight: 700 !important;
+  background-color: #20262d !important;
+  background-image: none !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  -webkit-box-shadow: 0 0 0 1000px #20262d inset !important;
+  box-shadow: 0 0 0 1000px #20262d inset !important;
+  transition: background-color 99999s ease-out !important;
+}
+
+/* The active box stays champagne. Writing in the box is bold white. */
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage .studio-journey :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
+  textarea
+):focus:not(.owner-qa):not(.owner-qa *) {
+  border: 2px solid #c8b59b !important;
+  outline: none !important;
+}
+
+html:has(.studio-environment-app) .studio-journey :is(input, textarea)::selection {
+  background: transparent !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Chrome paints a bright wash on saved names. Keep that writing bold white on the dark well. */
+html:has(.studio-environment-app) .studio-journey :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
+  textarea
+):-internal-autofill-selected,
+html:has(.studio-environment-app) .studio-journey :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
+  textarea
+):-internal-autofill-previewed {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  font-weight: 700 !important;
+  background-color: #20262d !important;
+  background-image: none !important;
+  -webkit-box-shadow: 0 0 0 1000px #20262d inset !important;
+  box-shadow: 0 0 0 1000px #20262d inset !important;
+}
+
+html:has(.studio-environment-app) .studio-journey input[type="checkbox"] {
+  accent-color: #bfd8f2 !important;
+  width: 1.15rem !important;
+  height: 1.15rem !important;
+}
+
+/* Add / Skip are one bubble each. Homepage and journey are the same box, so do not nest those classes. */
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey .studio-journey__choices button.studio-homepage__card-link:not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(.owner-qa):not(.owner-qa *):not(.is-pressed):not([data-pressed="true"]):not([aria-pressed="true"]):not([data-skip-action]):not([class*="btnSkip"]):not([class*="planMoreDetails"]):not([class*="planExtras"]):not([data-route-includes-cta]):not([class*="routeIncludes"]) {
+  margin: 0 !important;
+  min-height: 0 !important;
+  padding: 0.4rem 0.95rem !important;
+  border: 2px solid #c8b59b !important;
+  border-bottom: 2px solid #c8b59b !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  text-decoration: none !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: var(--studio-type-small) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  transform: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey .studio-journey__choices button.studio-homepage__card-link[data-selected="true"]:not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(.owner-qa):not(.owner-qa *):not(.is-pressed):not([data-pressed="true"]):not([data-skip-action]):not([class*="btnSkip"]):not([class*="planMoreDetails"]):not([class*="planExtras"]):not([data-route-includes-cta]):not([class*="routeIncludes"]) {
+  margin: 0 !important;
+  min-height: 0 !important;
+  padding: 0.4rem 0.95rem !important;
+  background: #bfd8f2 !important;
+  background-color: #bfd8f2 !important;
+  border: 2px solid #bfd8f2 !important;
+  border-bottom: 2px solid #bfd8f2 !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  outline: none !important;
+  text-decoration: none !important;
+  color: #20262d !important;
+  -webkit-text-fill-color: #20262d !important;
+  font-size: var(--studio-type-small) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.2 !important;
+  text-transform: none !important;
+  white-space: nowrap !important;
+  transform: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey .studio-journey__choices button.studio-homepage__card-link:not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(.owner-qa):not(.owner-qa *):not(.is-pressed):not([data-pressed="true"]):not([aria-pressed="true"]):not([data-skip-action]):not([class*="btnSkip"]):not([class*="planMoreDetails"]):not([class*="planExtras"]):not([data-route-includes-cta]):not([class*="routeIncludes"]):focus-visible,
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey .studio-journey__choices button.studio-homepage__card-link[data-selected="true"]:not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(.owner-qa):not(.owner-qa *):not(.is-pressed):not([data-pressed="true"]):not([data-skip-action]):not([class*="btnSkip"]):not([class*="planMoreDetails"]):not([class*="planExtras"]):not([data-route-includes-cta]):not([class*="routeIncludes"]):focus-visible {
+  outline: 2px solid #8ff5c6 !important;
+  outline-offset: 3px !important;
+}
+
+/* Review & Pay continue uses the same champagne primary as Save and continue. */
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey [data-review-pay="checkout"] a.lobby-entry-film__cta.co-submit[data-checkout-pay="continue"]:not(.owner-qa):not(.owner-qa *) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 3rem !important;
+  margin-top: 0.85rem !important;
+  padding: 0.75rem 1.6rem !important;
+  border-radius: 999px !important;
+  background: #c8b59b !important;
+  background-color: #c8b59b !important;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: var(--studio-type-body) !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transform: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey [data-review-pay="checkout"] a.lobby-entry-film__cta.co-submit[data-checkout-pay="continue"]:not(.owner-qa):not(.owner-qa *) span {
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+/* Review tiles match Build Your Project: white titles, air before Correct something. */
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey .studio-journey__review .pb-drawer-details__card:not(.owner-qa):not(.owner-qa *) {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.9rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey .studio-journey__review :is(
+  h3.pb-drawer-details__heading,
+  p.pb-drawer-details__prose,
+  a.studio-homepage__card-link
+):not(.owner-qa):not(.owner-qa *) {
+  margin: 0 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey .studio-journey__review h3.pb-drawer-details__heading:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey .studio-journey__doc h3.pb-drawer-details__heading:not(.owner-qa):not(.owner-qa *) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: var(--studio-type-subtitle) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.3 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey .studio-journey__doc .pb-drawer-details__icon {
+  display: none !important;
+}
+
+/* Checkout agreement stays put. Press must not scale the sentence or drop the card. */
+html:has(.studio-environment-app) .studio-homepage.studio-journey .co-card:is(:active, :has(:active)):not(.owner-qa) {
+  transform: none !important;
+  background: color-mix(in srgb, #20262d 42%, transparent) !important;
+  background-color: color-mix(in srgb, #20262d 42%, transparent) !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage.studio-journey label.pay-acknowledgment__checkbox:is(:active, :has(:active), :focus-within):not(.owner-qa):not(.owner-qa *) {
+  transform: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage.studio-journey label.pay-acknowledgment__checkbox:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) .studio-homepage.studio-journey label.pay-acknowledgment__checkbox span:not(.owner-qa):not(.owner-qa *) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: var(--studio-type-body) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.5 !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage.studio-journey label.pay-acknowledgment__checkbox {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  min-height: 44px !important;
+  cursor: pointer !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-panel="intake"] input[type="checkbox"] {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  accent-color: #43b7a2 !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-intake-preview-status] {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  font-weight: 700 !important;
+  margin: 0.75rem 0 0 !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage.studio-journey[data-journey-page="review-and-pay"] .route-map-social-intake__submit-error {
+  color: #ffb4a8 !important;
+  -webkit-text-fill-color: #ffb4a8 !important;
+  font-weight: 700 !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage.studio-journey .pay-acknowledgment__checkbox input[type="checkbox"] {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  margin: 0 !important;
+  flex: 0 0 24px !important;
+  accent-color: #43b7a2 !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage.studio-journey [role="alert"].co-payment-reassurance {
+  color: #ffb4a8 !important;
+  -webkit-text-fill-color: #ffb4a8 !important;
+  font-weight: 700 !important;
+}
+
+/* Journey progress numbers and words use sea green. */
+html:has(.studio-environment-app) .studio-homepage.studio-journey .co-next-steps__num:not(.owner-qa):not(.owner-qa *) {
+  background: #20262d !important;
+  background-color: #20262d !important;
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  border: 2px solid #5eedd0 !important;
+  font-size: var(--studio-type-small) !important;
+  font-weight: 700 !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage.studio-journey .co-next-steps__label:not(.owner-qa):not(.owner-qa *) {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  font-size: var(--studio-type-body) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.4 !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage .studio-homepage__footer .studio-homepage__inner {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage .studio-homepage__support-path {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 100% !important;
+}
+
+html:has(.studio-environment-app) .studio-homepage :is(button, a).studio-homepage__support-path {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-decoration: none !important;
+}
+
+/* Delivered writing sits on the same ink as a type well. The 28% smoke disappears on the bright lounge. */
+html:has(.studio-environment-app) :is(.fs-review-proof__reading, .fd-item__text) {
+  display: block !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  max-height: min(70vh, 36rem) !important;
+  margin: 0 !important;
+  padding: 1rem 1.1rem !important;
+  overflow: auto !important;
+  background: #20262d !important;
+  background-color: #20262d !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-family: var(--font-studio-board-sans), "Inter", system-ui, sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  line-height: 1.55 !important;
+  white-space: pre-wrap !important;
+  border: 2px solid #c8b59b !important;
+  border-radius: var(--studio-radius) !important;
+  text-shadow: none !important;
+}
+
+/* File titles were a 28px line pinched against the champagne border. Same on every file. */
+html:has(.studio-environment-app) .fs-preview__section-head {
+  box-sizing: border-box !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 1.15rem !important;
+  width: 100% !important;
+  margin: 0 0 0.75rem !important;
+  padding: 0.95rem 1.15rem !important;
+  min-height: 3.5rem !important;
+  background: #20262d !important;
+  background-color: #20262d !important;
+  border: 2px solid #c8b59b !important;
+  border-radius: var(--studio-radius) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.35 !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .fs-preview__section-label {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.35 !important;
+  white-space: normal !important;
+}
+
+html:has(.studio-environment-app) .fs-preview__status {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  color: #8ff5c6 !important;
+  -webkit-text-fill-color: #8ff5c6 !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: none !important;
+  line-height: 1.35 !important;
+  white-space: nowrap !important;
+}
+
+/* Journey rows, messages, and billing stay readable on the lounge. */
+html:has(.studio-environment-app) .sb-progress-timeline__step {
+  background: var(--studio-veil-fill) !important;
+  border: 1px solid #c8b59b !important;
+  box-shadow: none !important;
+  grid-template-columns: 1.25rem minmax(0, 1fr) !important;
+  padding: 0.45rem 0.7rem !important;
+}
+
+html:has(.studio-environment-app) .sb-progress-timeline__icon {
+  width: 1.15rem !important;
+  height: 1.15rem !important;
+  color: #fff8e7 !important;
+  opacity: 1 !important;
+}
+
+html:has(.studio-environment-app) .sb-progress-timeline__label,
+html:has(.studio-environment-app) .sb-progress-timeline__detail {
+  text-shadow: var(--studio-text-support) !important;
+  font-size: var(--studio-type-copy) !important;
+}
+
+html:has(.studio-environment-app) .sb-project-communication__studio-request,
+html:has(.studio-environment-app) .sb-project-communication__notice,
+html:has(.studio-environment-app) .sb-refund-request__body {
+  background: var(--studio-veil-fill) !important;
+  border: 1px solid #c8b59b !important;
+  border-radius: var(--studio-radius) !important;
+  padding: 0.9rem 1rem !important;
+}
+
+html:has(.studio-environment-app) .sb-project-communication__lead,
+html:has(.studio-environment-app) .sb-project-communication__studio-request-heading,
+html:has(.studio-environment-app) .sb-project-communication__studio-request-text,
+html:has(.studio-environment-app) .sb-project-communication__notice-text,
+html:has(.studio-environment-app) .sb-refund-request__body :is(p, a, li) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-shadow: var(--studio-text-support) !important;
+  font-size: var(--studio-type-copy) !important;
+}
+
+html:has(.studio-environment-app) .sb-refund-request__label {
+  color: #8ff5c6 !important;
+  -webkit-text-fill-color: #8ff5c6 !important;
+  font-size: var(--studio-type-label) !important;
+}
+
+/* Intake questions: one field, no card inside a card.
+   Beats the shared surface glass so Project Intake matches Build Your Project:
+   title, then a label, then one smoke field. Lounge stays visible. */
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] :is(
+  .route-map-social-intake,
+  .route-map-social-intake__card,
+  .route-map-social-intake__progress,
+  .route-map-social-intake__actions,
+  .route-map-social-intake__chips,
+  .route-map-social-intake__header,
+  [class*="intakeHostSurface"],
+  [class*="header"]
+):not(.owner-qa):not(.owner-qa *) {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] :is(
+  .route-map-social-intake__card,
+  .route-map-social-intake__progress,
+  [class*="intakeHostSurface"]
+):not(.owner-qa):not(.owner-qa *) {
+  padding: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__form {
+  gap: 1.35rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeSectionBlock"]:not(.owner-qa):not(.owner-qa *) {
+  display: grid !important;
+  gap: 1.35rem !important;
+  margin: 0 !important;
+  padding: 1.35rem 1.5rem !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  border-radius: var(--studio-radius) !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__step {
+  display: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeSectionHeading"] {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: var(--studio-type-subtitle) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.35 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__progress {
+  margin: 0.15rem 0 0.35rem !important;
+  gap: 0.15rem !important;
+  padding: 0 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__card-copy h3 {
+  margin: 0 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: var(--studio-type-subtitle) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html:has(.studio-environment-app) [data-panel="intake"] .route-map-social-intake__card,
+html:has(.studio-environment-app) [data-panel="intake"] [data-intake-type-well] {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  gap: 0.9rem !important;
+}
+
+html:has(.studio-environment-app) [data-panel="intake"] .route-map-social-intake__step {
+  background: #20262d !important;
+  background-color: #20262d !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border: 2px solid #c8b59b !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  min-width: 2rem !important;
+  min-height: 2rem !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  opacity: 1 !important;
+}
+
+html:has(.studio-environment-app) [data-panel="intake"] .route-map-social-intake__card-copy h3 {
+  font-size: var(--studio-type-subtitle) !important;
+  line-height: 1.35 !important;
+}
+
+html:has(.studio-environment-app) [data-panel="intake"] .route-map-social-intake__card-copy p,
+html:has(.studio-environment-app) [data-panel="intake"] .route-map-intake__req,
+html:has(.studio-environment-app) [data-panel="intake"] .route-map-intake__opt {
+  font-size: var(--studio-type-label) !important;
+}
+
+html:has(.studio-environment-app) [data-panel="intake"] .intakePaidAck {
+  display: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] .route-map-intake__req:not(.owner-qa):not(.owner-qa *) {
+  color: #d94e2b !important;
+  -webkit-text-fill-color: #d94e2b !important;
+  font-size: var(--studio-type-small) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] .route-map-intake__opt:not(.owner-qa):not(.owner-qa *) {
+  color: #8ff5c6 !important;
+  -webkit-text-fill-color: #8ff5c6 !important;
+  font-size: var(--studio-type-small) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeCheck"],
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeCheck"]:active,
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeCheck"]:focus-within {
+  transform: none !important;
+  border: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__chip,
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__chip:active,
+html:has(.studio-environment-app) .studio-environment-app [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__chip[aria-pressed="true"] {
+  box-sizing: border-box !important;
+  min-height: 3rem !important;
+  padding: 0.8rem 1rem !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-radius: var(--studio-radius) !important;
+  font-weight: 650 !important;
+  line-height: 1.35 !important;
+  transform: none !important;
+}
+
+/* Review & Pay “look at the next page” has no one-tablet wrapper.
+   Same open card as Build Your Project: one section, air inside, no frame on every question. */
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] :is(
+  .route-map-social-intake,
+  .route-map-social-intake__card,
+  .route-map-social-intake__progress,
+  .route-map-social-intake__header,
+  .route-map-social-intake__actions,
+  .route-map-social-intake__chips,
+  [class*="intakeHostSurface"]
+):not(.owner-qa):not(.owner-qa *):not(.fdr__feedback .fd-block) {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] :is(
+  .route-map-social-intake__card,
+  .route-map-social-intake__progress,
+  .route-map-social-intake__header,
+  [class*="intakeHostSurface"]
+):not(.owner-qa):not(.owner-qa *):not(.fdr__feedback .fd-block) {
+  padding: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey [data-panel="intake"][data-surface="page"] {
+  box-sizing: border-box;
+  width: min(var(--studio-journey-column), 100%) !important;
+  max-width: var(--studio-journey-column) !important;
+  height: auto !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] .route-map-social-intake__eyebrow {
+  display: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] .route-map-social-intake__title {
+  margin: 0 0 0.35rem !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: var(--studio-type-title) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-align: left !important;
+  text-transform: none !important;
+  line-height: 1.25 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] .route-map-social-intake__header {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 0.35rem !important;
+  margin: 0 0 1.5rem !important;
+  text-align: left !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] .route-map-social-intake__progress {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  justify-items: start !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] .route-map-social-intake__progress[data-intake-progress="bar"]:not(.owner-qa):not(.owner-qa *):not(.fdr__feedback .fd-block) {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 0.4rem !important;
+  margin: 0.85rem 0 0 !important;
+  border: none !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  overflow: hidden !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] .route-map-social-intake__progress-fill {
+  display: block !important;
+  width: var(--intake-progress, 0%) !important;
+  height: 100% !important;
+  background: #c8b59b !important;
+  border: none !important;
+  border-radius: inherit !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] [data-intake-test-notice="true"] {
+  font-family: inherit !important;
+  font-size: var(--studio-type-body) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.72) !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] .route-map-social-intake__form {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  grid-template-columns: none !important;
+  height: auto !important;
+  gap: 1.75rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] [class*="intakeSectionBlock"]:not(.owner-qa):not(.owner-qa *) {
+  display: grid !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  grid-column: 1 / -1 !important;
+  box-sizing: border-box !important;
+  gap: 1.75rem !important;
+  margin: 0 !important;
+  padding: 1.75rem 1.75rem !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  border-radius: var(--studio-radius) !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] [class*="intakeSectionHeading"] {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: var(--studio-type-subtitle) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.35 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] .route-map-social-intake__card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  grid-template-columns: 1fr !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  grid-column: 1 / -1 !important;
+  gap: 0.7rem !important;
+  min-height: 0 !important;
+  text-align: left !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] .route-map-social-intake__card-copy,
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] .route-map-social-intake__card-copy h3,
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] [class*="intakeSectionHeading"],
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] [class*="intakeTypeWell"],
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] [class*="intakeTypeLine"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  text-align: left !important;
+  grid-column: 1 / -1 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] [class*="intakeTypeLine"] {
+  min-height: 4.25rem !important;
+  padding: 1.05rem 1.15rem !important;
+  box-sizing: border-box !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] .route-map-social-intake__step {
+  display: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] [class*="intakeCheck"],
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] [class*="intakeCheck"] span {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: var(--studio-type-copy) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.45 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] .route-map-intake__req:not(.owner-qa):not(.owner-qa *) {
+  color: #d94e2b !important;
+  -webkit-text-fill-color: #d94e2b !important;
+  font-size: var(--studio-type-small) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-panel="intake"] .route-map-intake__opt:not(.owner-qa):not(.owner-qa *) {
+  color: #8ff5c6 !important;
+  -webkit-text-fill-color: #8ff5c6 !important;
+  font-size: var(--studio-type-small) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+}
+
+/* Journey intake actions match Continue to Review & Pay: pills, sentence case, sized to the words. */
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey [data-panel="intake"] .route-map-social-intake__actions:not(.owner-qa):not(.owner-qa *) {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  position: static !important;
+  margin-top: 0.25rem !important;
+  padding: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey [data-panel="intake"] .route-map-social-intake__next-step,
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey [data-panel="intake"] .route-map-social-intake__next-step strong,
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey [data-panel="intake"] .route-map-social-intake__next-step span {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: var(--studio-type-body) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.45 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey [data-panel="intake"] .route-map-social-intake__next-step {
+  flex: 1 1 100% !important;
+  margin: 0 0 0.35rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey [data-panel="intake"] :is(.route-map-secondary-btn, .route-map-primary-btn):not(.owner-qa):not(.owner-qa *) {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: none !important;
+  min-height: 3rem !important;
+  padding: 0.75rem 1.6rem !important;
+  border-radius: 999px !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+  box-shadow: none !important;
+  font-size: var(--studio-type-small) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.2 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey [data-panel="intake"] .route-map-primary-btn:not(.owner-qa):not(.owner-qa *) {
+  background: #c8b59b !important;
+  background-color: #c8b59b !important;
+  border-color: #c8b59b !important;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  font-weight: 700 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey [data-panel="intake"] .route-map-primary-btn:disabled:not(.owner-qa):not(.owner-qa *) {
+  opacity: 0.45 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey [data-panel="intake"] [data-intake-preview-status]:not(.owner-qa):not(.owner-qa *) {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  font-weight: 700 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey [data-panel="intake"] .route-map-secondary-btn:not(.owner-qa):not(.owner-qa *) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border-color: #c8b59b !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Build Your Project prototype only. Home and the other journey pages keep the shared veil.
+   Sea green #43B7A2 is a fill. Words on the slate use #5EEDD0 so small text stays readable.
+   Required words use #FFB4A8; the stronger coral #d94e2b stays on the field border. */
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-homepage__section :is(h1, h2, h3, p, label, a, button, span) {
+  white-space: normal !important;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] p.studio-homepage__kicker:not(.owner-qa):not(.owner-qa *) {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  line-height: 1.35 !important;
+  text-transform: uppercase !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-homepage__section-title {
+  color: #ffffff !important;
+  font-size: clamp(1.75rem, 3vw, 2.15rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__price {
+  color: #ffffff !important;
+  font-size: 1.5rem !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] :is(.studio-homepage__card-detail, .studio-journey__lead, .studio-journey__included, .studio-journey__materials-note, .studio-journey__support-detail) {
+  color: #ffffff !important;
+  font-size: 1.0625rem !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-homepage__card:not(.owner-qa):not(.owner-qa *) {
+  background: color-mix(in srgb, #344653 92%, transparent) !important;
+  background-color: color-mix(in srgb, #344653 92%, transparent) !important;
+  border: 2px solid #c8b59b !important;
+  box-shadow: none !important;
+  transform: none !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  color: #ffffff !important;
+  padding: 1.35rem 1.35rem 1.5rem !important;
+  gap: 1rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__tile-head {
+  align-items: center !important;
+  gap: 0.85rem 1rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__tile-head h3 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+  color: #ffffff !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__tile-head h3 .studio-build__glyph {
+  color: #5eedd0 !important;
+  width: 24px !important;
+  height: 24px !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__fields {
+  gap: 1.15rem !important;
+  margin-top: 0.35rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__fields h3 {
+  margin: 0 0 0.45rem !important;
+  color: #ffffff !important;
+  font-size: 1.0625rem !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-build__required,
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-build__optional {
+  display: inline !important;
+  margin-left: 0.35rem !important;
+  font-size: 0.8125rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+  line-height: 1.3 !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-build__required {
+  color: #ffb4a8 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-build__optional {
+  color: #5eedd0 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__fields :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
+  textarea
+):not(.owner-qa):not(.owner-qa *) {
+  background: #4d6474 !important;
+  background-color: #4d6474 !important;
+  border: 2px solid color-mix(in srgb, #c8b59b 82%, transparent) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  font-size: 1.0625rem !important;
+  font-weight: 600 !important;
+  line-height: 1.45 !important;
+  min-height: 3rem !important;
+  padding: 0.75rem 0.95rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__fields [data-builder-field="required"] :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
+  textarea
+):not(.owner-qa):not(.owner-qa *) {
+  border: 2px solid #d94e2b !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__fields :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
+  textarea
+):focus:not(.owner-qa):not(.owner-qa *) {
+  border-color: #5eedd0 !important;
+  outline: 3px solid #5eedd0 !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__fields :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
+  textarea
+):is(:-webkit-autofill, :autofill):not(.owner-qa):not(.owner-qa *) {
+  -webkit-text-fill-color: #ffffff !important;
+  box-shadow: 0 0 0 1000px #4d6474 inset !important;
+  -webkit-box-shadow: 0 0 0 1000px #4d6474 inset !important;
+  border: 2px solid color-mix(in srgb, #c8b59b 82%, transparent) !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] input[type="checkbox"] {
+  accent-color: #43b7a2 !important;
+  width: 1.375rem !important;
+  height: 1.375rem !important;
+  min-width: 1.375rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__confirm {
+  align-items: flex-start !important;
+  gap: 0.85rem !important;
+  min-height: 2.75rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__confirm label {
+  color: #ffffff !important;
+  font-size: 1.0625rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.45 !important;
+  text-transform: none !important;
+  align-items: flex-start !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] button.studio-homepage__btn-primary.studio-build__action:not(.owner-qa):not(.owner-qa *) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.55rem !important;
+  width: 100% !important;
+  min-height: 3rem !important;
+  padding: 0.75rem 1.25rem !important;
+  border-radius: 999px !important;
+  border: 2px solid #c8b59b !important;
+  background: #c8b59b !important;
+  background-color: #c8b59b !important;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  font-size: 1.0625rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.3 !important;
+  text-align: center !important;
+  text-transform: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] button.studio-homepage__btn-primary.studio-build__action:disabled:not(.owner-qa):not(.owner-qa *) {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] button.studio-build__action--main .studio-build__glyph {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] button.studio-build__action .studio-build__glyph {
+  color: #111111 !important;
+  width: 24px !important;
+  height: 24px !important;
+  flex: 0 0 auto !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] button.studio-build__toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.45rem !important;
+  min-height: 44px !important;
+  min-width: 44px !important;
+  padding: 0.45rem 0.95rem !important;
+  border: 2px solid #c8b59b !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] button.studio-build__toggle .studio-build__glyph {
+  color: #ffffff !important;
+  width: 24px !important;
+  height: 24px !important;
+  flex: 0 0 auto !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__actions {
+  display: grid !important;
+  gap: 0.85rem !important;
+  width: 100% !important;
+  max-width: var(--studio-journey-column) !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] :is(button, a, input, textarea):focus-visible {
+  outline: 3px solid #5eedd0 !important;
+  outline-offset: 3px !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__choices button.studio-homepage__card-link:not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(.owner-qa):not(.owner-qa *):not(.is-pressed):not([data-pressed="true"]):not([aria-pressed="true"]):not([data-skip-action]):not([class*="btnSkip"]):not([class*="planMoreDetails"]):not([class*="planExtras"]):not([data-route-includes-cta]):not([class*="routeIncludes"]) {
+  min-height: 44px !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  white-space: normal !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-journey__choices button.studio-homepage__card-link[data-selected="true"]:not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(.owner-qa):not(.owner-qa *):not(.is-pressed):not([data-pressed="true"]):not([data-skip-action]):not([class*="btnSkip"]):not([class*="planMoreDetails"]):not([class*="planExtras"]):not([data-route-includes-cta]):not([class*="routeIncludes"]) {
+  min-height: 44px !important;
+  padding: 0.5rem 1rem !important;
+  background: #43b7a2 !important;
+  background-color: #43b7a2 !important;
+  border-color: #43b7a2 !important;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  white-space: normal !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="build-your-project"] .studio-homepage__card:not(.owner-qa):not(.owner-qa *) {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transition: none !important;
+  }
+}
+
+/* Package Detail, Review & Pay, and the journey Project Intake match Build Your Project.
+   Route Map intake and the home page stay on their own rules. */
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey:is([data-journey-page="package-detail"], [data-journey-page="review-and-pay"]) .studio-homepage__section :is(h1, h2, h3, p, li, label, a, button, span) {
+  white-space: normal !important;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey:is([data-journey-page="package-detail"], [data-journey-page="review-and-pay"]) p.studio-homepage__kicker:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-panel="intake"] .route-map-social-intake__eyebrow:not(.owner-qa):not(.owner-qa *) {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey:is([data-journey-page="package-detail"], [data-journey-page="review-and-pay"]) .studio-homepage__section-title {
+  color: #ffffff !important;
+  font-size: clamp(1.75rem, 3vw, 2.15rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey:is([data-journey-page="package-detail"], [data-journey-page="review-and-pay"]) :is(.studio-homepage__card-detail, .studio-journey__lead, .pb-drawer-details__prose, .pb-drawer-details__list li) {
+  color: #ffffff !important;
+  font-size: 1.0625rem !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey:is([data-journey-page="package-detail"], [data-journey-page="review-and-pay"]) :is(.pb-drawer-details__card, .co-card):not(.owner-qa):not(.owner-qa *) {
+  background: color-mix(in srgb, #344653 92%, transparent) !important;
+  background-color: color-mix(in srgb, #344653 92%, transparent) !important;
+  border: 2px solid #c8b59b !important;
+  border-radius: 1.25rem !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  padding: 1.35rem 1.35rem 1.5rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey:is([data-journey-page="package-detail"], [data-journey-page="review-and-pay"]) :is(h3.pb-drawer-details__heading, .co-card__heading):not(.owner-qa):not(.owner-qa *) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.25 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey:is([data-journey-page="package-detail"], [data-journey-page="review-and-pay"]) .studio-journey__actions {
+  display: grid !important;
+  gap: 0.85rem !important;
+  width: 100% !important;
+  max-width: var(--studio-journey-column) !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey:is([data-journey-page="package-detail"], [data-journey-page="review-and-pay"]) :is(a, button).studio-homepage__btn-primary:not(.owner-qa):not(.owner-qa *) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.55rem !important;
+  width: 100% !important;
+  min-height: 3rem !important;
+  border-radius: 999px !important;
+  border: 2px solid #c8b59b !important;
+  background: #c8b59b !important;
+  background-color: #c8b59b !important;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  font-size: 1.0625rem !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-panel="intake"] {
+  width: 100% !important;
+  max-width: var(--studio-journey-column) !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-panel="intake"] .route-map-social-intake__card:not(.owner-qa):not(.owner-qa *):not(.fdr__feedback .fd-block) {
+  background: color-mix(in srgb, #344653 92%, transparent) !important;
+  background-color: color-mix(in srgb, #344653 92%, transparent) !important;
+  border: 2px solid #c8b59b !important;
+  border-radius: 1.25rem !important;
+  padding: 1.2rem 1.25rem !important;
+  margin: 0 0 0.9rem !important;
+  color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-panel="intake"] [data-intake-type-well]:not(.owner-qa):not(.owner-qa *) {
+  background: #4d6474 !important;
+  background-color: #4d6474 !important;
+  border: 2px solid color-mix(in srgb, #c8b59b 82%, transparent) !important;
+  border-radius: 0.75rem !important;
+  padding: 0.75rem 0.95rem !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-panel="intake"] :is(h2, h3, p):not(.studio-homepage__kicker):not(.owner-qa):not(.owner-qa *) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 600 !important;
+  white-space: normal !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-panel="intake"] p.studio-homepage__kicker:not(.owner-qa):not(.owner-qa *) {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  margin: 0 0 0.2rem !important;
+  font-weight: 700 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-panel="intake"][data-surface="page"] {
+  gap: 0.4rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-panel="intake"] .studio-homepage__section-title {
+  margin: 0 0 0.15rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-panel="intake"] .studio-homepage__card-detail {
+  margin: 0 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-panel="intake"] .studio-journey__intake-name {
+  margin: 0.45rem 0 0.1rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-panel="intake"] :is(.route-map-social-intake__title, .route-map-social-intake__card-copy h3) {
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-panel="intake"] .route-map-intake__req:not(.owner-qa):not(.owner-qa *) {
+  color: #ffb4a8 !important;
+  -webkit-text-fill-color: #ffb4a8 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey[data-journey-page="review-and-pay"] [data-panel="intake"] .route-map-intake__opt:not(.owner-qa):not(.owner-qa *) {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage.studio-journey:is([data-journey-page="package-detail"], [data-journey-page="review-and-pay"]) :is(button, a, input, textarea):focus-visible {
+  outline: 3px solid #5eedd0 !important;
+  outline-offset: 3px !important;
+}
+
+/* Help Center and client sign-in match the journey glass. Other rooms stay on their own rules. */
+html:has(.studio-environment-app) .studio-environment-app :is(.utility-page--help-center, .utility-page--client-access),
+html:has(.studio-environment-app) .studio-environment-app :is(.utility-page--help-center, .utility-page--client-access) :is(h1, h2, h3, h4, p, a, button, li, td, th, label, span, input, dt, dd) {
+  font-family: inherit !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center :is(h1, h2, h3, p, a, li, td, th, dt, dd) {
+  white-space: normal !important;
+  overflow-wrap: break-word;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center .utility-header {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center :is(.utility-card, .utility-header__copy, .hc-qpg-card):not(.owner-qa):not(.owner-qa *) {
+  background: color-mix(in srgb, #344653 92%, transparent) !important;
+  background-color: color-mix(in srgb, #344653 92%, transparent) !important;
+  border: 2px solid #c8b59b !important;
+  border-radius: 1.25rem !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center .utility-topbar__title {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  text-shadow: var(--studio-text-support) !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center :is(.utility-lead, .hc-body, .hc-body p, .hc-faq__answer, .hc-faq__answer p, .pkg-compare__lead, .hc-footer__hint) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center :is(.utility-card__title, .hc-philosophy__question, .hc-faq-group__title, .hc-policies__title, .hc-faq__question) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+  background: transparent !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center .hc-toc__title {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  font-weight: 700 !important;
+  border-bottom: 0 !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center .hc-toc .hc-toc__link {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center :is(.pkg-compare .hc-toc__link, .hc-qpg-card__link, .hc-footer__link) {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 0.15em !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center :is(.hc-qpg-table, .pkg-compare__scroll) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center :is(th, td) {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center .hc-card--philosophy .utility-card__title {
+  margin: 0 0 1.1rem !important;
+  padding: 0 0 0.55rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center .pkg-compare__table {
+  background: #4d6474 !important;
+  background-color: #4d6474 !important;
+  border: 2px solid #c8b59b !important;
+  color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center :is(th, td) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center .utility-subnav__link {
+  min-height: 44px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center a.utility-subnav__link.utility-subnav__link--active,
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center a.utility-subnav__link[aria-current="page"] {
+  background: #43b7a2 !important;
+  background-color: #43b7a2 !important;
+  border: 2px solid #43b7a2 !important;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  font-weight: 800 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center .utility-subnav__link--active :is(span, svg, .utility-subnav__label, .utility-subnav__icon),
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center .utility-subnav__link[aria-current="page"] :is(span, svg, .utility-subnav__label, .utility-subnav__icon) {
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--help-center :is(a, button):focus-visible {
+  outline: 3px solid #5eedd0 !important;
+  outline-offset: 3px !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page.utility-page--client-access .utility-card:not(.owner-qa):not(.owner-qa *):not(.fdr__feedback .fd-block) {
+  background: color-mix(in srgb, #344653 92%, transparent) !important;
+  background-color: color-mix(in srgb, #344653 92%, transparent) !important;
+  border: 2px solid #c8b59b !important;
+  border-radius: 1.25rem !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--client-access .utility-eyebrow {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  font-weight: 700 !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--client-access .utility-title {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--client-access :is(.utility-lead, .utility-note) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--client-access .utility-note a {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 0.15em !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--client-access .utility-field > span:not(.utility-password) {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  font-weight: 700 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page.utility-page--client-access :is(input, .utility-password__input):not(.owner-qa *):not(.owner-qa) {
+  background: #4d6474 !important;
+  background-color: #4d6474 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border: 2px solid #c8b59b !important;
+  min-height: 44px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page.utility-page--client-access :is(a.utility-btn.utility-btn--primary, button.utility-btn.utility-btn--primary):not(.owner-qa *):not(:active):not(.is-pressed):not([data-pressed="true"]) {
+  background: #c8b59b !important;
+  background-color: #c8b59b !important;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  border: 2px solid #c8b59b !important;
+  font-weight: 700 !important;
+  min-height: 44px !important;
+  width: 100% !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page.utility-page--client-access :is(a.utility-btn.utility-btn--secondary, button.utility-btn.utility-btn--secondary):not(.owner-qa *):not(:active):not(.is-pressed):not([data-pressed="true"]) {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border: 2px solid #c8b59b !important;
+  font-weight: 700 !important;
+  min-height: 44px !important;
+  width: 100% !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--client-access button.utility-password__toggle {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border: 2px solid #c8b59b !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  border-radius: 999px !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--client-access .utility-error {
+  color: #ffb4a8 !important;
+  -webkit-text-fill-color: #ffb4a8 !important;
+  font-weight: 700 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .utility-page--client-access :is(button, a, input):focus-visible {
+  outline: 3px solid #5eedd0 !important;
+  outline-offset: 3px !important;
+}
+
+/* Home and Review Room stay on the clear lounge.
+   Studio Board sections use the Package Detail card.
+   Same Manrope face, sea green, champagne, and mint. */
+html:has(.studio-environment-app) .studio-environment-app :is(
+  .studio-homepage,
+  [data-visual-proof="board"],
+  .fs-page
+) {
+  --studio-label: #5eedd0;
+  --sb-eucalyptus: #5eedd0;
+  font-family: var(--font-studio-manrope), Manrope, system-ui, sans-serif;
+}
+
+html:has(.studio-environment-app) .studio-environment-app :is(
+  .studio-homepage,
+  [data-visual-proof="board"],
+  .fs-page
+) :is(
+  h1,
+  h2,
+  h3,
+  .utility-title,
+  .utility-topbar,
+  .utility-subnav,
+  .utility-subnav__link,
+  .utility-subnav__label,
+  .utility-btn,
+  .sb-overview__service,
+  .sb-overview__status,
+  .sb-overview__note,
+  p,
+  li,
+  button,
+  a
+):not(.sb-next__sticky-text):not([class*="script"]) {
+  font-family: var(--font-studio-manrope), Manrope, system-ui, sans-serif !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app :is(
+  .studio-homepage,
+  [data-visual-proof="board"],
+  .fs-page
+) :is(h1, .utility-title) {
+  font-weight: 800 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app :is(
+  .studio-homepage,
+  [data-visual-proof="board"],
+  .fs-page
+) :is(p, li):not([class*="kicker"]):not([class*="eyebrow"]):not([class*="label"]):not([class*="status"]) {
+  font-weight: 500 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage .studio-homepage__hero-kicker {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  font-weight: 700 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app .studio-homepage :is(a, button).studio-homepage__btn-primary:not(.owner-qa):not(.owner-qa *):not(:active):not(.is-pressed):not([data-pressed="true"]),
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] :is(a, button).utility-btn--primary:not(.owner-qa):not(.owner-qa *):not(:active):not(.is-pressed):not([data-pressed="true"]),
+html:has(.studio-environment-app) .studio-environment-app .fs-page :is(a, button).utility-btn--primary:not(.owner-qa):not(.owner-qa *):not(:active):not(.is-pressed):not([data-pressed="true"]) {
+  background: #c8b59b !important;
+  background-color: #c8b59b !important;
+  border: 2px solid #c8b59b !important;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  font-weight: 700 !important;
+  text-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app :is(
+  [data-visual-proof="board"],
+  .fs-page
+) a.utility-subnav__link.utility-subnav__link--active:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) .studio-environment-app :is(
+  [data-visual-proof="board"],
+  .fs-page
+) a.utility-subnav__link[aria-current="page"]:not(.owner-qa):not(.owner-qa *) {
+  background: #43b7a2 !important;
+  background-color: #43b7a2 !important;
+  border: 2px solid #43b7a2 !important;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  font-weight: 800 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app :is(
+  [data-visual-proof="board"],
+  .fs-page
+) :is(.utility-subnav__link--active, .utility-subnav__link[aria-current="page"]) :is(span, svg, .utility-subnav__label, .utility-subnav__icon) {
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+}
+
+/* Opened Studio Board writing sits in the one section card. No second frame. */
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-more__body :is(
+  .sb-refund-request__body,
+  .sb-project-communication__studio-request,
+  .sb-project-communication__notice,
+  .sb-project-communication__problem-status,
+  .sb-project-communication__item,
+  .sb-project-communication__machine-answer,
+  .sb-progress-timeline__step,
+  .sb-progress-panel__update
+):not(.owner-qa):not(.owner-qa *) {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-more__body :is(
+  p,
+  li,
+  h2,
+  h3,
+  h4,
+  .sb-project-communication__lead,
+  .sb-project-communication__studio-request-heading,
+  .sb-project-communication__studio-request-text,
+  .sb-project-communication__notice-text,
+  .sb-refund-request__lead,
+  .sb-refund-request__policy,
+  .sb-refund-request__eligibility
+):not(.owner-qa):not(.owner-qa *) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-family: var(--font-studio-manrope), Manrope, system-ui, sans-serif !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-more__body :is(
+  .sb-refund-request__label,
+  .sb-refund-request__summary,
+  .sb-project-communication__label,
+  .sb-project-communication__intent-legend,
+  .sb-record-facts dt,
+  .sb-current-campaign__label
+):not(.owner-qa):not(.owner-qa *) {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-refund-request__optional {
+  color: #5eedd0 !important;
+  -webkit-text-fill-color: #5eedd0 !important;
+  font-weight: 800 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-more__body :is(
+  textarea,
+  select,
+  input:not([type="radio"]):not([type="checkbox"]):not([type="hidden"]):not([type="button"]):not([type="submit"])
+):not(.owner-qa):not(.owner-qa *) {
+  background: #4d6474 !important;
+  background-color: #4d6474 !important;
+  border: 2px solid #c8b59b !important;
+  border-radius: 0.75rem !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  font-family: var(--font-studio-manrope), Manrope, system-ui, sans-serif !important;
+  font-size: 1.0625rem !important;
+  font-weight: 600 !important;
+  line-height: 1.45 !important;
+  min-height: 3rem !important;
+  padding: 0.75rem 0.95rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-more__body :is(textarea, input)::placeholder {
+  color: color-mix(in srgb, #ffffff 72%, transparent) !important;
+  -webkit-text-fill-color: color-mix(in srgb, #ffffff 72%, transparent) !important;
+  font-weight: 500 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-project-communication__intent-option:not(.owner-qa):not(.owner-qa *):not([data-selected="true"]) {
+  background: #4d6474 !important;
+  background-color: #4d6474 !important;
+  border: 2px solid #c8b59b !important;
+  border-radius: 0.75rem !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  min-height: 44px !important;
+  padding: 0.45rem 0.95rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-project-communication__intent-option[data-selected="true"]:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-project-communication__intent-option:has(input:checked):not(.owner-qa):not(.owner-qa *) {
+  background: #c8b59b !important;
+  background-color: #c8b59b !important;
+  border: 2px solid #c8b59b !important;
+  border-radius: 0.75rem !important;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  min-height: 44px !important;
+  padding: 0.45rem 0.95rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-project-communication__intent-option span {
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-project-communication__intent-option[data-selected="true"] :is(span, legend),
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-project-communication__intent-option:has(input:checked) :is(span) {
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  background: transparent !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-project-communication__intent-option input {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  border: 0 !important;
+  appearance: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-project-communication__intent-options {
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  gap: 0.65rem !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] :is(
+  button.sb-refund-request__submit,
+  button.sb-project-communication__submit
+):not(.owner-qa):not(.owner-qa *) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 3rem !important;
+  margin-top: 0.35rem !important;
+  padding: 0.75rem 1.25rem !important;
+  border-radius: 0.85rem !important;
+  border: 2px solid #c8b59b !important;
+  background: #c8b59b !important;
+  background-color: #c8b59b !important;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  font-family: var(--font-studio-manrope), Manrope, system-ui, sans-serif !important;
+  font-size: 1.0625rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] :is(
+  button.sb-refund-request__submit,
+  button.sb-project-communication__submit
+):not(.owner-qa):not(.owner-qa *):disabled {
+  opacity: 0.45 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb-more__body a:not(.sb-more__new):not(.utility-btn):not(.owner-qa *) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 0.15em !important;
+}
+
+/* Studio Board cards match Package Detail and Clip Repurposing.
+   One slate card, champagne edge, no blur. The lounge stays behind the page. */
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb--v4 .sb-card.bf-material-paper:not(.owner-qa):not(.owner-qa *) {
+  background: color-mix(in srgb, #344653 92%, transparent) !important;
+  background-color: color-mix(in srgb, #344653 92%, transparent) !important;
+  background-image: none !important;
+  border: 2px solid #c8b59b !important;
+  border-radius: 1.25rem !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  color: #ffffff !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb--v4 .sb-card.bf-material-paper:not(.owner-qa):not(.owner-qa *) {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb--v4 .sb-card.bf-material-paper:not(.owner-qa):not(.owner-qa *)::before,
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb--v4 .sb-card.bf-material-paper:not(.owner-qa):not(.owner-qa *)::after {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 0 !important;
+}
+
+html:has(.studio-environment-app) .studio-environment-app [data-visual-proof="board"] .sb--v4 .sb-more__body .sb-card.bf-material-paper:not(.owner-qa):not(.owner-qa *) {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 0 !important;
 }

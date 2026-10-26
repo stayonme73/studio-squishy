@@ -10,7 +10,6 @@ import { join } from "node:path";
 
 const BASE = process.env.CERT_BASE_URL || "http://localhost:3000";
 const OUT = join(process.cwd(), "test-artifacts", "package-7b1-review-delivery-shell");
-const CLIENT_LOGIN = { email: "client@local.dev", password: "dev-only" };
 const CAMPAIGN_ID = "pkg7b1-shell-cert";
 const CAMPAIGN_KEY = "studio-squishy:current-campaign";
 
@@ -24,10 +23,8 @@ function push(check, ok, extra = {}) {
 }
 
 async function login() {
-  const res = await fetch(`${BASE}/api/auth/login`, {
+  const res = await fetch(`${BASE}/api/auth/local-customer-one`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(CLIENT_LOGIN),
   });
   if (!res.ok) throw new Error(`Login failed: ${res.status}`);
   const setCookie = res.headers.get("set-cookie") ?? "";
@@ -108,6 +105,79 @@ const JOB_DELIVERED = {
   terminal: true,
 };
 
+const JOB_EMAIL_READY = {
+  jobId: "job-email",
+  serviceName: "Email Kit",
+  stageId: "work-ready-for-review",
+  label: "Work Ready for Review",
+  explanation: "Work is available for your review.",
+  actionOwner: "customer",
+  blocksCampaignCustomerAction: true,
+  terminal: false,
+};
+
+const JOB_VIDEO_WORKING = {
+  jobId: "job-video",
+  serviceName: "Short Video",
+  stageId: "studio-working",
+  label: "Studio Working",
+  explanation: "The Studio owns the next move on this work.",
+  actionOwner: "studio",
+  blocksCampaignCustomerAction: false,
+  terminal: false,
+};
+
+const JOB_REVIEW_VIEW = {
+  jobId: JOB_REVIEW.jobId,
+  campaignId: CAMPAIGN_ID,
+  serviceName: JOB_REVIEW.serviceName,
+  campaignName: "Package 7B1 Shell Cert",
+  spineStatus: "ready_for_review",
+  deliverables: [
+    {
+      key: "deliverable-0",
+      label: "Primary",
+      prepared: true,
+      proofFiles: [],
+    },
+  ],
+  revisionRoundsIncluded: 1,
+  revisionRoundsUsed: 0,
+  revisionRoundsRemaining: 1,
+  extraCorrectionRemaining: 0,
+  correctionAccounting: {
+    included: 1,
+    includedSource: "campaign_field",
+    used: 0,
+    provisionalLegacyUsed: 0,
+    effectiveUsed: 0,
+    extraGranted: 0,
+    extraUsed: 0,
+    extraRemaining: 0,
+    remainingIncluded: 1,
+    remaining: 1,
+    exhausted: false,
+    history: [],
+    grants: [],
+  },
+  feedback: {
+    jobId: JOB_REVIEW.jobId,
+    campaignId: CAMPAIGN_ID,
+    sectionStatuses: { "deliverable-0": "neutral" },
+    stickyNotes: [],
+    voiceNotes: [],
+    drawSections: [],
+    updatedAt: new Date().toISOString(),
+  },
+  lockedFeedbackPackages: [],
+  activity: [],
+  updateHistory: [],
+  canRequestRevision: true,
+  canApproveForDelivery: true,
+  blockedReasons: [],
+  exhaustedWording: null,
+};
+
 async function preparePage(context, stagesBody, options = {}) {
   const page = await context.newPage();
   const delayMs = options.stagesDelayMs ?? 0;
@@ -186,6 +256,7 @@ async function certifyViewport(browser, cookie, viewport) {
   const context = await browser.newContext({
     viewport: { width: viewport.width, height: viewport.height },
     reducedMotion: "reduce",
+    ignoreHTTPSErrors: true,
   });
   await context.addCookies([
     {
@@ -213,7 +284,7 @@ async function certifyViewport(browser, cookie, viewport) {
     await page.goto(`${BASE}/feedback-studio`, { waitUntil: "networkidle" });
     await page.waitForSelector(".rd-shell", { timeout: 15000 });
     const heading = ((await page.locator("#rd-stage-heading").textContent()) || "").trim();
-    push(`${prefix}: production → Studio Working`, heading === "Studio Working", {
+    push(`${prefix}: production → still being worked on`, heading === "Still being worked on", {
       detail: heading,
     });
     const hasReviewLink = await page.locator("a", { hasText: "Open Review" }).count();
@@ -236,16 +307,14 @@ async function certifyViewport(browser, cookie, viewport) {
     await page.goto(`${BASE}/feedback-studio`, { waitUntil: "networkidle" });
     await page.waitForSelector(".rd-shell", { timeout: 15000 });
     const heading = ((await page.locator("#rd-stage-heading").textContent()) || "").trim();
-    const explanation = (
-      (await page.locator(".rd-stage-card__explanation").first().textContent()) || ""
-    ).trim();
-    push(`${prefix}: waiting → Waiting on You`, heading === "Waiting on You", {
+    push(`${prefix}: waiting → still being worked on`, heading === "Still being worked on", {
       detail: heading,
     });
     push(
-      `${prefix}: waiting uses generic explanation`,
-      explanation ===
-        "The Studio needs something from you before this work can continue.",
+      `${prefix}: waiting lists the blocked job`,
+      ((await page.locator(".rd-job-list__item--inactive").first().innerText()) || "").includes(
+        "Email Sequence",
+      ),
     );
     await page.screenshot({ path: join(OUT, `${prefix}-02-waiting-on-you.png`) });
     await page.close();
@@ -256,7 +325,7 @@ async function certifyViewport(browser, cookie, viewport) {
     const page = await preparePage(
       context,
       stagesPayload(
-        [JOB_REVIEW, JOB_PRODUCTION],
+        [JOB_REVIEW, JOB_EMAIL_READY, JOB_VIDEO_WORKING],
         "project-in-progress",
         "Project in Progress",
         "Your project has work in multiple stages.",
@@ -264,19 +333,29 @@ async function certifyViewport(browser, cookie, viewport) {
     );
     await page.goto(`${BASE}/feedback-studio`, { waitUntil: "networkidle" });
     await page.waitForSelector(".rd-shell", { timeout: 15000 });
-    const summary = ((await page.locator(".rd-shell__summary-label").textContent()) || "").trim();
+    const readyHeading = (
+      (await page.locator("#rd-stage-heading").textContent()) || ""
+    ).trim();
     const jobCount = await page.locator(".rd-job-list__item").count();
-    push(`${prefix}: mixed → Project in Progress`, summary === "Project in Progress", {
-      detail: summary,
+    push(`${prefix}: mixed → Ready for your review`, readyHeading === "Ready for your review", {
+      detail: readyHeading,
     });
-    push(`${prefix}: mixed shows all jobs`, jobCount === 2, { detail: `jobs=${jobCount}` });
+    push(`${prefix}: mixed shows all jobs`, jobCount === 3, { detail: `jobs=${jobCount}` });
     const openReview = page.locator("a", { hasText: "Open Review" });
-    push(`${prefix}: mixed shows Open Review for reviewable job`, (await openReview.count()) === 1);
+    push(`${prefix}: mixed has no Open Review doorway`, (await openReview.count()) === 0);
+    const readyHref = await page.locator("a.rd-job-list__item").first().getAttribute("href");
+    push(
+      `${prefix}: mixed ready job stays in Review Room`,
+      Boolean(readyHref && readyHref.includes("/feedback-studio?jobId=")),
+      { detail: readyHref || "(none)" },
+    );
+    const blocked = await page.locator(".rd-job-list__item--inactive").count();
+    push(`${prefix}: mixed keeps blocked work unavailable`, blocked === 1);
     await page.screenshot({ path: join(OUT, `${prefix}-03-mixed.png`) });
     await page.close();
   }
 
-  // 4) Bare /feedback-studio with review-ready opens shell (not workspace)
+  // 4) Bare /feedback-studio with one review-ready job opens the proof
   {
     const page = await preparePage(
       context,
@@ -294,16 +373,16 @@ async function certifyViewport(browser, cookie, viewport) {
             serviceName: JOB_REVIEW.serviceName,
           },
         ],
+        jobReview: JOB_REVIEW_VIEW,
       },
     );
     await page.goto(`${BASE}/feedback-studio`, { waitUntil: "networkidle" });
-    await page.waitForSelector(".rd-shell", { timeout: 15000 });
-    const workspace = await page.locator(".fs-review--workspace").count();
-    push(`${prefix}: bare review-ready opens shell`, workspace === 0);
+    await page.waitForSelector(".fs-review--workspace", { timeout: 15000 });
+    const shell = await page.locator(".rd-shell").count();
+    push(`${prefix}: bare one-ready job opens proof`, shell === 0);
     push(
-      `${prefix}: bare review-ready shows stage card`,
-      ((await page.locator("#rd-stage-heading").textContent()) || "").trim() ===
-        "Work Ready for Review",
+      `${prefix}: bare one-ready job has no Open Review doorway`,
+      (await page.locator("a", { hasText: "Open Review" }).count()) === 0,
     );
     await page.screenshot({ path: join(OUT, `${prefix}-04-bare-review-ready.png`) });
     await page.close();
@@ -327,36 +406,7 @@ async function certifyViewport(browser, cookie, viewport) {
             serviceName: JOB_REVIEW.serviceName,
           },
         ],
-        jobReview: {
-          jobId: JOB_REVIEW.jobId,
-          campaignId: CAMPAIGN_ID,
-          serviceName: JOB_REVIEW.serviceName,
-          campaignName: "Package 7B1 Shell Cert",
-          spineStatus: "ready_for_review",
-          deliverables: [
-            {
-              key: "deliverable-0",
-              label: "Primary",
-              prepared: true,
-              proofFiles: [],
-            },
-          ],
-          revisionRoundsIncluded: 1,
-          revisionRoundsUsed: 0,
-          feedback: {
-            jobId: JOB_REVIEW.jobId,
-            campaignId: CAMPAIGN_ID,
-            sectionStatuses: { "deliverable-0": "neutral" },
-            stickyNotes: [],
-            voiceNotes: [],
-            drawSections: [],
-            updatedAt: new Date().toISOString(),
-          },
-          activity: [],
-          canRequestRevision: true,
-          canApproveForDelivery: true,
-          blockedReasons: [],
-        },
+        jobReview: JOB_REVIEW_VIEW,
       },
     );
     await page.goto(
@@ -432,31 +482,36 @@ async function certifyViewport(browser, cookie, viewport) {
     await page.close();
   }
 
-  // 8) Keyboard selection + focus
+  // 8) Mixed readiness — ready work is a same-room link; blocked work is not
   {
     const page = await preparePage(
       context,
       stagesPayload(
-        [JOB_WAITING, JOB_PRODUCTION],
-        "waiting-on-you",
-        "Waiting on You",
-        "The Studio needs something from you before this work can continue.",
+        [JOB_REVIEW, JOB_EMAIL_READY, JOB_VIDEO_WORKING],
+        "project-in-progress",
+        "Project in Progress",
+        "Your project has work in multiple stages.",
       ),
+      { jobReview: JOB_REVIEW_VIEW },
     );
     await page.goto(`${BASE}/feedback-studio`, { waitUntil: "networkidle" });
     await page.waitForSelector(".rd-shell", { timeout: 15000 });
-    const second = page.locator(".rd-job-list__item").nth(1);
-    await second.focus();
-    await page.keyboard.press("Enter");
-    await page.waitForTimeout(200);
-    const heading = ((await page.locator("#rd-stage-heading").textContent()) || "").trim();
-    push(`${prefix}: keyboard selects second job`, heading === "Studio Working", {
-      detail: heading,
-    });
-    const focusedId = await page.evaluate(() => document.activeElement?.id || "");
-    push(`${prefix}: focus moves to stage heading`, focusedId === "rd-stage-heading", {
-      detail: focusedId,
-    });
+    const readyLink = page.locator("a.rd-job-list__item");
+    const blocked = page.locator(".rd-job-list__item--inactive");
+    push(`${prefix}: mixed ready work is a same-room link`, (await readyLink.count()) === 2);
+    push(`${prefix}: mixed blocked work is not a proof link`, (await blocked.count()) === 1);
+    await page.locator("a.rd-job-list__item").first().click();
+    await page.waitForSelector(".fs-review--workspace", { timeout: 15000 });
+    push(
+      `${prefix}: mixed ready tap opens proof in the same Review Room`,
+      (await page.locator(".rd-shell").count()) === 0,
+    );
+    await page.goBack();
+    await page.waitForSelector(".rd-shell", { timeout: 15000 });
+    push(
+      `${prefix}: browser Back from mixed proof returns to in-room chooser`,
+      (await page.locator(".rd-shell").count()) === 1,
+    );
     await page.screenshot({ path: join(OUT, `${prefix}-08-keyboard.png`) });
     await page.close();
   }

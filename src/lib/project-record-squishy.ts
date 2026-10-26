@@ -4,6 +4,7 @@
  */
 
 import type { RequestTargetKey } from "@/lib/customer-field-tokens";
+import { alignCustomerFacingServiceStatusLines } from "@/lib/studio-customer-current-status";
 import type { SquishyMessage } from "@/lib/squishy/types";
 
 export type MaterialUiKey = "logo_material" | "photo_material" | "document_material" | "reference_url";
@@ -443,9 +444,18 @@ export function resolveGroundedAnswer(
     if (!snapshot.projectStatusReady && snapshot.jobStatusLabels.length === 0) {
       return squishyMessage("status-unavailable", SQUISHY_PROJECT_RECORD_GROUNDED_COPY.statusUnavailable);
     }
+    const alignedJobLines = alignCustomerFacingServiceStatusLines(
+      snapshot.jobStatusLabels,
+      snapshot.campaignStatusLabel,
+    );
+    const jobLinesDifferFromCurrent = alignedJobLines.some((line) => {
+      const idx = line.lastIndexOf(" — ");
+      const status = idx < 0 ? line : line.slice(idx + 3);
+      return status !== snapshot.campaignStatusLabel;
+    });
     const jobLines =
-      snapshot.jobStatusLabels.length > 0
-        ? ` ${SQUISHY_PROJECT_RECORD_GROUNDED_COPY.jobStatusLead} ${snapshot.jobStatusLabels.join("; ")}.`
+      alignedJobLines.length > 0 && jobLinesDifferFromCurrent
+        ? ` ${SQUISHY_PROJECT_RECORD_GROUNDED_COPY.jobStatusLead} ${alignedJobLines.join("; ")}.`
         : "";
     return squishyMessage(
       "grounded-status",

@@ -203,7 +203,7 @@ async function certifyViewport(browser, vp) {
   await page.waitForTimeout(800);
   await assertNoScaffoldAds(page, vpId, "Help Center");
   const helpForbidden = await bodyHasForbiddenReadyCopy(page);
-  const helpPathHonest = /Lobby → Conversation Room → Payment → Intake/i.test(
+  const helpPathHonest = /Home → Package Detail → Build Your Project → Review & Pay/i.test(
     await page.locator("body").innerText(),
   );
   push(
@@ -212,7 +212,7 @@ async function certifyViewport(browser, vp) {
     { matrix: "gate-21", detail: helpForbidden || "clean" },
   );
   push(
-    `${vpId}: Help Center shows Conversation Room spine path`,
+    `${vpId}: Help Center shows condensed Home journey path`,
     helpPathHonest ? "PASS" : "FAIL",
     { matrix: "gate-21" },
   );

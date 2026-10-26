@@ -5,6 +5,11 @@
 import { readFileSync } from "fs";
 import path from "path";
 
+import {
+  LIVE_HOUSE_FONT_STACK,
+  liveHouseFontCss,
+} from "@/lib/studio-static-creative-lane/house-fonts-live";
+
 import type { FlyerDesignSpec } from "./types";
 
 function esc(s: string): string {
@@ -65,8 +70,11 @@ export function renderFlyerHtml(
       layer.letterSpacingPx != null
         ? `letter-spacing:${layer.letterSpacingPx}px;`
         : "";
+    const family = layer.fontStack
+      ? `font-family:${esc(layer.fontStack)};`
+      : "";
     parts.push(
-      `<div class="layer text" data-id="${esc(layer.id)}" data-role="${esc(layer.role)}" style="left:${layer.x}px;top:${layer.y}px;width:${layer.width}px;font-size:${layer.fontSizePx}px;font-weight:${layer.fontWeight};line-height:${layer.lineHeight};color:${esc(layer.color)};text-align:${layer.align};${tracking}">${esc(layer.content)}</div>`,
+      `<div class="layer text" data-id="${esc(layer.id)}" data-role="${esc(layer.role)}" style="left:${layer.x}px;top:${layer.y}px;width:${layer.width}px;font-size:${layer.fontSizePx}px;font-weight:${layer.fontWeight};line-height:${layer.lineHeight};color:${esc(layer.color)};text-align:${layer.align};${tracking}${family}">${esc(layer.content)}</div>`,
     );
   }
 
@@ -76,6 +84,7 @@ export function renderFlyerHtml(
 <meta charset="utf-8" />
 <title>Flyer ${esc(spec.skuId)}</title>
 <style>
+  ${liveHouseFontCss(repoRoot)}
   html, body {
     margin: 0;
     padding: 0;
@@ -90,7 +99,7 @@ export function renderFlyerHtml(
     height: ${spec.canvas.heightPx}px;
     overflow: hidden;
     background: ${esc(spec.background.color)};
-    font-family: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-family: ${LIVE_HOUSE_FONT_STACK};
   }
   .layer { position: absolute; box-sizing: border-box; }
   .layer.text {

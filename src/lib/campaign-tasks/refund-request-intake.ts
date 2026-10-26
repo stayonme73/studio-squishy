@@ -1,4 +1,3 @@
-import { JOB_CONTROL_POLICY } from "@/config/job-control";
 import type { PurchasedJobRecord } from "@/lib/job-control/types";
 
 import type { RefundRequestSourceChannel } from "@/config/refund-request-channels";
@@ -44,14 +43,12 @@ export function resolveReceivedConceptsOrFilesReadOnly(job: PurchasedJobRecord):
   return hasPreparedDeliverables || reviewVisibleStatuses.has(job.spineStatus);
 }
 
+/** No waiting period: before production starts a refund may be approved; never automatic. */
 export function resolveRefundPolicyStatusLabel(job: PurchasedJobRecord): string {
   if (resolveProductionStartedReadOnly(job)) {
     return "Non-refundable — production has started for this job.";
   }
-  if (job.refundEligibleAt) {
-    return `May be eligible per ${JOB_CONTROL_POLICY.refundEligibleDays}-day waiting-on-client policy — Owner approval required.`;
-  }
-  return "Refund review — policy facts recorded; Owner approval required.";
+  return "Refund may be approved — production has not started for this job. Owner approval required.";
 }
 
 /** Job-grain timeline only — campaign payment truth stays on CampaignRecord. */
@@ -61,7 +58,7 @@ export function resolveRefundTimelineFacts(job: PurchasedJobRecord): string {
     parts.push(`Waiting on client since ${formatFactDate(job.waitingOnClientSince)}.`);
   }
   if (job.refundEligibleAt) {
-    parts.push(`Internal refund-eligibility signal recorded ${formatFactDate(job.refundEligibleAt)}.`);
+    parts.push(`Owner refund-eligibility note recorded ${formatFactDate(job.refundEligibleAt)}.`);
   }
   if (job.lastClientResponseAt) {
     parts.push(`Last client response ${formatFactDate(job.lastClientResponseAt)}.`);
@@ -77,9 +74,6 @@ export function resolveRefundMissingEvidence(
   if (!payload.supportingDetails?.trim()) {
     gaps.push("No supporting details from the client.");
   }
-  if (!job.refundEligibleAt && !resolveProductionStartedReadOnly(job)) {
-    gaps.push("14-day eligibility signal not yet recorded — review timeline before deciding.");
-  }
   return gaps.length ? gaps.join(" ") : undefined;
 }
 
@@ -87,10 +81,7 @@ export function resolveRefundRecommendedNextAction(snapshot: RefundRequestSnapsh
   if (snapshot.productionStarted) {
     return "Deny refund — production has started; use approved client messaging if needed.";
   }
-  if (snapshot.policyStatusLabel.includes("May be eligible")) {
-    return "Review client reason and timeline, then approve or deny — do not auto-refund.";
-  }
-  return "Review client reason, policy status, and timeline before approve, deny, or hold.";
+  return "Review client reason and timeline, then approve, deny, or ask for more information — do not auto-refund.";
 }
 
 function formatFactDate(iso: string): string {

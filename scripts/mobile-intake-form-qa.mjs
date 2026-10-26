@@ -194,6 +194,7 @@ async function main() {
         hasContinueHint: /Complete the required questions to continue/i.test(
           text,
         ),
+        hasCompleteRequiredTwice: /complete every required/i.test(text),
         draftDisabled: draft ? draft.disabled : null,
         continueDisabled: cont ? cont.disabled : null,
         chipLabels: chips.map((el) => el.textContent?.trim()),
@@ -214,7 +215,8 @@ async function main() {
     report.checks.noSectionsCopy = layout.hasSectionsCopy === false;
     report.checks.questionsAnsweredCopy = layout.hasQuestionsCopy === true;
     report.checks.noSectionInNextStep = layout.hasSectionInNextStep !== true;
-    report.checks.continueHint = layout.hasContinueHint === true;
+    report.checks.continueHint = layout.hasContinueHint === false;
+    report.checks.noCompleteRequiredTwice = layout.hasCompleteRequiredTwice === false;
     report.checks.saveDraftEnabled = layout.draftDisabled === false;
     report.checks.saveContinueGuarded = layout.continueDisabled === true;
     report.checks.noSqueezedQuestions = layout.cardGeometry.every(

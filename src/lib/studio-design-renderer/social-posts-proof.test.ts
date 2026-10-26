@@ -397,13 +397,12 @@ describe("studio-design-renderer social-posts proof (v2-rtu-social-posts)", () =
     const captionsText = readFileSync(
       path.join(repoRoot, identity.captionTextRelativePath),
       "utf8",
-    )
-      .trim()
-      .split("\n");
-    expect(captionsText).toHaveLength(SOCIAL_POSTS_EXACT_COUNT);
-    captionsText.forEach((line, i) => {
-      expect(line.startsWith(`Post ${i + 1} / social-post-${i + 1} /`)).toBe(true);
-    });
+    ).trim();
+    expect(captionsText).toMatch(/^Post 1\n/);
+    expect(captionsText).toContain("\nPost 2\n");
+    expect(captionsText).toContain("\nPost 3\n");
+    expect(captionsText).toContain("\nPost 4\n");
+    expect(captionsText).not.toMatch(/social-post-\d+/);
 
     const trust = identity.assets.find((a) => a.roleAngle === "trust_brand")!;
     expect(result.declaredTextByAsset[trust.assetId]).not.toContain("$189");

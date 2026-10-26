@@ -22,7 +22,10 @@ import type {
 import { sha256File } from "./bind";
 import { persistMenuArtifacts } from "./menu-bind";
 import { captureMenuExports } from "./menu-capture";
-import { verifyMenuItemCompletenessAndPrices } from "./menu-completeness";
+import {
+  unsupportedMenuClaims,
+  verifyMenuItemCompletenessAndPrices,
+} from "./menu-completeness";
 import { isDesignRendererMenuSku } from "./menu-contracts";
 import { MENU_PROOF_ARTIFACT_ROOT } from "./menu-fixtures";
 import {
@@ -39,6 +42,8 @@ import type {
   MenuProjectTruth,
   MenuRendererPipelineResult,
 } from "./menu-types";
+import { applySharedLiveLaneEntryGate, sourcePxFromPlate } from "@/lib/studio-static-creative-lane/shared-live-gates";
+
 import { MENU_CANVAS } from "./menu-types";
 import { validateMenuDesignSpec } from "./menu-validate";
 
@@ -116,6 +121,14 @@ export async function runMenuRendererPipeline(input: {
     );
   }
 
+  const laneGate = applySharedLiveLaneEntryGate({
+    repoRoot: input.repoRoot,
+    sourcePx: sourcePxFromPlate(MENU_CANVAS),
+  });
+  if (!laneGate.ok) {
+    return fail(mode, laneGate.code, laneGate.message);
+  }
+
   try {
     assertMenuRequiredTruth(input.truth);
   } catch (e) {
@@ -142,6 +155,16 @@ export async function runMenuRendererPipeline(input: {
       return fail(mode, "MISSING_REQUIRED_TRUTH", msg);
     }
     return fail(mode, "RENDER_FAILURE", msg);
+  }
+
+  const unsupported = unsupportedMenuClaims(input.truth, spec);
+  if (unsupported.length > 0) {
+    return fail(
+      mode,
+      "QA_FAILURE",
+      `Quality rejected unsupported wording: ${unsupported.join(" | ")}`,
+      { designSpec: spec },
+    );
   }
 
   const validated = validateMenuDesignSpec(

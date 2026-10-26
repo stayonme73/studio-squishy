@@ -304,7 +304,7 @@ function applyDocumentBackfill(items: CampaignMaterialItem[], record: ProjectDet
 
 export function buildMaterialsRecordFromCampaign(campaign: CampaignRecord): CampaignMaterialsRecord {
   const now = new Date().toISOString();
-  const slots = resolveMaterialSlotsFromCampaign(campaign);
+  const slots = campaign.condensedOffer ? [] : resolveMaterialSlotsFromCampaign(campaign);
 
   const items: CampaignMaterialItem[] = slots.map((slot) => ({
     id: itemId(slot.category, slot.relatedServiceIds[0] ?? "plan"),

@@ -256,7 +256,7 @@ export function evaluateReviewEligibility(input: {
     if (
       candidate?.contentSha256 &&
       binding.contentSha256s.length === 0 &&
-      (kind === "design" || kind === "audio" || kind === "video")
+      (kind === "design" || kind === "audio" || kind === "video" || kind === "copy")
     ) {
       // Hash available on candidate but QA record has no bound hash → cannot prove same bytes.
       blockCodes.push("wrong_hash");

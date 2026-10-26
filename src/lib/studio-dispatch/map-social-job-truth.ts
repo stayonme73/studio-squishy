@@ -13,7 +13,6 @@ import {
 } from "@/lib/studio-design-renderer";
 import type { SocialPostsProjectTruth } from "@/lib/studio-design-renderer";
 import {
-  isInternalProductionChromeText,
   resolveCustomerBusinessName,
   resolveCustomerOfferHeadline,
   shortenCustomerFacingCta,
@@ -21,6 +20,7 @@ import {
 } from "@/lib/studio-design-renderer/customer-facing-creative-copy";
 
 import { resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
+import { flattenSkuIntakeAnswers } from "./sku-intake-answers";
 import type { JobDispatchRecord } from "./types";
 
 export type SocialPostsTruthMapResult =
@@ -56,13 +56,9 @@ function firstMatch(re: RegExp, text: string): string {
 
 function stringAnswers(
   answers: Record<string, unknown>,
+  skuId: string,
 ): Record<string, string | undefined> {
-  const out: Record<string, string | undefined> = {};
-  for (const [k, v] of Object.entries(answers)) {
-    if (v == null) out[k] = undefined;
-    else out[k] = String(v);
-  }
-  return out;
+  return flattenSkuIntakeAnswers(answers, skuId);
 }
 
 function extractContactPriceDates(input: {
@@ -95,9 +91,10 @@ function brandSafeBody(postsAbout: string): string {
   const cleaned = postsAbout
     .replace(/\$\s?\d{1,3}(?:,\d{3})*(?:\.\d{2})?/g, "")
     .replace(/\bwas\b/gi, "")
-    .replace(/\s*[–—-]\s*/g, " — ")
+    .replace(/\s+[–—-]\s+/g, " — ")
     .replace(/\s{2,}/g, " ")
     .replace(/\s+\./g, ".")
+    .replace(/\s+(?:from|starting at)\s*$/i, "")
     .trim();
   return (
     cleaned.slice(0, 220) ||
@@ -126,7 +123,7 @@ export function mapSocialPostsProjectTruthFromJob(input: {
   }
 
   const rawAnswers = input.campaign.routeMapIntake?.answers ?? {};
-  const answers = stringAnswers(rawAnswers);
+  const answers = stringAnswers(rawAnswers, DESIGN_RENDERER_SOCIAL_POSTS_SKU);
 
   const postsAbout = String(
     answers.postsAbout ?? answers.socialPostsPurposeChoice ?? "",
@@ -184,12 +181,12 @@ export function mapSocialPostsProjectTruthFromJob(input: {
     callToAction,
     wordingHashtags,
   });
-  if (!extracted.phone || !extracted.webDisplay) {
+  if (!extracted.phone && !extracted.webDisplay) {
     return {
       ok: false,
       code: "MISSING_REQUIRED_TRUTH",
       message:
-        "postsAbout and/or callToAction must provide phone and website/destination for contact fields",
+        "postsAbout and/or callToAction must provide a phone number or a website/destination — do not invent a contact the customer did not give",
     };
   }
   if (!extracted.priceDisplay) {
@@ -225,9 +222,6 @@ export function mapSocialPostsProjectTruthFromJob(input: {
     businessNameAnswer: String(answers.businessName ?? "").trim() || undefined,
   });
   const wordmark = businessName;
-  const purposeChoice = String(
-    answers.socialPostsPurposeChoice ?? "",
-  ).trim();
   const offerNameRaw = resolveCustomerOfferHeadline({
     postsAbout,
     mustInclude: String(answers.mustInclude ?? ""),
@@ -237,7 +231,7 @@ export function mapSocialPostsProjectTruthFromJob(input: {
           /^(Promote an offer|Share an update|Build awareness|Something else)\s*[—–-]\s*/i,
           "",
         )
-        .split(/[.\n—–-]/)[0]
+        .split(/[.\n]|\s*[—–]\s*/)[0]
         ?.trim()
         .slice(0, 80) || postsAbout.slice(0, 80),
   });
@@ -250,11 +244,8 @@ export function mapSocialPostsProjectTruthFromJob(input: {
       .slice(0, 80) || "Your offer";
   // Prefer offer language — never paint bare intake chips alone.
   const descriptor =
-    (purposeChoice && !isInternalProductionChromeText(purposeChoice)
-      ? ""
-      : "") ||
     String(answers.businessType ?? "").trim() ||
-    "Wellness studio";
+    businessName;
   const strippedCta = shortenCustomerFacingCta(
     stripCustomerFacingCta(callToAction),
   );
@@ -310,16 +301,18 @@ export function mapSocialPostsProjectTruthFromJob(input: {
       text: "#1A1A1A",
       muted: "#5A6570",
     },
-    approvedLogoVariantId: logo.material.approvedIdentitySourceId!,
-    materials: [
-      {
-        materialId: logo.material.materialId,
-        role: "logo",
-        relativePath: logo.material.relativePath,
-        contentSha256: logo.material.contentSha256,
-        approvedIdentitySourceId: logo.material.approvedIdentitySourceId,
-      },
-    ],
+    approvedLogoVariantId: logo.material?.approvedIdentitySourceId ?? "wordmark-only",
+    materials: logo.material
+      ? [
+          {
+            materialId: logo.material.materialId,
+            role: "logo",
+            relativePath: logo.material.relativePath,
+            contentSha256: logo.material.contentSha256,
+            approvedIdentitySourceId: logo.material.approvedIdentitySourceId,
+          },
+        ]
+      : [],
     requiredTextTokens,
     prohibitedClaimPatterns: [
       "CERTIFICATION FIXTURE",

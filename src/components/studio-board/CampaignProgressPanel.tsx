@@ -2,7 +2,6 @@
 
 import { type CSSProperties, useRef } from "react";
 
-import CampaignJourneyRoadmap from "@/components/studio-board/CampaignJourneyRoadmap";
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
 import type { ActivityFeedEntry } from "@/lib/campaign-record";
 import type { CampaignProgressStep, StudioBoardDisplayFacts } from "@/lib/studio-board-view";
@@ -20,48 +19,35 @@ type Props = {
 };
 
 type ProgressBodyProps = {
-  campaign: CampaignRecord | null;
   steps: readonly CampaignProgressStep[];
   recentUpdates: readonly ActivityFeedEntry[];
-  displayFacts?: StudioBoardDisplayFacts;
 };
 
-function ProgressBody({ campaign, steps, recentUpdates, displayFacts }: ProgressBodyProps) {
+function ProgressBody({ steps, recentUpdates }: ProgressBodyProps) {
   return (
     <>
-      <CampaignJourneyRoadmap campaign={campaign} displayFacts={displayFacts} />
+      <ol className="sb-progress-timeline" aria-label={copy.journeyHeading}>
+        {steps.map((step) => (
+          <li
+            key={step.id}
+            className={`sb-progress-timeline__step sb-progress-timeline__step--${step.state}${
+              step.id === "DISCOVERY_COMPLETE" ? " sb-progress-timeline__step--summary-ready" : ""
+            }`}
+          >
+            <span className="sb-progress-timeline__icon" aria-hidden>
+              <ProgressStageIcon stage={step.id} />
+            </span>
+            <div className="sb-progress-timeline__copy">
+              <span className="sb-progress-timeline__label">{step.label}</span>
+              {step.detail ? (
+                <span className="sb-progress-timeline__detail">{step.detail}</span>
+              ) : null}
+            </div>
+          </li>
+        ))}
+      </ol>
 
-      <details className="sb-progress-panel__pipeline">
-        <summary className="sb-progress-panel__pipeline-summary">Production status</summary>
-        <ol className="sb-progress-timeline">
-          {steps.map((step) => {
-            const stepCopy = (
-              <>
-                <span className="sb-progress-timeline__icon" aria-hidden>
-                  <ProgressStageIcon stage={step.id} />
-                </span>
-                <div className="sb-progress-timeline__copy">
-                  <span className="sb-progress-timeline__label">{step.label}</span>
-                  {step.detail ? (
-                    <span className="sb-progress-timeline__detail">{step.detail}</span>
-                  ) : null}
-                </div>
-              </>
-            );
-
-            return (
-              <li
-                key={step.id}
-                className={`sb-progress-timeline__step sb-progress-timeline__step--${step.state}`}
-              >
-                {stepCopy}
-              </li>
-            );
-          })}
-        </ol>
-      </details>
-
-      {recentUpdates.length > 0 ? (
+      {steps.length === 0 && recentUpdates.length > 0 ? (
         <div className="sb-progress-panel__timeline">
           <p className="sb-progress-panel__timeline-heading">{copy.timelineHeading}</p>
           <ul className="sb-progress-panel__updates">
@@ -73,15 +59,15 @@ function ProgressBody({ campaign, steps, recentUpdates, displayFacts }: Progress
             ))}
           </ul>
         </div>
-      ) : (
+      ) : steps.length === 0 ? (
         <p className="sb-progress-panel__timeline-empty">{timelineCopy.emptyHint}</p>
-      )}
+      ) : null}
     </>
   );
 }
 
 /** Journey stages plus recent timeline updates — scales to fit the card. */
-export default function CampaignProgressPanel({ campaign, steps, timeline, displayFacts }: Props) {
+export default function CampaignProgressPanel({ steps, timeline, displayFacts }: Props) {
   const recentUpdates = timeline.slice(0, 3);
   const contentKey = [
     steps.map((step) => `${step.id}:${step.state}:${step.detail ?? ""}`).join("|"),
@@ -107,19 +93,15 @@ export default function CampaignProgressPanel({ campaign, steps, timeline, displ
       >
         <div className="sb-progress-panel__fit">
           <ProgressBody
-            campaign={campaign}
             steps={steps}
             recentUpdates={recentUpdates}
-            displayFacts={displayFacts}
           />
         </div>
 
         <div ref={measureRef} className="sb-progress-panel__measure" aria-hidden="true">
           <ProgressBody
-            campaign={campaign}
             steps={steps}
             recentUpdates={recentUpdates}
-            displayFacts={displayFacts}
           />
         </div>
       </div>

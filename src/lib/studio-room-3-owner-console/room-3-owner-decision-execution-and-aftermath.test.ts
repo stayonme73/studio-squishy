@@ -412,7 +412,7 @@ describe("STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1", () 
     expect(handled?.items.some((item) => item.title === "Refund request")).toBe(true);
   });
 
-  it("keeps refund approve idempotent and uses a stable follow-up key", () => {
+  it("refuses refund approval without a Stripe-backed single-package payment", () => {
     const campaign: CampaignRecord = {
       campaignId: "room3-s2",
       campaignName: "Refund",
@@ -460,20 +460,10 @@ describe("STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1", () 
       owner,
       "client-1",
     );
-    expect(first.ok).toBe(true);
-    if (!first.ok) return;
-    const replay = applyOwnerApproveRefund(
-      first.envelope,
-      campaign,
-      "room3-s2:v2-rtu-flyer",
-      { reason: "Policy met." },
-      owner,
-      "client-1",
-    );
-    expect(replay.ok).toBe(false);
-    expect(first.envelope.jobCommunicationRecords?.filter((row) => row.eventType === "refund_issued")).toHaveLength(
-      1,
-    );
+    // No Stripe-backed single-package payment: approval stops before Stripe and leaves the folder with the Owner.
+    expect(first.ok).toBe(false);
+    if (first.ok) return;
+    expect(first.status).toBe(422);
   });
 
   it("extracts Owner ask wording for customer receipts", () => {
@@ -589,6 +579,26 @@ describe("STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1", () 
     );
     expect(record?.deliveryStatus).toBe("sent");
     expect(record?.channel).toBe("in_app_outbox");
+  });
+
+  it("returns a job gate to the Owner without creating an exception record", () => {
+    const gated = job({ ownerInternalResumeGate: "before_review" });
+    const result = applyCompleteInternalOwnerFollowUp(
+      envelope([], { jobRecords: [gated] }),
+      {
+        jobId: gated.jobId,
+        note: "The quote is already in Project Intake.",
+        outcome: "needs_owner_judgment",
+      },
+      owner,
+      assignments,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.exception).toBeUndefined();
+    expect(result.job?.ownerApprovalPending).toBe("before_review");
+    expect(result.job?.ownerInternalResumeGate).toBeNull();
+    expect(result.envelope.exceptionRecords ?? []).toEqual([]);
   });
 });
 

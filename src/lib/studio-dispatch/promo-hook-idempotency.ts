@@ -16,6 +16,7 @@ import path from "path";
 import {
   PROMO_RENDERER_VERSION,
   fingerprintPromoMaterials,
+  fingerprintPromoAssetSpec,
   fingerprintPromoSharedSpec,
   resolvePromoRenderPaths,
   sha256File,
@@ -67,6 +68,7 @@ export type PromoIdempotencyTuple = {
   sharedSpecFingerprint: string;
   materialFingerprint: string;
   rendererVersion: string;
+  layoutFingerprint: string;
 };
 
 export function buildPromoIdempotencyTuple(input: {
@@ -82,6 +84,7 @@ export function buildPromoIdempotencyTuple(input: {
     sharedSpecFingerprint: fingerprintPromoSharedSpec(input.spec),
     materialFingerprint: fingerprintPromoMaterials(input.spec),
     rendererVersion: PROMO_RENDERER_VERSION,
+    layoutFingerprint: input.spec.assets.map((asset) => fingerprintPromoAssetSpec(asset)).join("|"),
   };
 }
 
@@ -93,6 +96,7 @@ export function buildPromoIdempotencyKey(tuple: PromoIdempotencyTuple): string {
     tuple.sharedSpecFingerprint,
     tuple.materialFingerprint,
     tuple.rendererVersion,
+    tuple.layoutFingerprint,
   ].join("|");
 }
 

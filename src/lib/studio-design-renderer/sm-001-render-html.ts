@@ -7,6 +7,11 @@
 import { readFileSync } from "fs";
 import path from "path";
 
+import {
+  LIVE_HOUSE_FONT_STACK,
+  liveHouseFontCss,
+} from "@/lib/studio-static-creative-lane/house-fonts-live";
+
 import type { Sm001AssetSpec, Sm001SetSpec } from "./sm-001-types";
 
 function esc(s: string): string {
@@ -80,6 +85,7 @@ export function renderSm001AssetHtml(
 <meta charset="utf-8" />
 <title>Launch Set post ${esc(asset.assetId)}</title>
 <style>
+  ${liveHouseFontCss(repoRoot)}
   html, body {
     margin: 0;
     padding: 0;
@@ -94,7 +100,7 @@ export function renderSm001AssetHtml(
     height: ${asset.canvas.heightPx}px;
     overflow: hidden;
     background: ${esc(asset.background.color)};
-    font-family: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-family: ${LIVE_HOUSE_FONT_STACK};
   }
   .layer { position: absolute; box-sizing: border-box; }
   .layer.text { white-space: pre-wrap; overflow: hidden; }

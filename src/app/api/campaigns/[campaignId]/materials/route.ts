@@ -23,6 +23,7 @@ import {
   customerStoredReceiptMessage,
   storeAndAttachCustomerMaterialFile,
 } from "@/lib/materials/client-file-store";
+import { storedMaterialIdsMatchingChecksum } from "@/lib/materials/stored-material-item-ids";
 import { applyExceptionStatusOnClientMaterialSubmit } from "@/lib/materials/promotion";
 import { resolveUnderlyingItemIdsForConsolidated } from "@/lib/materials/client-requests";
 import { getOrGenerateTasks, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
@@ -39,6 +40,7 @@ import { resolveMaterialsApiPayload } from "@/lib/materials/materials-view";
 import { getOrInitializeMaterials, writeMaterialsEnvelope } from "@/lib/materials/store";
 import { recoverPaidOperatingChain } from "@/lib/studio-paid-activation-recovery";
 import { ensureDispatchExecution } from "@/lib/studio-dispatch";
+import { identitySessionFromRequest } from "@/lib/studio-customer-identity-safety-gate/session";
 import { deliverLifecycleNoticesForCampaign } from "@/lib/studio-lifecycle-email/campaign";
 import {
   applyCustomerWithdrawFile,
@@ -218,9 +220,16 @@ async function syncAfterClientSubmit(input: {
   if (input.campaignEnvelope.record.paymentTruth?.status === "confirmed") {
     const latest = await readCampaignEnvelope(input.campaignId);
     if (latest?.record) {
-      const recovered = await recoverPaidOperatingChain(latest.record);
+      const identitySession = identitySessionFromRequest(
+        input.request,
+        input.user.id,
+        input.campaignId,
+      );
+      const recovered = await recoverPaidOperatingChain(latest.record, {
+        identitySession,
+      });
       if (recovered.alreadyClear && recovered.campaign) {
-        await ensureDispatchExecution(recovered.campaign);
+        await ensureDispatchExecution(recovered.campaign, identitySession);
       }
     }
   }
@@ -295,11 +304,19 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     const materialsEnvelope = await getOrInitializeMaterials(campaignId, campaignEnvelope.record);
     const tasksEnvelope = await getOrGenerateTasks(campaignId, campaignEnvelope.record);
+    const jobRecords = syncJobRecordsFromCampaign(
+      campaignEnvelope.record,
+      tasksEnvelope.tasks ?? [],
+      materialsEnvelope.items,
+      tasksEnvelope.exceptionRecords ?? [],
+      tasksEnvelope.jobRecords,
+    );
+    const tasksForUpload = { ...tasksEnvelope, jobRecords };
     const stored = await storeAndAttachCustomerMaterialFile({
       adapter: createServerFileRoomStorageAdapter(),
       campaign: campaignEnvelope.record,
       campaignClientUserId: campaignEnvelope.clientUserId,
-      tasks: tasksEnvelope,
+      tasks: tasksForUpload,
       materials: materialsEnvelope,
       user,
       file,
@@ -325,9 +342,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     const saved = await writeMaterialsEnvelope(stored.materials);
     await writeTasksEnvelope(stored.tasks);
-    const submittedItemIds = saved.items
-      .filter((item) => item.uploadStatus === "stored" && item.storageRef?.checksumSha256 === stored.checksumSha256)
-      .map((item) => item.id);
+    const submittedItemIds = storedMaterialIdsMatchingChecksum(saved.items, stored.checksumSha256);
 
     return syncAfterClientSubmit({
       campaignId,

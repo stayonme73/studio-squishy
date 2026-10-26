@@ -26,6 +26,31 @@ export async function startHostedCheckout(args: {
   customerEmail?: string;
   /** Local fixture only — never use for Stripe smoke proof. */
   preferSandbox?: boolean;
+  purchaseKind?: "studio_plan" | "paid_cycle" | "condensed_offer";
+  /**
+   * Current three-package offer. The server derives the amount.
+   * Do not send a price.
+   */
+  condensedOffer?: {
+    packageId: string;
+    customerName?: string;
+    company?: string;
+    projectNeed?: string;
+    materialsNote?: string;
+    support?: Readonly<Record<string, string>>;
+    /** Studio Extras ids. The server re-validates eligibility and the limit of two. */
+    extras?: readonly string[];
+    customerAnswers?: {
+      purpose?: string;
+      context?: string;
+      cta?: string;
+      mustKeep?: string;
+      mustNot?: string;
+      qualifyingSource?: boolean;
+      intelligible?: boolean;
+      rightsConfirmed?: boolean;
+    };
+  };
   /**
    * ma-001 Promotion Pack — locked composition from working draft.
    * Required when facts include ma-001; server re-validates and seals.
@@ -64,6 +89,8 @@ export async function startHostedCheckout(args: {
       returnOrigin,
       customerEmail: args.customerEmail,
       preferSandbox: args.preferSandbox === true,
+      purchaseKind: args.purchaseKind,
+      ...(args.condensedOffer ? { condensedOffer: args.condensedOffer } : {}),
       ...(args.ma001PackComposition != null
         ? { ma001PackComposition: args.ma001PackComposition }
         : {}),
@@ -143,18 +170,29 @@ export async function confirmSandboxCheckoutClient(
     typeof body.claimRawToken === "string" && body.claimRawToken
       ? body.claimRawToken
       : null;
-  if (claimRawToken && typeof window !== "undefined") {
-    const { writeStoredProjectClaimReceipt } = await import(
-      "@/lib/studio-project-claim/client-receipt"
-    );
-    writeStoredProjectClaimReceipt({
-      campaignId: body.campaign.campaignId,
-      claimToken: claimRawToken,
-      checkoutSessionId,
-      savedAt: new Date().toISOString(),
-    });
-  }
+  await rememberGuestClaimToken({
+    campaignId: body.campaign.campaignId,
+    checkoutSessionId,
+    claimRawToken,
+  });
   return { ok: true, campaign: body.campaign, claimRawToken };
+}
+
+async function rememberGuestClaimToken(input: {
+  campaignId: string;
+  checkoutSessionId: string;
+  claimRawToken: string | null;
+}): Promise<void> {
+  if (!input.claimRawToken || typeof window === "undefined") return;
+  const { writeStoredProjectClaimReceipt } = await import(
+    "@/lib/studio-project-claim/client-receipt"
+  );
+  writeStoredProjectClaimReceipt({
+    campaignId: input.campaignId,
+    claimToken: input.claimRawToken,
+    checkoutSessionId: input.checkoutSessionId,
+    savedAt: new Date().toISOString(),
+  });
 }
 
 export async function reconcileCheckoutClient(
@@ -174,7 +212,19 @@ export async function reconcileCheckoutClient(
     paid?: boolean;
     campaign?: CampaignRecord | null;
     message?: string;
+    claimRawToken?: string | null;
   };
+  const claimRawToken =
+    typeof body.claimRawToken === "string" && body.claimRawToken
+      ? body.claimRawToken
+      : null;
+  if (body.campaign?.campaignId) {
+    await rememberGuestClaimToken({
+      campaignId: body.campaign.campaignId,
+      checkoutSessionId,
+      claimRawToken,
+    });
+  }
   return {
     ok: Boolean(body.ok),
     paid: Boolean(body.paid),

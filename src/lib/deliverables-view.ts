@@ -101,15 +101,16 @@ export function allowsFullCompletionLanguage(delivery: FinalDeliveryView): boole
 
 function latestDeliveryDate(
   jobs: readonly ClientJobDeliveryView[],
-  campaign: CampaignRecord | null,
 ): string {
-  const latestDelivered = jobs
-    .map((job) => job.deliveredAt)
-    .filter(Boolean)
+  const fromJobs = jobs
+    .flatMap((job) => [
+      job.deliveredAt,
+      ...job.files.map((file) => file.releasedAt),
+    ])
+    .filter((value): value is string => Boolean(value))
     .sort()
     .at(-1);
-  if (latestDelivered) return formatCompletionDate(latestDelivered);
-  if (campaign?.updatedAt) return formatCompletionDate(campaign.updatedAt);
+  if (fromJobs) return formatCompletionDate(fromJobs);
   return "—";
 }
 
@@ -121,7 +122,7 @@ function resolveFromJobDelivery(
   const released = totalReleasedFiles(jobs);
   const full = allowsFullCompletionLanguage(finalDelivery);
   const selectedOption = selectedOptionFromCampaign(campaign);
-  const completionDate = latestDeliveryDate(jobs, campaign);
+  const completionDate = latestDeliveryDate(jobs);
 
   if (released === 0) {
     return {

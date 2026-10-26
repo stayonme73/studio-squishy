@@ -81,7 +81,8 @@ export function bindShotstackArtifact(input: {
     return { ok: false, error: probe.error, findings: ["probe_failed"] };
   }
   if (!probe.hasVideo) findings.push("missing_video_stream");
-  if (!probe.hasAudio) findings.push("missing_audio_stream");
+  const requireAudio = input.packet.audioMode !== "captions_only";
+  if (requireAudio && !probe.hasAudio) findings.push("missing_audio_stream");
   if (probe.width !== input.packet.width || probe.height !== input.packet.height) {
     findings.push(
       `dimension_mismatch_${probe.width}x${probe.height}_expected_${input.packet.width}x${input.packet.height}`,

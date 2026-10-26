@@ -11,6 +11,15 @@ import type { RouteMapJobId, RouteMapRoadId } from "@/config/route-map-v1";
 import type { RouteMapIntakeAnswers } from "@/config/route-map-intake-v1";
 import type { StudioPaymentStatus } from "@/config/studio-payment-v1";
 
+export type RouteMapIntakeCustomerEdit = {
+  answerKey: string;
+  previous: string | null;
+  next: string;
+  editedAt: string;
+  authorizedBy: "customer";
+  reason: string;
+};
+
 /** Immutable scope snapshot for one approved SKU — post-approval reads this, not live catalog. */
 export type ApprovedStudioPlanLineItem = {
   skuId: ServiceId;
@@ -136,6 +145,8 @@ export type CampaignRecord = {
   routeMapIntake?: {
     answers: RouteMapIntakeAnswers;
     submittedAt: string;
+    /** Customer-authorized changes after submission. The original submittedAt stays. */
+    customerEdits?: readonly RouteMapIntakeCustomerEdit[];
   };
   /** Saved client draft for post-payment job-specific intake. Does not complete intake. */
   routeMapIntakeDraft?: {
@@ -143,6 +154,12 @@ export type CampaignRecord = {
     savedAt: string;
   };
   routeMapIntakeSubmittedAt?: string;
+  /** Owner release of the Social & Promo composite render hold. Applies to this project only. */
+  socialPromoRenderRelease?: {
+    releasedAt: string;
+    authorizedBy: "owner";
+    reason: string;
+  };
   /** Denormalized materials blocking count — updated when materials ledger changes (Slice 2c). */
   materialsSummary?: {
     blockingRequiredCount: number;
@@ -205,6 +222,17 @@ export type CampaignRecord = {
      */
     rmj007UpdateSeal?: import("@/lib/studio-design-renderer/rm-j007-kit-payment-gate").RmJ007UpdatePaymentSeal;
   };
+  /**
+   * Server-owned test switch for one disposable Campaign Launch Kit payment.
+   * Absent on every live customer project. A client sync cannot set it.
+   */
+  testPaymentIsolation?: import("@/lib/studio-payment/disposable-test-isolation-types").TestPaymentIsolation;
+  /**
+   * Server-only proof that a signed webhook or a retrieved Checkout Session
+   * was a paid Stripe test payment for this disposable project.
+   * A client sync cannot set it.
+   */
+  disposableKitStripeTestProof?: import("@/lib/studio-payment/disposable-kit-test-isolation").DisposableKitStripeTestProof;
   /**
    * Durable ma-001 post-pay pack structure derived from paymentTruth.ma001CompositionSeal.
    * Authoritative member list for future dispatch — not a remap / not renderer invoke.
@@ -271,10 +299,36 @@ export type CampaignRecord = {
    */
   dispatchExecution?: import("@/lib/studio-dispatch/types").DispatchExecutionRecord;
   /**
+   * Pre-payment source-audio quality gate + customer limitation acknowledgement.
+   * @see STUDIO-OPERATING-SOURCE-AUDIO-PREFLIGHT-AND-LIGHT-CLEANUP-1
+   */
+  sourceAudioPreflight?: import("@/lib/studio-source-audio-preflight/types").SourceAudioPreflightRecord;
+  /**
    * Constrained Machine overlay for a customer revision of v2-rtu-flyer.
    * May emphasize an existing intake token. Must not invent new business facts.
    * @see STUDIO-OPERATING-REVIEW-REVISION-FULL-LOOP-1
    */
+  /**
+   * Machine-owned internal production correction loop (not customer revisions).
+   * @see STUDIO-OPERATING-AUTONOMOUS-PRODUCTION-LOOP-1
+   */
+  internalProductionLoop?: import("@/lib/studio-production-correction").InternalProductionLoopRecord;
+  /**
+   * Owner-directed production freeze. Machine must not remint frozen SKUs.
+   * @see STUDIO-OPERATING-PRODUCTION-TEAM-WORKFORCE-1
+   */
+  productionFreeze?: {
+    packageId: "STUDIO-OPERATING-PRODUCTION-TEAM-WORKFORCE-1";
+    status: "FROZEN";
+    reason: string;
+    skuIds: readonly string[];
+    workVersionId: string;
+    renderVersion: number;
+    pngContentSha256: string;
+    pdfContentSha256?: string;
+    frozenAt: string;
+    doNotRemint: true;
+  };
   machineFlyerRevisionEmphasis?: import("@/config/studio-review-revision-full-loop-v1").MachineFlyerRevisionEmphasis;
   /**
    * Constrained Machine overlay for a customer revision of v2-rtu-short-video.
@@ -298,6 +352,40 @@ export type CampaignRecord = {
     authorizedAt: string;
     packageId: string;
   };
+  /**
+   * Current three-package checkout identity.
+   * Server-written. Not a catalog SKU and not a historical $549 / $349 row.
+   * Absent on older Studio Plan checkouts.
+   */
+  condensedOffer?: {
+    packageId:
+      | "clip_repurposing"
+      | "short_form_video_editing"
+      | "social_and_promo_graphics"
+      | "creative_qa_finish"
+      | "campaign_launch_kit";
+    name: string;
+    /** Original package list price. */
+    priceCents: number;
+    listPriceCents?: number;
+    thankYouDiscountCents?: number;
+    /** Discounted amount collected for this purchase. */
+    amountDueCents?: number;
+    revisionRounds: 3;
+    customerName: string;
+    customerEmail: string;
+    company: string;
+    projectNeed: string;
+    materialsNote: string;
+    support: Readonly<Record<string, "SELECT" | "SKIP" | "">>;
+    /** Studio Extras chosen at checkout (0–2). Server-validated against `studioExtrasV1`. */
+    extras?: readonly import("@/config/studio-extras-v1").StudioExtraId[];
+  };
+  /**
+   * Studio Extras shared job truth: selection, inputs, attempts, recovery,
+   * Quality, exhaustion proof, Courtesy Adjustment eligibility, history.
+   */
+  studioExtras?: import("@/lib/studio-extras/types").CampaignStudioExtras;
   targetCompletionDate?: string | null;
   revisionRoundsIncluded?: number;
   /**
@@ -432,6 +520,14 @@ export const studioBoard = {
       message: "Sign in with the account connected to this Studio work.",
       primaryCta: "Sign in",
       secondaryCta: "Help Center",
+    },
+    localProjectUnavailable: {
+      eyebrow: "Studio Board",
+      title: "This project can't be opened",
+      message:
+        "This browser has a project that this account cannot open. Your account and that project were left unchanged.",
+      primaryCta: "Back to the Lobby",
+      secondaryCta: "Sign in",
     },
   },
 
@@ -911,6 +1007,7 @@ export const studioBoard = {
       projectStatus: "Project Status",
       projectActivity: "Project Activity",
       visionSummary: "Vision Summary",
+      visionEmpty: "These details have not been provided yet.",
       revisionTracker: "Revision Tracker",
       packageDetails: "Package Includes",
       journey: "Project Journey",
@@ -984,6 +1081,8 @@ export const studioBoard = {
       body: "Start a project in the Conversation Room to see your details here.",
       cta: "Go to Studio Board",
     },
+    footerHint:
+      "Questions about this project? Studio Help Center has the policies and next steps.",
   },
 
   whatHappensNextCopy: {

@@ -1,3 +1,5 @@
+import { readFileSync } from "fs";
+import path from "path";
 import { describe, expect, it } from "vitest";
 
 import type { CampaignTaskItem, QaRecord } from "@/lib/campaign-tasks/types";
@@ -922,6 +924,16 @@ describe("PRODUCTION-ASSURANCE-QA-BEFORE-REVIEW-1", () => {
       "ELIGIBLE_FOR_REVIEW",
       "BLOCKED_FOR_INTERNAL_QA",
     ]);
+  });
+
+  it("keeps landing-page Playwright out of the review-eligibility browser graph", () => {
+    const source = readFileSync(
+      path.join(__dirname, "sku-evidence.ts"),
+      "utf8",
+    );
+    expect(source).toContain('const LANDING_PAGE_SKU = "rm-j005"');
+    expect(source).not.toContain("@/lib/studio-kitchen-production/landing-page");
+    expect(source).not.toContain("playwright");
   });
 
   it("leaves pre-acceptance, CR-D5, and post-pay Acceptance Review modules untouched", async () => {

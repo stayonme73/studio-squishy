@@ -14,6 +14,8 @@ describe("GATE-3-RECOMMENDATION-TRUTH-CERT-1", () => {
     expect(conversationRoomGuideV1.routeRecommendedBadge).toBe("Suggested starting point");
     expect(conversationRoomGuideV1.routePanelLead).toMatch(/good place to start/i);
     expect(conversationRoomGuideV1.routePanelLead).not.toMatch(OVERCLAIM);
+    expect(conversationRoomGuideV1.routePanelChoice).toMatch(/you can choose a different path/i);
+    expect(conversationRoomGuideV1.routePanelChoice).not.toMatch(OVERCLAIM);
     const bridge = routeVoiceBridge("Alex", "Get My Business Started");
     expect(bridge).toMatch(/good place to start/i);
     expect(bridge).not.toMatch(/best (service|path)|intelligent|AI recommend/i);

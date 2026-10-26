@@ -104,11 +104,11 @@ function mapHeadline(event: JobActivityEvent): string | null {
         case "building_concepts":
           return "The Studio is building your concepts";
         case "ready_for_queue":
-          return "The Studio is preparing the next step";
+          return "Your project is safely in line for a production slot";
         case "approved":
           return "Work approved for delivery";
         case "ready_for_delivery":
-          return "Final delivery is being prepared";
+          return "Your files are ready";
         case "delivered":
           return "Your deliverables are ready";
         case "waiting_on_client":
@@ -184,7 +184,7 @@ function mapActionRequired(
 }
 
 const INTERNAL_DETAIL =
-  /release checks|candidate matches|sha256|owner console|kitchen|internal qa|machine flyer|artifact|pin\b|contentSha256|hash/i;
+  /release checks|candidate matches|sha256|owner console|kitchen|internal qa|machine flyer|artifact|pin\b|contentSha256|hash|authorized final delivery|identity matches|delivery candidate/i;
 
 function mapDetail(event: JobActivityEvent): string | null {
   const reason = event.reason?.trim();

@@ -190,6 +190,18 @@ describe("resolveProjectStatusPanelState", () => {
     ).toEqual({ kind: "error" });
   });
 
+  it("uses Board-aligned fallback jobs instead of a dead error card", () => {
+    expect(
+      resolveProjectStatusPanelState({
+        paymentReceivedAt: "2026-07-01T00:00:00.000Z",
+        loading: false,
+        error: "Forbidden",
+        jobs: [],
+        fallbackJobs: jobs,
+      }),
+    ).toEqual({ kind: "loaded", jobs });
+  });
+
   it("returns empty when paid, loaded, and there are no jobs", () => {
     expect(
       resolveProjectStatusPanelState({

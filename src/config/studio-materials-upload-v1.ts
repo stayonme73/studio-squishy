@@ -8,6 +8,7 @@ export const studioMaterialsUploadV1 = {
   schemaVersion: 1 as const,
   routineOwnerAction: "NONE" as const,
   maxFileBytes: 5 * 1024 * 1024,
+  maxVideoFileBytes: 250 * 1024 * 1024,
   allowedMimeTypes: [
     "image/png",
     "image/jpeg",
@@ -19,6 +20,7 @@ export const studioMaterialsUploadV1 = {
     "audio/wav",
     "audio/wave",
     "video/mp4",
+    "video/quicktime",
   ] as const,
   allowedExtensions: [
     ".png",
@@ -31,20 +33,23 @@ export const studioMaterialsUploadV1 = {
     ".mp3",
     ".wav",
     ".mp4",
+    ".mov",
   ] as const,
 
   customerCopy: {
     receivedStored:
       "We received your file. The Studio has stored it with this project. Uploaded is not the same as approved for use.",
     filenameOnlyRejected:
-      "Please send the actual file. A file name by itself is not enough for the Studio to keep and use it.",
-    emptyFile: "That file is empty. Please choose a file that has content and send it again.",
-    tooLarge: "This file is larger than 5 MB. Please choose a smaller file and send it again.",
+      "Please add the actual file. A file name by itself is not enough for The Studio to keep and use it.",
+    emptyFile: "That file is empty. Please choose a file that has content.",
+    tooLarge: "This file is larger than 5 MB. Please choose a smaller file.",
+    videoTooLarge:
+      "This video is larger than 250 MB. Please choose a shorter or more compressed MP4 or MOV.",
     unsupportedType:
-      "This file type is not supported. Please send a PNG, JPG, PDF, Word document, text file, MP3, WAV, or MP4.",
+      "This file type is not supported. Please choose a PNG, JPG, PDF, Word document, text file, MP3, WAV, MP4, or MOV.",
     duplicateKept:
-      "We already have this exact file on your project. You do not need to send it again.",
-    missingFile: "A file upload is required. Please choose a file and send it to the Studio.",
+      "We already have this exact file on your project. You do not need to add it again.",
+    missingFile: "Please choose a file and add it here.",
     storageFailed:
       "The Studio could not store your file. Please try again. If it still fails, message the Studio from your Board.",
     optionalLogoPrompt:
@@ -56,6 +61,23 @@ export const studioMaterialsUploadV1 = {
     },
   },
 } as const;
+
+export function isCustomerTalkingHeadVideoFile(fileName: string, mimeType = ""): boolean {
+  const mime = mimeType.trim().toLowerCase();
+  const ext = fileName.trim().toLowerCase().match(/(\.[a-z0-9]+)$/)?.[1] ?? "";
+  return (
+    mime === "video/mp4" ||
+    mime === "video/quicktime" ||
+    ext === ".mp4" ||
+    ext === ".mov"
+  );
+}
+
+export function maxBytesForCustomerMaterialFile(fileName: string, mimeType = ""): number {
+  return isCustomerTalkingHeadVideoFile(fileName, mimeType)
+    ? studioMaterialsUploadV1.maxVideoFileBytes
+    : studioMaterialsUploadV1.maxFileBytes;
+}
 
 export function isAllowedCustomerMaterialFile(fileName: string, mimeType: string): boolean {
   const mime = mimeType.trim().toLowerCase();

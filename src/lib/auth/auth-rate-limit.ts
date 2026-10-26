@@ -7,6 +7,9 @@ import { createHash } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 
+import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
+import { pgConsumeRateLimit } from "@/lib/studio-durable-persistence/postgres-identity";
+
 const STORE_PATH = path.join(process.cwd(), "data", "auth-rate-limit.json");
 
 type RateBucket = {
@@ -51,6 +54,14 @@ export async function consumeRateLimit(rule: RateLimitRule): Promise<boolean> {
   const key = `${rule.scope}:${rule.subject}`;
   const now = Date.now();
   try {
+    if (isPostgresPersistenceEnabled()) {
+      return pgConsumeRateLimit({
+        rateKey: key,
+        limit: rule.limit,
+        windowMs: rule.windowMs,
+        nowMs: now,
+      });
+    }
     const store = await readStore();
     const existing = store[key];
     if (!existing || now - existing.windowStartedAt >= rule.windowMs) {

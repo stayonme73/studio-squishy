@@ -47,7 +47,18 @@ export async function applyPostPaymentOwnership(input: {
     };
   }
 
-  // Already owned — no receipt mint (resume via account).
+  // Already owned by this payer — still make it the session current.
+  if (payerId && prior === payerId) {
+    await linkClientCampaign(payerId, input.campaign.campaignId);
+    return {
+      campaign: input.campaign,
+      clientUserId: prior,
+      claimRawToken: null,
+      boundAtPayment: true,
+    };
+  }
+
+  // Already owned by someone else — no receipt mint (resume via account).
   if (prior) {
     return {
       campaign: input.campaign,

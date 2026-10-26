@@ -11,6 +11,51 @@ export type ServiceSheetCompletenessResult =
   | { ok: true; serviceCount: number }
   | { ok: false; message: string };
 
+function foldSheetText(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[✓•●▪]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Customer-provided sheet facts. Structural labels are included only when truth carries them. */
+export function serviceSheetAuthorizedCorpus(truth: ServiceSheetProjectTruth): string {
+  return foldSheetText(
+    [
+      truth.businessName,
+      truth.wordmark,
+      truth.descriptor ?? "",
+      truth.listHeading,
+      truth.contactDetails,
+      truth.legalDisclaimer,
+      ...truth.services.flatMap((service) => [
+        service.name,
+        service.description ?? "",
+        service.priceDisplay ?? "",
+      ]),
+    ].join("\n"),
+  );
+}
+
+/** Text on the sheet that the customer did not supply. */
+export function unsupportedServiceSheetClaims(
+  truth: ServiceSheetProjectTruth,
+  spec: ServiceSheetDesignSpec,
+): string[] {
+  const corpus = serviceSheetAuthorizedCorpus(truth);
+  const hits: string[] = [];
+  for (const layer of spec.layers) {
+    if (layer.type !== "text") continue;
+    const content = layer.content.trim();
+    if (!content) continue;
+    const folded = foldSheetText(content);
+    if (!folded || corpus.includes(folded)) continue;
+    hits.push(content);
+  }
+  return hits;
+}
+
 export function verifyServiceSheetCompletenessAndPrices(
   truth: ServiceSheetProjectTruth,
   spec: ServiceSheetDesignSpec,
@@ -157,6 +202,14 @@ export function verifyServiceSheetCompletenessAndPrices(
   }
   if (!declaredText.includes(truth.legalDisclaimer.trim())) {
     return { ok: false, message: "Legal disclaimer not preserved" };
+  }
+
+  const unsupported = unsupportedServiceSheetClaims(truth, spec);
+  if (unsupported.length > 0) {
+    return {
+      ok: false,
+      message: `Quality rejected unsupported wording: ${unsupported.join(" | ")}`,
+    };
   }
 
   return { ok: true, serviceCount: authoritative.length };

@@ -22,6 +22,7 @@ export {
 export { validateFlyerDesignSpec } from "./validate-spec";
 export {
   reasonFlyerDesignSpec,
+  reasonFlyerDesignSpecAnthropic,
   reasonFlyerDesignSpecDeterministic,
 } from "./reason";
 export { renderFlyerHtml, declaredTextFromSpec } from "./render-html";
@@ -34,6 +35,14 @@ export {
   resolveRenderPaths,
   sha256File,
 } from "./bind";
+export {
+  designFactSignature,
+  factProjectionTruth,
+  isFactBearingTextRole,
+  projectDesignFacts,
+  specCarriesGeneratedVisual,
+  type DesignFactProjection,
+} from "./fact-signature";
 export {
   runDesignRendererProofPipeline,
   runDesignRendererJobPipeline,
@@ -251,6 +260,7 @@ export {
   isInternalProductionChromeText,
   curatedCustomerBodyFromMustInclude,
   customerArtContainsForbiddenFragment,
+  sanitizeCustomerDisclaimer,
 } from "./customer-facing-creative-copy";
 export {
   evaluateTextLayerCollisions,
@@ -347,6 +357,12 @@ export {
   assertSocialPostsRequiredTruth,
   socialPostAuthorizedPurpose,
 } from "./social-posts-reason";
+export { themeLedSocialPostMembers } from "./social-posts-theme-led";
+export {
+  themeLedBeats,
+  themeLedStatement,
+  type ThemeLedCampaignTruth,
+} from "./theme-led-campaign";
 export {
   reasonSocialPostCaptionsDeterministic,
   assertCaptionsBoundToPosts,
@@ -764,7 +780,6 @@ export {
   RM_J008_PROOF_ARTIFACT_ROOT,
   buildRmJ008UpdateKitTruth,
   buildRmJ008UnsupportedInstagramCoverTruth,
-  buildRmJ008PartialBioOnlyTruth,
   ensureHarborOakRmJ008LogoMaterial,
 } from "./rm-j008-fixtures";
 export { mapRmJ008AfterToRmJ002Truth } from "./rm-j008-after-adapter";

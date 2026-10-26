@@ -17,6 +17,7 @@ export {
   formatDiscoveryStepSummary,
   isDeadlineAnswerComplete,
   isDiscoveryFormTileId,
+  isDiscoveryTabletStepId,
   isDiscoveryTabletComplete,
   isDiscoveryTabletStepComplete,
   resolveDiscoveryResumeStepIndex,

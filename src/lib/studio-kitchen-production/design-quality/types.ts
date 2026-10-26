@@ -24,7 +24,8 @@ export type DesignQualityFinding = {
     | "contact_semantics"
     | "bundle_inclusions"
     | "multi_asset_consistency"
-    | "artifact_binding";
+    | "artifact_binding"
+    | "creative_quality";
 };
 
 export type DesignContactKind = "phone" | "email" | "web" | "address";

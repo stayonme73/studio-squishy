@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import ClientAccessGlass from "@/components/auth/ClientAccessGlass";
 import type { NoActiveProjectCopy } from "@/config/access-control";
 
 type Props = {
@@ -10,7 +11,8 @@ type Props = {
 /** Reusable No Active Project card — room-specific copy, shared layout. */
 export default function NoActiveProjectPanel({ copy, titleId = "no-active-project-title" }: Props) {
   return (
-    <div className="utility-page utility-page--access">
+    <div className="utility-page utility-page--access utility-page--client-access">
+      <ClientAccessGlass />
       <div className="utility-access-card-shell">
         <section className="utility-card" aria-labelledby={titleId}>
           <p className="utility-eyebrow">{copy.eyebrow}</p>

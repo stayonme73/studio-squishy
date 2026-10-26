@@ -53,7 +53,7 @@ function sharesServiceScope(
   material: CampaignMaterialItem,
 ): boolean {
   return material.relatedServiceIds.some((serviceId) =>
-    task.relatedServiceIds.includes(serviceId),
+    task.relatedServiceIds.some((taskServiceId) => taskServiceId === serviceId),
   );
 }
 

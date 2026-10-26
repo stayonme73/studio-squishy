@@ -3,6 +3,8 @@ import type { InternalQaReviewAuthorization } from "@/lib/studio-review-eligibil
 import type { JobReviewFeedback } from "@/lib/job-control/review-feedback-types";
 import type { PurchasedJobRecord } from "@/lib/job-control/types";
 
+import { sameContentSha256Set } from "@/lib/studio-review-revision/hash";
+
 import type { CustomerApprovedArtifactAuthorization } from "./types";
 
 function newDecisionId(): string {
@@ -87,7 +89,7 @@ export function qaPinMatchesCustomerApproval(
   if (!qa || qa.status !== "ELIGIBLE_FOR_REVIEW") return false;
   if (qa.skuId !== approval.skuId) return false;
   if ((qa.workVersionId ?? null) !== (approval.workVersionId ?? null)) return false;
-  if (!setsEqual(qa.contentSha256s, approval.contentSha256s)) return false;
+  if (!sameContentSha256Set(qa.contentSha256s, approval.contentSha256s)) return false;
   if (!setsEqual(qa.artifactIds, approval.artifactIds)) return false;
   if (approval.sourceQaDecisionId && qa.decisionId !== approval.sourceQaDecisionId) {
     return false;

@@ -6,6 +6,7 @@ import type {
   DesignQualityJudgmentAttestations,
   DesignQualitySubmission,
 } from "./types";
+import { evaluateDeclaredFlyerCreativeQuality } from "@/lib/studio-design-renderer/flyer-creative-quality";
 
 /**
  * Design-quality gate for static visual production.
@@ -413,6 +414,16 @@ export function evaluateDesignQuality(input: {
         }
       }
     }
+  }
+
+  if (brief.skuId === "v2-rtu-flyer" && String(brief.fixtureId).startsWith("job-")) {
+    const approvedCta = brief.ctaTokens.join(" ");
+    findings.push(
+      ...evaluateDeclaredFlyerCreativeQuality(allText).filter((finding) => {
+        if (finding.id !== "generic_placeholder_1") return true;
+        return !/\bbook online or call\b/i.test(approvedCta);
+      }),
+    );
   }
 
   const fails = findings.filter((f) => f.severity === "fail");

@@ -2,9 +2,11 @@ import { randomUUID } from "crypto";
 
 import {
   getOrInitializeProjectCommunication,
+  mutateProjectCommunicationEnvelope,
   readProjectCommunicationEnvelope,
   writeProjectCommunicationEnvelope,
 } from "./store";
+import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
 import type {
   ProjectCommunicationEnvelope,
   ProjectCommunicationMessage,
@@ -102,50 +104,80 @@ export async function createCustomerProjectMessage(
     };
   }
 
-  let envelope = await getOrInitializeProjectCommunication(campaign.campaignId);
-  if (envelope.campaignId !== campaign.campaignId) {
-    return { ok: false, error: "Campaign identity mismatch.", status: 500 };
-  }
+  const applyMutation = (
+    envelope: import("./types").ProjectCommunicationEnvelope,
+  ): ProjectCommunicationActionResult | {
+    envelope: import("./types").ProjectCommunicationEnvelope;
+    result: ProjectCommunicationActionResult;
+  } => {
+    if (envelope.campaignId !== campaign.campaignId) {
+      return { ok: false, error: "Campaign identity mismatch.", status: 500 };
+    }
 
-  const existing = findByIdempotency(envelope, sender.senderUserId, key.idempotencyKey);
-  if (existing) {
-    if (existing.body !== body.body || existing.senderRole !== "customer") {
+    const existing = findByIdempotency(envelope, sender.senderUserId, key.idempotencyKey);
+    if (existing) {
+      if (existing.body !== body.body || existing.senderRole !== "customer") {
+        return {
+          ok: false,
+          error: "Idempotency key already used with a different payload.",
+          status: 409,
+        };
+      }
       return {
-        ok: false,
-        error: "Idempotency key already used with a different payload.",
-        status: 409,
+        envelope,
+        result: { ok: true, message: existing, envelope, replayed: true },
       };
     }
-    return { ok: true, message: existing, envelope, replayed: true };
+
+    const createdAt = nowIso();
+    const message: ProjectCommunicationMessage = {
+      id: randomUUID(),
+      campaignId: campaign.campaignId,
+      customerUserId: customerId.senderUserId,
+      senderRole: "customer",
+      senderUserId: sender.senderUserId,
+      senderDisplayName: input.senderDisplayName?.trim() || undefined,
+      body: body.body,
+      createdAt,
+      status: "accepted",
+      visibility: "customer_visible",
+      replyToMessageId: null,
+      idempotencyKey: key.idempotencyKey,
+      creationChannel: "customer_board_form",
+      sourceContext: "project_communication",
+    };
+
+    const next = {
+      ...envelope,
+      messages: [...envelope.messages, message],
+      updatedAt: createdAt,
+      version: envelope.version + 1,
+    };
+    return {
+      envelope: next,
+      result: { ok: true, message, envelope: next, replayed: false },
+    };
+  };
+
+  if (isPostgresPersistenceEnabled()) {
+    return mutateProjectCommunicationEnvelope(campaign.campaignId, (envelope) => {
+      const outcome = applyMutation(envelope);
+      if ("ok" in outcome && outcome.ok === false) {
+        return { envelope, value: outcome };
+      }
+      if ("ok" in outcome) {
+        return { envelope, value: outcome };
+      }
+      return { envelope: outcome.envelope, value: outcome.result };
+    });
   }
 
-  const createdAt = nowIso();
-  const message: ProjectCommunicationMessage = {
-    id: randomUUID(),
-    campaignId: campaign.campaignId,
-    customerUserId: customerId.senderUserId,
-    senderRole: "customer",
-    senderUserId: sender.senderUserId,
-    senderDisplayName: input.senderDisplayName?.trim() || undefined,
-    body: body.body,
-    createdAt,
-    status: "accepted",
-    visibility: "customer_visible",
-    replyToMessageId: null,
-    idempotencyKey: key.idempotencyKey,
-    creationChannel: "customer_board_form",
-    sourceContext: "project_communication",
-  };
-
-  envelope = {
-    ...envelope,
-    messages: [...envelope.messages, message],
-    updatedAt: createdAt,
-    version: envelope.version + 1,
-  };
-
-  const written = await writeProjectCommunicationEnvelope(envelope);
-  return { ok: true, message, envelope: written, replayed: false };
+  let envelope = await getOrInitializeProjectCommunication(campaign.campaignId);
+  const outcome = applyMutation(envelope);
+  if ("ok" in outcome && outcome.ok === false) return outcome;
+  if ("ok" in outcome) return outcome;
+  const written = await writeProjectCommunicationEnvelope(outcome.envelope);
+  return { ...outcome.result, envelope: written };
 }
 
 /**
@@ -177,65 +209,90 @@ export async function createStudioProjectReply(
     return { ok: false, error: "Reply target message id is required.", status: 400 };
   }
 
-  let envelope = await getOrInitializeProjectCommunication(campaign.campaignId);
-  const targetCustomerMessage = findMessageById(envelope, replyTo);
-  if (!targetCustomerMessage) {
-    return { ok: false, error: "Reply target message was not found.", status: 404 };
-  }
-  if (targetCustomerMessage.campaignId !== campaign.campaignId) {
-    return { ok: false, error: "Reply target belongs to a different project.", status: 400 };
-  }
-  if (targetCustomerMessage.senderRole !== "customer") {
-    return {
-      ok: false,
-      error: "Studio replies must target a customer message.",
-      status: 400,
-    };
-  }
+  const applyMutation = (
+    envelope: ProjectCommunicationEnvelope,
+  ): ProjectCommunicationActionResult | {
+    envelope: ProjectCommunicationEnvelope;
+    result: ProjectCommunicationActionResult;
+  } => {
+    if (envelope.campaignId !== campaign.campaignId) {
+      return { ok: false, error: "Campaign identity mismatch.", status: 500 };
+    }
 
-  const existing = findByIdempotency(envelope, staff.senderUserId, key.idempotencyKey);
-  if (existing) {
-    if (
-      existing.body !== body.body ||
-      existing.senderRole !== "studio_staff" ||
-      existing.replyToMessageId !== replyTo
-    ) {
+    const targetCustomerMessage = findMessageById(envelope, replyTo);
+    if (!targetCustomerMessage) {
+      return { ok: false, error: "Reply target message was not found.", status: 404 };
+    }
+    if (targetCustomerMessage.campaignId !== campaign.campaignId) {
+      return { ok: false, error: "Reply target belongs to a different project.", status: 400 };
+    }
+    if (targetCustomerMessage.senderRole !== "customer") {
       return {
         ok: false,
-        error: "Idempotency key already used with a different payload.",
-        status: 409,
+        error: "Studio replies must target a customer message.",
+        status: 400,
       };
     }
-    return { ok: true, message: existing, envelope, replayed: true };
-  }
 
-  const createdAt = nowIso();
-  const message: ProjectCommunicationMessage = {
-    id: randomUUID(),
-    campaignId: campaign.campaignId,
-    customerUserId: customerId.senderUserId,
-    senderRole: "studio_staff",
-    senderUserId: staff.senderUserId,
-    senderDisplayName: input.staffDisplayName?.trim() || undefined,
-    body: body.body,
-    createdAt,
-    status: "accepted",
-    visibility: "customer_visible",
-    replyToMessageId: replyTo,
-    idempotencyKey: key.idempotencyKey,
-    creationChannel: "studio_staff_reply",
-    sourceContext: "project_communication",
+    const existing = findByIdempotency(envelope, staff.senderUserId, key.idempotencyKey);
+    if (existing) {
+      if (
+        existing.body !== body.body ||
+        existing.senderRole !== "studio_staff" ||
+        existing.replyToMessageId !== replyTo
+      ) {
+        return {
+          ok: false,
+          error: "Idempotency key already used with a different payload.",
+          status: 409,
+        };
+      }
+      return {
+        envelope,
+        result: { ok: true, message: existing, envelope, replayed: true },
+      };
+    }
+
+    const createdAt = nowIso();
+    const message: ProjectCommunicationMessage = {
+      id: randomUUID(),
+      campaignId: campaign.campaignId,
+      customerUserId: customerId.senderUserId,
+      senderRole: "studio_staff",
+      senderUserId: staff.senderUserId,
+      senderDisplayName: input.staffDisplayName?.trim() || undefined,
+      body: body.body,
+      createdAt,
+      status: "accepted",
+      visibility: "customer_visible",
+      replyToMessageId: replyTo,
+      idempotencyKey: key.idempotencyKey,
+      creationChannel: "studio_staff_reply",
+      sourceContext: "project_communication",
+    };
+
+    const next = {
+      ...envelope,
+      messages: [...envelope.messages, message],
+      updatedAt: createdAt,
+      version: envelope.version + 1,
+    };
+    return {
+      envelope: next,
+      result: { ok: true, message, envelope: next, replayed: false },
+    };
   };
 
-  envelope = {
-    ...envelope,
-    messages: [...envelope.messages, message],
-    updatedAt: createdAt,
-    version: envelope.version + 1,
-  };
-
-  const written = await writeProjectCommunicationEnvelope(envelope);
-  return { ok: true, message, envelope: written, replayed: false };
+  return mutateProjectCommunicationEnvelope(campaign.campaignId, (envelope) => {
+    const outcome = applyMutation(envelope);
+    if ("ok" in outcome && outcome.ok === false) {
+      return { envelope, value: outcome };
+    }
+    if ("ok" in outcome) {
+      return { envelope, value: outcome };
+    }
+    return { envelope: outcome.envelope, value: outcome.result };
+  });
 }
 
 export async function listProjectCommunicationForCustomer(

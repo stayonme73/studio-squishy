@@ -32,13 +32,18 @@ export function summarizeCustomerLifeStatus(truth: CustomerLifeTruth): string {
     case "awaiting_intake":
       return copy.statusAwaitingIntake;
     case "awaiting_materials":
-      return truth.unusableMaterialCount > 0
-        ? copy.unusableMaterial
-        : copy.statusAwaitingMaterials;
+      if (truth.unusableMaterialCount > 0) return copy.unusableMaterial;
+      if (truth.blockingMaterialsCount > 0) return copy.statusAwaitingMaterials;
+      return copy.statusWaitingOnYou;
+    case "awaiting_production_slot":
+      return copy.statusWaitingForProductionSlot;
     case "recovering":
       return copy.recovering;
     case "producing":
-      return truth.productionStarted ? copy.holdingProduction : copy.statusProductionReady;
+      if (truth.productionStarted || truth.spineStatus === "building_concepts") {
+        return copy.holdingProduction;
+      }
+      return copy.workNotStarted;
     case "internal_qa":
       return truth.qaState === "failed" || truth.qaState === "blocked"
         ? copy.statusQaCorrection

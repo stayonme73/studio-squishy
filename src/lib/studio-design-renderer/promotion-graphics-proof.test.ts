@@ -39,6 +39,10 @@ import {
 } from "./promo-reason";
 import { PROMO_PORTRAIT_PLATE, PROMO_SQUARE_PLATE } from "./promo-types";
 import { validatePromoCampaignSetSpec } from "./promo-validate";
+import {
+  contrastRatio,
+  MIN_BODY_COPY_CONTRAST_RATIO,
+} from "./flyer-output-readability";
 
 const repoRoot = process.cwd();
 
@@ -82,6 +86,37 @@ describe("studio-design-renderer promotion-graphics proof (v2-rtu-promotion-grap
     expect(spec.assets[0]!.layoutVariant).not.toBe(
       spec.assets[1]!.layoutVariant,
     );
+  });
+
+  it("paints the square and portrait descriptor in navy on cream", () => {
+    const truth = buildHarborOakPromoCampaignSetTruth({ repoRoot });
+    const spec = reasonPromoCampaignSetDeterministic(truth);
+    expect(spec.colors.primary).toBe("#1F3A5F");
+    expect(spec.colors.secondary).toBe("#C4A574");
+    expect(spec.colors.background).toBe("#F7F4EF");
+
+    for (const asset of spec.assets) {
+      const descriptor = asset.layers.find(
+        (layer) => layer.type === "text" && layer.role === "descriptor",
+      );
+      const website = asset.layers.find(
+        (layer) => layer.type === "text" && layer.role === "contact_web",
+      );
+      const offerBand = asset.layers.find(
+        (layer) => layer.type === "shape" && (layer.role === "offer_band" || layer.role === "footer_rule"),
+      );
+      expect(descriptor?.type).toBe("text");
+      if (descriptor?.type !== "text") continue;
+      expect(descriptor.color).toBe("#1F3A5F");
+      expect(descriptor.color).toBe(spec.colors.primary);
+      const ratio = contrastRatio(descriptor.color, spec.colors.background);
+      expect(ratio).toBeGreaterThanOrEqual(MIN_BODY_COPY_CONTRAST_RATIO);
+      expect(Number(ratio.toFixed(2))).toBe(10.47);
+      expect(website?.type).toBe("text");
+      if (website?.type === "text") expect(website.color).toBe("#C4A574");
+      expect(offerBand?.type).toBe("shape");
+      if (offerBand?.type === "shape") expect(offerBand.fill).toBe("#C4A574");
+    }
   });
 
   it("missing Asset A purpose fails closed", () => {

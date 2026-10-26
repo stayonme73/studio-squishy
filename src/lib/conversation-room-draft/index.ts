@@ -1,7 +1,11 @@
-export { bridgeConversationPlanToCampaign } from "./bridge-campaign";
+export {
+  bridgeConversationPlanToCampaign,
+  ensureConversationIntakeCampaign,
+} from "./bridge-campaign";
 export {
   clearCompletedConversationLocalState,
   clearConversationGuideLocals,
+  detachCurrentCustomerBrowserSession,
   isConversationJourneyComplete,
   resolveLobbyConversationBeginInvite,
   type LobbyConversationBeginInvite,

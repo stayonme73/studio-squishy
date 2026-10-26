@@ -35,6 +35,7 @@ import {
 } from "./card-hook-idempotency";
 import { mapBusinessCardProjectTruthFromJob } from "./map-business-card-job-truth";
 import { customerArtifactRootRel } from "./map-flyer-job-truth";
+import { refineLaunchDesignSpecCreative } from "@/lib/studio-production-team-workforce";
 import type { JobDispatchRecord } from "./types";
 
 export { BUSINESS_CARD_DISPATCH_HOOK_PACKAGE_ID };
@@ -211,7 +212,12 @@ export async function invokeBusinessCardDispatchHook(input: {
     record.dispatchId,
   );
 
-  const designSpec = reasonBusinessCardDesignSpecDeterministic(mapped.truth);
+  const seed = reasonBusinessCardDesignSpecDeterministic(mapped.truth);
+  const designSpec = await refineLaunchDesignSpecCreative({
+    skuId: record.skuId,
+    seed,
+    authorizedFacts: mapped.truth,
+  });
   const tuple = buildCardIdempotencyTuple({
     dispatchId: record.dispatchId,
     jobId: record.jobId,

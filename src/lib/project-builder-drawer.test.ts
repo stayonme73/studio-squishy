@@ -29,10 +29,11 @@ describe("expandDrawerTimelineItems", () => {
     if (!job) return;
 
     const items = expandDrawerTimelineItems(job.timingLabel);
-    expect(items[0]).toMatch(/Estimated service turnaround: 2 to 3 business days/i);
+    expect(items[0]).toMatch(/production slot is available/i);
+    expect(items[0]).not.toMatch(/2 to 3 business days/i);
     expect(items[1]).toMatch(/required materials/i);
     expect(items[2]).toMatch(/this service only/i);
-    expect(items[3]).toMatch(/confirmed before payment/i);
+    expect(items[3]).toMatch(/will not invent a start date/i);
   });
 });
 

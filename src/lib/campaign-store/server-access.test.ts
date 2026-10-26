@@ -6,7 +6,7 @@ import { createSessionToken, SESSION_COOKIE_NAME } from "@/lib/auth/session";
 import type { CampaignRecord } from "@/config/studio-board";
 import type { StudioUser } from "@/lib/campaign-store/types";
 
-import { requireReadableCampaign } from "./server-access";
+import { requireClaimableCampaignSync, requireReadableCampaign } from "./server-access";
 import { upsertCampaignRecord } from "./store";
 
 const CAMPAIGNS_DIR = path.join(process.cwd(), "data", "campaigns");
@@ -119,6 +119,29 @@ describe("server campaign access", () => {
     expect(ownC).not.toBeInstanceOf(Response);
     expect(other).toBeInstanceOf(Response);
     if (other instanceof Response) expect(other.status).toBe(403);
+  });
+
+  it("marks another client's project as wrong_owner without project details", async () => {
+    const response = await requireClaimableCampaignSync(
+      {
+        id: "client-a",
+        email: "client-a@example.com",
+        displayName: "Client A",
+        roles: ["client"],
+        clientCampaignIds: [CAMPAIGN_A],
+      },
+      CAMPAIGN_B,
+      "/api/campaigns/current",
+    );
+
+    expect(response).toBeInstanceOf(Response);
+    if (response instanceof Response) {
+      expect(response.status).toBe(403);
+      const body = await response.text();
+      expect(body).toContain("\"code\":\"wrong_owner\"");
+      expect(body).not.toContain("Client B Private Campaign");
+      expect(body).not.toContain("Private description");
+    }
   });
 
   it("handles unauthenticated access safely", async () => {

@@ -6,7 +6,7 @@ import { existsSync } from "fs";
 import path from "path";
 
 import { countMenuItems } from "./menu-contracts";
-import type { MenuDesignSpec, MenuProjectTruth } from "./menu-types";
+import type { MenuDesignSpec, MenuProjectTruth, MenuTextLayer } from "./menu-types";
 import {
   DESIGN_RENDERER_MENU_SKU,
   MENU_CANVAS,
@@ -106,7 +106,7 @@ export function validateMenuDesignSpec(
 
   const sectionTitles = new Set(
     spec.layers
-      .filter((l) => l.type === "text" && l.role === "section_title")
+      .filter((l): l is MenuTextLayer => l.type === "text" && l.role === "section_title")
       .map((l) => l.sectionId)
       .filter(Boolean),
   );
@@ -122,13 +122,13 @@ export function validateMenuDesignSpec(
 
   const nameIds = new Set(
     spec.layers
-      .filter((l) => l.type === "text" && l.role === "item_name")
+      .filter((l): l is MenuTextLayer => l.type === "text" && l.role === "item_name")
       .map((l) => l.itemId)
       .filter(Boolean),
   );
   const priceIds = new Set(
     spec.layers
-      .filter((l) => l.type === "text" && l.role === "item_price")
+      .filter((l): l is MenuTextLayer => l.type === "text" && l.role === "item_price")
       .map((l) => l.itemId)
       .filter(Boolean),
   );

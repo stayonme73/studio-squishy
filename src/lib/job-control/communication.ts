@@ -1,11 +1,9 @@
 import type { CampaignRecord } from "@/config/studio-board";
-import { JOB_CONTROL_POLICY } from "@/config/job-control";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 
 import { appendJobActivityEvent } from "./activity-log";
 import { blockingMaterialsForSku } from "./resolve-jobs";
-import { resolveWaitingOnClientReminderStatus } from "./waiting-on-client";
 import type {
   JobActivityActor,
   JobCommunicationDeliveryStatus,
@@ -14,8 +12,6 @@ import type {
   JobCommunicationTransportCode,
   PurchasedJobRecord,
 } from "./types";
-
-const HOUR_MS = 60 * 60 * 1000;
 
 type CommunicationTemplate = {
   id: string;
@@ -36,17 +32,11 @@ export const JOB_COMMUNICATION_TEMPLATES = {
     message: (job) =>
       `We need a few required materials before ${job.serviceName} can move forward. Please open Project Intake and send the requested items.`,
   },
-  reminder_48_hour: {
-    id: "comm.reminder_48_hour.v1",
-    reason: `${JOB_CONTROL_POLICY.reminderDueHours}-hour reminder`,
+  waiting_on_client: {
+    id: "comm.waiting_on_client.v2",
+    reason: "Waiting on Client — materials needed",
     message: (job) =>
-      `Quick reminder: ${job.serviceName} is waiting on required materials from you. Send them when ready and we will continue from there.`,
-  },
-  waiting_on_client_72_hour: {
-    id: "comm.waiting_on_client_72_hour.v1",
-    reason: `${JOB_CONTROL_POLICY.moveToWaitingOnClientHours}-hour Waiting on Client notice`,
-    message: (job) =>
-      `${job.serviceName} is now Waiting on Client because required materials are still missing. This only pauses this job; your other jobs can continue independently.`,
+      `${job.serviceName} is waiting on required materials from you. Work on this service continues as soon as they arrive. Your other services can keep moving independently.`,
   },
   materials_received_returned_to_queue: {
     id: "comm.materials_received_returned_to_queue.v1",
@@ -78,6 +68,12 @@ export const JOB_COMMUNICATION_TEMPLATES = {
     message: (job) =>
       `The revised ${job.serviceName} is ready for another review. Open Review Room to check the updates.`,
   },
+  revision_rework_in_progress: {
+    id: "comm.revision_rework_in_progress.v1",
+    reason: "Revised work held back for rework",
+    message: (job) =>
+      `The Studio reviewed the updated ${job.serviceName} and decided it was not good enough to send you, so it is being reworked. Your included revision has not been counted, and you will be notified when a new version is ready for your review.`,
+  },
   approved_for_delivery: {
     id: "comm.approved_for_delivery.v1",
     reason: "Client approved for delivery",
@@ -90,17 +86,24 @@ export const JOB_COMMUNICATION_TEMPLATES = {
     message: (job) =>
       `Final delivery is available for ${job.serviceName}. Open Final Delivery to access your files.`,
   },
-  refund_eligibility_14_day: {
-    id: "comm.refund_eligibility_14_day.v1",
-    reason: `${JOB_CONTROL_POLICY.refundEligibleDays}-day refund eligibility`,
-    message: (job) =>
-      `${job.serviceName} has had no client response for 14 calendar days and may be eligible for a full refund if production has not started.`,
-  },
+  /** Queued only when Stripe reports the refund succeeded. */
   refund_issued: {
-    id: "comm.refund_issued.v1",
-    reason: "Refund issued",
+    id: "comm.refund_completed.v2",
+    reason: "Refund completed",
     message: (job) =>
-      `A refund has been issued for ${job.serviceName}. This job has been closed.`,
+      `Refund completed for ${job.serviceName}. The amount you paid was returned to your original payment method. Your bank may take a few business days to show it. This service is closed.`,
+  },
+  refund_processing: {
+    id: "comm.refund_processing.v1",
+    reason: "Refund processing",
+    message: (job) =>
+      `Refund processing for ${job.serviceName}. The Studio approved your refund and the payment processor accepted it. It has not finished, so the money is not back yet. You will see Refund completed when the processor finishes.`,
+  },
+  refund_review_needed: {
+    id: "comm.refund_review_needed.v1",
+    reason: "Refund could not be completed",
+    message: (job) =>
+      `Refund could not be completed for ${job.serviceName}. The Studio is reviewing it.`,
   },
   owner_ask_client: {
     id: "comm.owner_ask_client.v1",
@@ -116,12 +119,11 @@ export const JOB_COMMUNICATION_TEMPLATES = {
   },
 } satisfies Record<JobCommunicationEventType, CommunicationTemplate>;
 
-/** Authorized Resend lifecycle kinds. Owner aftermath notices stay in-app until domain/email resumes. */
+/** Authorized Resend lifecycle kinds. Routine notices are Machine mail, not Owner send chores. */
 export const AUTHORIZED_LIFECYCLE_EMAIL_EVENT_TYPES = [
   "payment_received",
   "intake_incomplete_materials_needed",
-  "reminder_48_hour",
-  "waiting_on_client_72_hour",
+  "waiting_on_client",
   "materials_received_returned_to_queue",
   "production_started",
   "ready_for_review",
@@ -129,14 +131,18 @@ export const AUTHORIZED_LIFECYCLE_EMAIL_EVENT_TYPES = [
   "revision_ready_again",
   "approved_for_delivery",
   "final_delivery_available",
-  "refund_eligibility_14_day",
+  "refund_processing",
   "refund_issued",
+  "refund_review_needed",
 ] as const satisfies readonly JobCommunicationEventType[];
 
-/** In-app Board notices — delivered immediately; not an Owner send chore. */
+/** In-app Board notices — recorded immediately; not an Owner send chore and not a customer email. */
 const IN_APP_IMMEDIATE_EVENT_TYPES = new Set<JobCommunicationEventType>([
   "owner_ask_client",
   "owner_decision_recorded",
+  // Silence is the failure mode this notice exists to prevent — do not queue it
+  // behind an Owner send chore.
+  "revision_rework_in_progress",
 ]);
 
 function defaultDeliveryStatus(
@@ -180,7 +186,7 @@ function systemSender(): JobActivityActor {
   return { role: "system", displayName: "System" };
 }
 
-function communicationRecordId(
+export function communicationRecordId(
   eventType: JobCommunicationEventType,
   jobId: string,
   idempotencyKey: string,
@@ -190,12 +196,6 @@ function communicationRecordId(
 
 function activityEventId(recordId: string): string {
   return `client_communication:${recordId}`;
-}
-
-function addHours(iso: string, hours: number): string {
-  const ms = new Date(iso).getTime();
-  if (Number.isNaN(ms)) return iso;
-  return new Date(ms + hours * HOUR_MS).toISOString();
 }
 
 function stableMaterialKey(materials: readonly CampaignMaterialItem[]): string {
@@ -491,49 +491,14 @@ export function syncJobCommunicationRecords(input: {
 
     if (job.spineStatus === "waiting_on_client") {
       const waitingSince = job.waitingOnClientSince ?? job.updatedAt;
-      const status = resolveWaitingOnClientReminderStatus(
-        waitingSince,
-        job.lastClientResponseAt ?? null,
-        nowMs,
-      );
-
-      if (status === "reminder_due" || status === "move_to_tray_due" || status === "refund_eligible") {
-        envelope = enqueueJobCommunicationRecord(envelope, {
-          campaign: input.campaign,
-          clientId: input.clientId,
-          job,
-          eventType: "reminder_48_hour",
-          occurredAt: addHours(waitingSince, JOB_CONTROL_POLICY.reminderDueHours),
-          idempotencyKey: `${waitingSince}:48h`,
-        });
-      }
-
-      if (status === "move_to_tray_due" || status === "refund_eligible" || previous?.spineStatus !== "waiting_on_client") {
-        envelope = enqueueJobCommunicationRecord(envelope, {
-          campaign: input.campaign,
-          clientId: input.clientId,
-          job,
-          eventType: "waiting_on_client_72_hour",
-          occurredAt: waitingSince,
-          idempotencyKey: `${waitingSince}:72h`,
-        });
-      }
-
-      if (status === "refund_eligible" && !job.productionStartedAt && !job.nonRefundable) {
-        job = {
-          ...job,
-          refundEligibleAt: job.refundEligibleAt ?? now,
-          updatedAt: now,
-        };
-        envelope = enqueueJobCommunicationRecord(envelope, {
-          campaign: input.campaign,
-          clientId: input.clientId,
-          job,
-          eventType: "refund_eligibility_14_day",
-          occurredAt: job.refundEligibleAt ?? now,
-          idempotencyKey: `${waitingSince}:14d`,
-        });
-      }
+      envelope = enqueueJobCommunicationRecord(envelope, {
+        campaign: input.campaign,
+        clientId: input.clientId,
+        job,
+        eventType: "waiting_on_client",
+        occurredAt: waitingSince,
+        idempotencyKey: `${waitingSince}:waiting`,
+      });
     }
 
     jobs.push(job);

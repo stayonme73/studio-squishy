@@ -13,6 +13,7 @@ export {
   collectRevisionInstruction,
   currentFlyerWorkVersionId,
   customerFacingVersionLabel,
+  resolveFlyerRevisionCallToAction,
   shouldEmphasizeExistingCtaAsHeadline,
 } from "./flyer-revision-emphasis";
 export {
@@ -25,10 +26,22 @@ export {
   isPriceOrDateScene,
 } from "./short-video-timing-revision";
 export { reproduceShortVideoAfterRevision } from "./reproduce-short-video-after-revision";
+export { presentFootageEditingReviewProof } from "./present-footage-editing-review";
+export { reproduceFootageEditingAfterRevision } from "./reproduce-footage-editing-after-revision";
+export { presentClipRepurposingReviewProof } from "./present-clip-repurposing-review";
+export { reproduceClipRepurposingAfterRevision } from "./reproduce-clip-repurposing-after-revision";
 export {
+  assembleApprovedBusinessCardClientDelivery,
+  assembleApprovedCampaignGraphicsClientDelivery,
   assembleApprovedClientDelivery,
+  assembleApprovedCopyKitClientDelivery,
   assembleApprovedFlyerClientDelivery,
+  assembleApprovedMenuClientDelivery,
+  assembleApprovedServiceSheetClientDelivery,
+  assembleApprovedClipRepurposingClientDelivery,
+  assembleApprovedFootageEditingClientDelivery,
   assembleApprovedShortVideoClientDelivery,
+  assembleApprovedSocialPostsClientDelivery,
 } from "./assemble-approved-delivery";
 export {
   FLYER_INCLUDED_SLOT_TRUTH,
@@ -42,7 +55,15 @@ export {
 } from "./flyer-purchase-delivery-truth";
 export { presentFlyerReviewProof, reviewProofAlreadyPresented } from "./present-flyer-review";
 export {
+  presentGeneralDesignReviewProof,
+  generalDesignReviewProofAlreadyPresented,
+} from "./present-general-design-review";
+export {
   presentShortVideoReviewProof,
   shortVideoReviewProofAlreadyPresented,
 } from "./present-short-video-review";
+export {
+  presentCopyReviewProof,
+  copyReviewProofAlreadyPresented,
+} from "./present-copy-review";
 export { contentSha256Hex, normalizeContentSha256, sameContentSha256 } from "./hash";

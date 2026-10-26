@@ -63,6 +63,8 @@ export type ComposeInstrumentalResult =
       durationMs: number;
       modelId: ElevenMusicModelId;
       rights: ElevenMusicRightsRecord;
+      creditHeaders: Record<string, string>;
+      estimatedCredits: number;
     }
   | { ok: false; code: string; message: string };
 
@@ -200,6 +202,13 @@ export async function composeElevenMusicInstrumental(
     response.headers.get("request-id") ||
     null;
   const requestId = response.headers.get("request-id");
+  const creditHeaders: Record<string, string> = {};
+  response.headers.forEach((value, key) => {
+    if (/credit|usage|limit|remaining|character/i.test(key)) {
+      creditHeaders[key] = value;
+    }
+  });
+  const estimatedCredits = Math.round((input.durationMs / 60000) * 900);
 
   const rights = buildRightsRecord({
     modelId,
@@ -223,6 +232,8 @@ export async function composeElevenMusicInstrumental(
     durationMs: input.durationMs,
     modelId,
     rights,
+    creditHeaders,
+    estimatedCredits,
   };
 }
 

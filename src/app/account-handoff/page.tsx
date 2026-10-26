@@ -5,12 +5,13 @@ import AccountHandoffScene from "@/components/auth/AccountHandoffScene";
 import StudioMobileLoungeShell from "@/components/shared/StudioMobileLoungeShell";
 import { safeReturnPath } from "@/lib/auth/safe-return-path";
 import { readSessionFromCookieHeader } from "@/lib/auth/session";
+import { studioBuildManrope } from "@/fonts/studio-build-manrope";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
-import "../mobile-route-fixes.css";
+import "../studio-customer-last-paint.css";
 
 export const metadata = {
-  title: "Open Your Studio Board | The Studio",
+  title: "Open Your Studio Board",
   description:
     "Create an account or sign in to open your Studio Board and follow your project.",
 };
@@ -45,7 +46,7 @@ export default async function AccountHandoffPage({ searchParams }: AccountHandof
 
   return (
     <StudioMobileLoungeShell
-      className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
+      className={`${studioBuildManrope.className} ${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
     >
       <AccountHandoffScene fromParam={fromParam} />
     </StudioMobileLoungeShell>

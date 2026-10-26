@@ -32,6 +32,6 @@ Protected by `src/lib/route-map-intake-materials.test.ts` (divergence guard).
 
 **Do not** add four customer role selects (`offer_lead` / `cta_book` / `dates_window` / `trust_brand`) to either surface. Those names are proven Machine **layout templates** from SOCIAL-POSTS-PROOF-1 (Harbor CERT), not fixed service-contract roles and not live intake choices.
 
-Service contract remains: exactly four coordinated posts, one campaign theme, one platform, Studio-written captions, Studio recommended posting order, one agreed platform size.
+Service contract remains: exactly four coordinated square 1024×1024 posts, one campaign theme, one platform, Studio-written captions, suggested posting order. Customer posts them. Portrait, TikTok vertical, Stories, Reels, carousel, and extra sizes are not sold.
 
 Machine mapper: `mapSocialPostsSetStructureFromIntakeAnswers` in `social-posts-intake-truth.ts` — reads campaign-level purpose / action / platform; assigns square `cert-square-1024` ×4; assigns durable `social-post-1…4` + order 1–4; Studio production assigns the four proven layout templates. Captions stay Studio-written. Portrait is not executable from Instagram chip copy alone.

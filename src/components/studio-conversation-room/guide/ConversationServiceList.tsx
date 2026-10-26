@@ -82,14 +82,12 @@ export default function ConversationServiceList({
       data-panel="builder"
       data-surface={phonePage ? "page" : "overlay"}
     >
-      {phonePage ? (
-        <div data-tablet-journey-chrome="true">
-          <SamsungDeckBack className={styles.backLink} onActivate={onBackToRoutes}>
-            ← {v.servicesBackToRouteLabel}
-          </SamsungDeckBack>
-          {topControls}
-        </div>
-      ) : null}
+      <div data-tablet-journey-chrome="true">
+        <SamsungDeckBack className={styles.backLink} onActivate={onBackToRoutes}>
+          ← {phonePage ? v.servicesBackToRouteLabel : v.servicesBackToRoutesLabel}
+        </SamsungDeckBack>
+        {topControls}
+      </div>
       <header className={styles.header} data-builder-chrome="header">
         <div>
           {phonePage ? null : (
@@ -122,11 +120,6 @@ export default function ConversationServiceList({
       {phonePage ? null : <p className={styles.intro}>{v.servicesPanelLead}</p>}
 
       <div className={styles.builderToolbar} data-builder-chrome="toolbar">
-        {phonePage ? null : (
-          <SamsungDeckBack className={styles.backLink} onActivate={onBackToRoutes}>
-            ← {v.servicesBackToRoutesLabel}
-          </SamsungDeckBack>
-        )}
         <div className={styles.builderSummaryStack}>
           <p className={styles.builderCount}>
             {PROJECT_BUILDER_V1.selectedCountLabel}: {selectedCount}

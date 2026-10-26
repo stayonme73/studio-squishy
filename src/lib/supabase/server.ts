@@ -115,17 +115,18 @@ export function createServerSupabaseStorageClient(
       );
       if (response.status === 404) return false;
       if (!response.ok) {
-        throw new Error(`Supabase private object check failed: ${await errorMessage(response)}`);
+        const message = await errorMessage(response);
+        if (/not found/i.test(message)) return false;
+        throw new Error(`Supabase private object check failed: ${message}`);
       }
       return true;
     },
 
     async deletePrivateObject(request) {
-      const response = await requestStorage(`/object/${encodeURIComponent(request.bucket)}`, {
-        method: "DELETE",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ prefixes: [request.objectPath] }),
-      });
+      const response = await requestStorage(
+        `/object/${encodeURIComponent(request.bucket)}/${encodeStoragePath(request.objectPath)}`,
+        { method: "DELETE" },
+      );
       if (!response.ok) {
         throw new Error(`Supabase private delete failed: ${await errorMessage(response)}`);
       }

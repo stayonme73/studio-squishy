@@ -195,7 +195,11 @@ export function applyClientSubmitItem(
     return { ok: false, error: "Material item not found.", status: 404 };
   }
 
-  if (item.requirementLevel === "required" && isBlockingMaterialItem(item, envelope.campaignId)) {
+  if (
+    item.requirementLevel === "required" &&
+    item.isolatedSlot !== true &&
+    isBlockingMaterialItem(item, envelope.campaignId)
+  ) {
     return {
       ok: false,
       error: "Use the consolidated request list for required blocking items.",

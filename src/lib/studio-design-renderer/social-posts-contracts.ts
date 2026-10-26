@@ -3,6 +3,7 @@
  * Studio-written captions, durable posting order.
  */
 
+import { SOCIAL_POSTS_HONEST_PROMISED_OUTPUT } from "@/config/studio-social-posts-standard-harden-v1";
 import {
   DESIGN_RENDERER_SOCIAL_POSTS_SKU,
   SOCIAL_POSTS_EXACT_COUNT,
@@ -13,6 +14,11 @@ import {
 
 export const SOCIAL_POSTS_PROOF_CONTRACT = {
   skuId: DESIGN_RENDERER_SOCIAL_POSTS_SKU,
+  name: "Make My Social Media Posts",
+  promisedOutput: SOCIAL_POSTS_HONEST_PROMISED_OUTPUT,
+  requiredDeliverableFormats: ["png", "txt"] as const,
+  oneSetRevisionNotFourRedesigns: true,
+  customerPosts: true,
   exactAssetCount: SOCIAL_POSTS_EXACT_COUNT,
   /** Square-only proof — reuses the promotion-graphics CERT square plate. */
   squarePlateReused: {
@@ -42,7 +48,7 @@ export const SOCIAL_POSTS_PROOF_CONTRACT = {
   ownerRoutineResponsibility: "NONE",
   dimensionTolerancePx: 40,
   note:
-    "v2-rtu-social-posts Machine path: four square posts, Studio layout templates (not customer role menus), Studio-written captions, durable posting order. DISPATCH-HOOK-1 remaps primaryTool to studio_design_renderer for this SKU only. Portrait/TikTok fail-closed. Owner routine NONE.",
+    "HARDEN #6 STANDARD 2026-09-24: four square 1024×1024 posts, one theme, one platform, Studio-written fact-bound captions, suggested posting order. Customer posts. One set revision. Portrait/TikTok/carousel/Stories/Reels fail-closed. Owner routine NONE.",
 } as const;
 
 export function isDesignRendererSocialPostsSku(

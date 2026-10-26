@@ -61,6 +61,8 @@ export function expectedCertVoiceDefaults(): Pick<
   | "label"
   | "qaState"
   | "ownerListeningApproval"
+  | "customerReadinessLabel"
+  | "wavCertified"
 > {
   return {
     campaignId: CERT_VOICE_CAMPAIGN_ID,

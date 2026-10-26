@@ -113,8 +113,11 @@ export function addJobFileReference(
   },
 ): { job: PurchasedJobRecord; events: JobActivityEvent[]; file: StudioFileReference } {
   const occurredAt = input.occurredAt ?? new Date().toISOString();
+  const deliverableKey = input.deliverableKey?.trim();
   const file: StudioFileReference = {
-    id: `${input.idPrefix ?? "file"}:${job.jobId}:${input.category}:${occurredAt}`,
+    id: deliverableKey
+      ? `${input.idPrefix ?? "file"}:${job.jobId}:${input.category}:${deliverableKey}:${occurredAt}`
+      : `${input.idPrefix ?? "file"}:${job.jobId}:${input.category}:${occurredAt}`,
     clientId: input.clientId,
     campaignId: job.campaignId,
     jobId: job.jobId,

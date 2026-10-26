@@ -19,10 +19,9 @@ import {
 import type { JobSpineStatus, PurchasedJobRecord } from "./types";
 
 export function isJobIntakeComplete(campaign: CampaignRecord): boolean {
-  if (campaign.routeMapContext) {
-    return Boolean(campaign.routeMapIntakeSubmittedAt);
-  }
-  return Boolean(campaign.projectDetailsSubmittedAt);
+  return Boolean(
+    campaign.routeMapIntakeSubmittedAt || campaign.projectDetailsSubmittedAt,
+  );
 }
 
 function tasksForSku(
@@ -30,6 +29,37 @@ function tasksForSku(
   skuId: string,
 ): CampaignTaskItem[] {
   return tasks.filter((task) => task.relatedServiceIds.includes(skuId as never));
+}
+
+/**
+ * Production execution already underway. A copied Building Concepts label,
+ * payment, and intake are not evidence. Incomplete start metadata still counts
+ * when tasks, files, QA authorization, or the start action itself are present.
+ */
+export function jobHasProductionExecutionEvidence(
+  job: Pick<
+    PurchasedJobRecord,
+    | "skuId"
+    | "productionStartedAt"
+    | "spineStatusReason"
+    | "workPackets"
+    | "clientDeliveryFiles"
+    | "deliverablePrep"
+    | "internalQaReviewAuthorization"
+    | "fileRegistry"
+  >,
+  tasks: readonly CampaignTaskItem[],
+): boolean {
+  if (job.productionStartedAt) return true;
+  if (hasProductionStartedForSku(tasks, job.skuId)) return true;
+  if ((job.workPackets ?? []).some((packet) => packet.assignmentEvents.length > 0 || packet.returnedFileRefs.length > 0)) {
+    return true;
+  }
+  if ((job.clientDeliveryFiles ?? []).length > 0) return true;
+  if ((job.deliverablePrep ?? []).some((item) => Boolean(item.preparedAt))) return true;
+  if (job.internalQaReviewAuthorization?.status === "ELIGIBLE_FOR_REVIEW") return true;
+  if ((job.fileRegistry ?? []).length > 0) return true;
+  return /started building concepts/i.test(job.spineStatusReason ?? "");
 }
 
 export function hasProductionStartedForSku(
@@ -90,6 +120,17 @@ function isWaitingOnClientForSku(
   return blockingMaterialsForSku(materials, skuId).length > 0;
 }
 
+function hasPresentedClientReviewProofs(
+  job: PurchasedJobRecord | undefined,
+): boolean {
+  return Boolean(
+    job?.fileRegistry?.some(
+      (ref) =>
+        ref.category === "review_proof" && ref.visibility === "client_visible",
+    ),
+  );
+}
+
 function deriveSpineStatus(
   campaign: CampaignRecord,
   skuId: string,
@@ -101,6 +142,20 @@ function deriveSpineStatus(
 ): JobSpineStatus {
   if (persisted && isTerminalSpineStatus(persisted.spineStatus)) {
     return persisted.spineStatus;
+  }
+
+  if (hasPresentedClientReviewProofs(persisted)) {
+    if (persisted?.spineStatus === "revision_requested") {
+      return "revision_requested";
+    }
+    if (
+      persisted?.spineStatus === "approved" ||
+      persisted?.spineStatus === "ready_for_delivery" ||
+      persisted?.spineStatus === "delivered"
+    ) {
+      return persisted.spineStatus;
+    }
+    return "ready_for_review";
   }
 
   if (isWaitingOnClientForSku(exceptions, materials, skuId, tasks)) {
@@ -132,7 +187,8 @@ function deriveSpineStatus(
   }
 
   if (persisted?.spineStatus === "building_concepts") {
-    return "building_concepts";
+    if (jobHasProductionExecutionEvidence(persisted, tasks)) return "building_concepts";
+    return "ready_for_queue";
   }
 
   if (persisted?.spineStatus === "ready_for_review") {
@@ -217,7 +273,10 @@ export function buildPurchasedJobRecord(
       Boolean(productionStarted || persisted?.productionStartedAt),
     refundEligibleAt: persisted?.refundEligibleAt ?? null,
     refundOwnerDecisionAt: persisted?.refundOwnerDecisionAt ?? null,
+    refundApprovedAmountCents: persisted?.refundApprovedAmountCents ?? null,
+    refundExecution: persisted?.refundExecution ?? null,
     heavyLaneOwnerDecision: persisted?.heavyLaneOwnerDecision ?? null,
+    heavyLaneBumpRequested: persisted?.heavyLaneBumpRequested ?? false,
     laneQueuedAt: leftWaitingTray ? now : persisted?.laneQueuedAt ?? now,
     deliverablePrep: persisted?.deliverablePrep,
     internalNotes: persisted?.internalNotes,
@@ -273,6 +332,9 @@ export function jobCountsTowardLaneCapacity(
   if (!job.intakeComplete) return false;
   if (job.spineStatus === "waiting_on_client") return false;
   if (!occupiesLaneCapacity(job.spineStatus)) return false;
+  if (job.spineStatus === "building_concepts" && !jobHasProductionExecutionEvidence(job, tasks)) {
+    return false;
+  }
   if (isJobPaused(job, tasks)) return false;
   return true;
 }

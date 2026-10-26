@@ -1,10 +1,16 @@
 import Stripe from "stripe";
 
 import { studioPaymentV1 } from "@/config/studio-payment-v1";
-import { readCampaignEnvelope } from "@/lib/campaign-store/store";
+import { readCampaignEnvelope, upsertCampaignRecord } from "@/lib/campaign-store/store";
 import { recoverPaidOperatingChain } from "@/lib/studio-paid-activation-recovery";
 
+import {
+  markProjectClaimReceiptDeliveredToBrowser,
+  releaseUnclaimedBrowserClaimToken,
+} from "@/lib/studio-project-claim/claim-receipts";
+
 import { confirmPaymentFromProcessor } from "./confirm";
+import { sealDisposableKitStripeTestProof } from "./disposable-kit-test-isolation";
 import {
   assertStripeSafeForTests,
   isStripeConfigured,
@@ -12,6 +18,32 @@ import {
 } from "./env";
 import { readCheckoutSessionBinding } from "./events-store";
 import type { ReconcileCheckoutResult } from "./types";
+
+/**
+ * Guest pay: the checkout session id is the payment identity Stripe already
+ * gave this browser. Return the existing one-time claim token once.
+ * A campaign id is not enough to reach this function.
+ */
+async function claimTokenForPayingBrowser(input: {
+  campaignId: string;
+  checkoutSessionId: string;
+  clientUserId?: string | null;
+  paid: boolean;
+  customerEmail?: string | null;
+  freshRawToken?: string | null;
+}): Promise<string | null> {
+  if (!input.paid || input.clientUserId) return null;
+  const fresh = input.freshRawToken?.trim() || "";
+  if (fresh) {
+    await markProjectClaimReceiptDeliveredToBrowser(fresh);
+    return fresh;
+  }
+  return releaseUnclaimedBrowserClaimToken({
+    campaignId: input.campaignId,
+    checkoutSessionId: input.checkoutSessionId,
+    customerEmail: input.customerEmail,
+  });
+}
 
 /**
  * Server retrieval after browser return — may establish paid truth when webhook
@@ -58,17 +90,33 @@ export async function reconcileCheckoutSession(
       const woken = envelope?.record
         ? await recoverPaidOperatingChain(envelope.record)
         : null;
+      const campaign = woken?.campaign ?? envelope?.record ?? null;
+      const claimRawToken = await claimTokenForPayingBrowser({
+        campaignId: binding.campaignId,
+        checkoutSessionId,
+        clientUserId: envelope?.clientUserId,
+        paid: true,
+        customerEmail: binding.customerEmail,
+      });
       return {
         ok: true,
         status: "confirmed",
         paid: true,
-        campaign: woken?.campaign ?? envelope?.record ?? null,
+        campaign,
         checkoutSessionId,
         message: studioPaymentV1.customerCopy.paymentConfirmed,
+        claimRawToken,
       };
     }
   } else if (envelope?.record.paymentReceivedAt) {
     const woken = await recoverPaidOperatingChain(envelope.record);
+    const claimRawToken = await claimTokenForPayingBrowser({
+      campaignId: binding.campaignId,
+      checkoutSessionId,
+      clientUserId: envelope.clientUserId,
+      paid: true,
+      customerEmail: binding.customerEmail,
+    });
     return {
       ok: true,
       status: "confirmed",
@@ -76,6 +124,7 @@ export async function reconcileCheckoutSession(
       campaign: woken.campaign,
       checkoutSessionId,
       message: studioPaymentV1.customerCopy.paymentConfirmed,
+      claimRawToken,
     };
   }
 
@@ -141,6 +190,19 @@ export async function reconcileCheckoutSession(
   );
   const confirmedAmountCents = session.amount_total ?? expectedAmountCents;
 
+  if (session.livemode === false && envelope?.record) {
+    const sealed = sealDisposableKitStripeTestProof({
+      campaign: envelope.record,
+      checkoutSessionId,
+      source: "stripe_retrieve",
+      livemode: false,
+      paymentStatus: "paid",
+    });
+    if (sealed) {
+      await upsertCampaignRecord(sealed, envelope.clientUserId);
+    }
+  }
+
   const result = await confirmPaymentFromProcessor({
     campaignId: binding.campaignId,
     checkoutSessionId,
@@ -179,6 +241,15 @@ export async function reconcileCheckoutSession(
     };
   }
 
+  const afterConfirm = await readCampaignEnvelope(binding.campaignId);
+  const claimRawToken = await claimTokenForPayingBrowser({
+    campaignId: binding.campaignId,
+    checkoutSessionId,
+    clientUserId: afterConfirm?.clientUserId ?? envelope?.clientUserId,
+    paid: true,
+    customerEmail: binding.customerEmail,
+    freshRawToken: result.claimRawToken,
+  });
   return {
     ok: true,
     status: "confirmed",
@@ -186,5 +257,6 @@ export async function reconcileCheckoutSession(
     campaign: result.campaign,
     checkoutSessionId,
     message: studioPaymentV1.customerCopy.paymentConfirmed,
+    claimRawToken,
   };
 }

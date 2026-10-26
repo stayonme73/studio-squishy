@@ -30,6 +30,7 @@ export {
 export {
   isJobIntakeComplete,
   hasProductionStartedForSku,
+  jobHasProductionExecutionEvidence,
   buildPurchasedJobRecord,
   syncJobRecordsFromCampaign,
   jobCountsTowardLaneCapacity,
@@ -47,13 +48,39 @@ export {
 } from "./capacity";
 
 export {
-  resolveWaitingOnClientReminderStatus,
+  LIVE_LANE_CAPACITY_SKIP_REASON,
+  createLiveLaneCapacityTracker,
+  liveLaneForDispatchRecord,
+  loadStudioLaneViews,
+  type LiveLaneJobRef,
+} from "./live-lane-capacity";
+
+export {
+  QUICK_LANE_ADMISSION_LOCK,
+  QUICK_LANE_RESERVATION_DIR,
+  admitQuickLaneProduction,
+  reconcileQuickLaneReservations,
+  releaseQuickLaneReservation,
+  readQuickLaneReservationJobIds,
+  type QuickLaneAdmission,
+} from "./quick-lane-admission";
+
+export {
+  HEAVY_OCCUPANCY_LOCK_REL,
+  acquireHeavyOccupancyLock,
+  releaseHeavyOccupancyLock,
+  recoverStaleHeavyOccupancyLock,
+  readHeavyOccupancyLock,
+  type AcquireHeavyOccupancyResult,
+  type HeavyOccupancyLockRecord,
+} from "./heavy-occupancy-lock";
+
+export {
   shouldMoveJobToWaitingOnClient,
   buildWaitingOnClientTrayItem,
   applyWaitingOnClientPolicies,
   requeueReturnedJob,
   type WaitingOnClientTrayItem,
-  type WaitingOnClientReminderStatus,
 } from "./waiting-on-client";
 
 export {

@@ -20,6 +20,7 @@ import {
   getActivationMapShelfEntriesForLane,
 } from "@/catalog/activation";
 import { customerJourneyStepRoute } from "@/config/customer-journey-v1";
+import { isInternalSellNowSku } from "@/config/studio-internal-sell-now-register-v1";
 import { ROUTE_MAP_GUIDANCE } from "@/config/route-map-guidance-v1";
 
 /** Route Map shelf job IDs — V1 continuing jobs + activated V2 RTU SKUs. */
@@ -191,7 +192,7 @@ function buildActiveShelfJobs(): readonly RouteMapJob[] {
       const id = (entry.v2Sku ?? entry.routeMapSku) as RouteMapJobId | undefined;
       if (!id || seen.has(id)) continue;
       const job = buildRouteMapJob(id);
-      if (job && !job.isRouteStart) {
+      if (job && !job.isRouteStart && isInternalSellNowSku(job.id)) {
         seen.add(id);
         jobs.push(job);
       }
@@ -204,7 +205,7 @@ function buildActiveShelfJobs(): readonly RouteMapJob[] {
 export const ROUTE_MAP_V1 = {
   pageTitle: "THE STUDIO",
   sidebarHeading: "Choose Your Way",
-  promiseFooter: "Every job includes one revision round. Timing varies by job.",
+  promiseFooter: "Revision rounds depend on the package. Timing varies by package.",
   chooseJobCta: "CHOOSE THIS JOB",
   backToMapLabel: "← Back to Route Map",
   jobShelfHeading: "Launch Job Shelf",
@@ -311,7 +312,7 @@ export function getJobsForRoad(roadId: RouteMapRoadId): readonly RouteMapJob[] {
     const rawId = (entry.v2Sku ?? entry.routeMapSku) as RouteMapJobId | undefined;
     if (!rawId) continue;
     const job = buildRouteMapJob(rawId);
-    if (job && !job.isRouteStart) jobs.push(job);
+    if (job && !job.isRouteStart && isInternalSellNowSku(job.id)) jobs.push(job);
   }
   return jobs;
 }

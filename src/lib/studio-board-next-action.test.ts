@@ -89,7 +89,7 @@ describe("resolveBoardNextActionPresentation", () => {
       href: resolveIntakeEditHref(campaign, campaign.packageId),
     });
     expect(presentation.action && "href" in presentation.action ? presentation.action.href : null).toBe(
-      CONVERSATION_ROOM_INTAKE_HREF,
+      `${CONVERSATION_ROOM_INTAKE_HREF}&campaignId=${campaign.campaignId}`,
     );
     expect(presentation.materialsSupportLine).toBe(MATERIALS_SUPPORT_INCOMPLETE_INTAKE);
     expect(presentation.materialsSupportLine).toMatch(/Project Intake/i);
@@ -171,6 +171,32 @@ describe("resolveBoardNextActionPresentation", () => {
       type: "navigate",
       label: studioBoard.nextAction.reviewMyConcepts,
       href: studioBoard.routes.feedbackStudio,
+    });
+
+    const oneJob = resolveBoardNextActionPresentation({
+      campaign: baseCampaign("READY_FOR_REVIEW", {
+        paymentReceivedAt: "2026-07-24T12:00:00.000Z",
+        projectDetailsSubmittedAt: "2026-07-24T13:00:00.000Z",
+        postPayActivation: {
+          schemaVersion: 1,
+          status: "activated",
+          phase: "ready_for_routing",
+          activatedAt: "2026-07-24T13:00:00.000Z",
+          lastAttemptAt: "2026-07-24T13:00:00.000Z",
+          checkoutSessionId: "cs_one_job",
+          jobIds: ["next-action-READY_FOR_REVIEW:v2-rtu-flyer"],
+          taskCount: 1,
+          intakeComplete: true,
+          blockingRequiredMaterialsCount: 0,
+          ownerActionRequired: false,
+          lastError: null,
+        },
+      }),
+    });
+    expect(oneJob.action).toEqual({
+      type: "navigate",
+      label: studioBoard.nextAction.reviewMyConcepts,
+      href: "/feedback-studio?jobId=next-action-READY_FOR_REVIEW%3Av2-rtu-flyer",
     });
 
     const delivered = resolveBoardNextActionPresentation({

@@ -10,7 +10,7 @@ import {
   previewPromotionSlotMapping,
   type PromotionSlotPreview,
 } from "@/lib/materials/promotion";
-import type { CampaignMaterialItem, MaterialCategory, MaterialContentKind } from "@/lib/materials/types";
+import type { CampaignMaterialItem, MaterialCategory, MaterialContentKind, MaterialRelatedId } from "@/lib/materials/types";
 
 import {
   canApproveClientRequest,
@@ -34,7 +34,7 @@ export type DefaultClientWording = {
   clientFacingPrompt: string;
   whyNeeded: string;
   requirementLevel: "required" | "optional";
-  relatedServiceIds: readonly ServiceId[];
+  relatedServiceIds: readonly MaterialRelatedId[];
 };
 
 export type FileRoomExceptionPromotionSummary = {
@@ -121,7 +121,7 @@ function relatedServiceIdsFromMaterials(
   record: CampaignExceptionRecord,
   materials: readonly CampaignMaterialItem[],
   tasks: readonly CampaignTaskItem[],
-): readonly ServiceId[] {
+): readonly MaterialRelatedId[] {
   if (!record.taskId) return [];
   const fromSlots = materials
     .filter((item) => item.relatedServiceIds.length > 0)

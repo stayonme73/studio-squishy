@@ -23,7 +23,10 @@ import type {
 import { sha256File } from "./bind";
 import { captureMenuExports } from "./menu-capture";
 import { persistServiceSheetArtifacts } from "./service-sheet-bind";
-import { verifyServiceSheetCompletenessAndPrices } from "./service-sheet-completeness";
+import {
+  unsupportedServiceSheetClaims,
+  verifyServiceSheetCompletenessAndPrices,
+} from "./service-sheet-completeness";
 import { isDesignRendererServiceSheetSku } from "./service-sheet-contracts";
 import { SERVICE_SHEET_PROOF_ARTIFACT_ROOT } from "./service-sheet-fixtures";
 import {
@@ -40,6 +43,8 @@ import type {
   ServiceSheetProjectTruth,
   ServiceSheetRendererPipelineResult,
 } from "./service-sheet-types";
+import { applySharedLiveLaneEntryGate, sourcePxFromPlate } from "@/lib/studio-static-creative-lane/shared-live-gates";
+
 import { SERVICE_SHEET_CANVAS } from "./service-sheet-types";
 import { validateServiceSheetDesignSpec } from "./service-sheet-validate";
 
@@ -116,6 +121,14 @@ export async function runServiceSheetRendererPipeline(input: {
     );
   }
 
+  const laneGate = applySharedLiveLaneEntryGate({
+    repoRoot: input.repoRoot,
+    sourcePx: sourcePxFromPlate(SERVICE_SHEET_CANVAS),
+  });
+  if (!laneGate.ok) {
+    return fail(mode, laneGate.code, laneGate.message);
+  }
+
   try {
     assertServiceSheetRequiredTruth(input.truth);
   } catch (e) {
@@ -149,6 +162,16 @@ export async function runServiceSheetRendererPipeline(input: {
       return fail(mode, "FIXTURE_LEAKAGE", msg);
     }
     return fail(mode, "RENDER_FAILURE", msg);
+  }
+
+  const unsupported = unsupportedServiceSheetClaims(input.truth, spec);
+  if (unsupported.length > 0) {
+    return fail(
+      mode,
+      "QA_FAILURE",
+      `Quality rejected unsupported wording: ${unsupported.join(" | ")}`,
+      { designSpec: spec },
+    );
   }
 
   const validated = validateServiceSheetDesignSpec(

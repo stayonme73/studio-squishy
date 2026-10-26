@@ -10,10 +10,11 @@ export function resolveProjectRecordPaintState(input: {
   ready: boolean;
   accessState: CurrentCampaignAccessState;
   hasCampaign: boolean;
-}): "loading" | "auth-required" | "denied" | "no-active-project" | "error" | "empty" | "ready" {
+}): "loading" | "auth-required" | "denied" | "local-unavailable" | "no-active-project" | "error" | "empty" | "ready" {
   if (!input.ready) return "loading";
   if (input.accessState === "auth-required") return "auth-required";
   if (input.accessState === "denied") return "denied";
+  if (input.accessState === "local-unavailable") return "local-unavailable";
   if (input.accessState === "error") return "error";
   if (input.accessState === "no-active-project") return "no-active-project";
   if (!input.hasCampaign) return "empty";
@@ -146,5 +147,12 @@ describe("AUTH-GATE-1 Project Record page authentication gate", () => {
         hasCampaign: true,
       }),
     ).toBe("ready");
+    expect(
+      resolveProjectRecordPaintState({
+        ready: true,
+        accessState: "local-unavailable",
+        hasCampaign: true,
+      }),
+    ).toBe("local-unavailable");
   });
 });

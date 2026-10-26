@@ -118,7 +118,7 @@ function StudioGuideCommPanel({
   }
 
   function runSend() {
-    const next = textRef.current?.value ?? "";
+    const next = textRef.current?.value ?? textDraft;
     onTextDraftFlush(next);
     const action = resolveComposerSendAction({
       isAnsweringQuestion,
@@ -206,7 +206,7 @@ function StudioGuideCommPanel({
             ) {
               return;
             }
-            micActivate.onClick(event);
+            micActivate.onClick();
           }}
           onKeyDown={(event) => {
             if (event.key !== "Enter" && event.key !== " ") return;
@@ -345,6 +345,12 @@ function StudioGuideCommPanel({
       {savedPulse ? (
         <p className={styles.savedCue} aria-live="polite">
           ✓ {v.savedCue}
+        </p>
+      ) : null}
+
+      {voiceMode === "on" && textDraft.trim() ? (
+        <p className={styles.speakHint} data-heard-transcript="true">
+          {textDraft}
         </p>
       ) : null}
 

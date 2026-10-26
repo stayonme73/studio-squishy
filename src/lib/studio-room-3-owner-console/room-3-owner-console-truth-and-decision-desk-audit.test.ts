@@ -26,6 +26,7 @@ import { resolveOwnerDeskItems } from "@/lib/job-control/owner-desk";
 import type { PurchasedJobRecord } from "@/lib/job-control/types";
 import type { OwnerDecisionInteractionRecord } from "@/lib/campaign-tasks/owner-decision-interaction-types";
 import { applyOwnerApproveRefund } from "@/lib/job-control/owner-decision-job-actions";
+import { applyRefundProviderOutcome } from "@/lib/job-control/refund-execution-state";
 import { resolveCustomerCurrentStatusOverlay } from "@/lib/studio-customer-current-status";
 import type { CampaignRecord } from "@/config/studio-board";
 import type { StudioUser } from "@/lib/campaign-store/types";
@@ -147,16 +148,36 @@ describe("STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1"
         jobId: "job-1",
         skuId: "v2-rtu-flyer",
         serviceName: "Make Me a Flyer",
-        eventType: "reminder_48_hour",
-        templateId: "comm.reminder_48_hour.v1",
+        eventType: "waiting_on_client",
+        templateId: "comm.waiting_on_client.v2",
         channel: "in_app_outbox",
         sender: { role: "system", displayName: "Studio" },
         reason: "Contact failed",
         messageContent: "Failed",
         deliveryStatus: "delivery_failed",
+        transportAttempts: 8,
         createdAt: now,
         updatedAt: now,
         activityEventId: "act-fail",
+      },
+      {
+        id: "comm-retrying",
+        campaignId: "c1",
+        clientId: "client-1",
+        jobId: "job-1",
+        skuId: "v2-rtu-flyer",
+        serviceName: "Make Me a Flyer",
+        eventType: "ready_for_review",
+        templateId: "comm.ready_for_review.v1",
+        channel: "in_app_outbox",
+        sender: { role: "system", displayName: "Studio" },
+        reason: "Ready for review",
+        messageContent: "Still retrying",
+        deliveryStatus: "delivery_failed",
+        transportAttempts: 1,
+        createdAt: now,
+        updatedAt: now,
+        activityEventId: "act-retry",
       },
     ];
 
@@ -209,6 +230,30 @@ describe("STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1"
       packageId: "custom-studio-plan",
       packageLabel: "Custom Studio Plan",
       paymentReceivedAt: now,
+      condensedOffer: { packageId: "social_and_promo_graphics", priceCents: 19900 } as never,
+      paymentTruth: {
+        processor: "stripe",
+        status: "confirmed",
+        currency: "usd",
+        expectedAmountCents: 15920,
+        confirmedAmountCents: 15920,
+        paymentIntentId: "pi_test_room3",
+        selectedServiceIds: ["v2-rtu-flyer"],
+        decisionId: "pa",
+        factFingerprint: "fp",
+        draftRevision: 1,
+      },
+      approvedStudioPlan: {
+        selectedServiceIds: [],
+        includedServiceIds: [],
+        additionalServiceIds: [],
+        additionalCostUsd: 0,
+        oneTimeTotalCents: 19900,
+        monthlyTotalCents: 0,
+        amountDueTodayCents: 15920,
+        lineItems: [{ skuId: "v2-rtu-flyer" } as never],
+        approvedAt: now,
+      },
       createdAt: now,
       updatedAt: now,
     } as CampaignRecord;
@@ -266,13 +311,26 @@ describe("STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1"
     ]);
     expect(before.some((item) => item.reason === "refund_eligible")).toBe(true);
 
-    const result = applyOwnerApproveRefund(
+    const approved = applyOwnerApproveRefund(
       envelope,
       campaign,
       job.jobId,
       { reason: "Goodwill refund after stall.", ownerNotes: "Approved on desk." },
       owner,
       "client-1",
+      { env: { STRIPE_SECRET_KEY: "sk_test_unit" } as unknown as NodeJS.ProcessEnv },
+    );
+    expect(approved.ok).toBe(true);
+    if (!approved.ok) return;
+    expect(approved.job.refundExecution?.stage).toBe("approved");
+    expect(approved.job.spineStatus).toBe("waiting_on_client");
+
+    const result = applyRefundProviderOutcome(
+      approved.envelope,
+      campaign,
+      job.jobId,
+      { kind: "provider_refund", refundId: "re_test_room3", status: "pending", amountCents: 15920, createdAt: now, failureReason: null },
+      { clientId: "client-1" },
     );
     expect(result.ok).toBe(true);
     if (!result.ok) return;

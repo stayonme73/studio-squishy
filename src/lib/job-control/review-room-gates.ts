@@ -1,4 +1,5 @@
 import { feedbackStudio } from "@/config/feedback-studio";
+import { studioRevisionToReviewRoundTripV1 } from "@/config/studio-revision-to-review-round-trip-v1";
 
 import type { JobReviewFeedback } from "./review-feedback-types";
 import type { PurchasedJobRecord } from "./types";
@@ -75,6 +76,8 @@ export function canRequestJobRevision(input: {
   feedback: JobReviewFeedback;
   revisionRoundsRemaining: number;
   allDeliverablesPrepared: boolean;
+  /** A revision already asked for that has not reached the customer yet. */
+  revisionInFlight?: boolean;
 }): ReviewGateResult {
   const reasons: string[] = [];
 
@@ -92,6 +95,13 @@ export function canRequestJobRevision(input: {
 
   if (input.revisionRoundsRemaining <= 0) {
     reasons.push(feedbackStudio.feedbackPanel.revisionLimitShort);
+  }
+
+  // Rounds are spent on delivery, so remaining alone cannot stop a second ask.
+  if (input.revisionInFlight) {
+    reasons.push(
+      studioRevisionToReviewRoundTripV1.customerCopy.revisionAlreadyInFlight,
+    );
   }
 
   const hasRevisionSignal = hasClientRevisionIntent(input.feedback);
@@ -147,10 +157,23 @@ export function hasClientRevisionIntent(feedback: JobReviewFeedback): boolean {
   const sectionRevision = Object.values(feedback.sectionStatuses).some(
     (status) => status === "revision",
   );
-  const stickyRevision = feedback.stickyNotes.some((note) => note.color === "coral");
+  const stickyRevision = feedback.stickyNotes.some((note) => note.text.trim());
   const hasDraw = feedback.drawSections.length > 0;
   const hasVoice = feedback.voiceNotes.length > 0;
-  return sectionRevision || stickyRevision || hasDraw || hasVoice;
+  const hasTextComment = (feedback.textComments ?? []).some((comment) =>
+    comment.text.trim(),
+  );
+  const hasHighlight = (feedback.highlights ?? []).some(
+    (entry) => entry.rects.length > 0,
+  );
+  return (
+    sectionRevision ||
+    stickyRevision ||
+    hasDraw ||
+    hasVoice ||
+    hasTextComment ||
+    hasHighlight
+  );
 }
 
 export function clientRevisionRoundWouldExceed(

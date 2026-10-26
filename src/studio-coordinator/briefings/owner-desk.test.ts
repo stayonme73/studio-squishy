@@ -368,7 +368,7 @@ describe("owner-desk briefings", () => {
         deskItem: {
           id: "desk:refund:job-1",
           reason: "refund_eligible",
-          reasonLabel: "14-day refund eligible",
+          reasonLabel: "Refund request",
           campaignId: "c1",
           campaignName: "Acme",
           jobId: "job-1",

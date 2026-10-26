@@ -7,6 +7,7 @@ export type CustomerLifeQuestionIntent =
   | "need_anything"
   | "received_upload"
   | "work_started"
+  | "when_start"
   | "flyer_status"
   | "holding_up"
   | "when_review"
@@ -20,6 +21,14 @@ export type CustomerLifeQuestionIntent =
   | "qa_status"
   | "current_review_version"
   | "revision_applied"
+  | "service_fit"
+  | "pricing"
+  | "scope"
+  | "source_quality"
+  | "dissatisfaction"
+  | "complaint"
+  | "refund"
+  | "returning_customer"
   | "unknown";
 
 export type CustomerLifePhase =
@@ -28,6 +37,7 @@ export type CustomerLifePhase =
   | "recovering"
   | "awaiting_intake"
   | "awaiting_materials"
+  | "awaiting_production_slot"
   | "producing"
   | "internal_qa"
   | "ready_for_review"
@@ -99,8 +109,14 @@ export type CustomerLifeAskResult = {
   truth: CustomerLifeTruth;
 };
 
+export type CustomerLifeAccountContext = {
+  signedIn: boolean;
+  preferredName?: string | null;
+};
+
 export type CustomerLifeInput = {
   campaign: CampaignRecord | null;
   materials?: readonly CampaignMaterialItem[];
   tasks?: ServerTasksEnvelope | null;
+  account?: CustomerLifeAccountContext;
 };

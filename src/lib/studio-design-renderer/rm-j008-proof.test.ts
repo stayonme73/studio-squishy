@@ -7,8 +7,8 @@ import { existsSync, readFileSync } from "fs";
 import path from "path";
 import { describe, expect, it } from "vitest";
 
+import { buildRmJ008PartialBioOnlyTruth } from "@/lib/studio-design-renderer/rm-j008-negative-fixture";
 import {
-  buildRmJ008PartialBioOnlyTruth,
   buildRmJ008UnsupportedInstagramCoverTruth,
   buildRmJ008UpdateKitTruth,
   fingerprintRmJ008UpdateKit,

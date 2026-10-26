@@ -8,7 +8,10 @@ import {
 import { resolveProductionFamilyId } from "@/lib/campaign-tasks/families";
 import type { ProductionRole, TaskPhase } from "@/lib/campaign-tasks/types";
 
-import { isActiveCustomerFacingSku } from "./active-set";
+import {
+  isActiveCustomerFacingSku,
+  isInternalStagingLaunchSku,
+} from "./active-set";
 import { FAMILY_PRODUCTION_BASELINES } from "./family-baselines";
 import { getSkuOverride } from "./sku-overrides";
 import type {
@@ -209,7 +212,7 @@ export function resolveServiceProductionContract(
     };
   }
 
-  if (!isActiveCustomerFacingSku(skuId)) {
+  if (!isActiveCustomerFacingSku(skuId) && !isInternalStagingLaunchSku(skuId)) {
     return {
       status: "not_active_customer_facing",
       skuId,

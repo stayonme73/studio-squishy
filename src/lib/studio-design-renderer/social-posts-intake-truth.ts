@@ -160,12 +160,12 @@ export function resolveSocialPostsPlatformPlacement(raw: string):
   if (chip) {
     const platformLabel =
       chip === "I am not sure"
-        ? "Feed post — square 1024×1024 (Studio safest format)"
+        ? "Feed post — square 1024×1024"
         : `${chip} — square feed (1024×1024)`;
     return { ok: true, platformChoice: chip, platformLabel };
   }
 
-  // Catalog schema select options (Facebook / Instagram / TikTok)
+  // Sold catalog schema options (Facebook / Instagram / LinkedIn). TikTok leftover fail-closes.
   const catalogNormalized = value.toLowerCase();
   if (catalogNormalized.includes("instagram")) {
     return {
@@ -193,8 +193,8 @@ export function resolveSocialPostsPlatformPlacement(raw: string):
       ok: false,
       code: "UNSUPPORTED_PLATE_EXECUTION",
       message:
-        "UNSUPPORTED_PLATE_EXECUTION: TikTok is recorded on catalog schema but " +
-        "v2-rtu-social-posts Machine execution is square-feed CERT only today. " +
+        "UNSUPPORTED_PLATE_EXECUTION: TikTok vertical is not sold on v2-rtu-social-posts. " +
+        "Machine execution is square-feed CERT 1024×1024 only. " +
         "No silent portrait/native substitution.",
     };
   }

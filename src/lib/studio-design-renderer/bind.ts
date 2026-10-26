@@ -44,6 +44,8 @@ export function fingerprintDesignSpec(spec: FlyerDesignSpec): string {
         relativePath: m.relativePath,
       })),
       outputFormats: spec.outputFormats,
+      creativeDirection: spec.creativeDirection ?? null,
+      revisionEmphasis: spec.revisionEmphasis ?? null,
     }),
   );
 }

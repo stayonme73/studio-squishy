@@ -5,6 +5,9 @@ import {
 } from "@/config/conversation-room-stage-v1";
 import type { VoiceIntent } from "@/lib/studio-conversation-framework";
 
+import "../studio-visual-system-three-screen-proof.css";
+import "../studio-customer-last-paint.css";
+
 type StudioConversationRoomPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
@@ -69,7 +72,7 @@ export default async function StudioConversationRoomPage({
       : null;
 
   return (
-    <main>
+    <main data-visual-proof="route-map">
       <h1 className="sr-only">Studio Conversation Room</h1>
       <ConversationRoomRuntime
         initialStage={initialStage}

@@ -1,11 +1,11 @@
 import type {
   MaterialCategory,
   MaterialContentKind,
+  MaterialRelatedId,
   MaterialRequirementLevel,
 } from "@/lib/materials/types";
 
 import type { ProductionRole } from "./types";
-import type { ServiceId } from "@/catalog/types";
 
 /** Current disposition of an exception — updated by new events, never rewritten in history. */
 export type CampaignExceptionStatus =
@@ -139,7 +139,7 @@ export type ApproveClientRequestPayload = {
   clientFacingPrompt: string;
   whyNeeded: string;
   requirementLevel: MaterialRequirementLevel;
-  relatedServiceIds?: readonly ServiceId[];
+  relatedServiceIds?: readonly MaterialRelatedId[];
   existingMaterialItemIds?: readonly string[];
 };
 

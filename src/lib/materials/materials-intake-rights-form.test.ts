@@ -9,9 +9,11 @@ import {
   createEmptyFileRightsDraft,
   FILE_RIGHTS_FORM_FIELDS,
   fileRightsDraftToInput,
+  fileRightsFieldsAreRelevant,
   fileUploadRequiresRightsCertification,
   rightsDraftHasNoPrecheckedDefaults,
   validateFileRightsDraft,
+  validateServerMaterialUploadRights,
 } from "@/lib/materials/materials-intake-rights-form";
 import type { ClientSubmitPayload } from "@/lib/materials/payload-validation";
 
@@ -27,6 +29,13 @@ function completeRightsDraft(overrides: Partial<ClientSubmitPayload> = {}): Clie
 }
 
 describe("materials-intake-rights-form", () => {
+  it("shows file-rights questions only for a selected or stored file", () => {
+    expect(fileRightsFieldsAreRelevant({})).toBe(false);
+    expect(fileRightsFieldsAreRelevant({ selectionKind: "error", storedFileName: "  " })).toBe(false);
+    expect(fileRightsFieldsAreRelevant({ selectionKind: "selected" })).toBe(true);
+    expect(fileRightsFieldsAreRelevant({ storedFileName: "logo.png" })).toBe(true);
+  });
+
   it("starts with no rights field prechecked", () => {
     expect(rightsDraftHasNoPrecheckedDefaults(createEmptyFileRightsDraft())).toBe(true);
     expect(rightsDraftHasNoPrecheckedDefaults(undefined)).toBe(true);
@@ -54,6 +63,18 @@ describe("materials-intake-rights-form", () => {
     for (const field of FILE_RIGHTS_FORM_FIELDS) {
       expect(form.get(field), `missing ${field}`).toBeTruthy();
     }
+  });
+
+  it("validateServerMaterialUploadRights mirrors UI rules for multipart uploads", () => {
+    expect(
+      validateServerMaterialUploadRights("logo-brand", { rightsInput: undefined }).ok,
+    ).toBe(false);
+    expect(
+      validateServerMaterialUploadRights("logo-brand", {
+        rightsInput: fileRightsDraftToInput(completeRightsDraft()),
+      }).ok,
+    ).toBe(true);
+    expect(validateServerMaterialUploadRights("factual-confirmation", {}).ok).toBe(true);
   });
 
   it("blocks submit when authority or commercial-use certification is missing", () => {
@@ -156,6 +177,25 @@ describe("materials-intake-rights-form", () => {
     expect(result.certification.routingState).toBe("QUARANTINED");
     expect(result.certification.rights.rightsAnswersContradictFilenameHints).toBe(true);
     expect(result.certification.productionCleared).toBe(false);
+  });
+
+  it("does not quarantine logo-brand uploads solely because the file name contains logo", () => {
+    const checksum = createHash("sha256").update(SYNTHETIC_PNG_1X1_BYTES).digest("hex");
+    const result = certifyCustomerMaterialUpload({
+      category: "logo-brand",
+      bytes: SYNTHETIC_PNG_1X1_BYTES,
+      fileName: "spruce-line-logo.png",
+      mimeType: "image/png",
+      checksumSha256: checksum,
+      rightsInput: fileRightsDraftToInput(
+        completeRightsDraft({ thirdPartyMaterialPresent: false }),
+      ),
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.certification.rights.rightsAnswersContradictFilenameHints).toBe(false);
+    expect(result.certification.routingState).toBe("CLEARED_FOR_PRODUCTION");
+    expect(result.certification.productionCleared).toBe(true);
   });
 
   it("assigns a distinct certification record per uploaded file", () => {

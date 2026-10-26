@@ -7,6 +7,9 @@ import ProjectIntakeMultiServiceForm from "@/components/studio-conversation-room
 import SamsungDeckBack from "@/components/studio-conversation-room/guide/SamsungDeckBack";
 import styles from "@/components/studio-conversation-room/guide/conversation-activity-panel.module.css";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
+import {
+  condensedIntakeWelcomeFor,
+} from "@/config/studio-customer-journey-condense-v1";
 import type { RouteMapIntakeAnswers } from "@/config/route-map-intake-v1";
 import { studioBoard } from "@/config/studio-board";
 import { ROUTE_MAP_INTAKE_STEP_HREF } from "@/lib/intake-edit";
@@ -17,6 +20,7 @@ import {
 } from "@/lib/route-map-intake-continuity";
 import { FLYER_PRODUCTION_INTAKE_ANSWER_KEYS } from "@/lib/project-intake-flyer-production";
 import {
+  ensureConversationIntakeCampaign,
   intakeBusinessNameCarryForward,
   recordIntakeAnswerChanges,
 } from "@/lib/conversation-room-draft";
@@ -30,6 +34,7 @@ import {
   isIntakeComplete,
   readCurrentCampaignHydrated,
 } from "@/lib/studio-board-campaign";
+import { buildCondensedOfferIntakePlan } from "@/lib/project-intake-plan";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
 import { resetConversationStageScroll } from "@/lib/studio-conversation-stage-scroll";
@@ -55,6 +60,11 @@ export type ConversationIntakePanelProps = {
   topControls?: ReactNode;
   onDeckBack?: () => void;
   deckBackLabel?: string | null;
+  /** Local look only. Saves into the working draft. Does not open Studio Board or take payment. */
+  lookOnly?: boolean;
+  lookSurface?: Extract<IntakeEntrySurface, { kind: "form" }>;
+  /** Unpaid preview save. Return false when the draft could not be written. */
+  onPreviewAnswers?: (answers: RouteMapIntakeAnswers) => boolean;
 };
 
 type IntakeGate = Exclude<IntakeEntrySurface, { kind: "form" }>;
@@ -102,25 +112,50 @@ export default function ConversationIntakePanel({
   topControls = null,
   onDeckBack,
   deckBackLabel = null,
+  lookOnly = false,
+  lookSurface,
+  onPreviewAnswers,
 }: ConversationIntakePanelProps) {
   const v = conversationRoomGuideV1;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [draftStatus, setDraftStatus] = useState<
     "unsaved" | "saved" | "error" | null
   >(null);
+  const [previewNote, setPreviewNote] = useState<string | null>(null);
   const [gateOverride, setGateOverride] = useState<IntakeGate | null>(null);
 
   const [formSurface, setFormSurface] = useState(() =>
-    gateOverride ?? resolveIntakeEntrySurface(readCurrentCampaignHydrated(), "intake"),
+    lookSurface ??
+      gateOverride ??
+      resolveIntakeEntrySurface(
+        ensureConversationIntakeCampaign() ?? readCurrentCampaignHydrated(),
+        "intake",
+      ),
   );
 
   useEffect(() => {
+    if (lookSurface) {
+      setFormSurface(lookSurface);
+      return;
+    }
     if (gateOverride) {
       setFormSurface(gateOverride);
       return;
     }
-    setFormSurface(resolveIntakeEntrySurface(readCurrentCampaignHydrated(), "intake"));
-  }, [gateOverride]);
+    const refresh = () => {
+      setFormSurface(
+        resolveIntakeEntrySurface(
+          ensureConversationIntakeCampaign() ?? readCurrentCampaignHydrated(),
+          "intake",
+        ),
+      );
+    };
+    refresh();
+    window.addEventListener("studio-squishy:campaign-updated", refresh);
+    return () => {
+      window.removeEventListener("studio-squishy:campaign-updated", refresh);
+    };
+  }, [gateOverride, lookSurface]);
 
   useEffect(() => {
     if (phonePage) {
@@ -129,9 +164,18 @@ export default function ConversationIntakePanel({
   }, [phonePage]);
 
   const surface = formSurface;
+  const journeyWelcome =
+    lookOnly &&
+    phonePage &&
+    surface?.kind === "form" &&
+    surface.condensedPackageId &&
+    !surface.flyerProductionCorrection
+      ? condensedIntakeWelcomeFor(surface.condensedPackageId)
+      : null;
 
   const handleSaveDraft = useCallback(
     (answers: RouteMapIntakeAnswers) => {
+      if (lookOnly) return true;
       const current = readCurrentCampaignHydrated();
       const correction = surface?.kind === "form" && surface.flyerProductionCorrection;
       if (!correction && (isIntakeComplete(current) || !current?.paymentReceivedAt)) {
@@ -155,12 +199,25 @@ export default function ConversationIntakePanel({
       setDraftStatus("saved");
       return true;
     },
-    [prefillBusinessName, surface],
+    [lookOnly, prefillBusinessName, surface],
   );
 
   const handleSubmit = useCallback(
     async (answers: RouteMapIntakeAnswers): Promise<boolean> => {
       setSubmitError(null);
+      if (lookOnly) {
+        const saved = onPreviewAnswers?.(answers) ?? true;
+        if (saved) {
+          setSubmitError(null);
+          setDraftStatus("saved");
+          setPreviewNote("Your answers are saved. Studio Board opens after payment.");
+        } else {
+          setPreviewNote(null);
+          setDraftStatus("error");
+          setSubmitError("Those answers could not be saved. They are still on this page.");
+        }
+        return false;
+      }
       const current = readCurrentCampaignHydrated();
       const correction = surface?.kind === "form" && surface.flyerProductionCorrection;
       if (!correction && isIntakeComplete(current)) {
@@ -250,7 +307,7 @@ export default function ConversationIntakePanel({
       await onSubmitSuccess();
       return true;
     },
-    [onSubmitSuccess, prefillBusinessName, surface],
+    [lookOnly, onPreviewAnswers, onSubmitSuccess, prefillBusinessName, surface],
   );
 
   const draftLabel =
@@ -261,7 +318,7 @@ export default function ConversationIntakePanel({
         : null;
 
   const journeyChrome =
-    phonePage && (topControls || (onDeckBack && deckBackLabel)) ? (
+    topControls || (onDeckBack && deckBackLabel) ? (
       <div data-tablet-journey-chrome="true">
         {onDeckBack && deckBackLabel ? (
           <SamsungDeckBack className={styles.backLink} onActivate={onDeckBack}>
@@ -277,14 +334,23 @@ export default function ConversationIntakePanel({
     {journeyChrome}
     <header className={styles.header}>
       <div>
-        {phonePage ? null : (
-          <p className={styles.eyebrow}>Conversation Room</p>
+        {journeyWelcome ? (
+          <>
+            <p className="studio-homepage__kicker">{journeyWelcome.eyebrow}</p>
+            <h1 className="studio-homepage__section-title">{journeyWelcome.title}</h1>
+          </>
+        ) : (
+          <>
+            {phonePage ? null : (
+              <p className={styles.eyebrow}>Conversation Room</p>
+            )}
+            <h2 className={styles.title}>
+              {surface?.kind === "form" && surface.flyerProductionCorrection
+                ? INTAKE_CONTINUITY_COPY.flyerCorrectionTitle
+                : v.intakeTitle}
+            </h2>
+          </>
         )}
-        <h2 className={styles.title}>
-          {surface?.kind === "form" && surface.flyerProductionCorrection
-            ? INTAKE_CONTINUITY_COPY.flyerCorrectionTitle
-            : v.intakeTitle}
-        </h2>
       </div>
       {phonePage ? null : (
         <button
@@ -300,20 +366,8 @@ export default function ConversationIntakePanel({
     </>
   );
 
-  const paidAck =
-    phonePage && paidAcknowledgment.length > 0 ? (
-      <ul className={styles.intakePaidAck} aria-label="Payment confirmation">
-        {paidAcknowledgment.map((item) => (
-          <li
-            key={item.label}
-            className={styles.intakePaidAckItem}
-            data-confirmed={item.confirmed ? "true" : "false"}
-          >
-            {item.label}
-          </li>
-        ))}
-      </ul>
-    ) : null;
+  const paidAck = null;
+  void paidAcknowledgment;
 
   if (!surface) {
     return (
@@ -325,9 +379,23 @@ export default function ConversationIntakePanel({
         {intakeHeader}
         {paidAck}
         <p className={styles.intro}>{INTAKE_CONTINUITY_COPY.missingContextLead}</p>
-        <Link className={styles.backLink} href={ROUTE_MAP_INTAKE_STEP_HREF}>
-          {v.intakeHostFallbackCta} →
-        </Link>
+        {onDeckBack ? (
+          <SamsungDeckBack className={styles.backLink} onActivate={onDeckBack}>
+            ← {deckBackLabel ?? v.studioPlanBackLabel}
+          </SamsungDeckBack>
+        ) : onRecoverPayment ? (
+          <button
+            type="button"
+            className={styles.primary}
+            onClick={onRecoverPayment}
+          >
+            {INTAKE_CONTINUITY_COPY.missingPaymentCta}
+          </button>
+        ) : (
+          <Link className={styles.backLink} href={ROUTE_MAP_INTAKE_STEP_HREF}>
+            {v.intakeHostFallbackCta} →
+          </Link>
+        )}
       </div>
     );
   }
@@ -343,14 +411,20 @@ export default function ConversationIntakePanel({
         {paidAck}
         <p className={styles.intro}>{gateTitle(surface)}</p>
         <p className={styles.intakeGateLead}>{gateLead(surface)}</p>
-        {surface.kind === "missing-payment" && onRecoverPayment ? (
-          <button
-            type="button"
-            className={styles.primary}
-            onClick={onRecoverPayment}
-          >
-            {INTAKE_CONTINUITY_COPY.missingPaymentCta}
-          </button>
+        {surface.kind === "missing-payment" ? (
+          onRecoverPayment ? (
+            <button
+              type="button"
+              className={styles.primary}
+              onClick={onRecoverPayment}
+            >
+              {INTAKE_CONTINUITY_COPY.missingPaymentCta}
+            </button>
+          ) : (
+            <Link className={styles.backLink} href="/studio-conversation-room?stage=checkout">
+              {INTAKE_CONTINUITY_COPY.missingPaymentCta} →
+            </Link>
+          )
         ) : null}
         {surface.kind === "already-submitted" ? (
           <Link className={styles.backLink} href={studioBoard.routes.studioBoard}>
@@ -358,10 +432,54 @@ export default function ConversationIntakePanel({
           </Link>
         ) : null}
         {surface.kind === "missing-plan" || surface.kind === "missing-context" ? (
-          <Link className={styles.backLink} href={surface.recoveryHref}>
-            {surface.recoveryLabel} →
-          </Link>
+          onDeckBack ? (
+            <SamsungDeckBack className={styles.backLink} onActivate={onDeckBack}>
+              ← {deckBackLabel ?? surface.recoveryLabel}
+            </SamsungDeckBack>
+          ) : onRecoverPayment && surface.kind === "missing-context" ? (
+            <button
+              type="button"
+              className={styles.primary}
+              onClick={onRecoverPayment}
+            >
+              {INTAKE_CONTINUITY_COPY.missingPaymentCta}
+            </button>
+          ) : (
+            <Link className={styles.backLink} href={surface.recoveryHref}>
+              {surface.recoveryLabel} →
+            </Link>
+          )
         ) : null}
+      </div>
+    );
+  }
+
+  const legacyCatalogIntake =
+    surface.kind === "form" &&
+    !surface.condensedPackageId &&
+    !surface.flyerProductionCorrection;
+
+  if (legacyCatalogIntake) {
+    return (
+      <div
+        className={styles.sheet}
+        data-panel="intake"
+        data-surface={phonePage ? "page" : "overlay"}
+        data-intake-buried="legacy-catalog"
+      >
+        {intakeHeader}
+        <p className={styles.intro}>
+          This older Project Intake is set aside for the current walk. It stays in the project until the screen-by-screen review is finished, and then it comes off.
+        </p>
+        <p className={styles.intro}>
+          Social & Promo Graphics already asks for the offer or theme, the facts and disclosures, your logo and photos if you have them, a call to action if you have one, and permission to use the materials. You answer those on Build Your Project. The files are added in My Studio.
+        </p>
+        <p className={styles.intro}>
+          The older page also asked you to pick one platform. The current package does not. It includes 4 square posts, matching captions, and two campaign graphics. You post them.
+        </p>
+        <Link className={styles.backLink} href="/project-builder?package=social_and_promo_graphics">
+          Open Social & Promo Graphics
+        </Link>
       </div>
     );
   }
@@ -375,12 +493,33 @@ export default function ConversationIntakePanel({
       {intakeHeader}
       {paidAck}
 
-      <p className={styles.intro}>
-        {surface.flyerProductionCorrection
-          ? INTAKE_CONTINUITY_COPY.flyerCorrectionLead
-          : v.intakeLead}
+      <p
+        className={
+          journeyWelcome &&
+          surface.clipAskOnce?.kind !== "saved" &&
+          surface.clipAskOnce?.kind !== "missing-confirmation"
+            ? "studio-homepage__card-detail"
+            : styles.intro
+        }
+      >
+        {journeyWelcome &&
+        surface.clipAskOnce?.kind !== "saved" &&
+        surface.clipAskOnce?.kind !== "missing-confirmation"
+          ? journeyWelcome.lead
+          : surface.clipAskOnce?.kind === "saved"
+          ? surface.clipAskOnce.lead
+          : surface.clipAskOnce?.kind === "missing-confirmation"
+            ? surface.clipAskOnce.lead
+            : surface.clipAskOnce?.kind === "gaps"
+              ? surface.clipAskOnce.lead ??
+                "One saved answer is still missing. The other answers stay as you left them."
+          : surface.flyerProductionCorrection
+            ? INTAKE_CONTINUITY_COPY.flyerCorrectionLead
+            : surface.condensedPackageName
+              ? `Payment is complete for ${surface.condensedPackageName}. Answer these questions for that package. You add the actual files in My Studio after this form.`
+              : v.intakeLead}
       </p>
-      {surface.flyerProductionCorrection ? null : (
+      {surface.flyerProductionCorrection || surface.clipAskOnce ? null : (
         <p className={styles.checkoutScopeDisclosure} role="note">
           {v.intakeLaterMaterialsTip}
         </p>
@@ -391,29 +530,57 @@ export default function ConversationIntakePanel({
         </p>
       ) : null}
 
+      {surface.clipAskOnce?.kind === "saved" && !lookOnly ? (
+        <Link className={styles.backLink} href={`${studioBoard.routes.studioBoard}#sb-materials`}>
+          {surface.clipAskOnce.action} →
+        </Link>
+      ) : surface.clipAskOnce?.kind === "missing-confirmation" ? (
+        <Link className={styles.backLink} href={studioBoard.routes.studioBoard}>
+          Return to My Studio →
+        </Link>
+      ) : (
       <div
         className={`${styles.intakeHostSurface} ${utilityPageFontClassName}`}
       >
         <ProjectIntakeMultiServiceForm
-          key={`${surface.selectedServiceIds.join("|")}:${surface.flyerProductionCorrection ? "flyer-fix" : "full"}`}
+          key={`${surface.condensedPackageId ?? surface.selectedServiceIds.join("|")}:${surface.flyerProductionCorrection ? "flyer-fix" : "full"}`}
           selectedServiceIds={surface.selectedServiceIds}
+          intakePlan={
+            surface.condensedPackageId
+              ? buildCondensedOfferIntakePlan({
+                  packageId: surface.condensedPackageId,
+                  name: surface.condensedPackageName ?? surface.condensedPackageId,
+                })
+              : null
+          }
           initialDraftAnswers={surface.draftAnswers}
           prefillBusinessName={prefillBusinessName}
-          onSaveDraft={handleSaveDraft}
+          onSaveDraft={
+            lookOnly
+              ? (answers) => onPreviewAnswers?.(answers) ?? true
+              : handleSaveDraft
+          }
           onSubmit={handleSubmit}
           onDraftStatusChange={setDraftStatus}
           onAnswersChange={onAnswersChange}
           submitError={submitError}
+          statusNote={previewNote}
           submitCtaLabel={submitCtaLabel}
           nextStepBlurb={nextStepBlurb}
           phoneLayout={phonePage}
           visibleAnswerKeys={
             surface.flyerProductionCorrection
               ? FLYER_PRODUCTION_INTAKE_ANSWER_KEYS
-              : null
+              : surface.clipAskOnce?.kind === "gaps"
+                ? surface.clipAskOnce.keys
+                : null
+          }
+          optionalAnswerKeys={
+            surface.clipAskOnce?.kind === "gaps" ? surface.clipAskOnce.optionalKeys : null
           }
         />
       </div>
+      )}
     </div>
   );
 }

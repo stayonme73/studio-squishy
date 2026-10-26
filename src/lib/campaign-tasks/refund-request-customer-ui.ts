@@ -66,3 +66,12 @@ export function mapRefundRequestSubmitFailure(
 export function refundProductionStartedCustomerNote(): string {
   return copy.productionStartedNote;
 }
+
+/** Compact Board eligibility line — does not change Help Center policy. */
+export function refundEligibilityCustomerMessage(input: {
+  productionStarted: boolean;
+}): string {
+  return input.productionStarted
+    ? copy.eligibilityAfterProduction
+    : copy.eligibilityBeforeProduction;
+}

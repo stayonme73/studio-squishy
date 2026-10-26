@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 
+import { EMPTY_DRAFT_INTAKE_FORM } from "@/config/draft-room";
 import type { CampaignRecord } from "@/config/studio-board";
 import { studioBoard } from "@/config/studio-board";
-import { resolveActivityFeed } from "@/lib/campaign-record";
+import { resolveActivityFeed, resolveCampaignDisplayName } from "@/lib/campaign-record";
 import { resolveCustomerJourneySteps } from "@/lib/customer-journey";
 import { resolveIntakeEditHref } from "@/lib/intake-edit";
 import { isIntakeComplete } from "@/lib/studio-board-campaign";
@@ -48,7 +49,7 @@ describe("Package 1b incomplete Project Intake Board cert", () => {
       "Tell us what we need for the services in your approved Studio Plan.",
     );
     expect(resolveIntakeEditHref(campaign, campaign.packageId)).toBe(
-      "/studio-conversation-room?stage=intake",
+      "/studio-conversation-room?stage=intake&campaignId=pkg1b-revise-cert",
     );
 
     const materialsNext = resolveBoardNextStepPanelMessage({
@@ -102,5 +103,28 @@ describe("Package 1b incomplete Project Intake Board cert", () => {
     expect(view.campaignProgressLabel).toBe(studioBoard.nextAction.waitingOnProjectIntakeLabel);
     expect(view.campaignProgressLabel).not.toBe("Campaign Queued");
     expect(view.statusLabel).toBe("Waiting on Project Intake");
+  });
+
+  it("tells the payment story once when the sandbox note repeats it", () => {
+    const campaign = {
+      ...paidIncompleteIntakeCampaign(),
+      studioNotes: [{ date: "Today", message: "Payment confirmed (sandbox — not live money)." }],
+    };
+    const feed = resolveActivityFeed(campaign);
+    expect(feed.filter((entry) => entry.message === "We received your payment")).toHaveLength(1);
+    expect(feed.some((entry) => /Payment confirmed/i.test(entry.message))).toBe(false);
+  });
+
+  it("names the project, not a Studio placeholder", () => {
+    const campaign = {
+      ...paidIncompleteIntakeCampaign(),
+      campaignName: "Make Me a Flyer",
+      visionData: {
+        ...EMPTY_DRAFT_INTAKE_FORM,
+        business: "THE STUDIO",
+        project: "Studio Project",
+      },
+    };
+    expect(resolveCampaignDisplayName(campaign)).toBe("Make Me a Flyer");
   });
 });

@@ -191,10 +191,18 @@ export type RouteMapV2ShelfServiceId =
   | "v2-rtu-sms-kit"
   | "v2-rtu-voice"
   | "v2-rtu-short-video"
+  | "v2-rtu-short-form-video-edit"
+  | "v2-rtu-clip-repurposing"
   | "v2-rtu-business-card";
 
 /** Route Map V2 checkout add-on — not a standalone shelf item. */
 export type RouteMapV2AddonServiceId = "v2-addon-post-publish";
+
+/** Internal unpublished SELL NOW — not a Route Map shelf SKU. */
+export type InternalStagingServiceId =
+  | "v2-rtu-short-form-video-edit"
+  | "v2-rtu-clip-repurposing"
+  | "v2-creative-qa-finish";
 
 export type RouteMapV2ServiceId = RouteMapV2ShelfServiceId | RouteMapV2AddonServiceId;
 
@@ -218,6 +226,7 @@ export type ServiceId =
   | ExecutionAddOnServiceId
   | RouteMapLaunchServiceId
   | RouteMapV2ServiceId
+  | InternalStagingServiceId
   | LegacyRetiredServiceId;
 
 export type ServiceBillingModel = "one-time" | "monthly";

@@ -75,7 +75,13 @@ describe("Mobile checkout + button consistency (2026-09-05)", () => {
     expect(film).not.toContain('setChosen("on")');
     expect(film).not.toContain('setChosen("off")');
     expect(film).toContain("lobby-entry-film__cta");
-    expect(film).not.toContain("setTimeout");
+    const continueCommit = film.slice(
+      film.indexOf("const continueActivate"),
+      film.indexOf("function select("),
+    );
+    expect(continueCommit).toContain("beginStudioPointerSettle();");
+    expect(continueCommit).toContain("onChoose(next);");
+    expect(continueCommit).not.toContain("setTimeout");
     expect(film).not.toContain("requestAnimationFrame");
     const voiceCss = read(
       "src/components/studio-conversation-room/voice-choice-film.module.css",

@@ -3,9 +3,11 @@
 import { useEffect, useMemo } from "react";
 import Link from "next/link";
 
+import ClientAccessGlass from "@/components/auth/ClientAccessGlass";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
 import { safeReturnPath } from "@/lib/auth/safe-return-path";
 import { promoteStudioVoiceBoardHandoffToWelcome } from "@/lib/studio-voice-board-handoff";
+import { useSamsungActivate } from "@/lib/studio-samsung-activate";
 
 const SESSION_PROBE_TIMEOUT_MS = 2500;
 
@@ -71,9 +73,16 @@ export default function AccountHandoffScene({ fromParam }: Props) {
 
   const createAccountHref = withFrom("/sign-up", returnTo);
   const signInHref = withFrom("/sign-in", returnTo);
+  const createActivate = useSamsungActivate<HTMLAnchorElement>(() => {
+    goToReturnPath(createAccountHref);
+  });
+  const signInActivate = useSamsungActivate<HTMLAnchorElement>(() => {
+    goToReturnPath(signInHref);
+  });
 
   return (
-    <div className="utility-page">
+    <div className="utility-page utility-page--client-access">
+      <ClientAccessGlass />
       <div className="utility-shell utility-shell--narrow">
         <section className="utility-card" aria-labelledby="account-handoff-title">
           <p className="utility-eyebrow">Client Access</p>
@@ -85,20 +94,26 @@ export default function AccountHandoffScene({ fromParam }: Props) {
           </p>
 
           <div className="utility-form" style={{ width: "100%" }}>
-            <Link
+            <a
+              ref={createActivate.ref}
               className="utility-btn utility-btn--primary"
               href={createAccountHref}
               style={{ width: "100%" }}
+              data-account-handoff="create-account"
+              onClick={createActivate.onClick}
             >
               Create Account
-            </Link>
-            <Link
+            </a>
+            <a
+              ref={signInActivate.ref}
               className="utility-btn utility-btn--secondary"
               href={signInHref}
               style={{ width: "100%" }}
+              data-account-handoff="sign-in"
+              onClick={signInActivate.onClick}
             >
               Sign In
-            </Link>
+            </a>
           </div>
 
           <p className="utility-note">

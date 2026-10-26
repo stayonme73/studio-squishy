@@ -9,6 +9,12 @@ import { createHash, randomBytes } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 
+import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
+import {
+  pgConsumeEmailVerificationToken,
+  pgIssueEmailVerificationToken,
+} from "@/lib/studio-durable-persistence/postgres-identity";
+
 const TOKENS_PATH = path.join(
   process.cwd(),
   "data",
@@ -90,6 +96,10 @@ export async function issueEmailVerificationToken(
       token.supersededAt = stamped;
     }
   }
+  if (isPostgresPersistenceEnabled()) {
+    await pgIssueEmailVerificationToken(record);
+    return { rawToken, record };
+  }
   tokens.push(record);
   await writeTokens(tokens);
   return { rawToken, record };
@@ -118,6 +128,17 @@ export async function consumeEmailVerificationToken(
   }
 
   const tokenHash = hashEmailVerificationToken(trimmed);
+  if (isPostgresPersistenceEnabled()) {
+    const consumed = await pgConsumeEmailVerificationToken(tokenHash);
+    if (!consumed.ok) {
+      return { ok: false, code: consumed.code };
+    }
+    return {
+      ok: true,
+      userId: consumed.record.userId,
+      record: consumed.record,
+    };
+  }
   const tokens = await readTokens();
   const index = tokens.findIndex((token) => token.tokenHash === tokenHash);
   if (index === -1) {

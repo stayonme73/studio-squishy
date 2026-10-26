@@ -2,12 +2,13 @@ import { Suspense } from "react";
 
 import VerifyEmailPendingScene from "@/components/auth/VerifyEmailPendingScene";
 import StudioMobileLoungeShell from "@/components/shared/StudioMobileLoungeShell";
+import { studioBuildManrope } from "@/fonts/studio-build-manrope";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
-import "../../mobile-route-fixes.css";
+import "../../studio-customer-last-paint.css";
 
 export const metadata = {
-  title: "Verify Your Email | The Studio",
+  title: "Verify Your Email",
   description:
     "Check your email to verify your Studio account. Your project stays safe while verification is pending.",
 };
@@ -15,7 +16,7 @@ export const metadata = {
 export default function VerifyEmailPendingPage() {
   return (
     <StudioMobileLoungeShell
-      className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
+      className={`${studioBuildManrope.className} ${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
     >
       <Suspense
         fallback={

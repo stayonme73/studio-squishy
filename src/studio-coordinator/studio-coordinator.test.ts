@@ -322,7 +322,7 @@ describe("studio-coordinator owner outcomes", () => {
 });
 
 describe("studio-coordinator issue detection", () => {
-  it("records stalled observation without changing production state", () => {
+  it("raises no timed stalled observation for a long Waiting on Client job and leaves state unchanged", () => {
     const waitingSince = "2026-06-28T10:00:00.000Z";
     const state = executionState({
       jobs: [
@@ -346,7 +346,7 @@ describe("studio-coordinator issue detection", () => {
       { user: COORDINATOR_SYSTEM_USER, assignments: coordinatorAssignments },
     );
 
-    expect(coordinated.observations.some((entry) => entry.kind === "stalled")).toBe(true);
+    expect(coordinated.observations.some((entry) => entry.kind === "stalled")).toBe(false);
     expect(JSON.stringify(coordinated.state.jobs)).toBe(beforeJobs);
   });
 });

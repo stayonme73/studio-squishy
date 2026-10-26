@@ -28,6 +28,7 @@ import {
   type OwnerRefundDecisionAction,
   type OwnerRevisionDecisionAction,
   type OwnerScopeDecisionAction,
+  type OwnerPricingDecisionAction,
   type OwnerDeskJobAction,
   type OwnerPostDecisionBriefing,
 } from "@/studio-coordinator/briefings/owner-desk";
@@ -47,11 +48,12 @@ import {
   type ResolveExceptionFormState,
 } from "./FileRoomExceptionResolvePanel";
 
-/** Deadline / revision / scope folder patches that use family briefing resolvers. */
+/** Deadline / revision / scope / pricing folder patches that use family briefing resolvers. */
 type OwnerFolderBriefingAction =
   | OwnerDeadlineDecisionAction
   | OwnerRevisionDecisionAction
-  | OwnerScopeDecisionAction;
+  | OwnerScopeDecisionAction
+  | OwnerPricingDecisionAction;
 
 type OwnerFolderBriefingBody = Extract<
   OwnerDecisionFolderPatchBody,

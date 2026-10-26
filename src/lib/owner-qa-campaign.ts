@@ -19,6 +19,7 @@ import {
   saveApprovedRouteMapPlan,
   saveRouteMapJourneyStep,
 } from "@/lib/route-map-campaign";
+import { isFixtureCampaignId } from "@/lib/campaign-store/fixture-guard";
 import { readCurrentCampaign, saveCurrentCampaign } from "@/lib/studio-board-campaign";
 import { discoveryBriefFromAnswers } from "@/lib/discovery-brief";
 import type { RouteMapJobId, RouteMapRoadId } from "@/config/route-map-v1";
@@ -267,6 +268,16 @@ function seedOwnerQaProjectBuilderPlan(currentStep: "panel" | "studio-plan") {
   saveRouteMapJourneyStep(currentStep);
 }
 
+/** Paid customer work must not be replaced by the owner-qa-dev fixture. */
+function keepPaidCustomerCampaign(): boolean {
+  const current = readCurrentCampaign();
+  return Boolean(
+    current?.campaignId &&
+      current.paymentReceivedAt &&
+      !isFixtureCampaignId(current.campaignId),
+  );
+}
+
 /** Apply journey seed — writes localStorage campaign + discovery state before navigation. */
 export function applyOwnerQaJourneySeed(kind: OwnerQaJourneySeedKind): void {
   if (typeof window === "undefined") return;
@@ -321,21 +332,25 @@ export function applyOwnerQaJourneySeed(kind: OwnerQaJourneySeedKind): void {
       return;
     }
     case "studio-board": {
+      if (keepPaidCustomerCampaign()) return;
       saveDiscoveryAnswers(OWNER_QA_DISCOVERY_ANSWERS);
       persistCampaign(buildBuildingConceptsCampaign());
       return;
     }
     case "production": {
+      if (keepPaidCustomerCampaign()) return;
       saveDiscoveryAnswers(OWNER_QA_DISCOVERY_ANSWERS);
       persistCampaign(buildBuildingConceptsCampaign());
       return;
     }
     case "review-room-ready": {
+      if (keepPaidCustomerCampaign()) return;
       saveDiscoveryAnswers(OWNER_QA_DISCOVERY_ANSWERS);
       persistCampaign(buildReviewReadyCampaign());
       return;
     }
     case "final-delivery": {
+      if (keepPaidCustomerCampaign()) return;
       saveDiscoveryAnswers(OWNER_QA_DISCOVERY_ANSWERS);
       persistCampaign(buildDeliveredCampaign());
       return;

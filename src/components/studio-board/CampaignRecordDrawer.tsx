@@ -9,7 +9,7 @@ import ProjectDetailsSummaryPanel from "@/components/campaign-details/ProjectDet
 import { RouteMapClientSummaryPanel } from "@/components/route-map/RouteMapIntakeSummaryPanels";
 import { studioBoard } from "@/config/studio-board";
 import { resolveCampaignDetailsView } from "@/lib/campaign-details-view";
-import { draftRoomEditHref, isIntakeEditable } from "@/lib/intake-edit";
+import { draftRoomEditHref, isIntakeEditableForCustomer } from "@/lib/intake-edit";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 import { useFinalDelivery } from "@/lib/use-final-delivery";
 
@@ -32,7 +32,9 @@ export default function CampaignRecordDrawer({ open, onClose }: Props) {
   const { delivery: finalDelivery } = useFinalDelivery(campaign?.campaignId);
   const panelRef = useRef<HTMLElement>(null);
   const view = resolveCampaignDetailsView(campaign, { finalDelivery });
-  const intakeEditable = campaign ? isIntakeEditable(campaign.campaignStatus) : false;
+  const intakeEditable = campaign
+    ? isIntakeEditableForCustomer(campaign.campaignStatus, view.statusLabel)
+    : false;
   const hintCopy = intakeEditable ? copy.editableHint : copy.submittedHint;
 
   const handleKeyDown = useCallback(

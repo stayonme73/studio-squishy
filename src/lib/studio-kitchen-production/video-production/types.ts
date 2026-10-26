@@ -65,7 +65,7 @@ export type VideoArtifactRef = {
   hasAudioStream?: boolean;
   /** Bound certified voice MP3 hash when voice-over is used. */
   voiceArtifactSha256?: string;
-  productionMethod: "capcut" | "unknown";
+  productionMethod: "shotstack" | "capcut" | "unknown";
   sourceAssetRefs: readonly string[];
 };
 

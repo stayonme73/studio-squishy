@@ -158,7 +158,7 @@ describe("STUDIO-OPERATING-REVIEW-REVISION-FULL-LOOP-1", () => {
           recordedAt: "2026-08-15T12:00:00.000Z",
         },
       }),
-    ).toBe("Book Your Reset");
+    ).toBe("Promotional flyer for Back-to-School Reset");
   });
 
   it("classifies the five frozen $69 flyer slots without rewriting SKU law", () => {

@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { ownerQa } from "@/config/owner-qa";
+import { ownerQa, ownerQaRouteInventory } from "@/config/owner-qa";
 import {
   applyOwnerQaJourneySeed,
   buildOwnerQaGreenApprovedPlan,
   clearAllOwnerQaBrowserState,
 } from "@/lib/owner-qa-campaign";
+import { buildOwnerQaJourneyView, resolveOwnerQaJourneyId } from "@/lib/owner-qa-journey-view";
 
 describe("owner-qa menu config", () => {
   it("lists the certified customer journey in order with no legacy routes", () => {
@@ -65,6 +66,11 @@ describe("owner-qa menu config", () => {
   it("uses customer journey section copy in the dev panel config", () => {
     expect(ownerQa.customerJourneySectionTitle).toBe("Customer Journey");
     expect(ownerQa.panelHint).toBe("Jump through the customer journey. Development only.");
+    expect(ownerQa.journeyPhases.map((phase) => phase.heading)).toEqual([
+      "Phase 1 — Plan",
+      "Phase 2 — Start",
+      "Phase 3 — Produce & Deliver",
+    ]);
   });
 
   it("exposes active internal shortcuts, help, and Reset Campaign", () => {
@@ -90,6 +96,30 @@ describe("owner-qa menu config", () => {
     expect(ownerQa.shortcuts.filter((shortcut) => shortcut.kind === "reset")).toHaveLength(1);
     expect(ownerQa.shortcuts.map((shortcut) => shortcut.label)).not.toContain("Final Delivery");
     expect(ownerQa.shortcuts.map((shortcut) => shortcut.label)).not.toContain("Project Record");
+  });
+
+  it("classifies leftover routes instead of deleting them", () => {
+    expect(ownerQaRouteInventory.every((item) => item.classification !== "REMOVE")).toBe(true);
+    expect(ownerQaRouteInventory.find((item) => item.route === "/final-delivery-room")?.classification).toBe(
+      "HIDE",
+    );
+    expect(ownerQaRouteInventory.find((item) => item.route === "/campaign-details")?.classification).toBe(
+      "HIDE",
+    );
+  });
+
+  it("marks the current journey stage from the live path", () => {
+    expect(resolveOwnerQaJourneyId({ pathname: "/studio-lobby" })).toBe("studio-lobby");
+    expect(resolveOwnerQaJourneyId({ pathname: "/project-builder", search: "view=studio-plan" })).toBe(
+      "studio-plan",
+    );
+    expect(resolveOwnerQaJourneyId({ pathname: "/deliverables" })).toBe("final-delivery");
+    const view = buildOwnerQaJourneyView({ pathname: "/feedback-studio" });
+    expect(view.currentId).toBe("review-room");
+    expect(view.stepStatus["review-room"]).toBe("ACTIVE");
+    expect(view.stepStatus["studio-lobby"]).toBe("COMPLETE");
+    expect(view.stepStatus["final-delivery"]).toBe("NOT STARTED");
+    expect(view.nextAction).toBe("Open Review Room");
   });
 
   it("seeds a believable Green custom plan total for checkout steps", () => {
@@ -247,6 +277,43 @@ describe("owner-qa hard reset", () => {
           currentStep: "intake",
         }),
       );
+    } finally {
+      Object.defineProperty(globalThis, "window", {
+        configurable: true,
+        value: originalWindow,
+      });
+    }
+  });
+
+  it("does not overwrite a paid customer campaign with the Review Room fixture", () => {
+    const localStorage = createStorage();
+    const originalWindow = globalThis.window;
+    const paid = {
+      campaignId: "849c793b-88c1-48cd-9194-5ed95554635a",
+      campaignName: "Make Me a Flyer",
+      paymentReceivedAt: "2026-09-20T18:32:52.327Z",
+    };
+
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: {
+        localStorage,
+        sessionStorage: createStorage(),
+        dispatchEvent: () => true,
+      },
+    });
+
+    try {
+      localStorage.setItem("studio-squishy:current-campaign", JSON.stringify(paid));
+      applyOwnerQaJourneySeed("review-room-ready");
+      const raw = localStorage.getItem("studio-squishy:current-campaign");
+      expect(raw).toBeTruthy();
+      const campaign = JSON.parse(raw!) as {
+        campaignId: string;
+        campaignName: string;
+      };
+      expect(campaign.campaignId).toBe(paid.campaignId);
+      expect(campaign.campaignName).toBe("Make Me a Flyer");
     } finally {
       Object.defineProperty(globalThis, "window", {
         configurable: true,

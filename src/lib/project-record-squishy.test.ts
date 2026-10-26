@@ -80,6 +80,34 @@ describe("resolveGroundedAnswer", () => {
     expect(answer?.text.toLowerCase()).not.toContain("applied");
   });
 
+  it("MJ-D38: does not append Building Concepts when current status is Project Intake Received", () => {
+    const answer = resolveGroundedAnswer(
+      snapshot({
+        campaignStatusLabel: "Project Intake Received",
+        jobStatusLabels: ["Make Me a Flyer — Building Concepts"],
+      }),
+      matchProjectRecordIntent("project status"),
+    );
+    expect(answer?.text).toBe("Your project is currently Project Intake Received.");
+    expect(answer?.text).not.toMatch(/Building Concepts/i);
+  });
+
+  it("keeps mixed service statuses after the shared current status", () => {
+    const answer = resolveGroundedAnswer(
+      snapshot({
+        campaignStatusLabel: "Ready for Review",
+        jobStatusLabels: [
+          "Make Me a Flyer — Ready for Review",
+          "Social Graphics — Waiting on you",
+        ],
+      }),
+      matchProjectRecordIntent("project status"),
+    );
+    expect(answer?.text).toContain("Your project is currently Ready for Review.");
+    expect(answer?.text).toContain("Social Graphics — Waiting on you");
+    expect(answer?.text).not.toMatch(/Building Concepts/i);
+  });
+
   it("answers revision count from snapshot", () => {
     const answer = resolveGroundedAnswer(snapshot(), matchProjectRecordIntent("revisions remaining"));
     expect(answer?.text).toBe(

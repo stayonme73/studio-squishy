@@ -8,6 +8,7 @@
 import { studioBoard, type CampaignRecord, type CampaignStatus } from "@/config/studio-board";
 import { resolveIntakeEditHref } from "@/lib/intake-edit";
 import { isIntakeComplete } from "@/lib/studio-board-campaign";
+import { reviewProofHref, singleCampaignJobId } from "@/lib/review-room-navigation";
 import {
   PROJECT_INTAKE_RECEIVED_LEAD,
   PROJECT_INTAKE_RECEIVED_STATUS,
@@ -23,7 +24,16 @@ import {
   type StudioBoardDisplayFacts,
 } from "@/lib/studio-board-view";
 import { resolvePaidOperatingRecoveryCustomerCopy } from "@/lib/studio-paid-activation-recovery/customer-copy";
+import { resolveCustomerIdentitySafetyCustomerCopy } from "@/lib/studio-customer-identity-safety-gate/customer-copy";
 import { resolveCustomerCurrentStatusOverlay } from "@/lib/studio-customer-current-status";
+import {
+  CLIP_RECORDING_NEXT,
+  clipRepurposingRecordingIsNext,
+} from "@/lib/studio-dispatch/clip-door-facts";
+import {
+  SOCIAL_FILES_NEXT,
+  socialGraphicsFilesAreNext,
+} from "@/lib/project-intake-plan";
 
 const { nextAction: nextCopy, campaignActions: actionCopy } = studioBoard;
 
@@ -139,7 +149,12 @@ export function resolveBoardNextActionPresentation(
   const { campaign, displayFacts, actionableMaterialKeys, nextUpdateLabel } = input;
   const status = campaign.campaignStatus;
   const signalFacts = resolveSignalFacts(campaign, displayFacts);
-  const actions = resolveBoardCampaignActions(status, true);
+  const actions = resolveBoardCampaignActions(status, true, {
+    reviewHref: (() => {
+      const jobId = singleCampaignJobId(campaign.postPayActivation?.jobIds);
+      return jobId ? reviewProofHref(jobId) : undefined;
+    })(),
+  });
   const primary = actions.find((entry) => entry.isPrimary);
 
   if (status === "DISCOVERY_COMPLETE") {
@@ -177,7 +192,7 @@ export function resolveBoardNextActionPresentation(
     });
   }
 
-  if (overlay?.kind === "review_ready") {
+  if (overlay?.kind === "review_ready" || overlay?.kind === "partial_review_ready") {
     return presentation({
       statusLabel: overlay.statusLabel,
       lead: overlay.lead,
@@ -242,6 +257,45 @@ export function resolveBoardNextActionPresentation(
 
   // Package 1b — paid incomplete Project Intake (product behavior unchanged).
   if (status === "PAYMENT_RECEIVED" && !isIntakeComplete(campaign)) {
+    const identityHold = resolveCustomerIdentitySafetyCustomerCopy(campaign);
+    if (identityHold) {
+      return presentation({
+        statusLabel: identityHold.statusLabel,
+        lead: identityHold.lead,
+        hint: identityHold.hint,
+        action: null,
+        tone: "waiting",
+        materialsSupportLine: identityHold.lead,
+      });
+    }
+    if (clipRepurposingRecordingIsNext(campaign)) {
+      return presentation({
+        statusLabel: CLIP_RECORDING_NEXT.statusLabel,
+        lead: CLIP_RECORDING_NEXT.lead,
+        hint: null,
+        action: {
+          type: "navigate",
+          label: CLIP_RECORDING_NEXT.actionLabel,
+          href: CLIP_RECORDING_NEXT.href,
+        },
+        tone: "default",
+        materialsSupportLine: CLIP_RECORDING_NEXT.materialsSupportLine,
+      });
+    }
+    if (socialGraphicsFilesAreNext(campaign)) {
+      return presentation({
+        statusLabel: SOCIAL_FILES_NEXT.statusLabel,
+        lead: SOCIAL_FILES_NEXT.lead,
+        hint: null,
+        action: {
+          type: "navigate",
+          label: SOCIAL_FILES_NEXT.actionLabel,
+          href: SOCIAL_FILES_NEXT.href,
+        },
+        tone: "default",
+        materialsSupportLine: SOCIAL_FILES_NEXT.materialsSupportLine,
+      });
+    }
     return presentation({
       statusLabel: nextCopy.waitingOnProjectIntakeLabel,
       lead: nextCopy.completeProjectDetailsHint,
@@ -253,6 +307,18 @@ export function resolveBoardNextActionPresentation(
       },
       tone: "default",
       materialsSupportLine: MATERIALS_SUPPORT_INCOMPLETE_INTAKE,
+    });
+  }
+
+  const identityHold = resolveCustomerIdentitySafetyCustomerCopy(campaign);
+  if (identityHold) {
+    return presentation({
+      statusLabel: identityHold.statusLabel,
+      lead: identityHold.lead,
+      hint: identityHold.hint,
+      action: null,
+      tone: "waiting",
+      materialsSupportLine: identityHold.lead,
     });
   }
 

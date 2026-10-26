@@ -110,7 +110,7 @@ export type RmJ008LiveKitLockInput = {
   platform: string;
   businessName: string;
   /** Must affirm existing profile control — not new setup. */
-  customerControlsExistingProfile: boolean | "Yes" | "true" | true;
+  customerControlsExistingProfile: boolean | string;
   beforeDisplayName: string;
   beforeBioOrAbout: string;
   beforeWebsite: string;

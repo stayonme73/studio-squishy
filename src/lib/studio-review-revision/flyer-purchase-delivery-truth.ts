@@ -6,7 +6,7 @@
  * the truth without inventing new SKU law.
  *
  * Authority already on the SKU:
- * - Route Map: “One single-sided flyer in one size — ready to print or share online.”
+ * - Route Map: “One single-sided digital flyer in one size — share online or print it yourself.”
  * - FLYER_PROOF_CONTRACT.requiredDeliverableFormats: png + pdf
  * - “One flyer — PDF + digital”
  *
@@ -17,7 +17,23 @@
  * fail closed.
  */
 
+import { FLYER_PRINT_PDF_LABEL_ALIASES } from "@/config/studio-flyer-light-harden-v1";
 import { FLYER_PROOF_CONTRACT } from "@/lib/studio-design-renderer/contracts";
+import { campaignGraphicsClientDeliveryFileLabels } from "./campaign-graphics-purchase-delivery-truth";
+import { copyKitClientDeliveryFileLabels } from "./copy-kit-purchase-delivery-truth";
+import { menuClientDeliveryFileLabels } from "./menu-purchase-delivery-truth";
+import { serviceSheetClientDeliveryFileLabels } from "./service-sheet-purchase-delivery-truth";
+import { businessCardClientDeliveryFileLabels } from "./business-card-purchase-delivery-truth";
+import { shortVideoClientDeliveryFileLabels } from "./short-video-purchase-delivery-truth";
+import { socialPostsClientDeliveryFileLabels } from "./social-posts-purchase-delivery-truth";
+import {
+  isSocialPromoParentSku,
+  socialPromoClientDeliveryFileLabels,
+} from "./social-promo-purchase-delivery-truth";
+import {
+  campaignLaunchKitClientDeliveryFileLabels,
+  isCampaignLaunchKitParentSku,
+} from "./campaign-launch-kit-purchase-delivery-truth";
 
 export const FLYER_SKU_ID = FLYER_PROOF_CONTRACT.skuId;
 
@@ -52,11 +68,12 @@ export const FLYER_INCLUDED_SLOT_TRUTH: readonly FlyerIncludedSlotTruth[] = [
   },
   {
     key: "print_ready_pdf",
-    label: "Print-ready PDF",
+    label:
+      "PDF you can print yourself (digital CERT plate — not a certified 300 DPI print file)",
     class: "customer_promised_file",
     format: "pdf",
     customerFacingExplanation:
-      "Print file exported from the approved Version N design identity.",
+      "Customer-print PDF exported from the approved Version N design identity. Digital CERT plate — not a certified 300 DPI print file.",
   },
   {
     key: "digital_share_file",
@@ -78,6 +95,14 @@ export const FLYER_INCLUDED_SLOT_TRUTH: readonly FlyerIncludedSlotTruth[] = [
 const SLOTS_BY_LABEL = new Map(
   FLYER_INCLUDED_SLOT_TRUTH.map((slot) => [slot.label, slot]),
 );
+
+const PRINT_PDF_SLOT = FLYER_INCLUDED_SLOT_TRUTH.find(
+  (slot) => slot.key === "print_ready_pdf",
+)!;
+
+for (const alias of FLYER_PRINT_PDF_LABEL_ALIASES) {
+  SLOTS_BY_LABEL.set(alias, PRINT_PDF_SLOT);
+}
 
 export function classifyFlyerIncludedSlot(
   label: string,
@@ -118,12 +143,21 @@ export function clientDeliveryFileLabelsForSku(
     return files.length > 0 ? files : [...labels];
   }
   if (skuId === "v2-rtu-short-video") {
-    const mp4 = labels.filter(
-      (label) => /mp4/i.test(label) || /final\s+mp4/i.test(label),
-    );
-    return mp4.length > 0 ? mp4 : [...labels];
+    return [...shortVideoClientDeliveryFileLabels(skuId, labels)];
   }
-  return [...labels];
+  if (isSocialPromoParentSku(skuId)) return [...socialPromoClientDeliveryFileLabels()];
+  if (isCampaignLaunchKitParentSku(skuId)) return [...campaignLaunchKitClientDeliveryFileLabels()];
+  const sheet = serviceSheetClientDeliveryFileLabels(skuId, labels);
+  if (skuId === "v2-rtu-service-sheet") return [...sheet];
+  const graphics = campaignGraphicsClientDeliveryFileLabels(skuId, labels);
+  if (skuId === "v2-rtu-promotion-graphics") return [...graphics];
+  const menu = menuClientDeliveryFileLabels(skuId, labels);
+  if (skuId === "v2-rtu-menu") return [...menu];
+  const social = socialPostsClientDeliveryFileLabels(skuId, labels);
+  if (skuId === "v2-rtu-social-posts") return [...social];
+  const card = businessCardClientDeliveryFileLabels(skuId, labels);
+  if (skuId === "v2-rtu-business-card") return [...card];
+  return [...copyKitClientDeliveryFileLabels(skuId, labels)];
 }
 
 export function customerVisiblePurchaseLabelsForSku(

@@ -1,12 +1,13 @@
 import SignUpScene from "@/components/auth/SignUpScene";
 import StudioMobileLoungeShell from "@/components/shared/StudioMobileLoungeShell";
 import { safeReturnPath } from "@/lib/auth/safe-return-path";
+import { studioBuildManrope } from "@/fonts/studio-build-manrope";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
-import "../mobile-route-fixes.css";
+import "../studio-customer-last-paint.css";
 
 export const metadata = {
-  title: "Create Account | The Studio",
+  title: "Create Account",
   description:
     "Create a Studio account to open your Board and follow your project.",
 };
@@ -29,7 +30,7 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
 
   return (
     <StudioMobileLoungeShell
-      className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
+      className={`${studioBuildManrope.className} ${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
     >
       <SignUpScene returnTo={returnTo} />
     </StudioMobileLoungeShell>

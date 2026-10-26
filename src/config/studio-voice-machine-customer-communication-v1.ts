@@ -16,6 +16,8 @@ export const studioVoiceMachineCustomerCommunicationV1 = {
   customerCopy: {
     lookupFailed:
       "I could not reach the live project record just now, so I will not guess. Please ask again in a moment, or check your Studio Board.",
+    unsignedAskNotDeadRecord:
+      "I can answer from the services The Studio currently offers, and from the plan on this screen. Sign in if you want me to look up a saved project. I will not treat a sign-in prompt as a missing project.",
     messageReceivedAnswered:
       "We received your question and answered it from the project record.",
     messageReceivedUnknown:
@@ -26,7 +28,7 @@ export const studioVoiceMachineCustomerCommunicationV1 = {
     awaitingStaffReply: "A person on The Studio team has not written a separate reply yet.",
     studioRequestHeading: "The Studio needs something from you",
     intakeRequest:
-      "We still need your Project Intake. Payment and your flyer project are already on the record. Please complete Project Intake so the next step can continue. You do not need to repeat facts the Studio already has.",
+      "We still need your Project Intake. Payment and your project are already on the record. Please complete Project Intake so the next step can continue. You do not need to repeat facts the Studio already has.",
     materialsRequest:
       "The Studio still needs a required material from you before this service can move forward.",
     unusableFileRequest:

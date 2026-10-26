@@ -22,6 +22,7 @@ export const deliverables = {
     reviewRoom: "/feedback-studio",
     deliverables: "/deliverables",
     draftRoom: "/studio-conversation-room?stage=intake",
+    newCampaign: studioBoard.routes.newCampaign,
   },
 
   sidebar: {
@@ -136,8 +137,8 @@ export const deliverables = {
   },
 
   empty: {
-    preparing: "The Studio team is preparing your final deliverables.",
-    preparingHint: "Check back soon — you'll be notified when your package is ready.",
+    preparing: "There are no released files for this project yet.",
+    preparingHint: "This project is still Project Intake Received. The Studio is working. Nothing has been approved or released yet.",
     noCampaignSubtitle:
       "Your completed files will appear here when a project is ready for delivery.",
     noCampaign: "Start a project to receive files from The Studio.",
@@ -159,9 +160,9 @@ export const deliverables = {
     notReady: {
       eyebrow: "Final Delivery",
       title: "Not Ready for Delivery Yet",
-      message: "The Studio team is preparing your final deliverables.",
+      message: "There are no released files for this project yet.",
       messageSecondary:
-        "Check back soon — your completed files will appear here once your project is approved and released.",
+        "This project is still Project Intake Received. The Studio is working. Nothing has been approved or released yet.",
       primaryCta: "GO TO STUDIO BOARD",
       secondaryCta: "Help Center",
       primaryHref: "/studio-board",
@@ -188,8 +189,13 @@ export const deliverables = {
 export function customerVisibleFileFormatLabel(fileType: string, fileName = ""): string {
   const haystack = `${fileType} ${fileName}`.toLowerCase();
   if (haystack.includes("pdf")) return "Print-ready PDF";
+  if (haystack.includes("mp4")) return "Vertical video";
+  if (haystack.includes("markdown") || fileName.toLowerCase().endsWith(".md")) return "Posting guide";
   if (haystack.includes("png")) return "Digital PNG";
   if (haystack.includes("jpeg") || haystack.includes("jpg")) return "Digital JPG";
+  if (haystack.includes("html") || haystack.includes("text/plain") || haystack.includes("text/")) {
+    return "Copy";
+  }
   const stripped = fileType.replace(/^application\//i, "").replace(/^image\//i, "").trim();
   return stripped ? stripped.toUpperCase() : "File";
 }

@@ -15,8 +15,14 @@ import {
 } from "@/lib/route-map-campaign";
 import {
   readCurrentCampaign,
+  readCurrentCampaignHydrated,
   saveCurrentCampaign,
 } from "@/lib/studio-board-campaign";
+import { readWorkingDraft } from "@/lib/studio-working-draft";
+import {
+  readSelectedRoute,
+  readSelectedServices,
+} from "@/lib/conversation-room-draft/slices";
 
 /**
  * Host checkout refuses to overwrite a paid campaign's approved plan.
@@ -84,4 +90,49 @@ export function bridgeConversationPlanToCampaign(
 
   saveRouteMapJourneyStep("checkout");
   return true;
+}
+
+/**
+ * Intake reads the current campaign pointer. If Lobby detached it, or the
+ * pointer has no restoreable job, rebuild from the Conversation working draft
+ * so the customer is not parked on a dead recovery link.
+ */
+export function ensureConversationIntakeCampaign() {
+  const existing = readCurrentCampaignHydrated();
+  if (existing?.condensedOffer && existing.paymentReceivedAt) {
+    return existing;
+  }
+  if (
+    existing?.routeMapContext?.jobId &&
+    existing.routeMapContext.roadId &&
+    (existing.routeMapContext.selectedServiceIds?.length ||
+      existing.approvedStudioPlan?.selectedServiceIds?.length)
+  ) {
+    return existing;
+  }
+
+  const draft = readWorkingDraft();
+  if (!draft) return existing;
+  const route = readSelectedRoute(draft);
+  const services = readSelectedServices(draft);
+  if (!route || services.length === 0) return existing;
+
+  const serviceIds = services.map((service) => service.jobId as ServiceId);
+
+  if (!existing || !existing.paymentReceivedAt) {
+    bridgeConversationPlanToCampaign(route.roadId, serviceIds);
+    return readCurrentCampaignHydrated();
+  }
+
+  saveCurrentCampaign({
+    ...existing,
+    routeMapContext: {
+      roadId: route.roadId,
+      jobId: services[0].jobId,
+      selectedServiceIds: serviceIds,
+      selectedAt: route.selectedAt,
+      currentStep: "intake",
+    },
+  });
+  return readCurrentCampaignHydrated();
 }

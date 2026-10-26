@@ -2,13 +2,19 @@ import { promises as fs } from "fs";
 import path from "path";
 
 import type { CampaignRecord } from "@/config/studio-board";
+import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
 import { readCampaignEnvelope } from "@/lib/campaign-store/store";
+import {
+  pgReadMaterialsEnvelope,
+  pgWriteMaterialsEnvelope,
+} from "@/lib/studio-durable-persistence/postgres-spine";
 import {
   FLYER_PROOF_CONTRACT,
   isDesignRendererProofSku,
 } from "@/lib/studio-design-renderer";
 
 import { syncMaterialsSummaryOnCampaign } from "./campaign-summary";
+import { ensureCondensedPackageMaterialSlots } from "./condensed-package-slots";
 import { migrateFromProjectDetails } from "./migrate-from-project-details";
 import { countBlockingRequiredMaterials } from "./materials-view";
 import type { CampaignMaterialItem, ServerMaterialsEnvelope } from "./types";
@@ -26,6 +32,9 @@ async function ensureMaterialsDir(): Promise<void> {
 export async function readMaterialsEnvelope(
   campaignId: string,
 ): Promise<ServerMaterialsEnvelope | null> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgReadMaterialsEnvelope(campaignId);
+  }
   try {
     const raw = await fs.readFile(materialsPath(campaignId), "utf8");
     return JSON.parse(raw) as ServerMaterialsEnvelope;
@@ -38,6 +47,9 @@ export async function readMaterialsEnvelope(
 export async function writeMaterialsEnvelope(
   envelope: ServerMaterialsEnvelope,
 ): Promise<ServerMaterialsEnvelope> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgWriteMaterialsEnvelope(envelope);
+  }
   await ensureMaterialsDir();
   await fs.writeFile(materialsPath(envelope.campaignId), JSON.stringify(envelope, null, 2), "utf8");
   return envelope;
@@ -53,9 +65,10 @@ async function ensureCampaignMaterialsSummary(
   items: readonly CampaignMaterialItem[],
 ): Promise<void> {
   const campaignEnvelope = await readCampaignEnvelope(campaignId);
-  if (!campaignEnvelope?.record.materialsSummary) {
-    await syncMaterialsSummaryOnCampaign(campaignId, countBlockingRequiredMaterials(items));
-  }
+  await syncMaterialsSummaryOnCampaign(
+    campaignId,
+    countBlockingRequiredMaterials(items, campaignId),
+  );
 }
 
 /**
@@ -78,7 +91,9 @@ export function reconcileFlyerWordmarkMaterialTruth(
   const now = new Date().toISOString();
   let changed = false;
   const items = envelope.items.map((item) => {
-    const flyerRelated = item.relatedServiceIds.some((skuId) => flyerSkuIds.has(skuId));
+    const flyerRelated = item.relatedServiceIds.some((skuId) =>
+      [...flyerSkuIds].some((flyerId) => flyerId === skuId),
+    );
     if (!flyerRelated) return item;
 
     if (item.sourceExceptionId || item.promotionApprovedAt || item.reviewStatus === "requested") {
@@ -98,9 +113,7 @@ export function reconcileFlyerWordmarkMaterialTruth(
         ...item,
         requirementLevel: "optional" as const,
         reviewStatus:
-          item.reviewStatus === "missing" || item.reviewStatus === "requested"
-            ? ("not_needed" as const)
-            : item.reviewStatus,
+          item.reviewStatus === "missing" ? ("not_needed" as const) : item.reviewStatus,
       };
     }
 
@@ -156,8 +169,23 @@ export async function getOrInitializeMaterials(
       record = envelope?.record;
     }
     const reconciled = await persistReconciliationIfNeeded(existing, record);
-    await ensureCampaignMaterialsSummary(campaignId, reconciled.items);
-    return reconciled;
+    const withSlots = record
+      ? ensureCondensedPackageMaterialSlots(reconciled, record)
+      : { record: reconciled, changed: false };
+    const ready = withSlots.changed
+      ? await writeMaterialsEnvelope({
+          ...withSlots.record,
+          syncedAt: new Date().toISOString(),
+        })
+      : reconciled;
+    if (withSlots.changed) {
+      await syncMaterialsSummaryOnCampaign(
+        campaignId,
+        countBlockingRequiredMaterials(ready.items, campaignId),
+      );
+    }
+    await ensureCampaignMaterialsSummary(campaignId, ready.items);
+    return ready;
   }
 
   let record = campaign;
@@ -169,7 +197,10 @@ export async function getOrInitializeMaterials(
     throw new Error(`Cannot initialize materials — campaign "${campaignId}" not found.`);
   }
 
-  const migrated = migrateFromProjectDetails(record);
+  const migrated = ensureCondensedPackageMaterialSlots(
+    migrateFromProjectDetails(record),
+    record,
+  ).record;
   const envelope = await writeMaterialsEnvelope(toEnvelope(migrated));
   await syncMaterialsSummaryOnCampaign(campaignId, countBlockingRequiredMaterials(envelope.items));
   return envelope;

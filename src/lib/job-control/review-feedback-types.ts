@@ -9,6 +9,9 @@ export type JobReviewStickyNote = {
   color: StickyNoteColorId;
   text: string;
   createdAt: string;
+  /** Optional 0–1 proof placement. Ignored by production. */
+  anchorX?: number;
+  anchorY?: number;
 };
 
 export type JobReviewVoiceNote = {

@@ -52,7 +52,6 @@ describe("navigation cleanup v1", () => {
   it("limits utility subnav to approved client items", () => {
     expect(utilityShell.nav.map((item) => item.id)).toEqual([
       "studio-board",
-      "campaign-details",
       "review-room",
       "deliverables",
       "help-center",

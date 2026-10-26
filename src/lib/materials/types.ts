@@ -1,7 +1,11 @@
 import type { ServiceId } from "@/catalog/types";
+import type { CondensedPackageId } from "@/config/studio-customer-journey-condense-v1";
 import type { StudioFileReference, StudioFileStorageReference } from "@/lib/file-registry/types";
 
 import type { CustomerContentCertification } from "@/lib/studio-customer-content-intake/types";
+
+/** Catalog service id or a current condensed package id. Both are already stored on material slots. */
+export type MaterialRelatedId = ServiceId | CondensedPackageId;
 
 export type MaterialCategory =
   | "logo-brand"
@@ -44,7 +48,7 @@ export type CampaignMaterialItem = {
   contentKind: MaterialContentKind;
   label: string;
   reason: string;
-  relatedServiceIds: readonly ServiceId[];
+  relatedServiceIds: readonly MaterialRelatedId[];
   /** Linked exception when promoted from File Room (Slice 3d-c). */
   sourceExceptionId?: string;
   promotionApprovedAt?: string;
@@ -108,6 +112,11 @@ export type CampaignMaterialItem = {
     escalationTarget: "none" | "owner_policy";
     reasons: readonly string[];
   };
+  /**
+   * This slot holds its own file. A category-wide upload must not copy one
+   * file onto every other slot of the same kind.
+   */
+  isolatedSlot?: boolean;
   /** Gate X per-file intake, rights, technical inspection, and routing record. */
   contentCertification?: CustomerContentCertification;
   /** Prior per-file certification records preserved on supersession or withdrawal. */
@@ -131,5 +140,5 @@ export type MaterialSlotDefinition = {
   label: string;
   reason: string;
   requirementLevel: MaterialRequirementLevel;
-  relatedServiceIds: readonly ServiceId[];
+  relatedServiceIds: readonly MaterialRelatedId[];
 };

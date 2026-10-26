@@ -173,6 +173,7 @@ function deskItemHeavyLaneFull(
 
   const nextJob = jobs.find((entry) => entry.jobId === nextUp.jobId);
   if (nextJob?.heavyLaneOwnerDecision) return null;
+  if (!nextJob?.heavyLaneBumpRequested) return null;
 
   return {
     id: `desk:heavy-full:${nextUp.jobId}`,
@@ -182,8 +183,9 @@ function deskItemHeavyLaneFull(
     campaignName: nextUp.campaignName,
     jobId: nextUp.jobId,
     serviceName: nextUp.serviceName,
-    title: `Heavy lane full — ${nextUp.serviceName} queued`,
-    detail: "Heavy lane at capacity (1/1). Decide whether to bump or wait.",
+    title: `Heavy lane full — ${nextUp.serviceName} needs a priority decision`,
+    detail:
+      "Routine overflow waits automatically. Owner is needed only for this priority bump.",
     drillDownHref: ownerConsoleCampaignRoute(nextUp.campaignId),
     updatedAt: new Date().toISOString(),
   };

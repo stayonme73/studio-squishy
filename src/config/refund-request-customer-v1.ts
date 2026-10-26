@@ -5,9 +5,14 @@
  */
 
 export const REFUND_REQUEST_CUSTOMER_V1 = {
-  sectionTitle: "REFUND REQUEST",
+  sectionTitle: "Billing & cancellation",
+  disclosureLabel: "Billing & cancellation",
   sectionLead:
     "You can request a refund review for a service on this project. Requests are reviewed by the owner. A refund may be eligible or may be approved only when policy conditions are met and production has not started on that service.",
+  eligibilityBeforeProduction:
+    "You may request cancellation/refund review.",
+  eligibilityAfterProduction:
+    "Refund eligibility may be limited. You can still request owner review.",
 
   jobLabel: "Which service is this request about?",
   jobSelectPlaceholder: "Select a service",
@@ -24,7 +29,7 @@ export const REFUND_REQUEST_CUSTOMER_V1 = {
   detailsLabel: "Supporting details (optional)",
   detailsPlaceholder: "Add any details that help the owner review your request.",
 
-  submitLabel: "Submit refund request",
+  submitLabel: "Request refund review",
   submitBusyLabel: "Submitting…",
 
   policyNote:
@@ -47,6 +52,6 @@ export const REFUND_REQUEST_CUSTOMER_V1 = {
   statusLoadFailed: "Could not load refund request status.",
   statusHeading: "Current request status",
 
-  helpCenterHint: "Read the Refund Policy in the Help Center for full eligibility details.",
-  helpCenterHref: "/help-center",
+  helpCenterHint: "Read the full Refund/Cancellation Policy in the Help Center.",
+  helpPolicyAnchor: "policy-refund-policy",
 } as const;

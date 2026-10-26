@@ -1,3 +1,5 @@
+import { maximumApprovedFullRefundCents } from "@/lib/studio-payment/thank-you-refund";
+import { evaluateRefundExecutionPlan } from "@/lib/studio-payment/refund-execution";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignRecord } from "@/config/studio-board";
@@ -77,20 +79,31 @@ function appendOwnerNote(
   return { job: updatedJob, events: updatedEvents };
 }
 
+/**
+ * Canonical refund approval (Owner approve and legacy issue_refund).
+ * Records "approved" and returns the Stripe execution plan. It never closes the job or
+ * claims money moved — that happens only from Stripe truth (`applyRefundProviderOutcome`).
+ */
 export function applyOwnerApproveRefund(
   envelope: ServerTasksEnvelope,
   campaign: CampaignRecord,
   jobId: string,
-  payload: { reason: string; ownerNotes?: string },
+  payload: { reason: string; ownerNotes?: string; amountCents?: number },
   user: StudioUser,
-  clientId: string,
+  _clientId: string,
+  options: { env?: NodeJS.ProcessEnv } = {},
 ): ProductionWorkspacePatchResult {
   if (!isOwnerUser(user)) {
     return { ok: false, error: "Owner role required.", status: 403 };
   }
   const job = findJob(envelope, jobId);
   if (!job) return { ok: false, error: "Job not found.", status: 404 };
-  if (isFinalRefundDecisionRecorded(job)) {
+  const priorExecution = job.refundExecution ?? null;
+  if (
+    isFinalRefundDecisionRecorded(job) ||
+    priorExecution?.stage === "processing" ||
+    priorExecution?.stage === "completed"
+  ) {
     return { ok: false, error: "Refund decision already recorded.", status: 409 };
   }
   if (job.productionStartedAt || job.nonRefundable) {
@@ -105,49 +118,76 @@ export function applyOwnerApproveRefund(
   if (!reason.trim()) {
     return { ok: false, error: "Refund reason is required.", status: 400 };
   }
+  const refundCapCents = maximumApprovedFullRefundCents(campaign);
+  if (typeof payload.amountCents === "number" && payload.amountCents !== refundCapCents) {
+    return {
+      ok: false,
+      error:
+        refundCapCents != null && payload.amountCents > refundCapCents
+          ? "A refund cannot exceed the amount still refundable after any Courtesy Adjustment."
+          : "Only full refunds of the amount still refundable are supported.",
+      status: 422,
+    };
+  }
+
+  const attempt =
+    priorExecution?.stage === "failed" ? priorExecution.attempt + 1 : priorExecution?.attempt ?? 1;
+  const jobsOnPayment = (envelope.jobRecords ?? []).filter(
+    (entry) => entry.campaignId === job.campaignId,
+  ).length;
+  const planned = evaluateRefundExecutionPlan({
+    campaign,
+    job,
+    jobsOnPayment,
+    attempt,
+    env: options.env,
+  });
+  if (!planned.ok) {
+    return { ok: false, error: planned.message, status: 422 };
+  }
 
   const actor = actorFromUser(user);
   const occurredAt = new Date().toISOString();
-  let events = [...(envelope.jobActivityEvents ?? [])];
-
-  const refundResult = applyJobSpineStatusChange(job, events, {
-    job,
-    nextStatus: "refunded_cancelled",
-    actor,
-    reason,
-    occurredAt,
-  });
-  let updatedJob = {
-    ...refundResult.job,
+  const updatedJob: PurchasedJobRecord = {
+    ...job,
     refundEligibleAt: job.refundEligibleAt ?? occurredAt,
-    refundOwnerDecisionAt: occurredAt,
-  };
-  events = refundResult.events;
-
-  let nextEnvelope = enqueueJobCommunicationRecord(
-    { ...envelope, jobActivityEvents: events },
-    {
-      campaign,
-      clientId,
-      job: updatedJob,
-      eventType: "refund_issued",
-      sender: actor,
-      occurredAt,
-      idempotencyKey: `owner-decision:refund-approve:${job.jobId}`,
-      reason,
+    refundApprovedAmountCents: planned.plan.amountCents,
+    refundExecution: {
+      provider: "stripe",
+      stage: "approved",
+      attempt,
+      idempotencyKey: planned.plan.idempotencyKey,
+      paymentIntentId: planned.plan.paymentIntentId,
+      requestedAmountCents: planned.plan.amountCents,
+      currency: "usd",
+      stripeRefundId: null,
+      providerStatus: null,
+      providerCreatedAt: null,
+      approvedAt: occurredAt,
+      updatedAt: occurredAt,
+      completedAt: null,
+      failedAt: null,
+      failureCode: null,
+      failureReason: null,
+      priorSpineStatus: job.spineStatus,
     },
-  );
-  events = nextEnvelope.jobActivityEvents ?? [];
+    updatedAt: occurredAt,
+  };
+  const events = appendJobActivityEvent([...(envelope.jobActivityEvents ?? [])], {
+    campaignId: job.campaignId,
+    jobId: job.jobId,
+    kind: "refund",
+    occurredAt,
+    actor,
+    reason: "Owner approved refund",
+    messageContent: reason,
+  });
 
   return {
     ok: true,
-    envelope: resolveRefundRequestInteractionOnOwnerDecision(
-      updateJobInEnvelope(nextEnvelope, updatedJob, events),
-      job.jobId,
-      reason,
-    ),
+    envelope: updateJobInEnvelope(envelope, updatedJob, events),
     job: updatedJob,
-    updatedCampaign: campaign,
+    refundExecutionPlan: planned.plan,
   };
 }
 

@@ -7,7 +7,9 @@ import {
 } from "@/lib/campaign-record";
 import {
   PROJECT_SNAPSHOT_DELIVERABLES_UNAVAILABLE,
+  projectSnapshotShowsDeliverablesLink,
   resolveProjectSnapshotDeliverables,
+  resolveProjectSnapshotProgressCopy,
 } from "@/lib/studio-board-project-snapshot";
 import {
   SOCIAL_POSTS_JOB_ID,
@@ -182,6 +184,54 @@ describe("BOARD-TRUTH-2 project snapshot deliverables honesty", () => {
       },
     ]);
     expect(view.kind).toBe("unavailable");
+  });
+
+  it("does not say 0 of 1 complete while the Board says Ready for Review", () => {
+    expect(
+      resolveProjectSnapshotProgressCopy(
+        { delivered: 0, total: 1 },
+        "Ready for Review",
+      ),
+    ).toBe("Ready for review — not yet released");
+    expect(
+      resolveProjectSnapshotProgressCopy(
+        { delivered: 0, total: 1 },
+        "Payment received",
+      ),
+    ).toBe("0 of 1 delivered");
+    expect(
+      resolveProjectSnapshotProgressCopy(
+        { delivered: 1, total: 1 },
+        "Ready for Review",
+      ),
+    ).toBe("1 of 1 complete");
+  });
+
+  it("does not say 0 of 1 delivered while Final Delivery is ready", () => {
+    expect(
+      resolveProjectSnapshotProgressCopy(
+        { delivered: 0, total: 1 },
+        "Final Delivery ready",
+      ),
+    ).toBe("Ready to download");
+    expect(
+      resolveProjectSnapshotProgressCopy(
+        { delivered: 1, total: 1 },
+        "Final Delivery ready",
+      ),
+    ).toBe("1 of 1 complete");
+    expect(
+      projectSnapshotShowsDeliverablesLink(
+        { showViewDeliverables: false },
+        "Final Delivery ready",
+      ),
+    ).toBe(true);
+    expect(
+      projectSnapshotShowsDeliverablesLink(
+        { showViewDeliverables: false },
+        "Payment received",
+      ),
+    ).toBe(false);
   });
 
   it("View deliverables appears only when released or complete counts exist", () => {

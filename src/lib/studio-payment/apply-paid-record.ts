@@ -78,6 +78,17 @@ export function applyPaidTruthToCampaignRecord(
     };
   }
 
+  if (updated.condensedOffer) {
+    updated = {
+      ...updated,
+      packageLabel: updated.condensedOffer.name,
+      revisionRoundsIncluded:
+        updated.revisionRoundsIncluded ?? updated.condensedOffer.revisionRounds,
+      revisionRoundsIncludedSource:
+        updated.revisionRoundsIncludedSource ?? "package_snapshot",
+    };
+  }
+
   if (intakeComplete(updated)) {
     updated = withStatus(updated, "BUILDING_CONCEPTS");
   } else {

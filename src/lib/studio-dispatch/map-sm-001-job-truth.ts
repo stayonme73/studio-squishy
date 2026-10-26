@@ -21,7 +21,7 @@ import type {
   Sm001SetStructureTruth,
 } from "@/lib/studio-design-renderer";
 
-import { resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
+import { requirePresentLogoMaterial, resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
 import type { JobDispatchRecord } from "./types";
 
 export const SM_001_DISPATCH_WIRING_SCOPE_NOTE =
@@ -266,12 +266,12 @@ export function mapSm001ProjectTruthFromJob(input: {
     };
   }
 
-  const logo = resolveApprovedLogoMaterial({
+  const logo = requirePresentLogoMaterial(resolveApprovedLogoMaterial({
     repoRoot: input.repoRoot,
     items: input.materials,
     skuId: DESIGN_RENDERER_SM_001_SKU,
     stagedLogoRelativePath: input.stagedLogoRelativePath,
-  });
+  }));
   if (!logo.ok) {
     return { ok: false, code: logo.code, message: logo.message };
   }

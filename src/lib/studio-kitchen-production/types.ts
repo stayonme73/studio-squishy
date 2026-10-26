@@ -33,6 +33,12 @@ export type ProductionToolId =
   | "studio_landing_page_structure"
   /** Deterministic HTML/CSS + Playwright design renderer (v2-rtu-flyer proof path). */
   | "studio_design_renderer"
+  | "studio_copy_producer"
+  | "footage_editing_pipeline"
+  /** CLIP_REPURPOSING_PRIMARY_TOOL_ID. The set factory the clip hook and launch observer already gate on. */
+  | "clip_repurposing_pipeline"
+  /** Contain, margin, and PNG export for v2-creative-qa-finish. Not another design SKU. */
+  | "creative_qa_finish_pipeline"
   | "manual_platform_admin"
   | "none_specified";
 

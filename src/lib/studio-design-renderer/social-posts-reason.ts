@@ -6,6 +6,16 @@
 
 import { resolveSocialPostPlate } from "./social-posts-contracts";
 import {
+  SOCIAL_POST_STACK_GAP_PX,
+  stackTextLayersFromY,
+} from "./social-post-offer-layout";
+import {
+  THEME_LED_SOCIAL_LAYOUTS,
+  assertThemeLedSocialPostsTruth,
+  isThemeLedSocialPostsTruth,
+  themeLedSocialPostPurpose,
+} from "./social-posts-theme-led";
+import {
   SOCIAL_POSTS_DESIGN_SPEC_VERSION,
   SOCIAL_POSTS_EXACT_COUNT,
   SOCIAL_POST_TRUST_ROLE_ANGLE,
@@ -65,20 +75,10 @@ export function assertSocialPostsRequiredTruth(
   if (!truth.wordmark?.trim()) {
     throw new Error("MISSING_REQUIRED_TRUTH: wordmark");
   }
-  if (!truth.offerName?.trim()) {
-    throw new Error("MISSING_REQUIRED_TRUTH: offerName");
-  }
-  if (!truth.priceDisplay?.trim()) {
-    throw new Error("MISSING_REQUIRED_TRUTH: priceDisplay");
-  }
-  if (!truth.dateWindow?.trim()) {
-    throw new Error("MISSING_REQUIRED_TRUTH: dateWindow");
-  }
-  if (!truth.cta?.trim()) {
-    throw new Error("MISSING_REQUIRED_TRUTH: cta");
-  }
-  if (!truth.phone?.trim()) {
-    throw new Error("MISSING_REQUIRED_TRUTH: phone");
+  if (!isThemeLedSocialPostsTruth(truth)) {
+    if (!truth.offerName?.trim()) {
+      throw new Error("MISSING_REQUIRED_TRUTH: offerName");
+    }
   }
   if (!truth.platformLabel?.trim()) {
     throw new Error(
@@ -133,7 +133,9 @@ export function assertSocialPostsRequiredTruth(
     );
   }
 
-  if (!truth.materials.some((m) => m.role === "logo")) {
+  const hasLogo = truth.materials.some((m) => m.role === "logo");
+  const wordmarkOnly = truth.approvedLogoVariantId === "wordmark-only";
+  if (!hasLogo && !wordmarkOnly) {
     throw new Error("MISSING_REQUIRED_MATERIAL: logo");
   }
   if (!truth.dispatchWiringScopeNote?.trim()) {
@@ -141,26 +143,64 @@ export function assertSocialPostsRequiredTruth(
       "MISSING_REQUIRED_TRUTH: dispatchWiringScopeNote must be documented on proof truth",
     );
   }
+  if (isThemeLedSocialPostsTruth(truth)) {
+    assertThemeLedSocialPostsTruth(truth);
+  }
 }
 
 type LayoutContext = {
   truth: SocialPostsProjectTruth;
   member: SocialPostMemberTruth;
-  logoMaterialId: string;
+  logoMaterialId: string | null;
   width: number;
   height: number;
 };
+
+function socialLogoLayers(input: {
+  id: string;
+  logoMaterialId: string | null;
+  plate: { x: number; y: number; width: number; height: number; borderRadiusPx: number };
+  image: { x: number; y: number; width: number; height: number };
+}): SocialPostDesignLayer[] {
+  if (!input.logoMaterialId) return [];
+  return [
+    {
+      type: "shape",
+      id: `${input.id}-logo-plate`,
+      role: "logo_plate",
+      x: input.plate.x,
+      y: input.plate.y,
+      width: input.plate.width,
+      height: input.plate.height,
+      fill: "#FFFFFF",
+      borderRadiusPx: input.plate.borderRadiusPx,
+    },
+    {
+      type: "image",
+      id: `${input.id}-logo`,
+      role: "logo",
+      materialId: input.logoMaterialId,
+      x: input.image.x,
+      y: input.image.y,
+      width: input.image.width,
+      height: input.image.height,
+      fit: "contain",
+    },
+  ];
+}
 
 /** Post 1 — offer/price hero. Top colour band, left-aligned price stack. */
 function layoutOfferLead(ctx: LayoutContext): SocialPostDesignLayer[] {
   const { truth, member, logoMaterialId: logo, width: W } = ctx;
   const c = truth.brandColors;
-  const priceLine = truth.wasPriceDisplay
-    ? `${truth.priceDisplay} · ${truth.wasPriceDisplay}`
-    : truth.priceDisplay;
+  const priceLine = truth.priceDisplay.trim()
+    ? truth.wasPriceDisplay
+      ? `${truth.priceDisplay} · ${truth.wasPriceDisplay}`
+      : truth.priceDisplay
+    : "";
   const id = member.assetId;
 
-  return [
+  const baseLayers: SocialPostDesignLayer[] = [
     {
       type: "shape",
       id: `${id}-band`,
@@ -185,35 +225,19 @@ function layoutOfferLead(ctx: LayoutContext): SocialPostDesignLayer[] {
       color: "#F7F4EF",
       align: "left",
     }),
-    {
-      type: "shape",
-      id: `${id}-logo-plate`,
-      role: "logo_plate",
-      x: 56,
-      y: 188,
-      width: 150,
-      height: 150,
-      fill: "#FFFFFF",
-      borderRadiusPx: 24,
-    },
-    {
-      type: "image",
-      id: `${id}-logo`,
-      role: "logo",
-      materialId: logo,
-      x: 72,
-      y: 204,
-      width: 118,
-      height: 118,
-      fit: "contain",
-    },
+    ...socialLogoLayers({
+      id,
+      logoMaterialId: logo,
+      plate: { x: 56, y: 188, width: 150, height: 150, borderRadiusPx: 24 },
+      image: { x: 72, y: 204, width: 118, height: 118 },
+    }),
     textLayer({
       id: `${id}-wordmark`,
       role: "wordmark",
       content: truth.wordmark,
-      x: 232,
+      x: logo ? 232 : 56,
       y: 202,
-      width: W - 288,
+      width: logo ? W - 288 : W - 112,
       fontSizePx: 34,
       fontWeight: 700,
       lineHeight: 1.15,
@@ -224,120 +248,128 @@ function layoutOfferLead(ctx: LayoutContext): SocialPostDesignLayer[] {
       id: `${id}-descriptor`,
       role: "descriptor",
       content: truth.descriptor,
-      x: 232,
+      x: logo ? 232 : 56,
       y: 252,
-      width: W - 288,
+      width: logo ? W - 288 : W - 112,
       fontSizePx: 18,
       fontWeight: 500,
       lineHeight: 1.25,
       color: c.secondary,
       align: "left",
     }),
-    textLayer({
+  ];
+
+  const offerLeadStack = stackTextLayersFromY(396, [
+    {
       id: `${id}-offer`,
       role: "offer",
       content: truth.offerName,
       x: 56,
-      y: 396,
       width: W - 112,
       fontSizePx: 44,
       fontWeight: 700,
       lineHeight: 1.2,
       color: c.primary,
       align: "left",
-    }),
-    textLayer({
-      id: `${id}-price`,
-      role: "price",
-      content: priceLine,
-      x: 56,
-      y: 490,
-      width: W - 112,
-      fontSizePx: 66,
-      fontWeight: 700,
-      lineHeight: 1.05,
-      color: c.text,
-      align: "left",
-    }),
-    textLayer({
-      id: `${id}-dates`,
-      role: "dates",
-      content: truth.dateWindow,
-      x: 56,
-      y: 596,
-      width: W - 112,
-      fontSizePx: 24,
-      fontWeight: 500,
-      lineHeight: 1.2,
-      color: c.muted,
-      align: "left",
-    }),
-    textLayer({
-      id: `${id}-body`,
-      role: "body",
-      content: truth.body,
-      x: 56,
-      y: 664,
-      width: W - 112,
-      fontSizePx: 22,
-      fontWeight: 400,
-      lineHeight: 1.35,
-      color: c.text,
-      align: "left",
-    }),
-    textLayer({
+    },
+    ...(priceLine
+      ? [
+          {
+            id: `${id}-price`,
+            role: "price" as const,
+            content: priceLine,
+            x: 56,
+            width: W - 112,
+            fontSizePx: 66,
+            fontWeight: 700,
+            lineHeight: 1.05,
+            color: c.text,
+            align: "left" as const,
+          },
+        ]
+      : []),
+    ...(truth.dateWindow.trim()
+      ? [
+          {
+            id: `${id}-dates`,
+            role: "dates" as const,
+            content: truth.dateWindow,
+            x: 56,
+            width: W - 112,
+            fontSizePx: 24,
+            fontWeight: 500,
+            lineHeight: 1.2,
+            color: c.muted,
+            align: "left" as const,
+          },
+        ]
+      : []),
+  ]);
+
+  if (!("layers" in offerLeadStack)) {
+    throw new Error(`INVALID_DESIGN_SPEC: offer_lead ${offerLeadStack.message}`);
+  }
+
+  const stacked = stackTextLayersFromY(offerLeadStack.endY, [
+    {
       id: `${id}-cta`,
       role: "cta",
       content: truth.cta,
       x: 56,
-      y: 776,
       width: W - 112,
       fontSizePx: 28,
       fontWeight: 700,
       lineHeight: 1.2,
       color: c.primary,
       align: "left",
-    }),
-    textLayer({
+      skipWhenEmpty: true,
+    },
+    {
       id: `${id}-phone`,
       role: "contact_phone",
-      content: truth.phone,
+      content: truth.phone.trim() || truth.webDisplay,
       x: 56,
-      y: 834,
       width: W - 112,
       fontSizePx: 24,
       fontWeight: 500,
       lineHeight: 1.2,
       color: c.text,
       align: "left",
-    }),
-    textLayer({
+      skipWhenEmpty: true,
+    },
+    {
       id: `${id}-web`,
       role: "contact_web",
       content: truth.webDisplay,
       x: 56,
-      y: 878,
       width: W - 112,
       fontSizePx: 22,
       fontWeight: 500,
       lineHeight: 1.2,
       color: c.secondary,
       align: "left",
-    }),
-    textLayer({
+      skipWhenEmpty: true,
+    },
+    {
       id: `${id}-disclaimer`,
       role: "disclaimer",
       content: truth.disclaimer,
       x: 56,
-      y: 950,
       width: W - 112,
       fontSizePx: 14,
       fontWeight: 400,
       lineHeight: 1.3,
       color: c.muted,
       align: "left",
-    }),
-  ];
+      skipWhenEmpty: true,
+    },
+  ]);
+
+  if (!("layers" in stacked)) {
+    throw new Error(`INVALID_DESIGN_SPEC: offer_lead ${stacked.message}`);
+  }
+
+  return [...baseLayers, ...offerLeadStack.layers, ...stacked.layers];
 }
 
 /** Post 2 — booking CTA emphasis. Centred stack, contact block above the fold. */
@@ -371,30 +403,12 @@ function layoutCtaBook(ctx: LayoutContext): SocialPostDesignLayer[] {
       color: c.secondary,
       align: "center",
     }),
-    {
-      type: "shape",
-      id: `${id}-logo-plate`,
-      role: "logo_plate",
-      x: 432,
-      y: 112,
-      width: 160,
-      height: 160,
-      fill: "#FFFFFF",
-      // Rounded rect, not a circle: the approved mark ships on an opaque square
-      // field, and a circular plate would expose its corners.
-      borderRadiusPx: 28,
-    },
-    {
-      type: "image",
-      id: `${id}-logo`,
-      role: "logo",
-      materialId: logo,
-      x: 452,
-      y: 132,
-      width: 120,
-      height: 120,
-      fit: "contain",
-    },
+    ...socialLogoLayers({
+      id,
+      logoMaterialId: logo,
+      plate: { x: 432, y: 112, width: 160, height: 160, borderRadiusPx: 28 },
+      image: { x: 452, y: 132, width: 120, height: 120 },
+    }),
     textLayer({
       id: `${id}-wordmark`,
       role: "wordmark",
@@ -438,7 +452,7 @@ function layoutCtaBook(ctx: LayoutContext): SocialPostDesignLayer[] {
     textLayer({
       id: `${id}-phone`,
       role: "contact_phone",
-      content: truth.phone,
+      content: truth.phone.trim() || truth.webDisplay,
       x: 64,
       y: 524,
       width: W - 128,
@@ -545,7 +559,7 @@ function layoutDatesWindow(ctx: LayoutContext): SocialPostDesignLayer[] {
   const c = truth.brandColors;
   const id = member.assetId;
 
-  return [
+  const baseLayers: SocialPostDesignLayer[] = [
     {
       type: "shape",
       id: `${id}-accent`,
@@ -570,35 +584,19 @@ function layoutDatesWindow(ctx: LayoutContext): SocialPostDesignLayer[] {
       color: c.secondary,
       align: "left",
     }),
-    {
-      type: "shape",
-      id: `${id}-logo-plate`,
-      role: "logo_plate",
-      x: 72,
-      y: 104,
-      width: 132,
-      height: 132,
-      fill: "#FFFFFF",
-      borderRadiusPx: 20,
-    },
-    {
-      type: "image",
-      id: `${id}-logo`,
-      role: "logo",
-      materialId: logo,
-      x: 86,
-      y: 118,
-      width: 104,
-      height: 104,
-      fit: "contain",
-    },
+    ...socialLogoLayers({
+      id,
+      logoMaterialId: logo,
+      plate: { x: 72, y: 104, width: 132, height: 132, borderRadiusPx: 20 },
+      image: { x: 86, y: 118, width: 104, height: 104 },
+    }),
     textLayer({
       id: `${id}-wordmark`,
       role: "wordmark",
       content: truth.wordmark,
-      x: 228,
+      x: logo ? 228 : 72,
       y: 120,
-      width: W - 300,
+      width: logo ? W - 300 : W - 144,
       fontSizePx: 32,
       fontWeight: 700,
       lineHeight: 1.15,
@@ -609,9 +607,9 @@ function layoutDatesWindow(ctx: LayoutContext): SocialPostDesignLayer[] {
       id: `${id}-descriptor`,
       role: "descriptor",
       content: truth.descriptor,
-      x: 228,
+      x: logo ? 228 : 72,
       y: 168,
-      width: W - 300,
+      width: logo ? W - 300 : W - 144,
       fontSizePx: 18,
       fontWeight: 500,
       lineHeight: 1.25,
@@ -681,84 +679,102 @@ function layoutDatesWindow(ctx: LayoutContext): SocialPostDesignLayer[] {
       color: c.text,
       align: "left",
     }),
-    textLayer({
+  ];
+
+  const stacked = stackTextLayersFromY(668, [
+    {
       id: `${id}-body`,
       role: "body",
       content: truth.body,
       x: 72,
-      y: 686,
       width: W - 144,
       fontSizePx: 22,
       fontWeight: 400,
       lineHeight: 1.35,
       color: c.text,
       align: "left",
-    }),
-    textLayer({
+      skipWhenEmpty: true,
+    },
+    {
       id: `${id}-cta`,
       role: "cta",
       content: truth.cta,
       x: 72,
-      y: 786,
       width: W - 144,
       fontSizePx: 26,
       fontWeight: 700,
       lineHeight: 1.2,
       color: c.primary,
       align: "left",
-    }),
-    textLayer({
+      skipWhenEmpty: true,
+    },
+    {
       id: `${id}-web`,
       role: "contact_web",
       content: truth.webDisplay,
       x: 72,
-      y: 842,
       width: W - 144,
       fontSizePx: 22,
       fontWeight: 500,
       lineHeight: 1.2,
       color: c.secondary,
       align: "left",
-    }),
-    textLayer({
+      skipWhenEmpty: true,
+    },
+    {
       id: `${id}-phone`,
       role: "contact_phone",
-      content: truth.phone,
+      content: truth.phone.trim() || truth.webDisplay,
       x: 72,
-      y: 884,
       width: W - 144,
       fontSizePx: 22,
       fontWeight: 500,
       lineHeight: 1.2,
       color: c.text,
       align: "left",
-    }),
-    textLayer({
+      skipWhenEmpty: true,
+    },
+    {
       id: `${id}-disclaimer`,
       role: "disclaimer",
       content: truth.disclaimer,
       x: 72,
-      y: 950,
       width: W - 144,
       fontSizePx: 14,
       fontWeight: 400,
       lineHeight: 1.3,
       color: c.muted,
       align: "left",
-    }),
-  ];
+      skipWhenEmpty: true,
+    },
+  ]);
+
+  if (!("layers" in stacked)) {
+    throw new Error(`INVALID_DESIGN_SPEC: dates_window ${stacked.message}`);
+  }
+
+  return [...baseLayers, ...stacked.layers];
 }
 
 /**
  * Post 4 — brand trust. Deliberately omits price/dates/offer name:
  * a brand-only piece must not restate campaign offer facts it is not carrying.
  */
+const SOCIAL_POST_TRUST_RULE_GAP_PX = 16;
+
+function trustBrandSupportingLine(truth: SocialPostsProjectTruth): string {
+  const descriptor = truth.descriptor.trim();
+  const headline = truth.headline.trim();
+  if (descriptor && descriptor !== headline) return descriptor;
+  return "";
+}
+
 function layoutTrustBrand(ctx: LayoutContext): SocialPostDesignLayer[] {
   const { truth, member, logoMaterialId: logo, width: W } = ctx;
   const c = truth.brandColors;
   const id = member.assetId;
 
-  return [
+  const baseLayers: SocialPostDesignLayer[] = [
     {
       type: "shape",
       id: `${id}-plate`,
@@ -783,28 +799,12 @@ function layoutTrustBrand(ctx: LayoutContext): SocialPostDesignLayer[] {
       color: "#F7F4EF",
       align: "center",
     }),
-    {
-      type: "shape",
-      id: `${id}-logo-plate`,
-      role: "logo_plate",
-      x: 412,
-      y: 124,
-      width: 200,
-      height: 200,
-      fill: "#FFFFFF",
-      borderRadiusPx: 32,
-    },
-    {
-      type: "image",
-      id: `${id}-logo`,
-      role: "logo",
-      materialId: logo,
-      x: 442,
-      y: 154,
-      width: 140,
-      height: 140,
-      fit: "contain",
-    },
+    ...socialLogoLayers({
+      id,
+      logoMaterialId: logo,
+      plate: { x: 412, y: 124, width: 200, height: 200, borderRadiusPx: 32 },
+      image: { x: 442, y: 154, width: 140, height: 140 },
+    }),
     textLayer({
       id: `${id}-wordmark`,
       role: "wordmark",
@@ -832,95 +832,112 @@ function layoutTrustBrand(ctx: LayoutContext): SocialPostDesignLayer[] {
       color: c.secondary,
       align: "center",
     }),
-    textLayer({
+  ];
+
+  const headlineStack = stackTextLayersFromY(580, [
+    {
       id: `${id}-headline`,
       role: "headline",
       content: truth.headline,
       x: 96,
-      y: 580,
       width: W - 192,
       fontSizePx: 36,
       fontWeight: 600,
       lineHeight: 1.2,
       color: c.text,
       align: "center",
-    }),
-    {
-      type: "shape",
-      id: `${id}-rule`,
-      role: "footer_rule",
-      x: 412,
-      y: 654,
-      width: 200,
-      height: 3,
-      fill: c.secondary,
     },
-    textLayer({
+  ]);
+
+  if (!("layers" in headlineStack)) {
+    throw new Error(`INVALID_DESIGN_SPEC: trust_brand headline ${headlineStack.message}`);
+  }
+
+  const ruleY = headlineStack.endY + SOCIAL_POST_TRUST_RULE_GAP_PX;
+  const ruleLayer: SocialPostDesignLayer = {
+    type: "shape",
+    id: `${id}-rule`,
+    role: "footer_rule",
+    x: 412,
+    y: ruleY,
+    width: 200,
+    height: 3,
+    fill: c.secondary,
+  };
+
+  const stacked = stackTextLayersFromY(ruleY + 3 + SOCIAL_POST_STACK_GAP_PX, [
+    {
       id: `${id}-body`,
       role: "body",
-      content: truth.body,
+      content: trustBrandSupportingLine(truth),
       x: 112,
-      y: 692,
       width: W - 224,
       fontSizePx: 24,
       fontWeight: 400,
       lineHeight: 1.35,
       color: c.text,
       align: "center",
-    }),
-    textLayer({
+      skipWhenEmpty: true,
+    },
+    {
       id: `${id}-cta`,
       role: "cta",
       content: truth.cta,
       x: 64,
-      y: 788,
       width: W - 128,
       fontSizePx: 30,
       fontWeight: 700,
       lineHeight: 1.2,
       color: c.primary,
       align: "center",
-    }),
-    textLayer({
+      skipWhenEmpty: true,
+    },
+    {
       id: `${id}-phone`,
       role: "contact_phone",
-      content: truth.phone,
+      content: truth.phone.trim() || truth.webDisplay,
       x: 64,
-      y: 844,
       width: W - 128,
       fontSizePx: 26,
       fontWeight: 600,
       lineHeight: 1.2,
       color: c.text,
       align: "center",
-    }),
-    textLayer({
+      skipWhenEmpty: true,
+    },
+    {
       id: `${id}-web`,
       role: "contact_web",
       content: truth.webDisplay,
       x: 64,
-      y: 890,
       width: W - 128,
       fontSizePx: 22,
       fontWeight: 500,
       lineHeight: 1.2,
       color: c.secondary,
       align: "center",
-    }),
-    textLayer({
+      skipWhenEmpty: true,
+    },
+    {
       id: `${id}-disclaimer`,
       role: "disclaimer",
       content: truth.disclaimer,
       x: 96,
-      y: 950,
       width: W - 192,
       fontSizePx: 14,
       fontWeight: 400,
       lineHeight: 1.3,
       color: c.muted,
       align: "center",
-    }),
-  ];
+      skipWhenEmpty: true,
+    },
+  ]);
+
+  if (!("layers" in stacked)) {
+    throw new Error(`INVALID_DESIGN_SPEC: trust_brand ${stacked.message}`);
+  }
+
+  return [...baseLayers, ...headlineStack.layers, ruleLayer, ...stacked.layers];
 }
 
 const LAYOUT_BY_ROLE_ANGLE: Record<
@@ -938,8 +955,11 @@ function reasonSocialPostAsset(
   member: SocialPostMemberTruth,
 ): SocialPostAssetSpec {
   const plate = resolveSocialPostPlate("cert-square-1024");
-  const logo = truth.materials.find((m) => m.role === "logo")!;
-  const layout = LAYOUT_BY_ROLE_ANGLE[member.roleAngle];
+  const logo = truth.materials.find((m) => m.role === "logo");
+  const themeLed = isThemeLedSocialPostsTruth(truth);
+  const layout = themeLed
+    ? THEME_LED_SOCIAL_LAYOUTS[member.roleAngle]
+    : LAYOUT_BY_ROLE_ANGLE[member.roleAngle];
   if (!layout) {
     throw new Error(
       `MISSING_REQUIRED_TRUTH: no proven social layout for roleAngle "${member.roleAngle}". Do not clone another post to fill the slot.`,
@@ -949,7 +969,7 @@ function reasonSocialPostAsset(
   const layers = layout({
     truth,
     member,
-    logoMaterialId: logo.materialId,
+    logoMaterialId: logo?.materialId ?? null,
     width: plate.widthPx,
     height: plate.heightPx,
   });
@@ -963,7 +983,9 @@ function reasonSocialPostAsset(
     assetId: member.assetId,
     orderIndex: member.orderIndex,
     roleAngle: member.roleAngle,
-    authorizedPurpose: socialPostAuthorizedPurpose(truth, member),
+    authorizedPurpose: themeLed
+      ? themeLedSocialPostPurpose(truth, member)
+      : socialPostAuthorizedPurpose(truth, member),
     plateId: plate.plateId,
     canvas: { widthPx: plate.widthPx, heightPx: plate.heightPx },
     background: { color: truth.brandColors.background },

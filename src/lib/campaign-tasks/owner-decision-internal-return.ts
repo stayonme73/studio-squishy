@@ -7,7 +7,7 @@ import { OWNER_HELD_EXCEPTION_KINDS } from "@/config/campaign-exceptions";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
-import type { CampaignMaterialItem } from "@/lib/materials/types";
+import type { CampaignMaterialItem, ServerMaterialsEnvelope } from "@/lib/materials/types";
 import type { PurchasedJobRecord } from "@/lib/job-control/types";
 
 import type { ExceptionActionResult } from "./exceptions-actions";
@@ -251,7 +251,15 @@ export function applyCompleteInternalOwnerFollowUp(
   user: StudioUser,
   assignments: CampaignAssignmentsFile,
   materials: readonly CampaignMaterialItem[] = [],
-): ExceptionActionResult & { job?: PurchasedJobRecord } {
+):
+  | {
+      ok: true;
+      envelope: ServerTasksEnvelope;
+      exception?: CampaignExceptionRecord;
+      materialsEnvelope?: ServerMaterialsEnvelope;
+      job?: PurchasedJobRecord;
+    }
+  | { ok: false; error: string; status: number } {
   const actorGate = requireStaffFollowUpActor(user, assignments);
   if (!actorGate.ok) return actorGate;
 

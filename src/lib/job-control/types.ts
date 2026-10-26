@@ -30,19 +30,49 @@ export type OwnerDeskReason =
 export type JobCommunicationEventType =
   | "payment_received"
   | "intake_incomplete_materials_needed"
-  | "reminder_48_hour"
-  | "waiting_on_client_72_hour"
+  | "waiting_on_client"
   | "materials_received_returned_to_queue"
   | "production_started"
   | "ready_for_review"
   | "revision_requested"
   | "revision_ready_again"
+  | "revision_rework_in_progress"
   | "approved_for_delivery"
   | "final_delivery_available"
-  | "refund_eligibility_14_day"
   | "refund_issued"
+  | "refund_processing"
+  | "refund_review_needed"
   | "owner_ask_client"
   | "owner_decision_recorded";
+
+/**
+ * approved — Owner approved; provider call not yet complete.
+ * processing — Stripe accepted the refund; final provider status pending.
+ * completed — Stripe reports the refund succeeded.
+ * failed — Stripe rejected or failed the refund; no money moved.
+ */
+export type JobRefundExecutionStage = "approved" | "processing" | "completed" | "failed";
+
+export type JobRefundExecution = {
+  provider: "stripe";
+  stage: JobRefundExecutionStage;
+  attempt: number;
+  idempotencyKey: string;
+  paymentIntentId: string;
+  requestedAmountCents: number;
+  currency: "usd";
+  stripeRefundId?: string | null;
+  providerStatus?: string | null;
+  providerCreatedAt?: string | null;
+  approvedAt: string;
+  updatedAt: string;
+  completedAt?: string | null;
+  failedAt?: string | null;
+  failureCode?: string | null;
+  failureReason?: string | null;
+  /** Spine status before Stripe accepted; restored if the provider later fails. */
+  priorSpineStatus?: JobSpineStatus | null;
+};
 
 export type JobCommunicationChannel = "in_app_outbox" | "test_email";
 
@@ -245,8 +275,16 @@ export type PurchasedJobRecord = {
   refundEligibleAt?: string | null;
   /** Set when Owner acts on refund-eligible desk folder — clears desk item. */
   refundOwnerDecisionAt?: string | null;
+  /**
+   * Approved full-refund cap. The amount Stripe collected, never the list price.
+   */
+  refundApprovedAmountCents?: number | null;
+  /** Provider refund execution. Full refund of the amount paid only; written before and after the Stripe call. */
+  refundExecution?: JobRefundExecution | null;
   /** Owner heavy-lane queue decision — clears heavy-lane desk item for queued job. */
   heavyLaneOwnerDecision?: "wait" | "bump" | null;
+  /** Explicit priority-bump request. Routine Heavy overflow auto-waits and does not page Owner. */
+  heavyLaneBumpRequested?: boolean;
   laneQueuedAt?: string;
   /** Required deliverable prep checklist — internal only. */
   deliverablePrep?: readonly JobDeliverablePrep[];

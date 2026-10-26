@@ -1,7 +1,9 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { projectCustomerUpdateHistory } from "./customer-update-history";
-import type { JobActivityEvent } from "./types";
+import type { JobActivityEvent, PurchasedJobRecord } from "./types";
 
 function event(
   partial: Partial<JobActivityEvent> &
@@ -48,6 +50,23 @@ describe("projectCustomerUpdateHistory", () => {
     expect(items[1]?.headline).toBe("Studio submitted work for your review");
     expect(items[1]?.actionRequired).toContain("return feedback or approve");
     expect(items[1]?.actorLabel).toBe("Maya");
+  });
+
+  it("labels an automatic Machine system actor as The Studio", () => {
+    const items = projectCustomerUpdateHistory(
+      [
+        event({
+          id: "status_change:machine",
+          kind: "status_change",
+          occurredAt: "2026-08-01T10:00:00.000Z",
+          spineStatus: "ready_for_review",
+          reason: "Machine presented the review",
+          actor: { role: "system", displayName: "Studio Machine" },
+        }),
+      ],
+      "job-1",
+    );
+    expect(items[0]?.actorLabel).toBe("The Studio");
   });
 
   it("remaps formerly client-hidden file release kinds to customer-safe language", () => {
@@ -199,5 +218,51 @@ describe("projectCustomerUpdateHistory", () => {
     expect(items[0]?.headline).toBe("Studio submitted work for your review");
     expect(items[0]?.detail).toBeNull();
     expect(items[0]?.actionRequired).toContain("return feedback or approve");
+  });
+
+  it("ready_for_delivery is ready, not still preparing, and hides Machine authorize jargon", () => {
+    const items = projectCustomerUpdateHistory(
+      [
+        event({
+          id: "status_change:ready",
+          kind: "status_change",
+          occurredAt: "2026-09-17T01:26:39.529Z",
+          spineStatus: "ready_for_delivery",
+          reason:
+            "System authorized Final Delivery — approved identity matches delivery candidate",
+        }),
+      ],
+      "job-1",
+      { currentSpineStatus: "ready_for_delivery" },
+    );
+
+    expect(items).toHaveLength(1);
+    expect(items[0]?.headline).toBe("Your files are ready");
+    expect(items[0]?.headline).not.toMatch(/preparing/i);
+    expect(items[0]?.detail).toBeNull();
+  });
+
+  it("Maya Version 16 activity projects approval and release when a jobId is named", () => {
+    const MAYA = "716a15b6-d8d6-436c-8f84-9e8b40d2f959";
+    const envelope = JSON.parse(
+      readFileSync(path.join(process.cwd(), "data/campaign-tasks", `${MAYA}.json`), "utf8"),
+    ) as { jobRecords?: PurchasedJobRecord[]; jobActivityEvents?: JobActivityEvent[] };
+    const job = envelope.jobRecords?.[0];
+    expect(job?.jobId).toBe(`${MAYA}:v2-rtu-flyer`);
+    const items = projectCustomerUpdateHistory(
+      envelope.jobActivityEvents ?? [],
+      job!.jobId,
+      { currentSpineStatus: job!.spineStatus },
+    );
+    expect(items.length).toBeGreaterThan(0);
+    expect(items.some((item) => item.sourceKind === "client_delivery_approval")).toBe(true);
+    expect(
+      items.some(
+        (item) =>
+          item.sourceKind === "owner_final_release" ||
+          item.sourceKind === "file_released" ||
+          item.sourceKind === "file_download_available",
+      ),
+    ).toBe(true);
   });
 });

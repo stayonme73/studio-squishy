@@ -7,10 +7,12 @@ import {
   reasonFlyerDesignSpecDeterministic,
   validateFlyerDesignSpec,
 } from "@/lib/studio-design-renderer";
+import { evaluateFlyerSpecCreativeQuality } from "@/lib/studio-design-renderer/flyer-creative-quality";
 
 import { evaluateJobDispatch } from "./evaluate";
 import { mapFlyerProjectTruthFromJob } from "./map-flyer-job-truth";
 import type { JobDispatchRecord } from "./types";
+import { projectIntakeServiceFieldKey } from "@/lib/project-intake-plan";
 
 const REPO = path.resolve(__dirname, "../../..");
 
@@ -91,8 +93,11 @@ describe("v2-rtu-flyer no-logo customer mapping", () => {
     expect(mapped.truth.headline).toMatch(/Back-to-School Reset/);
     expect(mapped.truth.cta).toBe("Book Your Reset");
     expect(mapped.truth.descriptor).toBe("");
+    expect(mapped.truth.intendedUse).toBe("Both print and digital");
+    expect(mapped.truth.sizeNotes).toBe("");
 
     const spec = reasonFlyerDesignSpecDeterministic(mapped.truth);
+    expect(spec.canvas).toEqual({ widthPx: 1024, heightPx: 1536 });
     expect(spec.layers.some((l) => l.type === "image" && l.role === "logo")).toBe(
       false,
     );
@@ -104,6 +109,29 @@ describe("v2-rtu-flyer no-logo customer mapping", () => {
     );
     const validated = validateFlyerDesignSpec(REPO, spec, mapped.truth);
     expect(validated).toEqual({ ok: true });
+  });
+
+  it("maps customer-selected flyer size without inventing a different plate", () => {
+    const campaignId = "camp-size-lock";
+    const campaign = mayaCampaign(campaignId);
+    campaign.routeMapIntake = {
+      submittedAt: campaign.routeMapIntake!.submittedAt,
+      answers: {
+        ...campaign.routeMapIntake!.answers,
+        sizeNotes: "8.5 x 11",
+      },
+    };
+    const mapped = mapFlyerProjectTruthFromJob({
+      repoRoot: REPO,
+      campaign,
+      dispatchRecord: readyFlyerRecord(campaignId),
+      materials: [],
+    });
+    expect(mapped.ok).toBe(true);
+    if (!mapped.ok) return;
+    expect(mapped.truth.sizeNotes).toBe("8.5 x 11");
+    const spec = reasonFlyerDesignSpecDeterministic(mapped.truth);
+    expect(spec.canvas.heightPx).toBe(1536);
   });
 
   it("applies Maya's CTA-as-headline emphasis without inventing a new offer", () => {
@@ -126,10 +154,16 @@ describe("v2-rtu-flyer no-logo customer mapping", () => {
     });
     expect(mapped.ok).toBe(true);
     if (!mapped.ok) return;
-    expect(mapped.truth.headline).toBe("Book Your Reset");
+    expect(mapped.truth.headline).toMatch(/Back-to-School Reset/);
+    expect(mapped.truth.headline).not.toBe("Book Your Reset");
     expect(mapped.truth.cta).toBe("Book Your Reset");
+    expect(mapped.truth.revisionEmphasis?.emphasizeExistingCtaAsHeadline).toBe(
+      true,
+    );
     expect(mapped.truth.priceDisplay).toBe("$149");
-    expect(mapped.truth.body).toMatch(/2-hour session \$149/);
+    expect(mapped.truth.offerName).toMatch(/2-hour session/i);
+    expect(mapped.truth.body).not.toMatch(/\$149/);
+    expect(mapped.truth.body).not.toMatch(/555-0186/);
   });
 
   it("executes the locked Maya brief facts and style, not Harbor leftover navy", () => {
@@ -176,6 +210,7 @@ describe("v2-rtu-flyer no-logo customer mapping", () => {
     expect(mapped.truth.body).not.toMatch(/555-0186/);
     expect(mapped.truth.body).not.toMatch(/cedarandbloom/);
     expect(mapped.truth.body).not.toMatch(/You distribute/);
+    expect(mapped.truth.creativeDirection).toBeTruthy();
     expect(mapped.truth.brandColors.primary).toBe("#3F5A4A");
     expect(mapped.truth.requiredTextTokens).toEqual(
       expect.arrayContaining([
@@ -201,5 +236,182 @@ describe("v2-rtu-flyer no-logo customer mapping", () => {
     expect(
       spec.layers.some((layer) => layer.type === "text" && layer.role === "disclaimer"),
     ).toBe(false);
+  });
+
+  it("maps live Project Intake prefixed keys without requiring bare field ids", () => {
+    const campaignId = "camp-live-prefixed-intake";
+    const campaign = mayaCampaign(campaignId);
+    campaign.routeMapIntake = {
+      submittedAt: campaign.routeMapIntake!.submittedAt,
+      answers: {
+        "shared:materials": "I do not have this yet",
+        [projectIntakeServiceFieldKey("v2-rtu-flyer", "flyerPurpose")]:
+          "Promotional flyer for Back-to-School Reset",
+        [projectIntakeServiceFieldKey("v2-rtu-flyer", "mustInclude")]:
+          "Back-to-School Reset — 2-hour session $149. August 24 – September 14, 2026. Call (804) 555-0186 or visit cedarandbloom.example. Book Your Reset.",
+        [projectIntakeServiceFieldKey("v2-rtu-flyer", "intendedUse")]:
+          "Both print and digital",
+      },
+    };
+    const mapped = mapFlyerProjectTruthFromJob({
+      repoRoot: REPO,
+      campaign,
+      dispatchRecord: readyFlyerRecord(campaignId),
+      materials: [],
+    });
+    expect(mapped.ok).toBe(true);
+  });
+
+  it("does not invent flyerPurpose or mustInclude from Maya's materials-only submitted Intake", () => {
+    const campaignId = "716a15b6-d8d6-436c-8f84-9e8b40d2f959";
+    const campaign = mayaCampaign(campaignId);
+    campaign.campaignName = "Maya’s Mobile Boutique";
+    campaign.routeMapIntake = {
+      submittedAt: "2026-09-09T00:19:37.586Z",
+      answers: { "shared:materials": "I do not have this yet" },
+    };
+    const mapped = mapFlyerProjectTruthFromJob({
+      repoRoot: REPO,
+      campaign,
+      dispatchRecord: readyFlyerRecord(campaignId),
+      materials: [],
+    });
+    expect(mapped.ok).toBe(false);
+    if (mapped.ok) return;
+    expect(mapped.code).toBe("INVALID_DESIGN_SPEC");
+    expect(mapped.message).toMatch(/flyerPurpose or mustInclude/);
+  });
+
+  it("does not print Maya's intake purpose as the customer-facing offer", () => {
+    const campaignId = "camp-instructional-purpose";
+    const campaign = mayaCampaign(campaignId);
+    campaign.campaignName = "Maya’s Mobile Boutique";
+    campaign.routeMapIntake = {
+      submittedAt: campaign.routeMapIntake!.submittedAt,
+      answers: {
+        [projectIntakeServiceFieldKey("v2-rtu-flyer", "flyerPurpose")]:
+          "Grand opening flyer for Maya’s Mobile Boutique",
+        [projectIntakeServiceFieldKey("v2-rtu-flyer", "mustInclude")]:
+          "Grand Opening — first styling appointment $45. Call (804) 555-0142 or visit mayasmobileboutique.example.",
+        [projectIntakeServiceFieldKey("v2-rtu-flyer", "intendedUse")]:
+          "Both print and digital",
+      },
+    };
+    const mapped = mapFlyerProjectTruthFromJob({
+      repoRoot: REPO,
+      campaign,
+      dispatchRecord: readyFlyerRecord(campaignId),
+      materials: [],
+    });
+    expect(mapped.ok).toBe(true);
+    if (!mapped.ok) return;
+    expect(mapped.truth.headline).toMatch(/Grand Opening/i);
+    expect(mapped.truth.headline).not.toMatch(/flyer for/i);
+    expect(mapped.truth.offerName).toMatch(/styling appointment/i);
+    expect(mapped.truth.dateWindow).toBe("");
+    expect(mapped.truth.cta).toBe("Call or visit");
+    expect(mapped.truth.body).not.toMatch(/\(804\) 555-0142/);
+    expect(mapped.truth.body).not.toMatch(/mayasmobileboutique\.example/i);
+    expect(mapped.truth.body).not.toMatch(/\bor\s*\./i);
+    expect(mapped.truth.prohibitedClaimPatterns).toEqual(
+      expect.arrayContaining(["See offer details", "Book online or call", "flyer for"]),
+    );
+
+    const spec = reasonFlyerDesignSpecDeterministic(mapped.truth);
+    const declared = spec.layers
+      .filter((layer) => layer.type === "text")
+      .map((layer) => layer.content)
+      .join("\n");
+    expect(declared).not.toMatch(/flyer for/i);
+    expect(declared).not.toMatch(/See offer details/i);
+    expect(declared).not.toMatch(/^phone /m);
+    expect(declared).not.toMatch(/^web /m);
+    expect(declared).toMatch(/First styling appointment/i);
+    expect(declared).toMatch(/\$45/);
+    const price = spec.layers.find((layer) => layer.type === "text" && layer.role === "price");
+    const offer = spec.layers.find((layer) => layer.type === "text" && layer.role === "offer");
+    expect(price && offer && price.type === "text" && offer.type === "text").toBe(true);
+    if (offer?.type === "text") {
+      expect(offer.content).toMatch(/styling appointment/i);
+      expect(offer.content).not.toMatch(/\$45/);
+    }
+    if (price?.type === "text") {
+      expect(price.content).toMatch(/\$45/);
+    }
+    expect(spec.layers.some((layer) => layer.id === "offer-panel")).toBe(true);
+    expect(spec.layers.some((layer) => layer.id === "offer-medallion")).toBe(
+      false,
+    );
+    expect(validateFlyerDesignSpec(REPO, spec, mapped.truth)).toEqual({ ok: true });
+  });
+
+  it("maps a submitted launch announcement without inventing a phone, website, or price", () => {
+    const campaignId = "camp-studio-launch";
+    const campaign = mayaCampaign(campaignId);
+    campaign.campaignName = "the Studio";
+    campaign.routeMapIntake = {
+      submittedAt: campaign.routeMapIntake!.submittedAt,
+      answers: {
+        "shared:materials":
+          "No logo yet. Use the business name The Studio as a clean wordmark.",
+        [projectIntakeServiceFieldKey("v2-rtu-flyer", "flyerPurpose")]:
+          "Launch announcement for The Studio. Invite small-business owners to use The Studio.",
+        [projectIntakeServiceFieldKey("v2-rtu-flyer", "mustInclude")]:
+          "THE STUDIO\nOpening October 2026\nCreative services for small businesses and entrepreneurs.\nProfessional design, marketing copy, social content, and short-form video created through an AI Production Team.\nNow accepting launch clients.",
+        [projectIntakeServiceFieldKey("v2-rtu-flyer", "intendedUse")]:
+          "Both print and digital",
+      },
+    };
+    const mapped = mapFlyerProjectTruthFromJob({
+      repoRoot: REPO,
+      campaign,
+      dispatchRecord: readyFlyerRecord(campaignId),
+      materials: [],
+    });
+    expect(mapped.ok).toBe(true);
+    if (!mapped.ok) return;
+    expect(mapped.truth.phone).toBe("");
+    expect(mapped.truth.webDisplay).toBe("");
+    expect(mapped.truth.priceDisplay).toBe("");
+    expect(mapped.truth.dateWindow).toMatch(/October 2026/i);
+    expect(mapped.truth.headline).not.toMatch(/launch announcement for/i);
+    expect(mapped.truth.headline).not.toMatch(/flyer for/i);
+    expect(mapped.truth.headline).toMatch(/Opening October 2026/i);
+    expect(mapped.truth.headline).not.toMatch(/entre$/i);
+    expect(mapped.truth.offerName).toMatch(/creative services/i);
+    expect(mapped.truth.body).toMatch(/professional design/i);
+    const spec = reasonFlyerDesignSpecDeterministic(mapped.truth);
+    expect(spec.layers.some((layer) => layer.type === "text" && layer.role === "price")).toBe(
+      false,
+    );
+    expect(
+      spec.layers.some((layer) => layer.type === "text" && layer.role === "contact_phone"),
+    ).toBe(false);
+    expect(
+      spec.layers.some((layer) => layer.type === "text" && layer.role === "contact_web"),
+    ).toBe(false);
+    expect(spec.layers.some((layer) => layer.id === "offer-medallion")).toBe(false);
+    expect(spec.colors.primary.toUpperCase()).not.toBe("#1F3A5F");
+    expect(spec.colors.secondary.toUpperCase()).not.toBe("#C4A574");
+    expect(mapped.truth.creativeDirection?.intelligenceVersion).toBeTruthy();
+    expect(mapped.truth.dateWindow).toMatch(/October 2026/i);
+    expect(spec.layers.some((layer) => layer.type === "text" && layer.role === "headline")).toBe(
+      true,
+    );
+    expect(
+      spec.layers.some(
+        (layer) =>
+          layer.type === "text" &&
+          /Opening October 2026/i.test(layer.content),
+      ),
+    ).toBe(true);
+    expect(validateFlyerDesignSpec(REPO, spec, mapped.truth)).toEqual({ ok: true });
+    const canvasFails = evaluateFlyerSpecCreativeQuality(spec, mapped.truth).filter(
+      (finding) => finding.severity === "fail",
+    );
+    expect(canvasFails).toEqual([]);
+    expect(
+      spec.layers.some((layer) => layer.type === "text" && layer.role === "cta"),
+    ).toBe(true);
   });
 });

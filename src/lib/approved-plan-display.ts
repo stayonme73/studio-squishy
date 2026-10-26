@@ -74,14 +74,44 @@ export function resolveApprovedServiceIds(approved: ApprovedStudioPlan): Service
   return [...approved.includedServiceIds, ...approved.additionalServiceIds];
 }
 
-/** Ordered client-facing names for every service in the approved plan snapshot. */
+function customerPlanLineName(name: string): string {
+  const trimmed = name.trim();
+  if (!trimmed || isInternalSkuId(trimmed) || isInternalCategoryLabel(trimmed)) return "";
+  if (
+    trimmed === "clip_repurposing" ||
+    trimmed === "short_form_video_editing" ||
+    trimmed === "social_and_promo_graphics" ||
+    trimmed === "creative_qa_finish" ||
+    trimmed === "campaign_launch_kit"
+  ) {
+    return "";
+  }
+  return trimmed;
+}
+
+/**
+ * Ordered client-facing names for every service in the approved plan snapshot.
+ * Condensed checkouts store the package name on the line item and leave the
+ * catalog id lists empty. Those line names are the paid plan. They are not
+ * replaced with a historical catalog service.
+ */
 export function resolveApprovedPlanServiceNames(approved: ApprovedStudioPlan): string[] {
   const lineBySku = new Map(
     approved.lineItems.map((line) => [(line.skuId ?? line.serviceId!) as ServiceId, line]),
   );
-  return resolveApprovedServiceIds(approved).map((skuId) =>
-    resolveClientFacingServiceName(skuId, lineBySku.get(skuId)),
-  );
+  const ids = resolveApprovedServiceIds(approved);
+  if (ids.length > 0) {
+    return ids.map((skuId) =>
+      resolveClientFacingServiceName(skuId, lineBySku.get(skuId)),
+    );
+  }
+  return approved.lineItems
+    .map((line) => {
+      const skuId = (line.skuId ?? line.serviceId) as ServiceId | undefined;
+      if (!skuId) return customerPlanLineName(line.serviceName ?? line.name ?? "");
+      return customerPlanLineName(resolveClientFacingServiceName(skuId, line));
+    })
+    .filter((name) => name.length > 0);
 }
 
 /** Names aligned to a subset of SKUs (e.g. green Project Details services). */
@@ -107,8 +137,11 @@ export function campaignHasApprovedStudioPlan(
 export function resolveCampaignPlanIncludes(campaign: CampaignRecord): readonly string[] {
   const approved = campaign.approvedStudioPlan;
   if (approved) {
-    return resolveApprovedPlanServiceNames(approved);
+    const names = resolveApprovedPlanServiceNames(approved);
+    if (names.length > 0) return names;
   }
+  const condensedName = campaign.condensedOffer?.name?.trim();
+  if (condensedName) return [condensedName];
   if (campaignUsesCustomStudioPlan(campaign)) {
     return [];
   }
@@ -116,6 +149,8 @@ export function resolveCampaignPlanIncludes(campaign: CampaignRecord): readonly 
 }
 
 export function resolveCampaignPlanLabel(campaign: CampaignRecord): string {
+  const condensedName = campaign.condensedOffer?.name?.trim();
+  if (condensedName) return condensedName;
   if (campaign.approvedStudioPlan) return CUSTOM_STUDIO_PLAN_LABEL;
   return campaign.packageLabel;
 }

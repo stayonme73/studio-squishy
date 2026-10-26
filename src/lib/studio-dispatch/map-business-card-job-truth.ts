@@ -5,10 +5,12 @@
 
 import type { CampaignRecord } from "@/config/studio-board";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
+import { evaluateBusinessCardExactFacts } from "@/lib/studio-design-renderer/card-exact-facts";
 import type { BusinessCardProjectTruth } from "@/lib/studio-design-renderer/card-types";
 import { DESIGN_RENDERER_BUSINESS_CARD_SKU } from "@/lib/studio-design-renderer/card-types";
 
 import { resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
+import { flattenSkuIntakeAnswers } from "./sku-intake-answers";
 import type { JobDispatchRecord } from "./types";
 
 export type BusinessCardTruthMapResult =
@@ -20,6 +22,8 @@ export type BusinessCardTruthMapResult =
         | "BROKEN_ASSET_REFERENCE"
         | "INVALID_DESIGN_SPEC"
         | "MISSING_REQUIRED_TRUTH"
+        | "AMBIGUOUS_CUSTOMER_FACT"
+        | "UNSUPPORTED_PLATE_CLAIM"
         | "SKU_NOT_SUPPORTED";
       message: string;
     };
@@ -52,7 +56,10 @@ export function mapBusinessCardProjectTruthFromJob(input: {
     };
   }
 
-  const answers = input.campaign.routeMapIntake?.answers ?? {};
+  const answers = flattenSkuIntakeAnswers(
+    input.campaign.routeMapIntake?.answers,
+    DESIGN_RENDERER_BUSINESS_CARD_SKU,
+  );
   const businessName = String(
     answers.businessName ?? input.campaign.campaignName ?? "",
   ).trim();
@@ -62,6 +69,11 @@ export function mapBusinessCardProjectTruthFromJob(input: {
   const webOrSocial = String(answers.webOrSocial ?? "").trim();
   const address = String(answers.address ?? "").trim();
   const brandMaterials = String(answers.brandMaterials ?? "").trim();
+  const cardSize = String(answers.cardSize ?? "").trim();
+  const typeLed =
+    /no logo|do not have a logo|don't have a logo|none yet|wordmark|type-led|type led/i.test(
+      brandMaterials,
+    );
 
   const missing: string[] = [];
   if (!businessName) missing.push("businessName");
@@ -86,13 +98,27 @@ export function mapBusinessCardProjectTruthFromJob(input: {
     };
   }
 
+  const facts = evaluateBusinessCardExactFacts({
+    businessName,
+    personName,
+    title,
+    phone,
+    email,
+    webDisplay: webOrSocial,
+    address,
+    cardSize,
+  });
+  if (!facts.ok) {
+    return { ok: false, code: facts.code, message: facts.message };
+  }
+
   const logo = resolveApprovedLogoMaterial({
     repoRoot: input.repoRoot,
     items: input.materials,
     skuId: DESIGN_RENDERER_BUSINESS_CARD_SKU,
     stagedLogoRelativePath: input.stagedLogoRelativePath,
   });
-  if (!logo.ok) {
+  if (!logo.ok && !typeLed) {
     return { ok: false, code: logo.code, message: logo.message };
   }
 
@@ -153,8 +179,11 @@ export function mapBusinessCardProjectTruthFromJob(input: {
       text: "#1A1A1A",
       muted: "#5A6570",
     },
-    approvedLogoVariantId: logo.material.approvedIdentitySourceId!,
-    materials: [logo.material],
+    approvedLogoVariantId:
+      logo.ok && logo.material
+        ? logo.material.approvedIdentitySourceId!
+        : "wordmark-only",
+    materials: logo.ok && logo.material ? [logo.material] : [],
     requiredTextTokens,
     prohibitedClaimPatterns: [
       "Best in Richmond",

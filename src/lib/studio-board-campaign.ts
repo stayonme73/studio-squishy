@@ -158,6 +158,16 @@ export function saveCurrentCampaign(campaign: CampaignRecord): boolean {
   }
 }
 
+/**
+ * Replace the browser's current campaign and tell open screens to read it.
+ * Used when Stripe paid a different campaign than the one already on screen.
+ */
+export function adoptReturnedPaidCampaign(campaign: CampaignRecord): boolean {
+  const saved = saveCurrentCampaign(campaign);
+  if (saved) dispatchCampaignUpdated();
+  return saved;
+}
+
 function intakeFromDraft(draft: DraftIntakePayload): CampaignIntakeSnapshot {
   return {
     idea: draft.idea.trim(),
@@ -476,7 +486,6 @@ export function applyServerPaymentTruthToLocalCampaign(
 
   const local = readCurrentCampaign();
   if (local && local.campaignId !== serverCampaign.campaignId) {
-    console.error("[payment-truth] refused to apply paid truth for a different campaign");
     return null;
   }
 

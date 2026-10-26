@@ -9,6 +9,7 @@ import {
   discoveryTabletCoversAllFormTiles,
   isDiscoveryReadyForRouteRecommendation,
   isDiscoveryTabletComplete,
+  isDiscoveryTabletStepId,
   readDeadlineFromDraft,
   readDiscoveryAnswersFromDraft,
   recordDiscoveryStepAnswer,
@@ -201,6 +202,12 @@ describe("studio conversation discovery", () => {
       payload,
     );
     expect(surface.kind).toBe("discovery");
+
+    for (const captured of payload.captured) {
+      expect(isDiscoveryTabletStepId(captured.stepId)).toBe(true);
+    }
+    expect(isDiscoveryTabletStepId("submit-project")).toBe(false);
+    expect(isDiscoveryTabletStepId("not-a-step")).toBe(false);
     expect(surface.discovery?.currentTitle).toBe("Your Focus");
   });
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { studioLobbyPodiumGuidanceV1 } from "@/config/studio-lobby-podium-guidance-v1";
+import { studioVoiceLaunchBlockerHardeningV1 } from "@/config/studio-voice-launch-blocker-hardening-v1";
 import {
   clearStudioLobbyVisited,
   markStudioLobbyVisited,
@@ -97,14 +98,15 @@ describe("studio lobby podium guidance", () => {
     expect(studioLobbyPodiumGuidanceV1.speakCooldownMs).toBe(30_000);
     expect(studioLobbyPodiumGuidanceV1.storageKey).toBe("studioLobbyVisited");
     expect(studioLobbyPodiumGuidanceV1.spokenLine).toBe(
-      "Welcome to The Studio. I'm Studio Voice. I'll help you choose the right services, answer your questions, and guide you through your project from start to finish. Whenever you're ready, select Let's Get Started on the podium. I'll take it from there.",
+      studioVoiceLaunchBlockerHardeningV1.lobbySpokenLine,
     );
     expect(studioLobbyPodiumGuidanceV1.hesitationPrompt.title).toBe(
       "Welcome to The Studio.",
     );
     expect(studioLobbyPodiumGuidanceV1.hesitationPrompt.body).toBe(
-      'I\'m Studio Voice. I\'ll help you choose the right services, answer your questions, and guide you through your project from start to finish. Whenever you\'re ready, select "Let\'s Get Started" on the podium. I\'ll take it from there.',
+      studioVoiceLaunchBlockerHardeningV1.lobbyHesitationBody,
     );
+    expect(studioLobbyPodiumGuidanceV1.spokenLine).not.toMatch(/from start to finish/i);
   });
 
   it("clears the visit flag for cert retests", () => {

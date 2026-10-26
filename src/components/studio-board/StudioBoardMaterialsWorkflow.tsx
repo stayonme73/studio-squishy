@@ -5,7 +5,10 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react
 import StudioBoardSlideOutPanel from "@/components/studio-board/StudioBoardSlideOutPanel";
 import { materialsConfig } from "@/config/materials";
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
-import { resolveMaterialsStillNeedEmptyState } from "@/lib/studio-board-client-copy";
+import {
+  isLeakedMaterialsBoardError,
+  resolveMaterialsStillNeedEmptyState,
+} from "@/lib/studio-board-client-copy";
 import { filterReceivedAgainstStillNeeded } from "@/lib/studio-board-materials-honesty";
 import {
   BOARD_ACTIONABLE_CAMPAIGN_MESSAGE_KEY,
@@ -14,11 +17,16 @@ import {
   resolveMaterialsNextStepSupportLine,
 } from "@/lib/studio-board-next-action";
 import { isIntakeComplete } from "@/lib/studio-board-campaign";
+import {
+  isCeremonialNextActionLead,
+  isRepeatedRecoveryCopy,
+} from "@/lib/studio-board/board-status-mobile-presentation";
 import { isSocialPostsCampaign } from "@/lib/route-map-social-posts";
 import type {
   ClientConsolidatedRequest,
   ClientOptionalRequest,
 } from "@/lib/materials/client-requests";
+import { boardRequestStatus } from "@/lib/studio-board-materials-request-status";
 import type { ClientSubmitPayload } from "@/lib/materials/payload-validation";
 import type { MaterialCategory, MaterialContentKind } from "@/lib/materials/types";
 
@@ -86,6 +94,7 @@ function resolveClientMaterialInstruction(
   if (status === "Received") {
     return "We received this material and our team is reviewing it.";
   }
+  if ("prompt" in request && request.prompt.trim()) return request.prompt;
 
   const key =
     `${request.category}:${request.contentKind}` as keyof typeof materialsConfig.clientRequestWhyNeeded;
@@ -142,23 +151,6 @@ function summarizeRouteMapIntake(
     destination: firstText(answers?.callToAction, answers?.destination, answers?.link),
     avoid: firstText(answers?.mustNotSay, answers?.avoid),
   };
-}
-
-function boardRequestStatus(
-  request: ClientConsolidatedRequest | ClientOptionalRequest,
-  kind: BoardRequest["kind"],
-): BoardMaterialStatus {
-  if (request.clientAvailability === "not_available_yet") return "Not Applicable";
-  if (
-    request.isPendingReview ||
-    request.reviewStatus === "submitted" ||
-    request.reviewStatus === "approved_for_use"
-  ) {
-    return "Received";
-  }
-  if (kind === "optional" && request.canSubmit) return "Optional";
-  if (request.canSubmit) return "Still Needed";
-  return "Not Applicable";
 }
 
 function shouldHideSocialPostsRequest(request: ClientConsolidatedRequest | ClientOptionalRequest): boolean {
@@ -300,11 +292,11 @@ function buildSocialActionCards(
 
     const status =
       definition.id === CAMPAIGN_MESSAGE_CARD_ID && request
-        ? boardRequestStatus(request.request, request.kind)
+        ? boardRequestStatus(request)
         : definition.value
           ? "Received"
           : request
-            ? boardRequestStatus(request.request, request.kind)
+            ? boardRequestStatus(request)
             : "Not Applicable";
     return {
       id: definition.id,
@@ -318,7 +310,7 @@ function buildSocialActionCards(
 
 function buildGenericActionCards(requests: BoardRequest[]): MaterialActionCard[] {
   return requests.map((request) => {
-    const status = boardRequestStatus(request.request, request.kind);
+    const status = boardRequestStatus(request);
     return {
       id: `${request.kind}:${request.request.id}`,
       label: request.request.label,
@@ -382,6 +374,7 @@ function StudioBoardMaterialsWorkflowActive({
   campaign,
   onMaterialsFactsChange,
   movedToProduction = false,
+  hideGlance = false,
 }: {
   campaign: CampaignRecord;
   onMaterialsFactsChange?: (facts: {
@@ -390,6 +383,7 @@ function StudioBoardMaterialsWorkflowActive({
     receivedLabels: readonly string[];
   }) => void;
   movedToProduction?: boolean;
+  hideGlance?: boolean;
 }) {
   const [data, setData] = useState<MaterialsClientResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -406,7 +400,11 @@ function StudioBoardMaterialsWorkflowActive({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(materialsEndpoint);
+      const request = () => fetch(materialsEndpoint);
+      let res = await request();
+      if (res.status === 401 || res.status === 403) {
+        res = await request();
+      }
       const json = (await res.json()) as MaterialsClientResponse;
       if (!res.ok) {
         throw new Error(json.error ?? `Request failed (${res.status})`);
@@ -415,7 +413,9 @@ function StudioBoardMaterialsWorkflowActive({
       /* Do not emit campaign-updated here — that reloads the Board campaign and
          re-triggers this fetch in a tight loop (Materials We Still Need flicker). */
     } catch (fetchError) {
-      setError(fetchError instanceof Error ? fetchError.message : "Could not load materials.");
+      const raw =
+        fetchError instanceof Error ? fetchError.message : "Could not load materials.";
+      setError(isLeakedMaterialsBoardError(raw) ? null : raw);
     } finally {
       setLoading(false);
     }
@@ -652,7 +652,10 @@ function StudioBoardMaterialsWorkflowActive({
         body: JSON.stringify(body),
       });
       const json = (await res.json()) as MaterialsClientResponse;
-      if (!res.ok) throw new Error(json.error ?? `Submit failed (${res.status})`);
+      if (!res.ok) {
+        const leaked = isLeakedMaterialsBoardError(json.error);
+        throw new Error(leaked || !json.error ? "Submit failed." : json.error);
+      }
       setData(json);
       setActiveCardId(null);
       setCampaignGoalSelection("");
@@ -666,6 +669,8 @@ function StudioBoardMaterialsWorkflowActive({
   };
 
   const emptyMaterials = studioBoard.empty.board.materials;
+
+  if (hideGlance) return null;
 
   return (
     <>
@@ -762,12 +767,15 @@ function StudioBoardMaterialsWorkflowActive({
         </div>
       </article>
 
-      <article className="sb-card sb-card--materials-next sb-materials-tile bf-material bf-material-paper">
-        <p className="sb-card__tab">What You Should Do Next</p>
-        <div className="sb-materials-board-next">
-          <p>{nextStepMessage}</p>
-        </div>
-      </article>
+      {isRepeatedRecoveryCopy(nextStepMessage) ||
+      isCeremonialNextActionLead(nextStepMessage) ? null : (
+        <article className="sb-card sb-card--materials-next sb-materials-tile bf-material bf-material-paper">
+          <p className="sb-card__tab">What You Should Do Next</p>
+          <div className="sb-materials-board-next">
+            <p>{nextStepMessage}</p>
+          </div>
+        </article>
+      )}
       </MaterialsGlance>
 
       {showWorkflow && activeCard && activeRequest && activeRequestId ? (
@@ -893,6 +901,7 @@ export default function StudioBoardMaterialsWorkflow({
   campaignLookupPending = false,
   onMaterialsFactsChange,
   movedToProduction = false,
+  hideGlance = false,
 }: {
   campaign: CampaignRecord | null;
   hasCampaign: boolean;
@@ -904,6 +913,8 @@ export default function StudioBoardMaterialsWorkflow({
     receivedLabels: readonly string[];
   }) => void;
   movedToProduction?: boolean;
+  /** The file list below is already showing the requests. */
+  hideGlance?: boolean;
 }) {
   if (campaignLookupPending) {
     return <StudioBoardMaterialsLookupPendingRow />;
@@ -918,6 +929,7 @@ export default function StudioBoardMaterialsWorkflow({
       campaign={campaign}
       onMaterialsFactsChange={onMaterialsFactsChange}
       movedToProduction={movedToProduction}
+      hideGlance={hideGlance}
     />
   );
 }

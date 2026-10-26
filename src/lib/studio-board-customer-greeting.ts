@@ -6,6 +6,10 @@
  * After mount, session resolution upgrades to a named time-of-day greeting.
  */
 
+import type { CampaignRecord } from "@/config/studio-board";
+import { MAYA_PROTECTED_CAMPAIGN_ID } from "@/config/studio-production-team-workforce-v1";
+import { isLocalCustomerOnePaidFlyerCampaign } from "@/lib/auth/local-customer-one-campaign";
+
 export const BOARD_NEUTRAL_GREETING = "Welcome to your Studio Board.";
 
 /** Trimmed non-empty display name, or null. */
@@ -52,6 +56,27 @@ export function resolveBoardHeaderGreeting(input: {
     name,
     busy: false,
   };
+}
+
+/**
+ * Greeting follows the Board-bound campaign. A leftover Maya session name
+ * must not greet a fresh non-Maya current project.
+ */
+export function resolveBoardBoundCustomerDisplayName(input: {
+  sessionDisplayName: string | null | undefined;
+  campaign: CampaignRecord | null | undefined;
+}): string | null {
+  const sessionName = resolveBoardCustomerDisplayName(input.sessionDisplayName);
+  const campaign = input.campaign ?? null;
+  if (!campaign) return sessionName;
+
+  const boundToMaya =
+    campaign.campaignId === MAYA_PROTECTED_CAMPAIGN_ID ||
+    isLocalCustomerOnePaidFlyerCampaign(campaign);
+  if (!boundToMaya && sessionName && /^maya$/i.test(sessionName)) {
+    return null;
+  }
+  return sessionName;
 }
 
 /** First line of Studio Note letter — never uses a hardcoded customer name. */

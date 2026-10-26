@@ -88,30 +88,39 @@ export function resolveVisionData(campaign: CampaignRecord): DraftIntakeFormValu
   return normalizeDraftIntakeFormValues(resolved);
 }
 
-/** Short campaign label for board cards — project only, not the full intake blob. */
+function isGenericBoardProjectName(name: string): boolean {
+  const normalized = name.trim().toLowerCase();
+  return (
+    normalized === "" ||
+    normalized === "studio project" ||
+    normalized === "the studio" ||
+    normalized === "your project"
+  );
+}
+
+/** Short campaign label for board cards — project only, not the Studio brand. */
 export function resolveCampaignDisplayName(campaign: CampaignRecord): string {
   const vision = resolveVisionData(campaign);
+  let visionName = "";
   if (vision) {
-    const name = resolveCampaignCustomerName(vision);
-    if (name) return name;
+    visionName = resolveCampaignCustomerName(vision);
   }
 
-  if (campaign.visionData) {
-    const project = resolveCampaignCustomerName(
+  if (!visionName && campaign.visionData) {
+    visionName = resolveCampaignCustomerName(
       normalizeDraftIntakeFormValues({
         ...EMPTY_DRAFT_INTAKE_FORM,
         ...campaign.visionData,
       }),
     );
-    if (project) return project;
   }
 
-  const name = campaign.campaignName.trim();
-  if (!name) return name;
+  const stored = campaign.campaignName.trim();
+  const first = stored.split(" · ")[0]?.trim() || stored;
 
-  // Legacy campaigns stored a concatenated intake summary as the name.
-  const first = name.split(" · ")[0]?.trim();
-  return first || name;
+  if (visionName && !isGenericBoardProjectName(visionName)) return visionName;
+  if (first && !isGenericBoardProjectName(first)) return first;
+  return visionName || first;
 }
 
 /** Campaign notes — persisted record first, then status template. */
@@ -303,7 +312,11 @@ export function resolveActivityFeed(
 function formatActivityDate(value: string): string {
   const date = new Date(value);
   if (!Number.isNaN(date.getTime())) {
-    return date.toLocaleDateString(undefined, { month: "long", day: "numeric" });
+    return date.toLocaleDateString(undefined, {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
   }
   return value;
 }

@@ -1,6 +1,6 @@
 /**
- * Owner QA — lean dev nav for the current Studio product journey.
- * Shown in local development (@see OwnerQaRoot).
+ * Owner QA — legacy journey seed + route inventory (tests / seeds).
+ * Active Owner shortcuts: @see owner-console-website-inspection-v1.ts (Owner Console).
  */
 
 import { customerJourneyStepRoute } from "@/config/customer-journey-v1";
@@ -34,12 +34,32 @@ export type OwnerQaShortcut =
 export const ownerQa = {
   panelHint: "Jump through the customer journey. Development only.",
   customerJourneySectionTitle: "Customer Journey",
+  brand: "The Studio Company",
+  reviewModeLabel: "Review mode",
+
+  journeyPhases: [
+    {
+      id: "plan",
+      heading: "Phase 1 — Plan",
+      stepIds: ["studio-lobby", "route-map", "project-builder", "studio-plan"],
+    },
+    {
+      id: "start",
+      heading: "Phase 2 — Start",
+      stepIds: ["checkout", "project-intake"],
+    },
+    {
+      id: "produce",
+      heading: "Phase 3 — Produce & Deliver",
+      stepIds: ["studio-board", "production", "review-room", "final-delivery"],
+    },
+  ] as const,
 
   journeyPresets: [
     {
       id: "studio-lobby",
       label: "Studio Lobby",
-      description: "Customer entry experience",
+      description: "Customer enters the Studio",
       href: studioLobbyEntryV1.routes.frontDoor,
       seed: "lobby",
     },
@@ -60,7 +80,7 @@ export const ownerQa = {
     {
       id: "studio-plan",
       label: "Studio Plan",
-      description: "Review your project",
+      description: "Review your project plan",
       href: `${projectBuilderHref(OWNER_QA_BUILDER_ROAD_ID)}&view=studio-plan`,
       seed: "studio-plan",
     },
@@ -74,7 +94,7 @@ export const ownerQa = {
     {
       id: "project-intake",
       label: "Project Intake",
-      description: "Submit Project Intake",
+      description: "Submit project information/files",
       href: ROUTE_MAP_INTAKE_STEP_HREF,
       seed: "project-intake",
     },
@@ -88,21 +108,21 @@ export const ownerQa = {
     {
       id: "production",
       label: "Production",
-      description: "Studio is creating your work",
+      description: "Studio is creating the work",
       href: studioBoard.routes.studioBoard,
       seed: "production",
     },
     {
       id: "review-room",
       label: "Review Room",
-      description: "Concept review and approvals",
+      description: "Review and approvals",
       href: studioBoard.routes.feedbackStudio,
       seed: "review-room-ready",
     },
     {
       id: "final-delivery",
       label: "Final Delivery",
-      description: "Campaign delivered",
+      description: "Receive completed work",
       href: studioBoard.routes.deliverables,
       seed: "final-delivery",
     },
@@ -165,3 +185,35 @@ export const ownerQa = {
     },
   ] satisfies OwnerQaShortcut[],
 } as const;
+
+export type OwnerQaRouteClass = "KEEP" | "HIDE" | "ARCHIVE CANDIDATE" | "REMOVE";
+
+export const ownerQaRouteInventory: readonly {
+  route: string;
+  classification: OwnerQaRouteClass;
+  note: string;
+}[] = [
+  { route: "/studio-lobby?lobbyEntry=reset", classification: "KEEP", note: "Customer journey step 1." },
+  { route: "/route-map", classification: "KEEP", note: "Customer journey step 2." },
+  { route: "/project-builder", classification: "KEEP", note: "Customer journey step 3." },
+  { route: "/project-builder?view=studio-plan", classification: "KEEP", note: "Customer journey step 4." },
+  { route: "/checkout", classification: "KEEP", note: "Customer journey step 5." },
+  { route: "/route-map?step=intake", classification: "KEEP", note: "Customer journey step 6." },
+  { route: "/studio-board", classification: "KEEP", note: "Customer journey steps 7 and 8." },
+  { route: "/feedback-studio", classification: "KEEP", note: "Customer journey step 9." },
+  { route: "/deliverables", classification: "KEEP", note: "Live Final Delivery. Proof room is not this route." },
+  { route: "/studio-conversation-room", classification: "KEEP", note: "Studio Tool. Hidden until Studio Tools opens." },
+  { route: "/file-room", classification: "KEEP", note: "Studio Tool." },
+  { route: "/file-room/owner-console", classification: "KEEP", note: "Studio Tool. Owner Console stays parked." },
+  { route: "/file-room/studio-self-test", classification: "KEEP", note: "Studio Tool." },
+  { route: "/help-center", classification: "KEEP", note: "Studio Tool." },
+  { route: "/final-delivery-room", classification: "HIDE", note: "Clip proof room. Do not put it on this menu." },
+  { route: "/campaign-details", classification: "HIDE", note: "Project Record still exists. Not on this journey list." },
+  { route: "/review-room", classification: "HIDE", note: "Alias of Review Room. Keep the live /feedback-studio door." },
+  { route: "/payment", classification: "HIDE", note: "Checkout alias. Keep /checkout as the jump." },
+  { route: "/project-summary", classification: "ARCHIVE CANDIDATE", note: "Legacy. Already off this menu." },
+  { route: "/project-details", classification: "ARCHIVE CANDIDATE", note: "Legacy intake. Already off this menu." },
+  { route: "/business-discovery-studio", classification: "ARCHIVE CANDIDATE", note: "Legacy Discovery Room. Already off this menu." },
+  { route: "/studio-guide-prototype", classification: "ARCHIVE CANDIDATE", note: "Legacy Route Map alias. Already off this menu." },
+  { route: "/studio-kitchen", classification: "ARCHIVE CANDIDATE", note: "Not on this menu. Do not delete from this overhaul." },
+];

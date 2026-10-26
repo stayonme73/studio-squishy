@@ -10,7 +10,8 @@ export const siteConfig = {
   routes: {
     home: "/",
     studioGuide: "/studio-conversation-room",
-    studio: "/studio",
+    /** @deprecated obsolete Step-2 environment — redirects to Lobby */
+    studio: "/studio-lobby",
     projectDiscovery: "/studio-conversation-room?stage=intake",
     /** @deprecated legacy route — use Route Map */
     draftRoom: "/studio-conversation-room?stage=intake",

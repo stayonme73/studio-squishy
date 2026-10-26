@@ -1,7 +1,14 @@
 import { promises as fs } from "fs";
 import path from "path";
 
+import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
 import { atomicReplaceFile, withCampaignWriteLock } from "@/lib/campaign-store/file-io";
+import {
+  pgReadCheckoutSessionBinding,
+  pgReadProcessedPaymentEvent,
+  pgWriteCheckoutSessionBinding,
+  pgWriteProcessedPaymentEvent,
+} from "@/lib/studio-durable-persistence/postgres-spine";
 
 const EVENTS_DIR = path.join(process.cwd(), "data", "payment-events");
 
@@ -25,6 +32,9 @@ async function ensureDir(): Promise<void> {
 export async function readProcessedPaymentEvent(
   eventId: string,
 ): Promise<ProcessedPaymentEvent | null> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgReadProcessedPaymentEvent(eventId);
+  }
   try {
     const raw = await fs.readFile(eventPath(eventId), "utf8");
     return JSON.parse(raw) as ProcessedPaymentEvent;
@@ -38,6 +48,9 @@ export async function writeProcessedPaymentEvent(
   event: ProcessedPaymentEvent,
 ): Promise<ProcessedPaymentEvent> {
   return withCampaignWriteLock(`payment-event:${event.eventId}`, async () => {
+    if (isPostgresPersistenceEnabled()) {
+      return pgWriteProcessedPaymentEvent(event);
+    }
     await ensureDir();
     await atomicReplaceFile(eventPath(event.eventId), JSON.stringify(event, null, 2));
     return event;
@@ -68,7 +81,7 @@ export type CheckoutSessionBinding = {
    * Pay-per-cycle purchase (sm-001-monthly). Absent on sealed studio_plan checkouts.
    * When set, amount must include cyclePriceCents and confirm writes ledger authority only for this id.
    */
-  purchaseKind?: "studio_plan" | "paid_cycle";
+  purchaseKind?: "studio_plan" | "paid_cycle" | "condensed_offer";
   paidCyclePurchaseId?: string;
   cycleSkuId?: "sm-001-monthly";
   cyclePriceCents?: number;
@@ -106,6 +119,9 @@ function sessionPath(sessionId: string): string {
 export async function readCheckoutSessionBinding(
   checkoutSessionId: string,
 ): Promise<CheckoutSessionBinding | null> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgReadCheckoutSessionBinding(checkoutSessionId);
+  }
   try {
     const raw = await fs.readFile(sessionPath(checkoutSessionId), "utf8");
     return JSON.parse(raw) as CheckoutSessionBinding;
@@ -119,6 +135,9 @@ export async function writeCheckoutSessionBinding(
   binding: CheckoutSessionBinding,
 ): Promise<CheckoutSessionBinding> {
   return withCampaignWriteLock(`payment-session:${binding.checkoutSessionId}`, async () => {
+    if (isPostgresPersistenceEnabled()) {
+      return pgWriteCheckoutSessionBinding(binding);
+    }
     await fs.mkdir(SESSIONS_DIR, { recursive: true });
     await atomicReplaceFile(
       sessionPath(binding.checkoutSessionId),

@@ -2,6 +2,10 @@ import { ROUTE_MAP_REVISION_DRAWER_ITEMS } from "@/catalog/route-map-shared-copy
 import type { ServiceId } from "@/catalog/types";
 import { PROJECT_BUILDER_V1 } from "@/config/project-builder-v1";
 import {
+  LAUNCH_MENU_HONEST_TIMING_LABEL,
+  LAUNCH_MENU_HONEST_TIMING_SHORT_LABEL,
+} from "@/config/studio-menu-readiness-and-demand-freeze-v1";
+import {
   getRouteMapJob,
   getRouteMapRoad,
   isRouteMapShelfJobId,
@@ -118,7 +122,17 @@ function formatBusinessDayRange(range: BusinessDayRange): string {
   return `${range.min}–${range.max} business days`;
 }
 
+function isHonestLaunchTimingLabel(timingLabel: string): boolean {
+  return (
+    timingLabel === LAUNCH_MENU_HONEST_TIMING_LABEL ||
+    /will not invent a start date/i.test(timingLabel)
+  );
+}
+
 function resolveShortTimingDisplay(timingLabel: string): string {
+  if (isHonestLaunchTimingLabel(timingLabel)) {
+    return LAUNCH_MENU_HONEST_TIMING_SHORT_LABEL;
+  }
   const range = parseBusinessDayRange(timingLabel);
   return range ? formatBusinessDayRange(range) : "Timing varies by deliverable";
 }
@@ -170,6 +184,7 @@ export function buildProjectBuilderStudioPlanSummary(
   const deliverableTimelines: ProjectBuilderStudioPlanTimelineItem[] = [];
   const timingRanges: BusinessDayRange[] = [];
   const responsibilityItems: string[] = [];
+  let sawHonestLaunchTiming = false;
 
   for (const serviceId of selectedServiceIds) {
     const job = resolveProjectBuilderShelfJob(serviceId);
@@ -178,7 +193,12 @@ export function buildProjectBuilderStudioPlanSummary(
     const presentation = resolveProjectBuilderJobPresentation(job, roadId);
     const lineItem = totals.lineItems.find((item) => item.serviceId === serviceId);
     const timingDisplay = resolveShortTimingDisplay(job.timingLabel);
-    const parsedRange = parseBusinessDayRange(job.timingLabel);
+    const parsedRange = isHonestLaunchTimingLabel(job.timingLabel)
+      ? null
+      : parseBusinessDayRange(job.timingLabel);
+    if (isHonestLaunchTimingLabel(job.timingLabel)) {
+      sawHonestLaunchTiming = true;
+    }
 
     deliverables.push({
       serviceId: job.id,
@@ -199,7 +219,9 @@ export function buildProjectBuilderStudioPlanSummary(
     routeLabel,
     deliverables,
     totalDisplay: formatUsdFromCents(totals.amountDueTodayCents),
-    overallTimelineDisplay: computeOverallTimelineDisplay(timingRanges),
+    overallTimelineDisplay: sawHonestLaunchTiming
+      ? LAUNCH_MENU_HONEST_TIMING_LABEL
+      : computeOverallTimelineDisplay(timingRanges),
     deliverableTimelines,
     revisionPolicySummary: [...STUDIO_PLAN_REVISION_SUMMARY],
     revisionPolicyFull: [...ROUTE_MAP_REVISION_DRAWER_ITEMS],

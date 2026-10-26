@@ -1,5 +1,7 @@
 import { feedbackStudio } from "@/config/feedback-studio";
+import { CLIP_REPURPOSING_SKU } from "@/config/studio-clip-repurposing-build-v1";
 import type { CampaignRecord } from "@/config/studio-board";
+import { studioRevisionToReviewRoundTripV1 } from "@/config/studio-revision-to-review-round-trip-v1";
 import { requiredClientDeliveryFileLabelsForJob, requiredDeliverablesForJob } from "@/lib/approved-plan-line";
 import { isClientOnly } from "@/lib/auth/roles";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
@@ -22,8 +24,8 @@ import {
   type CorrectionUseRecord,
 } from "./correction-round-ledger";
 import {
-  allRequiredDeliverablesPrepared,
   resolveRequiredDeliverableKeys,
+  reviewDeliverableSetPrepared,
 } from "./production-workspace-gates";
 import {
   ensureFeedbackPackageId,
@@ -35,7 +37,7 @@ import {
   releaseMessageRef,
 } from "./review-handoff-receipts";
 import { buildCustomerApprovedArtifactAuthorization } from "@/lib/studio-approved-delivery";
-import { assembleApprovedFlyerClientDelivery } from "@/lib/studio-review-revision/assemble-approved-delivery";
+import { assembleApprovedClientDelivery } from "@/lib/studio-review-revision/assemble-approved-delivery";
 import {
   buildMachineFlyerRevisionEmphasis,
   currentFlyerWorkVersionId,
@@ -86,7 +88,14 @@ export type ReviewRoomActionResult =
       correctionUse?: CorrectionUseRecord;
       correctionUseCreated?: boolean;
     }
-  | { ok: false; error: string; status: number; revisionLimitReached?: boolean };
+  | {
+      ok: false;
+      error: string;
+      status: number;
+      revisionLimitReached?: boolean;
+      /** Asked again while an earlier revision has not been delivered yet. */
+      revisionAlreadyInFlight?: boolean;
+    };
 
 function clientActor(user: StudioUser): JobActivityActor {
   return {
@@ -249,7 +258,7 @@ export function applyReviewRoomPatch(
   }
 
   const requiredDeliverables = requiredDeliverablesForJob(campaign, job);
-  const allPrepared = allRequiredDeliverablesPrepared(job, requiredDeliverables);
+  const allPrepared = reviewDeliverableSetPrepared(job, requiredDeliverables);
   const deliverableKeys = resolveRequiredDeliverableKeys(requiredDeliverables)
     .filter((def) =>
       (job.deliverablePrep ?? []).some(
@@ -257,6 +266,11 @@ export function applyReviewRoomPatch(
       ),
     )
     .map((def) => def.key);
+  const clipSetPrepared =
+    job.skuId === CLIP_REPURPOSING_SKU &&
+    requiredDeliverables.length === 0 &&
+    (job.deliverablePrep ?? []).some((entry) => entry.preparedAt);
+  const deliverableCount = deliverableKeys.length > 0 ? deliverableKeys.length : clipSetPrepared ? 1 : 0;
 
   const accounting = deriveCorrectionAccounting({
     campaign,
@@ -321,6 +335,9 @@ export function applyReviewRoomPatch(
     }
 
     case "request_revision": {
+      const revisionInFlight = accounting.pending.some(
+        (row) => row.jobId === job.jobId,
+      );
       const gate = canRequestJobRevision({
         job,
         feedback: body.feedback,
@@ -364,6 +381,19 @@ export function applyReviewRoomPatch(
           updatedCampaign: campaign,
           correctionUse: existingUse,
           correctionUseCreated: false,
+        };
+      }
+
+      // A retry of the same package is handled above. A genuinely new ask while an
+      // earlier revision is still owed must be refused: rounds are charged on
+      // delivery, so remaining alone would let a second request stack.
+      if (revisionInFlight) {
+        return {
+          ok: false,
+          error:
+            studioRevisionToReviewRoundTripV1.customerCopy.revisionAlreadyInFlight,
+          status: 422,
+          revisionAlreadyInFlight: true,
         };
       }
 
@@ -491,7 +521,12 @@ export function applyReviewRoomPatch(
         };
       }
 
-      const ledgerUsed = (nextEnvelope.jobCorrectionUses ?? []).length;
+      // Asking does not spend the round. The counter mirrors proven consumption,
+      // and this row stays pending until the revised work reaches Review.
+      const consumedAfterRequest = deriveCorrectionAccounting({
+        campaign,
+        envelope: { ...nextEnvelope, jobActivityEvents: events },
+      }).used;
       const emphasis = buildMachineFlyerRevisionEmphasis({
         feedback,
         campaign,
@@ -502,7 +537,7 @@ export function applyReviewRoomPatch(
         ...campaign,
         revisionRoundsIncluded: campaign.revisionRoundsIncluded,
         revisionRoundsIncludedSource: campaign.revisionRoundsIncludedSource,
-        revisionRoundsUsed: ledgerUsed,
+        revisionRoundsUsed: consumedAfterRequest,
         ...(emphasis ? { machineFlyerRevisionEmphasis: emphasis } : {}),
         updatedAt: occurredAt,
       };
@@ -532,7 +567,7 @@ export function applyReviewRoomPatch(
         job,
         feedback: body.feedback,
         allDeliverablesPrepared: allPrepared,
-        deliverableCount: deliverableKeys.length,
+        deliverableCount,
       });
 
       if (!gate.allowed) {
@@ -584,7 +619,7 @@ export function applyReviewRoomPatch(
       };
       events = statusResult.events;
 
-      const assembled = assembleApprovedFlyerClientDelivery({
+      const assembled = assembleApprovedClientDelivery({
         job: currentJob,
         events,
         actor,

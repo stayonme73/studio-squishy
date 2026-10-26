@@ -103,6 +103,7 @@ export default function VoicePreferenceControls({
           type="button"
           ref={activateOn.ref}
           className={styles.toggleOn}
+          data-voice-pref="on"
           data-active={preference === "on" ? "true" : "false"}
           aria-pressed={preference === "on"}
           onClick={activateOn.onClick}
@@ -113,6 +114,7 @@ export default function VoicePreferenceControls({
           type="button"
           ref={activateOff.ref}
           className={styles.toggleOff}
+          data-voice-pref="off"
           data-active={preference === "off" ? "true" : "false"}
           aria-pressed={preference === "off"}
           onClick={activateOff.onClick}

@@ -1,36 +1,24 @@
-import {
-  campaignStatusIndex,
-  studioBoard,
-  type CampaignStatus,
-} from "@/config/studio-board";
+import type { CampaignProgressStep } from "@/lib/studio-board-view";
 
-const { journeyStages } = studioBoard;
-
-/** Campaign Details — hero-sized vertical journey (“Where am I?”). */
-export default function CampaignJourneyHero({ status }: { status: CampaignStatus | null }) {
-  const activeIndex = status ? campaignStatusIndex(status) : -1;
-
+/** Campaign Details — production progress only (same Board source-of-truth). */
+export default function CampaignJourneyHero({
+  steps,
+}: {
+  steps: readonly CampaignProgressStep[];
+}) {
   return (
     <ol className="cd-journey" aria-label="Project journey">
-      {journeyStages.map((stage, index) => {
-        const isComplete = activeIndex >= 0 && index < activeIndex;
-        const isCurrent = activeIndex === index;
-        const state = isCurrent ? "current" : isComplete ? "complete" : "upcoming";
-
-        return (
-          <li key={stage.id} className={`cd-journey__step cd-journey__step--${state}`}>
-            <span className="cd-journey__dot" aria-hidden>
-              {isComplete ? "✓" : null}
-            </span>
-            <div className="cd-journey__copy">
-              <span className="cd-journey__label">{stage.label}</span>
-              {isCurrent && "hint" in stage ? (
-                <span className="cd-journey__hint">{stage.hint}</span>
-              ) : null}
-            </div>
-          </li>
-        );
-      })}
+      {steps.map((step) => (
+        <li key={step.id} className={`cd-journey__step cd-journey__step--${step.state}`}>
+          <span className="cd-journey__dot" aria-hidden>
+            {step.state === "complete" ? "✓" : null}
+          </span>
+          <div className="cd-journey__copy">
+            <span className="cd-journey__label">{step.label}</span>
+            {step.detail ? <span className="cd-journey__hint">{step.detail}</span> : null}
+          </div>
+        </li>
+      ))}
     </ol>
   );
 }

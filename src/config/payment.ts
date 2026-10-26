@@ -19,14 +19,14 @@ export const payment = {
     summary: "Your Studio Plan",
     deliverables: "Selected services",
     /** Hosted Stripe Checkout — confirm plan, then redirect (no local card form). */
-    confirm: "Confirm and continue",
+    confirm: "Confirm checkout and complete intake",
     next: "What Happens Next",
     /** @deprecated Hosted Checkout does not collect contact/card in The Studio. */
     billing: "Contact Information",
     /** @deprecated Card entry is Stripe-hosted only. */
     payment: "Checkout details",
     /** @deprecated use confirm */
-    form: "Confirm and continue",
+    form: "Confirm checkout and complete intake",
   },
   summary: {
     recommendedServicesLabel: "Selected services",
@@ -92,7 +92,7 @@ export const payment = {
       { label: "Final delivery", marker: "number" },
     ] as const,
     emailReassurance:
-      "You can follow project status on your Studio Board after Project Intake. Email notices are a courtesy. Your Studio Board is the source of truth.",
+      "You can follow project status in My Studio after Project Intake. Email notices are a courtesy. My Studio is the source of truth.",
   },
   secureNote:
     "Payment truth comes from Stripe confirmation. The success return page is not fulfillment by itself.",

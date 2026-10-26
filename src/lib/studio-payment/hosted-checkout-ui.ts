@@ -3,6 +3,11 @@
  * The Studio never collects card/payment-method details — Stripe does.
  */
 
+import {
+  searchHasStudioPaymentSandbox,
+  sessionHasStudioPaymentSandbox,
+} from "./sandbox-query";
+
 /** Input name attributes that must not appear on Studio hosted-checkout surfaces. */
 export const HOSTED_CHECKOUT_FORBIDDEN_FIELD_NAMES = [
   "cardNumber",
@@ -44,11 +49,9 @@ export function isDeveloperCheckoutSandboxVisible(options?: {
   if (devTools === "1") return true;
 
   const search = options?.search ?? null;
+  if (searchHasStudioPaymentSandbox(search)) return true;
   if (search == null) return false;
-  const params = new URLSearchParams(
-    search.startsWith("?") ? search.slice(1) : search,
-  );
-  return params.get("studioPaymentSandbox") === "1";
+  return sessionHasStudioPaymentSandbox();
 }
 
 export function markupContainsForbiddenCardFields(markup: string): boolean {

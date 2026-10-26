@@ -8,6 +8,7 @@
 import { studioPlanPreCheckoutFlexibilityV1 } from "@/config/studio-plan-pre-checkout-flexibility-v1";
 import type { GuideConversationStep } from "@/config/studio-guide-conversation-v1";
 import { studioGuideConversationV1 } from "@/config/studio-guide-conversation-v1";
+import { studioVoiceLaunchBlockerHardeningV1 } from "@/config/studio-voice-launch-blocker-hardening-v1";
 
 export type GuideBubbleMode = "single" | "multi";
 
@@ -36,6 +37,8 @@ export const conversationRoomGuideV1 = {
   confirmedSavedBadge: studioGuideConversationV1.confirmedSavedBadge,
   confirmedBody: studioGuideConversationV1.confirmedBody,
   summaryIntro: studioGuideConversationV1.summaryIntro,
+  summaryIntroLead: studioGuideConversationV1.summaryIntroLead,
+  summaryIntroAsk: studioGuideConversationV1.summaryIntroAsk,
   confirmedSummaryIntro: studioGuideConversationV1.confirmedSummaryIntro,
   startNewLabel: studioGuideConversationV1.startNewConversationLabel,
   saveForNowLabel: studioGuideConversationV1.saveForNowLabel,
@@ -51,13 +54,14 @@ export const conversationRoomGuideV1 = {
    */
   routePanelTitle: "Choose Your Route",
   routePanelLead:
-    "Based on what you said you’re working on, this may be a good place to start. You can choose a different path.",
+    "Based on what you said you’re working on, this may be a good place to start.",
+  routePanelChoice: "You can choose a different path.",
   routeRecommendedBadge: "Suggested starting point",
   routeConfirmCtaPrefix: "Continue with",
   routeConfirmCtaFallback: "Confirm your route",
   routeHelpPrompt: "Not sure where to start?",
   routeHelpCta:
-    "Based on what you said you’re working on, this may be a good place to start. You can choose a different path.",
+    "Based on what you said you’re working on, this may be a good place to start.",
   /** Activity Panel — peek at a route before confirming on the tablet. */
   routePeekEyebrow: "Route details",
   routePeekJobsHeading: "Services on this route",
@@ -95,7 +99,7 @@ export const conversationRoomGuideV1 = {
   servicesTabletOpenPanelCta: "Open service list",
   /** Always available on the services tablet — do not bury route change in the panel only. */
   servicesChangeRouteCta: "Change route",
-  servicesBackToRoutesLabel: "Back to routes",
+  servicesBackToRoutesLabel: "Back to Choose Your Route",
   /** Mobile dedicated services page — one step back, not overlay Close. */
   servicesBackToRouteLabel: "Back to Route",
   deckBackToLetsGetStarted: "Back to Let’s Get Started",
@@ -114,19 +118,19 @@ export const conversationRoomGuideV1 = {
   /** Activity Panel — Studio Plan (short summary first; View Details expands). */
   studioPlanTitle: "Studio Plan",
   studioPlanLead:
-    "Here's your Studio Plan. Review the services, price, and timeline. You can still make changes before checkout.",
+    "Here's your Studio Plan. Review the services and the price. You can still make changes before checkout. The Studio does not promise a delivery date.",
   /**
    * Spoken once when Plan opens — brief orientation, not a full read-aloud.
    * Facts stay on the tablet for the customer to scan.
    */
   studioPlanVoiceOrient:
-    "Here's your Studio Plan. Review the services, price, and timeline. You can still make changes before checkout.",
+    "Here's your Studio Plan. Review the services and the price. You can still make changes before checkout. The Studio does not promise a delivery date.",
   studioPlanRouteLabel: "Route",
   studioPlanServicesLabel: "Services",
   studioPlanServicesSelectedSuffix: "selected",
-  studioPlanTimelineLabel: "Estimated Timeline",
+  studioPlanTimelineLabel: "When production can begin",
   studioPlanTimelineAsteriskNote:
-    "This timeline begins after we receive the required project materials.",
+    "The Studio does not promise a start date or a delivery date.",
   /** Visible Voice callout on Studio Plan — spoken with the brief orientation. */
   studioVoiceSaysLabel: "Studio Voice says:",
   studioPlanVoiceConfirmAsk: "Is this correct?",
@@ -138,8 +142,6 @@ export const conversationRoomGuideV1 = {
   studioPlanMoreDetailsCta: "Revisions, materials & scope",
   studioPlanStepLabel: "Step 3 — Review Studio Plan",
   studioPlanDetailsToggle: "Plan details: Revisions, Materials & Scope",
-  studioPlanDetailsOpenHint:
-    "Optional information. Open or close this without leaving Studio Plan.",
   studioPlanDetailsHideLabel: "Hide plan details",
   studioPlanEditServicesLabel: "Edit Services",
   studioPlanExtrasHint:
@@ -148,7 +150,7 @@ export const conversationRoomGuideV1 = {
   studioPlanExtraDetailsLead:
     "Revision policy, what you'll need after checkout, and View Scope for each service.",
   studioPlanEditLabel: "Edit Plan",
-  /** Change the highway without hunting through Edit Plan → Back to routes. */
+  /** Change the highway without hunting through Edit Plan → Back to Choose Your Route. */
   studioPlanChangeRouteLabel: "Change route",
   /** @deprecated Prefer studioPlanConfirmCta — kept for Host/legacy callers. */
   studioPlanLooksGoodLabel: "Looks Good, Continue",
@@ -185,6 +187,7 @@ export const conversationRoomGuideV1 = {
   checkoutScopeDisclosure:
     "Checkout confirms the selected project scope. After payment, the purchased scope is fixed. Later changes are handled through the Project Change process.",
   checkoutBackToPlanLabel: "Back to Studio Plan",
+  intakeBackToCheckoutLabel: "Back to Checkout",
   checkoutCompleteCta: "Continue to secure checkout",
   /** Tablet status during checkout — guidance + facts, not a second pay button. */
   checkoutTabletTitle: "Checkout",
@@ -199,6 +202,9 @@ export const conversationRoomGuideV1 = {
    */
   checkoutPaymentSuccessVoice:
     "Payment is complete. Next, I'll collect the project details and materials the Studio needs to begin.",
+  checkoutPaymentFailedVoice: studioVoiceLaunchBlockerHardeningV1.checkoutPaymentFailedVoice,
+  checkoutPaymentCancelledVoice:
+    studioVoiceLaunchBlockerHardeningV1.checkoutPaymentCancelledVoice,
   /** Spoken when Checkout succeeds and Project Intake opens — same confirmed-success line. */
   intakeVoiceBridge:
     "Payment is complete. Next, I'll collect the project details and materials the Studio needs to begin.",
@@ -242,11 +248,11 @@ export const conversationRoomGuideV1 = {
   intakeHostFallbackCta: "Open Project Intake",
   /** Form primary CTA — must match real next destination. */
   intakeSubmitCtaSignedOut: "SAVE & CONTINUE TO YOUR ACCOUNT",
-  intakeSubmitCtaSignedIn: "SAVE & CONTINUE TO STUDIO BOARD",
+  intakeSubmitCtaSignedIn: "Save and continue to Studio Board",
   intakeNextStepBlurbSignedOut:
-    "Complete every required section for all purchased services, then continue to create an account or sign in.",
+    "Continue to create an account or sign in.",
   intakeNextStepBlurbSignedIn:
-    "Complete every required section for all purchased services, then continue to Studio Board.",
+    "Continue to Studio Board.",
   /**
    * Spoken on Intake submit when signed out — neutral account choice (Create Account or Sign In).
    */
@@ -276,10 +282,12 @@ export const conversationRoomGuideV1 = {
     "I couldn't open checkout yet. Please try again, or edit your plan and review once more.",
   /** Quiet confirmation — not a spoken “Got it.” every turn. */
   savedCue: "Saved",
-  speakHint: "Tap the mic to speak or start typing below.",
+  speakHint: "Tap the mic to speak.",
+  speakHintWithType: "Tap the mic to speak or start typing below.",
+  typeHintOff: "Start typing below.",
   speakSubhint: "or start typing below",
   typeLabel: "Type your answer",
-  /** Shown on required guide answers (preferred name cannot be skipped). */
+  /** Shown on every opening question page, including skippable ones. */
   answerRequiredLabel: "Required",
   typeRequiredEmptyHint: "This answer is required.",
   /** Typed-only questions — tablet shows the question; Speak/Type owns Continue. */
@@ -301,7 +309,7 @@ export const conversationRoomGuideV1 = {
    */
   voiceBriefThanks: "Thank you.",
   voiceWelcomeBack: "Welcome back. We can continue where we left off.",
-  voiceHelpOpen: "Sure, let's look at that.",
+  voiceHelpOpen: studioVoiceLaunchBlockerHardeningV1.helpOverlayVoice,
   privacyNote: studioGuideConversationV1.voice.privacyNote,
   deadlineFormatHint: studioGuideConversationV1.deadlineFormatHint,
   deadlineFormatError: studioGuideConversationV1.deadlineFormatError,
@@ -367,8 +375,8 @@ export const conversationRoomGuideV1 = {
         "Within 2 weeks",
         "Within 1 month",
         "More than 1 month",
-        "I have a specific date",
         "No deadline yet",
+        "I have a specific date",
       ],
       placeholder: studioGuideConversationV1.deadlinePlaceholder,
     },

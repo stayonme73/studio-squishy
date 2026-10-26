@@ -10,6 +10,8 @@ import {
 } from "@/config/studio-review-revision-full-loop-v1";
 import type { JobReviewFeedback } from "@/lib/job-control/review-feedback-types";
 import type { PurchasedJobRecord } from "@/lib/job-control/types";
+import { readProjectIntakeAnswer } from "@/lib/project-intake-plan";
+import { deriveCustomerFacingCta } from "@/lib/studio-design-renderer/flyer-creative-quality";
 
 const EMPHASIS_RE =
   /\b(headline|more prominent|emphasiz|stand out|bigger|lead with)\b/i;
@@ -35,6 +37,17 @@ export function shouldEmphasizeExistingCtaAsHeadline(
   return mentionsCta || EMPHASIS_RE.test(instruction);
 }
 
+/** Same CTA the flyer mapper already uses — never an invented offer. */
+export function resolveFlyerRevisionCallToAction(campaign: CampaignRecord): string {
+  const answers = campaign.routeMapIntake?.answers;
+  const explicit = readProjectIntakeAnswer(answers, "callToAction", "v2-rtu-flyer");
+  const mustInclude = readProjectIntakeAnswer(answers, "mustInclude", "v2-rtu-flyer");
+  const fromFlyer = deriveCustomerFacingCta({ explicitCta: explicit, mustInclude });
+  if (fromFlyer.trim()) return fromFlyer;
+  const kitCta = readProjectIntakeAnswer(answers, "cta", "campaign_launch_kit");
+  return deriveCustomerFacingCta({ explicitCta: kitCta, mustInclude: "" });
+}
+
 export function buildMachineFlyerRevisionEmphasis(input: {
   feedback: JobReviewFeedback;
   campaign: CampaignRecord;
@@ -43,9 +56,7 @@ export function buildMachineFlyerRevisionEmphasis(input: {
 }): MachineFlyerRevisionEmphasis | null {
   const instruction = collectRevisionInstruction(input.feedback);
   if (!instruction) return null;
-  const callToAction = String(
-    input.campaign.routeMapIntake?.answers?.callToAction ?? "",
-  ).trim();
+  const callToAction = resolveFlyerRevisionCallToAction(input.campaign);
   return {
     packageId: studioReviewRevisionFullLoopV1.packageId,
     instruction,
@@ -78,13 +89,19 @@ export function customerFacingVersionLabel(
   return workVersionId.trim();
 }
 
+/**
+ * Truth-layer policy: emphasis may not delete or replace the supplied headline.
+ *
+ * The CTA can be promoted in composition. The headline fact stays the headline
+ * fact. Overwriting it here is the Maya mutation class — `headline` becomes the
+ * CTA and "Grand Opening" disappears before any composer runs.
+ */
 export function applyExistingCtaHeadlineEmphasis(input: {
   headline: string;
   callToAction: string;
   emphasis?: MachineFlyerRevisionEmphasis | null;
 }): string {
-  if (!input.emphasis?.emphasizeExistingCtaAsHeadline) return input.headline;
-  const cta = input.callToAction.trim();
-  if (!cta) return input.headline;
-  return cta.slice(0, 90);
+  void input.callToAction;
+  void input.emphasis;
+  return input.headline;
 }

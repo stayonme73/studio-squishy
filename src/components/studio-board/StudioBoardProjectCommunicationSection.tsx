@@ -16,6 +16,11 @@ import {
   shouldShowMachineAskState,
 } from "@/lib/studio-board/board-communication-thread-presentation";
 import type { ProblemReportCustomerView } from "@/lib/campaign-tasks/problem-report-status-view";
+import { speakConversationLine } from "@/lib/studio-conversation-speech";
+import {
+  SOCIAL_FILES_NEXT,
+  socialGraphicsFilesAreNext,
+} from "@/lib/project-intake-plan";
 
 type MachineAnswerView = {
   text: string;
@@ -91,6 +96,7 @@ type StudioBoardProjectCommunicationSectionProps = {
     sectionLead: string;
     titleId?: string;
     rootClassName?: string;
+    autoFocusComposer?: boolean;
   };
 };
 
@@ -103,6 +109,13 @@ function formatWhen(iso: string): string {
   } catch {
     return iso;
   }
+}
+
+function customerFacingCommError(message: string): string {
+  if (/^(access denied|forbidden)\.?$/i.test(message.trim())) {
+    return copy.loadFailedFallback;
+  }
+  return message;
 }
 
 function newIdempotencyKey(): string {
@@ -141,6 +154,15 @@ export default function StudioBoardProjectCommunicationSection({
     "sb-card sb-card--project-communication bf-material bf-material-paper";
   const threadRef = useRef<HTMLDivElement | null>(null);
   const campaignId = campaign?.campaignId ?? null;
+  const autoFocusComposer = Boolean(presentation?.autoFocusComposer);
+
+  useEffect(() => {
+    if (!autoFocusComposer) return;
+    const field = document.getElementById(fieldId);
+    if (field instanceof HTMLTextAreaElement) {
+      field.focus();
+    }
+  }, [autoFocusComposer, fieldId]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -219,13 +241,18 @@ export default function StudioBoardProjectCommunicationSection({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(
-        `/api/campaigns/${encodeURIComponent(campaignId)}/project-communication/customer`,
-        {
-          method: "GET",
-          headers: { Accept: "application/json" },
-        },
-      );
+      const request = () =>
+        fetch(
+          `/api/campaigns/${encodeURIComponent(campaignId)}/project-communication/customer`,
+          {
+            method: "GET",
+            headers: { Accept: "application/json" },
+          },
+        );
+      let res = await request();
+      if (res.status === 401 || res.status === 403) {
+        res = await request();
+      }
       const json = (await res.json()) as ListResponse;
       if (!res.ok) {
         throw new Error(json.error ?? copy.loadFailedFallback);
@@ -235,7 +262,11 @@ export default function StudioBoardProjectCommunicationSection({
       await loadNotification(campaignId);
       await loadProblemReportStatus(campaignId);
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : copy.loadFailedFallback);
+      setError(
+        customerFacingCommError(
+          loadError instanceof Error ? loadError.message : copy.loadFailedFallback,
+        ),
+      );
       setMessages([]);
       setStudioRequests([]);
     } finally {
@@ -290,6 +321,15 @@ export default function StudioBoardProjectCommunicationSection({
     setSuccess(json.confirmation ?? copy.successCopy);
     setMessages(json.messages ?? []);
     setStudioRequests(json.studioRequests ?? []);
+    const spoken =
+      json.messages
+        ?.slice()
+        .reverse()
+        .find((message) => message.machineAnswer?.text?.trim())
+        ?.machineAnswer?.text?.trim() ?? json.machineConfirmation;
+    if (spoken) {
+      speakConversationLine(spoken);
+    }
     await loadNotification(campaignId);
   };
 
@@ -338,7 +378,9 @@ export default function StudioBoardProjectCommunicationSection({
     } catch (sendError) {
       const fallback =
         intent === "problem" ? problemCopy.problemSendFailedFallback : copy.sendFailedFallback;
-      setError(sendError instanceof Error ? sendError.message : fallback);
+      setError(
+        customerFacingCommError(sendError instanceof Error ? sendError.message : fallback),
+      );
     } finally {
       setBusy(false);
     }
@@ -427,7 +469,9 @@ export default function StudioBoardProjectCommunicationSection({
           </p>
           {studioRequests.map((request) => (
             <p key={request.id} className="sb-project-communication__studio-request-text">
-              {request.prompt}
+              {request.id === "awaiting_intake" && socialGraphicsFilesAreNext(campaign)
+                ? SOCIAL_FILES_NEXT.lead
+                : request.prompt}
             </p>
           ))}
         </div>
@@ -443,7 +487,9 @@ export default function StudioBoardProjectCommunicationSection({
           {loading ? (
             <p className="sb-project-communication__meta">Loading project messages…</p>
           ) : presentationMessages.length === 0 ? (
-            <p className="sb-project-communication__meta">{copy.emptyState}</p>
+            <p className="sb-project-communication__meta" data-empty="true">
+              {copy.emptyState}
+            </p>
           ) : (
             <ul className="sb-project-communication__list">
               {presentationMessages.map((message) => {
@@ -575,7 +621,7 @@ export default function StudioBoardProjectCommunicationSection({
               if (success) setSuccess(null);
             }}
             maxLength={PROJECT_COMMUNICATION_BODY_MAX_LENGTH}
-            rows={4}
+            rows={3}
             placeholder={
               intent === "problem" ? problemCopy.problemComposerPlaceholder : copy.composerPlaceholder
             }
@@ -588,7 +634,7 @@ export default function StudioBoardProjectCommunicationSection({
             </p>
             <button
               type="submit"
-              className="sb-project-communication__submit"
+              className="utility-btn utility-btn--primary sb-project-communication__submit"
               disabled={!canSubmit}
             >
               {intent === "problem"
@@ -604,7 +650,7 @@ export default function StudioBoardProjectCommunicationSection({
       </div>
 
       <div id={statusId} className="sb-project-communication__status" aria-live="polite">
-        {error ? (
+        {error && error !== copy.loadFailedFallback ? (
           <p className="sb-project-communication__error" role="alert">
             {error}
           </p>

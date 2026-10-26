@@ -1,7 +1,12 @@
 import { promises as fs } from "fs";
 import path from "path";
 
+import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
 import { atomicReplaceFile, withCampaignWriteLock } from "@/lib/campaign-store/file-io";
+import {
+  pgReadProjectCommunicationAckEnvelope,
+  pgWriteProjectCommunicationAckEnvelope,
+} from "@/lib/studio-durable-persistence/postgres-comms";
 
 import {
   PROJECT_COMMUNICATION_ACK_ENVELOPE_VERSION,
@@ -41,6 +46,9 @@ export async function readProjectCommunicationAckEnvelope(
   campaignId: string,
   customerUserId: string,
 ): Promise<ProjectCommunicationAckEnvelope | null> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgReadProjectCommunicationAckEnvelope(campaignId, customerUserId);
+  }
   try {
     const raw = await fs.readFile(ackPath(campaignId, customerUserId), "utf8");
     return JSON.parse(raw) as ProjectCommunicationAckEnvelope;
@@ -53,6 +61,9 @@ export async function readProjectCommunicationAckEnvelope(
 export async function writeProjectCommunicationAckEnvelope(
   envelope: ProjectCommunicationAckEnvelope,
 ): Promise<ProjectCommunicationAckEnvelope> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgWriteProjectCommunicationAckEnvelope(envelope);
+  }
   const lockKey = `comm-ack:${envelope.campaignId}:${envelope.customerUserId}`;
   return withCampaignWriteLock(lockKey, async () => {
     await ensureAckDir();

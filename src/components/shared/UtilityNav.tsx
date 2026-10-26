@@ -1,7 +1,13 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { helpCenterHref } from "@/config/help-center";
 import { utilityShell, type UtilityNavId } from "@/config/utility-shell";
+import {
+  resolveHelpCenterOriginForUtilityNav,
+  resolveHelpCenterProtectedAriaLabel,
+  resolveHelpCenterProtectedHref,
+} from "@/lib/help-center-navigation";
 
 const navIcons: Record<(typeof utilityShell.nav)[number]["id"], ReactNode> = {
   "studio-board": (
@@ -10,12 +16,6 @@ const navIcons: Record<(typeof utilityShell.nav)[number]["id"], ReactNode> = {
       <rect x="14" y="3" width="7" height="7" rx="1" />
       <rect x="3" y="14" width="7" height="7" rx="1" />
       <rect x="14" y="14" width="7" height="7" rx="1" />
-    </svg>
-  ),
-  "campaign-details": (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
-      <path d="M8 4h12v16H8z" />
-      <path d="M4 8h2M4 12h2M4 16h2" strokeLinecap="round" />
     </svg>
   ),
   "review-room": (
@@ -41,27 +41,43 @@ const navIcons: Record<(typeof utilityShell.nav)[number]["id"], ReactNode> = {
 
 type Props = {
   activeId: UtilityNavId;
+  /** Default true so authenticated rooms keep room hrefs. Help Center passes the probe. */
+  signedIn?: boolean;
 };
 
 /** Optional secondary nav — icon + label per design system guide. */
-export default function UtilityNav({ activeId }: Props) {
+export default function UtilityNav({ activeId, signedIn = true }: Props) {
+  const helpFrom = resolveHelpCenterOriginForUtilityNav(activeId);
+
   return (
     <nav aria-label="Studio utility navigation">
       <ul className="utility-subnav__list">
-        {utilityShell.nav.map((item) => (
-          <li key={item.id} className="utility-subnav__item">
-            <Link
-              href={item.href}
-              className={`utility-subnav__link${
-                item.id === activeId ? " utility-subnav__link--active" : ""
-              }`}
-              aria-current={item.id === activeId ? "page" : undefined}
-            >
-              <span className="utility-subnav__icon">{navIcons[item.id]}</span>
-              <span className="utility-subnav__label">{item.label}</span>
-            </Link>
-          </li>
-        ))}
+        {utilityShell.nav.map((item) => {
+          const href =
+            item.id === "help-center"
+              ? helpCenterHref(undefined, helpFrom)
+              : resolveHelpCenterProtectedHref(item.href, signedIn);
+          const ariaLabel =
+            item.id === "help-center"
+              ? item.label
+              : resolveHelpCenterProtectedAriaLabel(item.label, item.href, signedIn);
+
+          return (
+            <li key={item.id} className="utility-subnav__item">
+              <Link
+                href={href}
+                className={`utility-subnav__link${
+                  item.id === activeId ? " utility-subnav__link--active" : ""
+                }`}
+                aria-current={item.id === activeId ? "page" : undefined}
+                aria-label={ariaLabel}
+              >
+                <span className="utility-subnav__icon">{navIcons[item.id]}</span>
+                <span className="utility-subnav__label">{item.label}</span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );

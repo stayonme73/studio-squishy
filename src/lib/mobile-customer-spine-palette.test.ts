@@ -124,19 +124,19 @@ describe("Mobile customer-spine palette (scoped)", () => {
       "html:has(.studio-utility-scene--studio-board) .studio-environment-shell__frost",
     );
     expect(read("src/components/studio-board/StudioBoardProjectCommunicationSection.tsx")).toContain(
-      'className="sb-project-communication__submit"',
+      "sb-project-communication__submit",
     );
     expect(read("src/components/studio-board/StudioBoardProjectCommunicationSection.tsx")).not.toContain(
       "lobby-entry-film__cta sb-project-communication__submit",
     );
     expect(read("src/components/studio-board/StudioBoardRefundRequestSection.tsx")).toContain(
-      'className="sb-refund-request__submit"',
+      "sb-refund-request__submit",
     );
     expect(read("src/components/studio-board/StudioBoardRefundRequestSection.tsx")).not.toContain(
       "lobby-entry-film__cta sb-refund-request__submit",
     );
     expect(read("src/app/(studio)/studio-board/page.tsx")).toContain(
-      'import "../../mobile-route-fixes.css"',
+      'import "../../studio-customer-last-paint.css"',
     );
     expect(surfaces).toContain(".sb-refund-request__optional");
     expect(read("src/components/studio-board/StudioBoardRefundRequestSection.tsx")).toContain(
@@ -167,6 +167,7 @@ describe("Mobile customer-spine palette (scoped)", () => {
     const routeFixes = read("src/app/mobile-route-fixes.css");
     expect(routeFixes).toContain("LAST PAINT — mobile Studio Board typography roles (A–G)");
     expect(routeFixes).toContain(".sb-visibility-continuity__row dt");
+    expect(routeFixes).toContain("border-bottom: 1px solid #c8b59b !important");
     expect(routeFixes).toContain(".sb-project-snapshot__heading");
     expect(routeFixes).toContain(".sb-journey__step--current .sb-journey__detail");
     expect(routeFixes).toContain(".sb-progress-panel__update-date");
@@ -177,12 +178,12 @@ describe("Mobile customer-spine palette (scoped)", () => {
     expect(routeFixes).toContain("background-color: #b6c4c9 !important");
     expect(routeFixes).toContain("justify-self: start");
     expect(routeFixes).toContain("--sb-help-nav-width");
-    expect(routeFixes).toContain("min-height: 2.5rem");
+    expect(routeFixes).toContain("min-height: 3rem");
     expect(routeFixes).toContain(".sb-sign-out__control");
     expect(routeFixes).toContain("height: 100lvh");
     expect(routeFixes).toContain("transform: none");
     expect(read("src/components/studio-board/StudioBoardScene.tsx")).toContain(
-      "--sb-help-nav-width",
+      "UtilityPageHeader",
     );
     expect(routeFixes).toContain("position: absolute");
     expect(routeFixes).toContain("opacity: 0");
@@ -230,7 +231,7 @@ describe("Mobile customer-spine palette (scoped)", () => {
       "StudioMobileLoungeShell",
     );
     expect(read("src/app/(studio)/campaign-details/page.tsx")).toContain(
-      "data-mobile-customer-spine",
+      'redirect("/studio-board#sb-project-details")',
     );
     expect(read("src/components/shared/StudioMobileLoungeShell.tsx")).toContain(
       "data-mobile-customer-spine",
@@ -293,7 +294,7 @@ describe("Mobile customer-spine palette (scoped)", () => {
     expect(reviewTab).toContain("border-radius: 1.05rem 1.05rem 0 0");
     expect(reviewTab).toContain("color: #f7f4ee");
     expect(reviewTab).toContain("blur(14px) saturate(1.04) brightness(1.1)");
-    expect(read("src/components/dev/OwnerQaPanel.tsx")).toContain(
+    expect(read("src/components/dev/StudioMobileUtilityHost.tsx")).toContain(
       "studio-review-mobile-tab",
     );
     expect(read("src/app/globals.css")).toContain(
@@ -421,7 +422,8 @@ describe("Mobile customer-spine palette (scoped)", () => {
     const shell = read("src/app/studio-environment-shell.css");
     expect(shell).toContain("object-position: 16% 42%");
     expect(shell).toContain("object-position: 50% 50%");
-    expect(shell).toContain("color-mix(in srgb, #2e2b28 18%, transparent)");
+    expect(shell).toContain(".studio-environment-shell__veil");
+    expect(shell).not.toContain("color-mix(in srgb, #2e2b28 18%, transparent)");
     expect(shell).toContain("filter: blur(2px)");
     expect(read("src/app/layout.tsx")).toContain("<StudioEnvironmentShell");
     const room = read(
@@ -449,8 +451,7 @@ describe("Mobile customer-spine palette (scoped)", () => {
     const workspace = read(
       "src/components/studio-conversation-room/StudioWorkspace.tsx",
     );
-    expect(workspace).toContain('from "@/components/studio-conversation-room/voice-choice-film.module.css"');
-    expect(workspace).toContain("voiceFilm.panel");
+    expect(workspace).not.toContain("voiceFilm.panel");
     expect(workspace).toContain('data-name-question-panel="true"');
     expect(workspace).toContain("nameQuestion ? (");
     expect(workspace).toContain("styles.notch");
@@ -468,7 +469,7 @@ describe("Mobile customer-spine palette (scoped)", () => {
     expect(runtime).toContain("phonePlanStage");
     expect(runtime).toContain("phoneCheckoutStage");
     expect(runtime).toContain('stage === "services"');
-    expect(runtime).toContain("(servicesStage && !isPhone)");
+    expect(runtime).toContain("voiceNarration != null");
     expect(runtime).toContain("phonePlanStage");
     expect(runtime).toContain(
       'stage === "opening" && step === "summary" && !correcting',
@@ -488,8 +489,10 @@ describe("Mobile customer-spine palette (scoped)", () => {
     const voice = read(
       "src/components/studio-conversation-room/VoicePreferenceControls.tsx",
     );
-    expect(voice).toContain("lobby-entry-film__cta");
+    expect(voice).not.toContain("lobby-entry-film__cta");
     expect(voice).toContain("filmFamily");
+    expect(voice).toContain('data-voice-pref="on"');
+    expect(voice).toContain('data-voice-pref="off"');
     const tablet = read(
       "src/components/studio-conversation-room/guide/studio-guide-tablet.module.css",
     );

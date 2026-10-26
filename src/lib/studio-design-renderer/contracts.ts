@@ -8,7 +8,8 @@ import { FLYER_CANVAS, DESIGN_RENDERER_PROOF_SKU } from "./types";
 export const FLYER_PROOF_CONTRACT = {
   skuId: DESIGN_RENDERER_PROOF_SKU,
   name: "Make Me a Flyer",
-  promisedOutput: "One single-sided flyer in one size — ready to print or share online.",
+  promisedOutput:
+    "One single-sided digital flyer in one size — share online or print it yourself. This is not a certified 300 DPI print file.",
   formatExportRequirements: [
     "Final flattened digital export (PNG and/or PDF as appropriate)",
     "Editable Canva source files are not included unless separately authorized",

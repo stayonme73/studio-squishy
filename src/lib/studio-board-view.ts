@@ -43,6 +43,14 @@ import {
 } from "@/lib/post-submit-customer-signals";
 import type { CustomerJobStatusSummary } from "@/lib/project-record-status";
 import { resolveCustomerCurrentStatusOverlay, type CustomerCurrentStatusOverlay } from "@/lib/studio-customer-current-status";
+import {
+  CLIP_RECORDING_NEXT,
+  clipRepurposingRecordingIsNext,
+} from "@/lib/studio-dispatch/clip-door-facts";
+import {
+  SOCIAL_FILES_NEXT,
+  socialGraphicsFilesAreNext,
+} from "@/lib/project-intake-plan";
 
 const { empty, statusContent, routes, boardHeader } = studioBoard;
 
@@ -188,7 +196,11 @@ export function resolveStudioNoteView(
   const bodyLines = isPaidIncompleteIntake(campaign)
     ? [
         "We received your payment.",
-        nextAction.completeProjectDetailsHint,
+        socialGraphicsFilesAreNext(campaign)
+          ? SOCIAL_FILES_NEXT.lead
+          : clipRepurposingRecordingIsNext(campaign)
+            ? CLIP_RECORDING_NEXT.lead
+            : nextAction.completeProjectDetailsHint,
         "Production has not begun.",
         "Thank you for trusting The Studio.",
         "— The Studio Team ♥",
@@ -224,7 +236,11 @@ function formatBoardDate(iso: string | null | undefined): string | null {
   if (!iso) return null;
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
-  return date.toLocaleDateString(undefined, { month: "long", day: "numeric" });
+  return date.toLocaleDateString(undefined, {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 function resolveBoardDisplayFacts(
@@ -347,9 +363,11 @@ export function resolveCampaignProgressSteps(
     }
 
     const label =
-      stage.id === "BUILDING_CONCEPTS" && campaign && facts
-        ? resolveHonestBuildingStepLabel(campaign, facts, stage.boardLabel)
-        : stage.boardLabel;
+      stage.id === "BUILDING_CONCEPTS" && overlay?.kind === "waiting_for_production_slot"
+        ? overlay.statusLabel
+        : stage.id === "BUILDING_CONCEPTS" && campaign && facts
+          ? resolveHonestBuildingStepLabel(campaign, facts, stage.boardLabel)
+          : stage.boardLabel;
 
     return {
       id: stage.id,
@@ -405,7 +423,7 @@ const whatHappensNextSentences: Record<CampaignStatus, string> = {
 
   DRAFT_RECEIVED: "Choose your package and complete payment to continue.",
 
-  PAYMENT_RECEIVED: "The Studio is preparing to begin your project.",
+  PAYMENT_RECEIVED: "The Studio record does not yet show the current production step.",
 
   BUILDING_CONCEPTS: "The Studio is building your concepts. Check back here for your review invitation.",
 
@@ -425,6 +443,7 @@ export function resolveWhatHappensNextSentence(
   if (!campaign) return "Start a project in the Conversation Room to begin.";
 
   if (isPaidIncompleteIntake(campaign)) {
+    if (socialGraphicsFilesAreNext(campaign)) return SOCIAL_FILES_NEXT.lead;
     return studioBoard.nextAction.completeProjectDetailsHint;
   }
 
@@ -807,7 +826,7 @@ export function resolveBoardCampaignActions(
 
   hasCampaign: boolean,
 
-  options?: { studioGuideHref?: string },
+  options?: { studioGuideHref?: string; reviewHref?: string },
 
 ): BoardCampaignAction[] {
 
@@ -849,7 +868,7 @@ export function resolveBoardCampaignActions(
 
           label: copy.reviewConcepts,
 
-          href: routes.feedbackStudio,
+          href: options?.reviewHref ?? routes.feedbackStudio,
 
           isPrimary: true,
 

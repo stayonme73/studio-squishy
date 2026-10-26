@@ -76,7 +76,7 @@ function customerPromoCampaign(
     dates: "March 10 – April 15, 2026",
     callToAction: "Call (804) 555-0142 or visit cedarlane.example/tuneup",
     materials: "Logo staged for Machine production.",
-    disclaimers: "While appointments remain. Finished graphics — you distribute.",
+    disclaimers: "While appointments remain.",
   };
   if (!overrides?.omitPurposeA) {
     answers.graphicA_authorizedPurpose = overrides?.graphicAPurpose ?? "Social";

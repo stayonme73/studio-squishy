@@ -5,13 +5,42 @@ import { applySm001MonthlyDispatchTargetMirror } from "@/lib/studio-monthly-prod
 import { ensureRoutingHandoff } from "@/lib/studio-routing-handoff";
 
 import { ensureFlyerMachineReviewBind } from "@/lib/studio-customer-life/machine-review-bind";
+import { ensureGeneralDesignMachineReviewBind } from "@/lib/studio-customer-life/machine-general-design-review-bind";
+import { ensureSocialPromoCompositeReviewBind } from "@/lib/studio-customer-life/machine-social-promo-review-bind";
+import { ensureCampaignLaunchKitReviewBind } from "@/lib/studio-customer-life/machine-campaign-launch-kit-review-bind";
+import { ensureCopyMachineReviewBind } from "@/lib/studio-customer-life/machine-copy-review-bind";
+import { ensureShortVideoMachineReviewBindFromCampaign } from "@/lib/studio-customer-life/machine-short-video-review-bind";
+import { ensureClipRepurposingMachineReviewBindFromCampaign } from "@/lib/studio-customer-life/machine-clip-repurposing-review-bind";
+import { ensureFootageEditingMachineReviewBindFromCampaign } from "@/lib/studio-customer-life/machine-footage-editing-review-bind";
+import { recordMachineProductionPass } from "@/lib/studio-production-team-workforce";
+import { advanceStudioExtras } from "@/lib/studio-extras/advance";
+import { loadStudioLaneViews, resolveProductionLaneViews } from "@/lib/job-control";
 import { runDesignRendererDispatchObserver } from "./design-renderer-observer";
+import {
+  LAUNCH_MENU_PRODUCTION_OBSERVER_PACKAGE_ID,
+  runLaunchMenuProductionObserver,
+} from "./launch-menu-production-observer";
+import { CREATIVE_QA_FINISH_SKU } from "@/lib/studio-creative-qa-finish/contract";
+import {
+  CREATIVE_QA_FINISH_OBSERVER_PACKAGE_ID,
+  runCreativeQaFinishObserver,
+} from "./creative-qa-finish-observer";
 import { evaluateJobDispatch } from "./evaluate";
 import type {
   DispatchExecutionRecord,
   DispatchExecutionResult,
   JobDispatchRecord,
 } from "./types";
+import {
+  collectCustomerIdentityDispatchContext,
+} from "@/lib/studio-customer-identity-safety-gate/collect";
+import { applyCustomerIdentityFailClosed } from "@/lib/studio-customer-identity-safety-gate/apply";
+import {
+  evaluateCustomerIdentitySafetyGate,
+  type CustomerIdentityDispatchSession,
+} from "@/lib/studio-customer-identity-safety-gate";
+import { studioCustomerIdentitySafetyGateV1 } from "@/config/studio-customer-identity-safety-gate-v1";
+import { resolveDispatchExecutionIsolationBlock } from "@/lib/studio-payment/disposable-test-isolation-guards";
 
 function recordsEqual(
   a: readonly JobDispatchRecord[],
@@ -70,27 +99,120 @@ async function attachDesignRendererObserver(input: {
   dispatch: DispatchExecutionRecord;
   alreadyEvaluated: boolean;
 }): Promise<Extract<DispatchExecutionResult, { ok: true }>> {
+  const laneViews =
+    process.env.NODE_ENV === "test"
+      ? resolveProductionLaneViews([])
+      : await loadStudioLaneViews();
   const observer = await runDesignRendererDispatchObserver({
     campaign: input.campaign,
     dispatch: input.dispatch,
+    laneViews,
   });
+  let launchMenu: Awaited<ReturnType<typeof runLaunchMenuProductionObserver>>;
+  try {
+    launchMenu = await runLaunchMenuProductionObserver({
+      campaign: input.campaign,
+      dispatch: input.dispatch,
+      laneViews,
+    });
+  } catch (error) {
+    launchMenu = {
+      packageId: LAUNCH_MENU_PRODUCTION_OBSERVER_PACKAGE_ID,
+      observedAt: new Date().toISOString(),
+      campaignId: input.campaign.campaignId,
+      results: [
+        {
+          dispatchId: "observer",
+          skuId: "unknown",
+          action: "skipped",
+          skipReason: "observer_threw",
+          ok: false,
+          failureCode: "OBSERVER_THREW",
+          message: error instanceof Error ? error.message : "Launch-menu observer failed.",
+          ownerRoutineProduction: "NONE",
+        },
+      ],
+      ownerRoutineProduction: "NONE",
+    };
+  }
+
+  let creativeQa: Awaited<ReturnType<typeof runCreativeQaFinishObserver>>;
+  try {
+    creativeQa = await runCreativeQaFinishObserver({
+      campaign: input.campaign,
+      dispatch: input.dispatch,
+    });
+  } catch (error) {
+    creativeQa = {
+      packageId: CREATIVE_QA_FINISH_OBSERVER_PACKAGE_ID,
+      observedAt: new Date().toISOString(),
+      campaignId: input.campaign.campaignId,
+      results: [
+        {
+          dispatchId: "observer",
+          skuId: CREATIVE_QA_FINISH_SKU,
+          action: "failed",
+          ok: false,
+          failureCode: "OBSERVER_THREW",
+          message: error instanceof Error ? error.message : "Creative QA observer failed.",
+        },
+      ],
+    };
+  }
+
+  recordMachineProductionPass({
+    repoRoot: process.cwd(),
+    campaign: input.campaign,
+    records: input.dispatch.records,
+    designResults: observer.results,
+    launchResults: launchMenu.results,
+  });
+
+  const flyerLoop = observer.results.find(
+    (result) => result.skuId === "v2-rtu-flyer" && result.internalLoop,
+  )?.internalLoop;
 
   const dispatchWithObserver: DispatchExecutionRecord = {
     ...input.dispatch,
     designRendererObserver: observer,
+    launchMenuProductionObserver: launchMenu,
+    creativeQaFinishObserver: creativeQa,
   };
 
   const envelope = await readCampaignEnvelope(input.campaign.campaignId);
   const saved = await upsertCampaignRecord(
     {
       ...input.campaign,
+      routeMapIntake:
+        envelope?.record.routeMapIntake ?? input.campaign.routeMapIntake,
+      routeMapIntakeDraft:
+        envelope?.record.routeMapIntakeDraft ?? input.campaign.routeMapIntakeDraft,
+      routeMapIntakeSubmittedAt:
+        envelope?.record.routeMapIntakeSubmittedAt ??
+        input.campaign.routeMapIntakeSubmittedAt,
+      studioExtras: envelope?.record.studioExtras ?? input.campaign.studioExtras,
       dispatchExecution: dispatchWithObserver,
+      ...(flyerLoop ? { internalProductionLoop: flyerLoop } : {}),
       updatedAt: new Date().toISOString(),
     },
     envelope?.clientUserId,
   );
 
-  const boundCampaign = await ensureFlyerMachineReviewBind(saved.record);
+  const boundFlyer = await ensureFlyerMachineReviewBind(saved.record);
+  const boundGeneralDesign = await ensureGeneralDesignMachineReviewBind(boundFlyer);
+  const boundDesign = await ensureSocialPromoCompositeReviewBind(boundGeneralDesign);
+  const boundCampaignKit = await ensureCampaignLaunchKitReviewBind(boundDesign);
+  const boundCopy = await ensureCopyMachineReviewBind(boundCampaignKit);
+  const boundStills = await ensureShortVideoMachineReviewBindFromCampaign(
+    boundCopy,
+  );
+  const boundFootage = await ensureFootageEditingMachineReviewBindFromCampaign(
+    boundStills,
+  );
+  const boundClip = await ensureClipRepurposingMachineReviewBindFromCampaign(
+    boundFootage,
+  );
+  const boundCampaign = await advanceStudioExtras(boundClip);
   const boundObserver =
     boundCampaign.dispatchExecution?.designRendererObserver ?? observer;
 
@@ -103,6 +225,23 @@ async function attachDesignRendererObserver(input: {
   };
 }
 
+async function failClosedIdentity(
+  campaign: CampaignRecord,
+  session?: CustomerIdentityDispatchSession,
+): Promise<DispatchExecutionResult | null> {
+  const context = await collectCustomerIdentityDispatchContext(campaign, session);
+  const verdict = evaluateCustomerIdentitySafetyGate(context);
+  if (verdict.ok) return null;
+  const blocked = await applyCustomerIdentityFailClosed(campaign, verdict);
+  return {
+    ok: false,
+    campaign: blocked,
+    dispatch: blocked.dispatchExecution ?? null,
+    error: "customer_context_mismatch",
+    message: studioCustomerIdentitySafetyGateV1.customerCopy.lead,
+  };
+}
+
 /**
  * Server-driven dispatch execution identity.
  * Refreshes routing first. Identity evaluation does not invoke tools.
@@ -110,9 +249,13 @@ async function attachDesignRendererObserver(input: {
  * auto-invoke studio_design_renderer for v2-rtu-flyer, v2-rtu-business-card,
  * v2-rtu-menu, v2-rtu-service-sheet, v2-rtu-promotion-graphics, and
  * v2-rtu-social-posts.
+ *
+ * STUDIO-OPERATING-MACHINE-CUSTOMER-IDENTITY-SAFETY-GATE-1 runs after
+ * routing and before any Production observer/hook.
  */
 export async function ensureDispatchExecution(
   campaign: CampaignRecord,
+  identitySession?: CustomerIdentityDispatchSession,
 ): Promise<DispatchExecutionResult> {
   const routed = await ensureRoutingHandoff(campaign);
   const working = routed.campaign;
@@ -129,6 +272,20 @@ export async function ensureDispatchExecution(
       message: "Dispatch requires processor-confirmed payment.",
     };
   }
+
+  const isolationBlock = resolveDispatchExecutionIsolationBlock(working, process.env);
+  if (isolationBlock) {
+    return {
+      ok: false,
+      campaign: working,
+      dispatch: working.dispatchExecution ?? null,
+      error: isolationBlock.error,
+      message: isolationBlock.message,
+    };
+  }
+
+  const identityBlock = await failClosedIdentity(working, identitySession);
+  if (identityBlock) return identityBlock;
 
   if (!working.routingHandoff) {
     return {

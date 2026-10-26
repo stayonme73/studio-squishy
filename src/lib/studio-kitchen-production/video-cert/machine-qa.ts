@@ -94,10 +94,10 @@ export function runCertVideoMachineQa(input: {
       );
     }
   }
-  dummyUrls.set(
-    input.packet.voiceArtifact.relativePath,
-    "https://example.test/voice.mp3",
-  );
+  const voiceArtifact = input.packet.voiceArtifact;
+  if (voiceArtifact) {
+    dummyUrls.set(voiceArtifact.relativePath, "https://example.test/voice.mp3");
+  }
   const built = buildShotstackEditPayload(input.packet, dummyUrls);
   push("payload_builds", built.ok, built.ok ? "ok" : built.findings.join("; "));
 
@@ -249,13 +249,13 @@ export function runCertVideoMachineQa(input: {
 
   // V5+: SKU narration must fit without truncating source VO
   if (input.packet.workPacketVersion === "wp-v5") {
-    const voiceAbs = path.join(
-      input.repoRoot,
-      input.packet.voiceArtifact.relativePath,
-    );
-    const voiceDur = existsSync(voiceAbs)
-      ? probeMediaDurationSeconds(voiceAbs)
-      : null;
+    const voiceAbs = voiceArtifact
+      ? path.join(input.repoRoot, voiceArtifact.relativePath)
+      : "";
+    const voiceDur =
+      voiceArtifact && existsSync(voiceAbs)
+        ? probeMediaDurationSeconds(voiceAbs)
+        : null;
     push(
       "sku_narration_duration_band",
       Boolean(voiceDur && voiceDur >= 15 && voiceDur <= 30),
@@ -281,9 +281,12 @@ export function runCertVideoMachineQa(input: {
     // Source voice SHA must be the new short-video narration, not the 39s voice-cert fixture
     push(
       "not_bound_to_voice_cert_39s_fixture",
-      input.packet.voiceArtifact.contentSha256 !==
-        "d283144563a6fe2075be956fd144fe1c0bb4de29ec55ca308c5b8060c94647e4",
-      `voiceSha=${input.packet.voiceArtifact.contentSha256.slice(0, 12)}…`,
+      voiceArtifact != null &&
+        voiceArtifact.contentSha256 !==
+          "d283144563a6fe2075be956fd144fe1c0bb4de29ec55ca308c5b8060c94647e4",
+      voiceArtifact
+        ? `voiceSha=${voiceArtifact.contentSha256.slice(0, 12)}…`
+        : "voice artifact absent",
     );
 
     if (voiceDur != null) {
@@ -326,10 +329,9 @@ export function runCertVideoMachineQa(input: {
       push("audio_present", probe.hasAudio, `hasAudio=${probe.hasAudio}`);
 
       if (input.packet.workPacketVersion === "wp-v5") {
-        const voiceAbs = path.join(
-          input.repoRoot,
-          input.packet.voiceArtifact.relativePath,
-        );
+        const voiceAbs = voiceArtifact
+          ? path.join(input.repoRoot, voiceArtifact.relativePath)
+          : "";
         const voiceDur = existsSync(voiceAbs)
           ? probeMediaDurationSeconds(voiceAbs)
           : null;

@@ -13,9 +13,8 @@ import {
   type PromoPlateId,
 } from "./promo-types";
 
-/** Customer-facing purpose options (intake select). */
+/** Customer-facing purpose options (intake select). Print is not a Studio print claim. */
 export const PROMO_INTAKE_PURPOSE_OPTIONS = [
-  "Print",
   "Social",
   "Email",
   "In-store",
@@ -25,11 +24,16 @@ export const PROMO_INTAKE_PURPOSE_OPTIONS = [
 export type PromoIntakePurposeOption =
   (typeof PROMO_INTAKE_PURPOSE_OPTIONS)[number];
 
-/** Customer-facing agreed-format options — map only to proven Studio plates. */
+/** Sold intake plates. Landscape remains mapped for leftover answers and fail-closes. */
 export const PROMO_INTAKE_PLATE_OPTIONS = [
   "Square 1024×1024 (social / feed)",
   "Portrait 1024×1536 (print / tall)",
-  "Landscape 1536×1024 (wide)",
+] as const;
+export const PROMO_INTAKE_SOLD_PLATE_A = [
+  "Square 1024×1024 (social / feed)",
+] as const;
+export const PROMO_INTAKE_SOLD_PLATE_B = [
+  "Portrait 1024×1536 (print / tall)",
 ] as const;
 
 export type PromoIntakePlateOption =
@@ -42,7 +46,7 @@ export const PROMO_INTAKE_FIELD_IDS = {
   graphicBPlate: "graphicB_agreedPlate",
 } as const;
 
-const PLATE_OPTION_TO_ID: Record<PromoIntakePlateOption, PromoPlateId> = {
+const PLATE_OPTION_TO_ID: Record<string, PromoPlateId> = {
   "Square 1024×1024 (social / feed)": PROMO_SQUARE_PLATE.plateId,
   "Portrait 1024×1536 (print / tall)": PROMO_PORTRAIT_PLATE.plateId,
   "Landscape 1536×1024 (wide)": PROMO_LANDSCAPE_PLATE.plateId,
@@ -83,7 +87,8 @@ function parsePurpose(
     };
   }
   if (
-    !(PROMO_INTAKE_PURPOSE_OPTIONS as readonly string[]).includes(value)
+    !(PROMO_INTAKE_PURPOSE_OPTIONS as readonly string[]).includes(value) &&
+    value !== "Print"
   ) {
     return {
       ok: false,
@@ -97,7 +102,9 @@ function parsePurpose(
 function parsePlate(
   raw: string | undefined,
   which: "Graphic 1" | "Graphic 2",
-): { plateId: PromoPlateId; canvas: { widthPx: number; heightPx: number } } | PromoIntakeAssetTruthResult {
+):
+  | { plateId: PromoPlateId; canvas: { widthPx: number; heightPx: number } }
+  | Extract<PromoIntakeAssetTruthResult, { ok: false }> {
   const value = raw?.trim() ?? "";
   if (!value) {
     return {

@@ -5,47 +5,22 @@ import {
   writeTasksEnvelope,
 } from "@/lib/campaign-tasks/store";
 import { upsertCampaignRecord, readCampaignEnvelope } from "@/lib/campaign-store/store";
-import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
 import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
-import { buildServiceScopeSnapshot } from "@/lib/plan-pricing";
-import type { ServiceId } from "@/catalog/types";
 import { ensureSm001MonthlyProductionCyclesFromPaidAuthority } from "@/lib/studio-monthly-production-cycle";
 
 import {
   isPaymentConfirmedForActivation,
   resolvePostPayActivationPhase,
 } from "./resolve-phase";
+import {
+  ProductionScopeRestoreError,
+  restoreProductionScopeFromPaymentAuthority,
+} from "./restore-production-scope-from-payment";
 import type {
   PostPayActivationRecord,
   PostPayActivationResult,
 } from "./types";
-
-/**
- * If checkout left an approved plan with empty production lines, rebuild lines
- * from payment-confirmed SKUs only — never invent SKUs beyond payment truth.
- */
-function ensureProductionLineItems(campaign: CampaignRecord): CampaignRecord {
-  const plan = campaign.approvedStudioPlan;
-  if (!plan) return campaign;
-  if (filterProductionPlanLineItems(plan).length > 0) return campaign;
-
-  const skuIds = (campaign.paymentTruth?.selectedServiceIds ??
-    plan.selectedServiceIds) as readonly ServiceId[];
-  if (!skuIds.length) return campaign;
-
-  return {
-    ...campaign,
-    approvedStudioPlan: {
-      ...plan,
-      selectedServiceIds: [...skuIds],
-      includedServiceIds: plan.includedServiceIds.length
-        ? plan.includedServiceIds
-        : [...skuIds],
-      lineItems: buildServiceScopeSnapshot(skuIds),
-    },
-  };
-}
 
 function arraysEqual(a: readonly string[], b: readonly string[]): boolean {
   if (a.length !== b.length) return false;
@@ -120,7 +95,22 @@ export async function ensurePostPayActivation(
 
   const checkoutSessionId = campaign.paymentTruth!.checkoutSessionId!;
   const now = new Date().toISOString();
-  let working = ensureProductionLineItems(campaign);
+  let working: CampaignRecord;
+  try {
+    working = restoreProductionScopeFromPaymentAuthority(campaign);
+  } catch (error) {
+    if (error instanceof ProductionScopeRestoreError) {
+      const failed = await writePendingRetry(campaign, error.message);
+      return {
+        ok: false,
+        campaign: failed,
+        activation: failed.postPayActivation ?? null,
+        error: "production_scope_ambiguous",
+        message: error.message,
+      };
+    }
+    throw error;
+  }
 
   // Paid-cycle → production cycle create (idempotent). Skips purchases lacking
   // explicit period truth. Does not invoke renderer / remap / dispatch.

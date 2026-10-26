@@ -7,12 +7,13 @@ import { fetchJobReview } from "@/lib/review-room-client";
 
 export function useJobReview(campaignId: string | undefined, jobId: string | null) {
   const [review, setReview] = useState<ClientReviewView | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(() => Boolean(campaignId && jobId));
   const [error, setError] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
     if (!campaignId || !jobId) {
       setReview(null);
+      setLoading(false);
       return;
     }
 

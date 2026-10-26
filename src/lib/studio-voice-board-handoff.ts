@@ -119,3 +119,18 @@ export function consumeStudioVoiceBoardWelcome(): boolean {
   clearStudioVoiceBoardHandoff();
   return true;
 }
+
+const RETURNING_VOICE_KEY = "studio-squishy:voice-returning-greeted:v1";
+
+/** Once per browser session. Returning customers hear account/project truth. */
+export function consumeStudioVoiceReturningWelcome(): boolean {
+  const storage = getSessionStorage();
+  if (!storage) return false;
+  try {
+    if (storage.getItem(RETURNING_VOICE_KEY) === "1") return false;
+    storage.setItem(RETURNING_VOICE_KEY, "1");
+    return true;
+  } catch {
+    return false;
+  }
+}

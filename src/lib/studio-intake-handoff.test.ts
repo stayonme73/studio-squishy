@@ -236,4 +236,16 @@ describe("Conversation Room Intake → Account Handoff navigation", () => {
     expect(success).not.toContain("closeActivityPanel");
     expect(success).not.toContain("await ");
   });
+
+  it("persists guest Project Intake through the paid checkout session", () => {
+    const panel = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationIntakePanel.tsx",
+      ),
+      "utf8",
+    );
+    expect(panel).toContain("/api/payments/intake-submit");
+    expect(panel).toContain("checkoutSessionId");
+  });
 });

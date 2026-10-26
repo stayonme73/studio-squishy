@@ -30,8 +30,16 @@ import {
   welcomeHallScene,
 } from "@/config/welcome-hall-scene";
 import { cancelLobbyPodiumGuidanceSpeech } from "@/lib/studio-lobby-podium-guidance";
-import { loadGuideDraft } from "@/lib/studio-guide-hard-nav";
-import { withStudioPaymentSandboxQuery } from "@/lib/studio-payment/sandbox-query";
+import { resolveLobbyConversationBeginInvite } from "@/lib/conversation-room-draft";
+import { canOpenIntakeForCampaign } from "@/lib/studio-intake-resume";
+import {
+  rememberStudioPaymentSandbox,
+  restoreStudioPaymentSandboxQuery,
+  searchHasStudioPaymentSandbox,
+  sessionHasStudioPaymentSandbox,
+  withStudioPaymentSandboxQuery,
+} from "@/lib/studio-payment/sandbox-query";
+import { readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
 import { markVoiceFirstEntryChoiceRequired } from "@/lib/studio-voice-preference";
 import { setStudioVoiceInvite } from "@/lib/studio-voice-invite";
 import {
@@ -98,6 +106,10 @@ export default function WelcomeHallWelcomeScene({
   const [sessionState, setSessionState] =
     useState<LobbyEntrySessionState>("signed-out");
   const [viewportWidth, setViewportWidth] = useState(0);
+  /** First paint matches SSR from the URL prop. Session opt-in stamps after mount. */
+  const [sandboxSearch, setSandboxSearch] = useState(
+    paymentSandbox ? "?studioPaymentSandbox=1" : "",
+  );
 
   const phoneFrontDoor = shouldForceLobbyEntryFilmOnPhone({
     transitioning,
@@ -133,6 +145,15 @@ export default function WelcomeHallWelcomeScene({
   }, [coverLayout, isDesktopKiosk]);
 
   useEffect(() => {
+    rememberStudioPaymentSandbox(window.location.search);
+    restoreStudioPaymentSandboxQuery();
+    if (
+      paymentSandbox ||
+      searchHasStudioPaymentSandbox(window.location.search) ||
+      sessionHasStudioPaymentSandbox()
+    ) {
+      setSandboxSearch("?studioPaymentSandbox=1");
+    }
     const params = new URLSearchParams(window.location.search);
     const entryParam = params.get("lobbyEntry");
 
@@ -171,7 +192,7 @@ export default function WelcomeHallWelcomeScene({
         setFilmOpen(true);
       }
     }
-  }, [initialChoseNew]);
+  }, [initialChoseNew, paymentSandbox]);
 
   useEffect(() => {
     let cancelled = false;
@@ -244,20 +265,29 @@ export default function WelcomeHallWelcomeScene({
        A leftover Voice On/Off from an earlier visit must not skip that choice
        unless this is a reversible deck return. */
     cancelLobbyPodiumGuidanceSpeech();
+    const currentCampaign = readCurrentCampaignHydrated();
+    const resumePaidIntake = canOpenIntakeForCampaign(currentCampaign);
     if (deckResume) {
       markPreCheckoutDeckVoiceChoice();
-    } else {
+    } else if (!resumePaidIntake) {
       markVoiceFirstEntryChoiceRequired();
     }
-    const draft = loadGuideDraft();
-    const hasProgress = Boolean(draft?.projectNeed?.trim() || draft?.confirmedAt);
-    setStudioVoiceInvite(hasProgress ? "resume" : "start");
+    const invite = resolveLobbyConversationBeginInvite();
+    setStudioVoiceInvite(invite);
     setTransitioning(true);
-    const sourceSearch = paymentSandbox
+    const optedIn =
+      paymentSandbox ||
+      searchHasStudioPaymentSandbox(window.location.search) ||
+      sessionHasStudioPaymentSandbox();
+    const sourceSearch = optedIn
       ? window.location.search || "?studioPaymentSandbox=1"
       : window.location.search;
+    const conversationPath =
+      resumePaidIntake && currentCampaign?.campaignId
+        ? `/studio-conversation-room?stage=intake&campaignId=${encodeURIComponent(currentCampaign.campaignId)}`
+        : "/studio-conversation-room";
     window.location.assign(
-      withStudioPaymentSandboxQuery("/studio-conversation-room", sourceSearch),
+      withStudioPaymentSandboxQuery(conversationPath, sourceSearch),
     );
   }, [paymentSandbox]);
 
@@ -331,7 +361,7 @@ export default function WelcomeHallWelcomeScene({
             onBeginNew={handleBeginNew}
             beginNewHref={withStudioPaymentSandboxQuery(
               studioLobbyEntryV1.routes.beginNew,
-              paymentSandbox ? "?studioPaymentSandbox=1" : "",
+              sandboxSearch,
             )}
           />
         ) : null}

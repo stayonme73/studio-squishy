@@ -22,6 +22,7 @@ import {
 } from "@/lib/route-map-campaign";
 
 import { resetConversationStageScroll } from "@/lib/studio-conversation-stage-scroll";
+import { renderWithCoralProjectChange } from "@/components/studio-conversation-room/guide/renderWithCoralProjectChange";
 
 import "@/app/payment.css";
 import "@/app/checkout/checkout.css";
@@ -85,7 +86,7 @@ export default function ConversationCheckoutPanel({
     confirm?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [phonePage]);
 
-  const journeyChrome = phonePage ? (
+  const journeyChrome = (
     <div data-tablet-journey-chrome="true">
       <SamsungDeckBack
         className={styles.backLink}
@@ -95,7 +96,7 @@ export default function ConversationCheckoutPanel({
       </SamsungDeckBack>
       {topControls}
     </div>
-  ) : null;
+  );
 
   if (serviceIds.length === 0 || !planSummary) {
     return (
@@ -128,14 +129,6 @@ export default function ConversationCheckoutPanel({
         <p className={styles.intro} role="status">
           {v.studioPlanBridgeError}
         </p>
-        {phonePage ? null : (
-          <SamsungDeckBack
-            className={styles.backLink}
-            onActivate={onBackToStudioPlan}
-          >
-            ← {v.checkoutBackToPlanLabel}
-          </SamsungDeckBack>
-        )}
       </div>
     );
   }
@@ -168,17 +161,8 @@ export default function ConversationCheckoutPanel({
         )}
       </header>
 
-      {phonePage ? null : (
-        <SamsungDeckBack
-          className={styles.backLink}
-          onActivate={onBackToStudioPlan}
-        >
-          ← {v.checkoutBackToPlanLabel}
-        </SamsungDeckBack>
-      )}
-
       {routeCustomerLabel ? (
-        <p className={`${styles.checkoutRouteLabel}${phonePage ? "" : ` ${studioTileClass.standardLight}`}`}>
+        <p className={styles.checkoutRouteLabel}>
           <span className={styles.checkoutRouteEyebrow}>
             {v.studioPlanRouteLabel}
           </span>
@@ -186,10 +170,10 @@ export default function ConversationCheckoutPanel({
         </p>
       ) : null}
 
-      <p className={styles.intro}>{v.checkoutLead}</p>
+      <p className={styles.intro}>{renderWithCoralProjectChange(v.checkoutLead)}</p>
       {phonePage ? null : (
         <p className={styles.checkoutScopeDisclosure} role="note">
-          {v.checkoutScopeDisclosure}
+          {renderWithCoralProjectChange(v.checkoutScopeDisclosure)}
         </p>
       )}
       {paymentHonestyMessage ? (

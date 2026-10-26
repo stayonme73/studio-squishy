@@ -44,16 +44,38 @@ describe("refund-request-intake", () => {
     });
     expect(snapshot.productionStarted).toBe(false);
     expect(snapshot.receivedConceptsOrFiles).toBe(false);
-    expect(snapshot.policyStatusLabel).toContain("May be eligible");
-    expect(snapshot.recommendedNextAction).toContain("approve or deny");
+    expect(snapshot.policyStatusLabel).toContain("Refund may be approved");
+    expect(snapshot.recommendedNextAction).toContain("approve, deny, or ask for more information");
+    expect(snapshot.recommendedNextAction).toContain("do not auto-refund");
   });
 
   it("BH-RF-1: timeline facts stay job-grain and omit campaign payment", () => {
     const facts = resolveRefundTimelineFacts(job);
     expect(facts).toMatch(/Waiting on client since/i);
-    expect(facts).toMatch(/refund-eligibility signal/i);
+    expect(facts).toMatch(/Owner refund-eligibility note recorded/i);
     expect(facts).not.toMatch(/Payment received/i);
     expect(resolveProductionStartedReadOnly(job)).toBe(false);
-    expect(resolveRefundPolicyStatusLabel(job)).toContain("May be eligible");
+    expect(resolveRefundPolicyStatusLabel(job)).toContain("Refund may be approved");
+  });
+
+  it("judges refunds on production-start truth, not elapsed days", () => {
+    const sameDay: PurchasedJobRecord = {
+      ...job,
+      refundEligibleAt: null,
+      waitingOnClientSince: "2026-07-06T11:00:00.000Z",
+    };
+    const label = resolveRefundPolicyStatusLabel(sameDay);
+    expect(label).toContain("Refund may be approved");
+    expect(label).toContain("Owner approval required");
+    expect(label).not.toMatch(/\b14\b|days?|wait/i);
+    expect(resolveRefundTimelineFacts(sameDay)).not.toMatch(/\b14\b|evidence|clock/i);
+
+    const started: PurchasedJobRecord = {
+      ...job,
+      productionStartedAt: "2026-07-02T12:00:00.000Z",
+    };
+    expect(resolveProductionStartedReadOnly(started)).toBe(true);
+    expect(resolveRefundPolicyStatusLabel(started)).toContain("Non-refundable");
+    expect(buildRefundRequestSnapshot(started, { reason: "x", requestedOutcome: "Full refund" }).recommendedNextAction).toMatch(/Deny refund/);
   });
 });

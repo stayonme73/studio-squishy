@@ -1,8 +1,10 @@
 /**
  * Deterministic responsive checks via Playwright (when available).
  * Falls back to HTML/CSS structural checks if browser cannot launch.
+ * Node-only — do not import from Client Components.
  */
 
+import "server-only";
 import { existsSync } from "fs";
 import path from "path";
 import { pathToFileURL } from "url";

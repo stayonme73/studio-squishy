@@ -59,13 +59,13 @@ export const kitchenFileBuckets: KitchenFileBucketDefinition[] = [
     actions: [
       { label: "Open Campaign Brief", href: studioBoard.routes.campaignDetails },
       { label: "Copy Campaign Brief", phase1Stub: true },
-      { label: "Send to ChatGPT", phase1Stub: true },
+      { label: "Does not send to ChatGPT", phase1Stub: true },
     ],
   },
   {
     id: "needs-concepts",
     label: "Needs Concepts",
-    summary: "ChatGPT builds Concept A, B, and C — owner pastes and sends to client.",
+    summary: "Concept folder. ChatGPT send is not connected — do not treat this as a live send.",
     ownerAction: true,
     movesTo: "client-reviewing-concepts",
     actions: [
@@ -89,19 +89,19 @@ export const kitchenFileBuckets: KitchenFileBucketDefinition[] = [
   {
     id: "production-ready",
     label: "Production Ready",
-    summary: "Concept selected — send production brief to ChatGPT.",
+    summary: "Concept selected. Production-brief send to ChatGPT is not connected.",
     ownerAction: true,
     movesTo: "in-production",
     actions: [
       { label: "Open Production Brief", phase1Stub: true },
       { label: "Copy Production Brief", phase1Stub: true },
-      { label: "Send To ChatGPT", phase1Stub: true },
+      { label: "Does not send to ChatGPT", phase1Stub: true },
     ],
   },
   {
     id: "in-production",
     label: "In Production",
-    summary: "ChatGPT builds social, email, SMS, video scripts, and calendar.",
+    summary: "Copy and calendar folder. ChatGPT send is not connected.",
     ownerAction: false,
     movesTo: "owner-review",
     actions: [{ label: "View Production Brief", phase1Stub: true }],
@@ -128,13 +128,13 @@ export const kitchenFileBuckets: KitchenFileBucketDefinition[] = [
   {
     id: "revision-queue",
     label: "Revision Queue",
-    summary: "Owner sends revision notes to ChatGPT — folder returns to client deliverable review.",
+    summary: "Revision notes stay in the folder. ChatGPT send is not connected.",
     ownerAction: true,
     movesTo: "client-reviewing-deliverables",
     actions: [
       { label: "Open Revision Notes", href: "/feedback-studio" },
       { label: "Copy Revision Notes", phase1Stub: true },
-      { label: "Send To ChatGPT", phase1Stub: true },
+      { label: "Does not send to ChatGPT", phase1Stub: true },
     ],
   },
   {

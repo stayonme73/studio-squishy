@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 
 import ProjectBuilderStudioPlanSummary from "@/components/project-builder/ProjectBuilderStudioPlanSummary";
+import { renderWithCoralProjectChange } from "@/components/studio-conversation-room/guide/renderWithCoralProjectChange";
 import SamsungDeckBack from "@/components/studio-conversation-room/guide/SamsungDeckBack";
 import SamsungDenimCta from "@/components/studio-conversation-room/guide/SamsungDenimCta";
 import {
@@ -41,6 +42,19 @@ export type ConversationStudioPlanTabletProps = {
 function routeCustomerLabel(routeLabel: string): string {
   const parts = routeLabel.split("·");
   return (parts[parts.length - 1] ?? routeLabel).trim();
+}
+
+function renderStudioPlanVoiceOrient(text: string) {
+  const at = text.search(/you can still make changes/i);
+  if (at < 0) return renderWithCoralProjectChange(text);
+  return (
+    <>
+      <span className={styles.voiceSaysLine}>{text.slice(0, at).trim()}</span>
+      <span className={styles.voiceSaysLine}>
+        {renderWithCoralProjectChange(text.slice(at))}
+      </span>
+    </>
+  );
 }
 
 export function ConversationStudioPlanActions({
@@ -170,7 +184,7 @@ export default function ConversationStudioPlanTablet({
           >
             <p className={styles.voiceSaysLabel}>{v.studioVoiceSaysLabel}</p>
             <blockquote className={styles.voiceSaysQuote}>
-              {v.studioPlanVoiceOrient}
+              {renderStudioPlanVoiceOrient(v.studioPlanVoiceOrient)}
             </blockquote>
           </aside>
         )}
@@ -245,54 +259,57 @@ export default function ConversationStudioPlanTablet({
             <p className={styles.planFactNote}>{v.studioPlanTimelineAsteriskNote}</p>
           </section>
         ) : null}
-
-        {extrasInPlace ? (
-          <section
-            className={styles.planDetailsCard}
-            data-plan-details="true"
-            data-open={extrasOpen ? "true" : "false"}
-          >
-            <button
-              type="button"
-              ref={extrasActivate.ref}
-              className={styles.planDetailsToggle}
-              data-plan-details-toggle="true"
-              aria-expanded={extrasOpen}
-              aria-controls="studio-plan-mobile-details"
-              onClick={extrasActivate.onClick}
-            >
-              {extrasOpen ? v.studioPlanDetailsHideLabel : v.studioPlanDetailsToggle}
-            </button>
-            {extrasOpen ? (
-              <div
-                id="studio-plan-mobile-details"
-                className={styles.planDetailsBody}
-              >
-                <ProjectBuilderStudioPlanSummary
-                  model={model}
-                  variant="extras"
-                  showActions={false}
-                  onEditProject={onEditPlan}
-                  onContinueToCheckout={onLooksGood}
-                  onViewScope={onViewScope ?? (() => undefined)}
-                />
-              </div>
-            ) : null}
-          </section>
-        ) : (
-          <>
-            <p className={styles.planFactNote}>{v.studioPlanExtrasHint}</p>
-            <button
-              type="button"
-              ref={extraDetailsActivate.ref}
-              className={styles.planMoreDetailsLink}
-              onClick={extraDetailsActivate.onClick}
-            >
-              {v.studioPlanMoreDetailsCta} →
-            </button>
-          </>
-        )}
       </div>
+
+      {extrasInPlace ? null : (
+        <p className={styles.planExtrasLinkWrap} data-plan-extras-link="true">
+          <span className={styles.planFactNote}>{v.studioPlanExtrasHint}</span>
+          <button
+            type="button"
+            ref={extraDetailsActivate.ref}
+            className={styles.planMoreDetailsLink}
+            data-plan-extras-cta="true"
+            onClick={extraDetailsActivate.onClick}
+          >
+            {v.studioPlanMoreDetailsCta} →
+          </button>
+        </p>
+      )}
+
+      {extrasInPlace ? (
+        <section
+          className={styles.planDetailsCard}
+          data-plan-details="true"
+          data-open={extrasOpen ? "true" : "false"}
+        >
+          <button
+            type="button"
+            ref={extrasActivate.ref}
+            className={styles.planDetailsToggle}
+            data-plan-details-toggle="true"
+            aria-expanded={extrasOpen}
+            aria-controls="studio-plan-mobile-details"
+            onClick={extrasActivate.onClick}
+          >
+            {extrasOpen ? v.studioPlanDetailsHideLabel : v.studioPlanDetailsToggle}
+          </button>
+          {extrasOpen ? (
+            <div
+              id="studio-plan-mobile-details"
+              className={styles.planDetailsBody}
+            >
+              <ProjectBuilderStudioPlanSummary
+                model={model}
+                variant="extras"
+                showActions={false}
+                onEditProject={onEditPlan}
+                onContinueToCheckout={onLooksGood}
+                onViewScope={onViewScope ?? (() => undefined)}
+              />
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       {bridgeError ? (
         <p className={styles.planTabletError} role="alert">

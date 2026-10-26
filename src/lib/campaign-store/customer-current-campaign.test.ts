@@ -6,6 +6,10 @@ import type { CampaignRecord } from "@/config/studio-board";
 import {
   applyCustomerOneSubmittedIntake,
   campaignProgressRank,
+  isFreshNonMayaCurrentCampaign,
+  isPlaceholderLocalBlockingNamedPaid,
+  isProtectedMayaCampaign,
+  shouldBindOwnedPaidWhenCurrentMissing,
   shouldKeepLocalCampaignOverServer,
   shouldRedirectUnpaidCurrentToPaidSibling,
 } from "@/lib/campaign-store/customer-current-campaign-progress";
@@ -71,6 +75,69 @@ describe("customer current campaign resolution", () => {
     expect(shouldKeepLocalCampaignOverServer(local, server)).toBe(false);
   });
 
+  it("keeps a fresh non-Maya local campaign over Maya even when Maya is further along", () => {
+    const maya = flyer({
+      routeMapIntakeSubmittedAt: now,
+      campaignStatus: "BUILDING_CONCEPTS",
+    });
+    const fresh = flyer({
+      campaignId: "customer-one-fresh-board-bind",
+      campaignName: "Harbor & Co.",
+      campaignStatus: "PAYMENT_RECEIVED",
+      paymentReceivedAt: "2026-09-12T18:00:00.000Z",
+      createdAt: "2026-09-12T18:00:00.000Z",
+    });
+    expect(campaignProgressRank(maya)).toBeGreaterThan(campaignProgressRank(fresh));
+    expect(shouldKeepLocalCampaignOverServer(fresh, maya)).toBe(true);
+    expect(shouldKeepLocalCampaignOverServer(maya, fresh)).toBe(false);
+  });
+
+  it("does not keep the owner-qa-dev fixture over a paid customer campaign", () => {
+    const paid = flyer({
+      campaignId: "849c793b-88c1-48cd-9194-5ed95554635a",
+      campaignName: "Make Me a Flyer",
+    });
+    const fixture = flyer({
+      campaignId: "owner-qa-dev",
+      campaignName: "Tagia Bakery Campaign",
+      campaignStatus: "READY_FOR_REVIEW",
+    });
+    expect(shouldKeepLocalCampaignOverServer(fixture, paid)).toBe(false);
+    expect(shouldKeepLocalCampaignOverServer(fixture, null)).toBe(false);
+  });
+
+  it("does not keep a leftover Studio Project over a named paid current", () => {
+    const paidNamed = flyer({
+      campaignId: "849c793b-88c1-48cd-9194-5ed95554635a",
+      campaignName: "Make Me a Flyer",
+    });
+    const leftover = flyer({
+      campaignId: "058c5ee4-4cdc-4dd2-9466-0fe5597e57a1",
+      campaignName: "Studio Project",
+      paymentReceivedAt: "2026-09-20T18:32:52.327Z",
+    });
+    expect(isPlaceholderLocalBlockingNamedPaid(leftover, paidNamed)).toBe(true);
+    expect(shouldKeepLocalCampaignOverServer(leftover, paidNamed)).toBe(false);
+    expect(isFreshNonMayaCurrentCampaign(leftover)).toBe(false);
+  });
+
+  it("keeps THE STUDIO local current over paid Maya (MJ-D25 phone miss)", () => {
+    const maya = flyer({
+      campaignStatus: "READY_FOR_REVIEW",
+      routeMapIntakeSubmittedAt: now,
+    });
+    const theStudio = flyer({
+      campaignId: "9c6c25f2-2562-4192-97a5-44536e45cd18",
+      campaignName: "the Studio",
+      campaignStatus: "READY_FOR_REVIEW",
+      paymentReceivedAt: "2026-09-12T21:31:13.833Z",
+      createdAt: "2026-09-12T21:31:13.779Z",
+    });
+    expect(isFreshNonMayaCurrentCampaign(theStudio)).toBe(true);
+    expect(isProtectedMayaCampaign(maya)).toBe(true);
+    expect(shouldKeepLocalCampaignOverServer(theStudio, maya)).toBe(true);
+  });
+
   it("redirects an unpaid same-service current onto the paid sibling", () => {
     const paid = flyer();
     const unpaid = flyer({
@@ -82,6 +149,24 @@ describe("customer current campaign resolution", () => {
     expect(shouldRedirectUnpaidCurrentToPaidSibling(unpaid, paid)).toBe(true);
     expect(shouldRedirectUnpaidCurrentToPaidSibling(paid, paid)).toBe(false);
     expect(shouldRedirectUnpaidCurrentToPaidSibling(null, paid)).toBe(false);
+    expect(shouldBindOwnedPaidWhenCurrentMissing(null, paid)).toBe(true);
+    expect(shouldBindOwnedPaidWhenCurrentMissing(unpaid, paid)).toBe(false);
+    expect(shouldBindOwnedPaidWhenCurrentMissing(paid, paid)).toBe(false);
+  });
+
+  it("does not redirect a newer unpaid flyer onto a previously paid Maya job", () => {
+    const paid = flyer({
+      createdAt: "2026-09-06T10:00:00.000Z",
+      paymentReceivedAt: "2026-09-06T22:28:33.080Z",
+    });
+    const unpaid = flyer({
+      campaignId: "new-studio-customer-one",
+      campaignName: "Make Me a Flyer",
+      campaignStatus: "DISCOVERY_COMPLETE",
+      createdAt: "2026-09-12T18:00:00.000Z",
+    });
+    delete (unpaid as { paymentReceivedAt?: string }).paymentReceivedAt;
+    expect(shouldRedirectUnpaidCurrentToPaidSibling(unpaid, paid)).toBe(false);
   });
 
   it("does not redirect a different service unpaid draft onto the flyer", () => {
@@ -124,6 +209,25 @@ describe("customer current campaign resolution", () => {
     expect(applyCustomerOneSubmittedIntake(other).routeMapIntakeSubmittedAt).toBeUndefined();
   });
 
+  it("GET /api/campaigns/current prefers an owned paid non-Maya campaign over Maya", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/lib/campaign-store/customer-current-campaign.ts"),
+      "utf8",
+    );
+    expect(source).toContain("pickOwnedPaidNonMayaCampaign");
+    expect(source).toContain("currentIsMaya");
+  });
+
+  it("empty current binds the owned paid flyer instead of No Active Project (MJ-D28)", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/lib/campaign-store/customer-current-campaign.ts"),
+      "utf8",
+    );
+    expect(source).toContain("shouldBindOwnedPaidWhenCurrentMissing");
+    expect(source).toContain("pickLocalCustomerOnePaidFlyerCampaign");
+    expect(source).toContain("sessionUserWithCampaign(workingUser, paid.campaignId)");
+  });
+
   it("GET /api/campaigns/current resolves through the customer current helper", () => {
     const source = readFileSync(
       join(process.cwd(), "src/app/api/campaigns/current/route.ts"),
@@ -131,5 +235,49 @@ describe("customer current campaign resolution", () => {
     );
     expect(source).toContain("resolveCustomerCurrentCampaign");
     expect(source).toContain("Cache-Control");
+  });
+
+  it("Board hydrate asks the signed-in current first and does not fetch leftover local by id", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/lib/use-current-campaign.ts"),
+      "utf8",
+    );
+    expect(source).toContain('"/api/campaigns/current"');
+    expect(source).not.toContain("bindLocalNonMaya");
+    expect(source).toContain("isPlaceholderStudioBoardName");
+    expect(source).toContain("shouldKeepLocalCampaignOverServer(localCampaign, nextCampaign)");
+    expect(source).toContain("!requestedCampaignId &&");
+  });
+
+  it("a leftover Studio Project flyer cannot hide a named paid Clip current", () => {
+    const leftover = flyer({
+      campaignId: "058c5ee4-4cdc-4dd2-9466-0fe5597e57a1",
+      campaignName: "Studio Project",
+      routeMapIntakeSubmittedAt: now,
+    });
+    const clip = flyer({
+      campaignId: "camp-clip-full-cust-cert-20261002",
+      campaignName: "River & Reed",
+      approvedStudioPlan: {
+        selectedServiceIds: ["v2-rtu-clip-repurposing"],
+        includedServiceIds: ["v2-rtu-clip-repurposing"],
+        additionalServiceIds: [],
+        additionalCostUsd: 0,
+        oneTimeTotalCents: 54900,
+        monthlyTotalCents: 0,
+        amountDueTodayCents: 54900,
+        lineItems: [],
+        approvedAt: now,
+      },
+      routeMapContext: {
+        roadId: "i20",
+        jobId: "v2-rtu-clip-repurposing",
+        selectedServiceIds: ["v2-rtu-clip-repurposing"],
+        currentStep: "intake",
+        selectedAt: now,
+      },
+    });
+    expect(isPlaceholderLocalBlockingNamedPaid(leftover, clip)).toBe(true);
+    expect(shouldKeepLocalCampaignOverServer(leftover, clip)).toBe(false);
   });
 });

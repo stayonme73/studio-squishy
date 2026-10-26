@@ -10,14 +10,11 @@ import CampaignJourneyHero from "@/components/campaign-details/CampaignJourneyHe
 import CampaignVisionSummary from "@/components/campaign-details/CampaignVisionSummary";
 import ProjectDetailsSummaryPanel from "@/components/campaign-details/ProjectDetailsSummaryPanel";
 import { RouteMapClientSummaryPanel } from "@/components/route-map/RouteMapIntakeSummaryPanels";
-import InformationUpdateEntry from "@/components/campaign-details/InformationUpdateEntry";
 import ProjectRecordSquishy from "@/components/campaign-details/ProjectRecordSquishy";
-import ProjectActivityCard from "@/components/campaign-details/ProjectActivityCard";
 import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
 import HelpCenterLink from "@/components/shared/HelpCenterLink";
 import UtilityPageFrame from "@/components/shared/UtilityPageFrame";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
-import CampaignJourneyMap from "@/components/studio-board/CampaignJourneyMap";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
 import { helpCenter } from "@/config/help-center";
 import { studioBoard } from "@/config/studio-board";
@@ -98,8 +95,6 @@ export default function CampaignDetailsScene() {
     events: activityEvents,
     pendingCount,
     pendingProjectChangeConsent,
-    loading: activityLoading,
-    error: activityError,
     refresh: refreshActivity,
   } = useProjectActivity(
     authorizedCampaign?.campaignId,
@@ -110,7 +105,8 @@ export default function CampaignDetailsScene() {
     paymentReceivedAt: campaign?.paymentReceivedAt,
     loading: projectJobsLoading,
     error: projectJobsError,
-    jobs: projectJobs,
+    jobs: view.statusJobs,
+    fallbackJobs: view.statusJobs,
   });
 
   const [showArrival, setShowArrival] = useState(false);
@@ -132,7 +128,7 @@ export default function CampaignDetailsScene() {
       projectStatusError: Boolean(projectJobsError),
       blockingMaterialsCount: campaign?.materialsSummary?.blockingRequiredCount ?? 0,
       waitingOnClientJobCount: projectJobs.filter((job) => job.isWaitingOnClient).length,
-      jobStatusLabels: projectJobs.map((job) => `${job.serviceName} — ${job.statusLabel}`),
+      jobStatusLabels: view.statusJobs.map((job) => `${job.serviceName} — ${job.statusLabel}`),
     };
   }, [
     campaign?.paymentReceivedAt,
@@ -140,6 +136,7 @@ export default function CampaignDetailsScene() {
     showArrival,
     squishyHasGreeted,
     view.statusLabel,
+    view.statusJobs,
     view.revisionTracker,
     pendingCount,
     projectJobs,
@@ -183,6 +180,7 @@ export default function CampaignDetailsScene() {
         <div className="utility-page">
           <UtilityPageHeader
             backHref={routes.studioBoard}
+            backLabel={`← ${copy.backLabel}`}
             activeNav="campaign-details"
             title={copy.empty.title}
             lead={copy.empty.body}
@@ -209,17 +207,11 @@ export default function CampaignDetailsScene() {
       <div className="utility-page" aria-label="Campaign Details">
         <UtilityPageHeader
           backHref={routes.studioBoard}
+          backLabel={`← ${copy.backLabel}`}
           activeNav="campaign-details"
           title={copy.pageTitle}
           lead={copy.lead}
           helpCenterFrom="campaign-details"
-          aside={
-            <CampaignJourneyMap
-              activeStep="campaign-details"
-              status={view.status}
-              hasCampaign={view.hasCampaign}
-            />
-          }
         />
 
         {showArrival ? (
@@ -265,7 +257,6 @@ export default function CampaignDetailsScene() {
           <h2 id="cd-project-status-title" className="utility-card__title">
             {copy.sections.projectStatus}
           </h2>
-          <p className="cd-journey__lead">{statusCopy.lead}</p>
           {projectStatusState.kind === "pending-payment" ? (
             <p className="cd-updates__hint">{statusCopy.pendingPayment}</p>
           ) : projectStatusState.kind === "loading" ? (
@@ -312,17 +303,14 @@ export default function CampaignDetailsScene() {
               showView={false}
               layout="stack"
               className="cd-vision__brief-actions"
+              currentStatusLabel={view.statusLabel}
             />
           ) : null}
-          <CampaignVisionSummary sections={view.visionSummary} />
-          {campaignLinks.visionSummary.map((link) => (
-            <HelpCenterLink
-              key={link.anchor}
-              label={link.label}
-              anchor={link.anchor}
-              from="campaign-details"
-            />
-          ))}
+          {view.visionSummary.length > 0 ? (
+            <CampaignVisionSummary sections={view.visionSummary} useRecordEmptyCopy />
+          ) : (
+            <p className="cd-vision__missing">{copy.sections.visionEmpty}</p>
+          )}
         </section>
 
         {view.hasProjectDetailsSummary ? (
@@ -373,14 +361,16 @@ export default function CampaignDetailsScene() {
                 </dd>
               </div>
             </dl>
-            {campaignLinks.revisionTracker.map((link) => (
-              <HelpCenterLink
-                key={link.anchor}
-                label={link.label}
-                anchor={link.anchor}
-                from="campaign-details"
-              />
-            ))}
+            {campaignLinks.revisionTracker
+              .filter((link) => link.label === "Revision policy")
+              .map((link) => (
+                <HelpCenterLink
+                  key={link.anchor}
+                  label={link.label}
+                  anchor={link.anchor}
+                  from="campaign-details"
+                />
+              ))}
           </section>
         ) : null}
 
@@ -398,14 +388,6 @@ export default function CampaignDetailsScene() {
               </li>
             ))}
           </ul>
-          {campaignLinks.packageIncludes.map((link) => (
-            <HelpCenterLink
-              key={link.anchor}
-              label={link.label}
-              anchor={link.anchor}
-              from="campaign-details"
-            />
-          ))}
         </section>
 
         <section
@@ -415,33 +397,7 @@ export default function CampaignDetailsScene() {
           <h2 id="cd-journey-title" className="utility-card__title cd-card__title--journey">
             {copy.sections.journey}
           </h2>
-          <p className="cd-journey__lead">Where you are in your Studio journey.</p>
-          <CampaignJourneyHero status={view.status} />
-        </section>
-
-        <section
-          className="utility-card cd-card--timeline"
-          aria-labelledby="cd-timeline-title"
-        >
-          <h2 id="cd-timeline-title" className="utility-card__title">
-            {copy.sections.timeline}
-          </h2>
-          <ol className="cd-timeline">
-            {view.timeline.map((entry) => (
-              <li key={`${entry.label}-${entry.sortKey}`} className="cd-timeline__item">
-                <span className="cd-timeline__date">{entry.date}</span>
-                <span className="cd-timeline__label">{entry.label}</span>
-              </li>
-            ))}
-          </ol>
-          {campaignLinks.timeline.map((link) => (
-            <HelpCenterLink
-              key={link.anchor}
-              label={link.label}
-              anchor={link.anchor}
-              from="campaign-details"
-            />
-          ))}
+          <CampaignJourneyHero steps={view.progressSteps} />
         </section>
 
         <section
@@ -487,14 +443,6 @@ export default function CampaignDetailsScene() {
               <p className="cd-deliverables__hint">{view.deliverables.hint}</p>
             </div>
           )}
-          {campaignLinks.deliverables.map((link) => (
-            <HelpCenterLink
-              key={link.anchor}
-              label={link.label}
-              anchor={link.anchor}
-              from="campaign-details"
-            />
-          ))}
         </section>
 
         {campaign && campaign.paymentReceivedAt ? (
@@ -510,24 +458,7 @@ export default function CampaignDetailsScene() {
           />
         ) : null}
 
-        {campaign && campaign.paymentReceivedAt ? (
-          <InformationUpdateEntry campaign={campaign} onSubmitted={() => void refreshActivity()} />
-        ) : null}
-
-        <ProjectActivityCard
-          events={activityEvents}
-          loading={activityLoading}
-          error={activityError}
-          title={copy.sections.projectActivity}
-          emptyCopy={copy.informationUpdate.activityEmpty}
-        />
-
         <StudioUpdatesSection updates={view.studioUpdates} />
-
-        <footer className="utility-card cd-card--footer">
-          <p className="cd-footer__hint">{helpCenter.footer.campaignHint}</p>
-          <HelpCenterLink label={campaignLinks.pageFooter[0].label} from="campaign-details" />
-        </footer>
       </div>
 
         <StudioBoardDevStatus placement="sidebar" />

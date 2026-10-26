@@ -12,8 +12,8 @@ import {
   type CorrectionUseRecord,
 } from "./correction-round-ledger";
 import {
-  allRequiredDeliverablesPrepared,
   resolveRequiredDeliverableKeys,
+  reviewDeliverableSetPrepared,
 } from "./production-workspace-gates";
 import {
   createEmptyJobReviewFeedback,
@@ -41,6 +41,14 @@ import {
 import type { JobActivityEvent, PurchasedJobRecord } from "./types";
 import { isApprovedReviewProofReference } from "@/lib/file-registry/job-files";
 import { resolveClientFacingFileHref } from "@/lib/file-storage/routes";
+import {
+  customerFacingReviewTextLeaks,
+  isGeneralDesignReviewDeliverableKey,
+} from "@/lib/studio-general-design-review-bind/customer-facing";
+import {
+  customerFacingCopyReviewTextLeaks,
+  isCopyReviewDeliverableKey,
+} from "@/lib/studio-copy-review-bind/customer-facing";
 
 export type ClientReviewView = {
   jobId: string;
@@ -64,6 +72,8 @@ export type ClientReviewView = {
   canApproveForDelivery: boolean;
   blockedReasons: readonly string[];
   exhaustedWording: string | null;
+  /** Asked for and not yet received — the round is not spent yet. */
+  revisionInFlight: boolean;
 };
 
 export const CORRECTION_EXHAUSTED_WORDING =
@@ -89,6 +99,18 @@ export function listLockedJobReviewFeedback(
     .filter((entry) => entry.jobId === jobId && Boolean(entry.submittedAt))
     .map(ensureFeedbackPackageId)
     .sort((a, b) => (a.submittedAt ?? "").localeCompare(b.submittedAt ?? ""));
+}
+
+/** Feedback that decides read-only Review access — shared by the view and the proof file route. */
+export function findReviewAccessFeedback(
+  envelope: ServerTasksEnvelope,
+  jobId: string,
+): JobReviewFeedback | null {
+  return (
+    findActiveJobReviewFeedback(envelope, jobId) ??
+    listLockedJobReviewFeedback(envelope, jobId).at(-1) ??
+    null
+  );
 }
 
 /**
@@ -147,9 +169,8 @@ export function resolveClientReviewView(input: {
 
   const existingActive = findActiveJobReviewFeedback(envelope, job.jobId);
   const lockedPackages = listLockedJobReviewFeedback(envelope, job.jobId);
-  const existingForAccess = existingActive ?? lockedPackages.at(-1);
 
-  if (!canClientViewJobReview(job, existingForAccess ?? null)) {
+  if (!canClientViewJobReview(job, findReviewAccessFeedback(envelope, job.jobId))) {
     return null;
   }
 
@@ -189,6 +210,98 @@ export function resolveClientReviewView(input: {
     })
     .filter((entry) => entry.prepared && entry.proofFiles.length > 0);
 
+  const frozenKeys = new Set(deliverables.map((entry) => entry.key));
+  const generalDesignProofs = (job.fileRegistry ?? []).filter(
+    (ref) =>
+      isApprovedReviewProofReference(ref) &&
+      isGeneralDesignReviewDeliverableKey(ref.deliverableKey) &&
+      !frozenKeys.has(ref.deliverableKey ?? ""),
+  );
+  const generalByKey = new Map<string, typeof generalDesignProofs>();
+  for (const ref of generalDesignProofs) {
+    const key = ref.deliverableKey!;
+    const list = generalByKey.get(key) ?? [];
+    list.push(ref);
+    generalByKey.set(key, list);
+  }
+  for (const [key, refs] of generalByKey) {
+    const leak = customerFacingReviewTextLeaks(
+      `${refs[0]?.deliverableLabel ?? ""} ${refs.map((item) => item.filename).join(" ")}`,
+    );
+    if (leak) continue;
+    const prep = (job.deliverablePrep ?? []).find((entry) => entry.deliverableKey === key);
+    if (!prep?.preparedAt) continue;
+    deliverables.push({
+      key,
+      label: refs[0]?.deliverableLabel || "Design proof",
+      prepared: true,
+      preparedAt: prep.preparedAt,
+      proofFiles: refs.map((ref) => ({
+        id: ref.id,
+        filename: ref.filename,
+        fileType: ref.fileType,
+        accessHref:
+          resolveClientFacingFileHref({
+            registryFileId: ref.id,
+            url:
+              ref.storageRef.provider === "google_shared_drive"
+                ? ref.storageRef.reference
+                : undefined,
+            storageRef: ref.storageRef,
+            purpose: "proof",
+          }) || null,
+        versionLabel: ref.versionLabel,
+        addedAt: ref.addedAt,
+      })),
+    });
+  }
+
+  const copyProofs = (job.fileRegistry ?? []).filter(
+    (ref) =>
+      isApprovedReviewProofReference(ref) &&
+      isCopyReviewDeliverableKey(ref.deliverableKey) &&
+      !frozenKeys.has(ref.deliverableKey ?? "") &&
+      !deliverables.some((entry) => entry.key === ref.deliverableKey),
+  );
+  const copyByKey = new Map<string, typeof copyProofs>();
+  for (const ref of copyProofs) {
+    const key = ref.deliverableKey!;
+    const list = copyByKey.get(key) ?? [];
+    list.push(ref);
+    copyByKey.set(key, list);
+  }
+  for (const [key, refs] of copyByKey) {
+    const leak = customerFacingCopyReviewTextLeaks(
+      `${refs[0]?.deliverableLabel ?? ""} ${refs.map((item) => item.filename).join(" ")}`,
+    );
+    if (leak) continue;
+    const prep = (job.deliverablePrep ?? []).find((entry) => entry.deliverableKey === key);
+    if (!prep?.preparedAt) continue;
+    deliverables.push({
+      key,
+      label: refs[0]?.deliverableLabel || "Copy",
+      prepared: true,
+      preparedAt: prep.preparedAt,
+      proofFiles: refs.map((ref) => ({
+        id: ref.id,
+        filename: ref.filename,
+        fileType: ref.fileType,
+        accessHref:
+          resolveClientFacingFileHref({
+            registryFileId: ref.id,
+            url:
+              ref.storageRef.provider === "google_shared_drive"
+                ? ref.storageRef.reference
+                : undefined,
+            storageRef: ref.storageRef,
+            purpose: "proof",
+          }) || null,
+        versionLabel: ref.versionLabel,
+        addedAt: ref.addedAt,
+      })),
+    });
+  }
+
   const deliverableKeys = deliverables.map((entry) => entry.key);
   const release = findLatestStudioReviewRelease(
     envelope.jobActivityEvents ?? [],
@@ -222,7 +335,7 @@ export function resolveClientReviewView(input: {
   });
 
   const requiredDeliverableLabels = line?.deliverables ?? [];
-  const allPrepared = allRequiredDeliverablesPrepared(job, requiredDeliverableLabels);
+  const allPrepared = reviewDeliverableSetPrepared(job, requiredDeliverableLabels);
 
   const blockedReasons = resolveReviewBlockedReasons({
     job,
@@ -248,6 +361,10 @@ export function resolveClientReviewView(input: {
     { currentSpineStatus: job.spineStatus },
   );
 
+  const revisionInFlight = correctionAccounting.pending.some(
+    (row) => row.jobId === job.jobId,
+  );
+
   return {
     jobId: job.jobId,
     campaignId: job.campaignId,
@@ -269,6 +386,7 @@ export function resolveClientReviewView(input: {
       feedback,
       revisionRoundsRemaining: correctionAccounting.remaining,
       allDeliverablesPrepared: allPrepared,
+      revisionInFlight,
     }).allowed,
     canApproveForDelivery: canApproveJobForDelivery({
       job,
@@ -280,6 +398,7 @@ export function resolveClientReviewView(input: {
     exhaustedWording: correctionAccounting.exhausted
       ? CORRECTION_EXHAUSTED_WORDING
       : null,
+    revisionInFlight,
   };
 }
 

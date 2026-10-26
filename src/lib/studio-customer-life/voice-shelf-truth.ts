@@ -113,7 +113,14 @@ export function answerPricingFromShelf(
   }
   const matched = findPublicShelfService(question);
   if (matched) return priceSentence(matched);
-  return `${canonicalLaunchMenuSentence()} Each includes three revision rounds, and the 20% Studio Thank-You applies at checkout. Tell me which package you mean. I will not invent a price.`;
+  const due = listCanonicalLaunchPackages().map(
+    (pkg) => `${formatCanonicalUsd(pkg.amountDueAfterThankYouCents)} for ${pkg.customerFacingName}`,
+  );
+  const dueList =
+    due.length > 1
+      ? `${due.slice(0, -1).join(", ")}, and ${due[due.length - 1]}`
+      : due.join("");
+  return `${canonicalLaunchMenuSentence()} With the 20% Studio Thank-You, you pay ${dueList}. Each includes three revision rounds. The Thank-You is applied at checkout. Tell me which package you mean. I will not invent a price.`;
 }
 
 export function answerScopeFromShelf(

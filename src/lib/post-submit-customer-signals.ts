@@ -165,6 +165,7 @@ export function mayShowBuildingConceptsCustomerCopy(
   facts: PostSubmitSignalFacts,
 ): boolean {
   if (campaign && needsPaidOperatingRecovery(campaign)) return false;
+  if (campaign && isPaidIncompleteIntake(campaign)) return false;
   const mode = resolvePostSubmitCustomerMode(campaign, facts);
   return mode === "pass_through" || mode === "building_concepts_allowed";
 }

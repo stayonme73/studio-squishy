@@ -4,13 +4,15 @@
  * Creative reasoning and rendering remain separable — HTML is not the creative SoR.
  */
 
+import type { FlyerCreativeDirection } from "@/lib/studio-design-intelligence/types";
+
 export const DESIGN_RENDERER_PROOF_SKU = "v2-rtu-flyer" as const;
 export type DesignRendererProofSku = typeof DESIGN_RENDERER_PROOF_SKU;
 
 export const FLYER_DESIGN_SPEC_VERSION = "flyer-design-spec-1.0.0" as const;
-export const DESIGN_RENDERER_VERSION = "design-renderer-proof-1.0.0" as const;
+export const DESIGN_RENDERER_VERSION =
+  "design-renderer-autonomous-loop-1.0.0" as const;
 
-/** CERT / design-quality plate used for v2-rtu-flyer. */
 export const FLYER_CANVAS = {
   widthPx: 1024,
   heightPx: 1536,
@@ -28,6 +30,7 @@ export type FlyerTextRole =
   | "cta"
   | "contact_phone"
   | "contact_web"
+  | "was_price"
   | "disclaimer";
 
 export type FlyerImageRole = "logo" | "hero";
@@ -59,6 +62,8 @@ export type FlyerTextLayer = {
   color: string;
   align: "left" | "center" | "right";
   maxLines?: number;
+  /** Studio-safe stack: serif, sans, or display. Omitted = house serif. */
+  fontStack?: string;
 };
 
 export type FlyerImageLayer = {
@@ -106,6 +111,23 @@ export type FlyerDesignSpec = {
   reasoningMode: "deterministic_constrained" | "anthropic_text_model";
   /** Optional model id when anthropic path used. */
   reasoningModel?: string;
+  /** Present when Design Intelligence chose a route. */
+  creativeDirection?: {
+    intelligenceVersion: string;
+    routeId: string;
+    layoutFamilyId: string;
+    paletteFamilyId: string;
+    typeSystemId: string;
+    geometryId: string;
+  };
+  /**
+   * Composition instruction only. Must travel with the request identity so a
+   * CTA-as-headline revision is new work, not a reuse of the prior artifact.
+   */
+  revisionEmphasis?: {
+    emphasizeExistingCtaAsHeadline: boolean;
+    instruction: string;
+  };
 };
 
 export type FlyerOutputMode = "customer" | "certification_fixture";
@@ -119,6 +141,11 @@ export type FlyerProjectTruth = {
   label: string;
   /** customer = live job truth; certification_fixture = Harbor CERT / internal proof only. */
   outputMode: FlyerOutputMode;
+  /**
+   * Campaign Launch Kit may print the approved customer example website.
+   * Certification fixture labels stay banned. Standalone flyers leave this unset.
+   */
+  approvedCustomerExampleDomain?: boolean;
   businessName: string;
   wordmark: string;
   descriptor: string;
@@ -133,6 +160,10 @@ export type FlyerProjectTruth = {
   webDisplay: string;
   webUrl: string;
   disclaimer: string;
+  /** Raw intake size field. Empty means the customer did not lock a size. */
+  sizeNotes?: string;
+  /** Raw intake intended-use field. Influences format only when size is unlocked. */
+  intendedUse?: string;
   brandColors: {
     primary: string;
     secondary: string;
@@ -144,6 +175,16 @@ export type FlyerProjectTruth = {
   materials: readonly DesignMaterialRef[];
   requiredTextTokens: readonly string[];
   prohibitedClaimPatterns: readonly string[];
+  /** Customer jobs only — Design Intelligence brief + selected route. */
+  creativeDirection?: FlyerCreativeDirection;
+  /**
+   * Composition instruction only. Must never be used to overwrite `headline`
+   * in this truth object — that is the Maya headline → CTA mutation class.
+   */
+  revisionEmphasis?: {
+    emphasizeExistingCtaAsHeadline: boolean;
+    instruction: string;
+  };
 };
 
 export type DesignArtifactIdentity = {
@@ -201,4 +242,10 @@ export type DesignRendererPipelineResult =
       identity?: DesignArtifactIdentity;
       designSpec?: FlyerDesignSpec;
       outputMode?: FlyerOutputMode;
+      /**
+       * Creative Director critique of the composed artifact, when the rejection
+       * came from that inspection. The internal correction loop feeds it into the
+       * next generation attempt so a retry is directed, not a reroll.
+       */
+      visionCritique?: string;
     };

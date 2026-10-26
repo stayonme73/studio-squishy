@@ -13,6 +13,10 @@ import {
   textLayersForCollisionCheck,
 } from "./text-layer-collision";
 import {
+  evaluateThemeLedSocialSet,
+  isThemeLedSocialPostsTruth,
+} from "./social-posts-theme-led";
+import {
   SOCIAL_POSTS_EXACT_COUNT,
   SOCIAL_POST_TRUST_ROLE_ANGLE,
   type SocialPostAssetSpec,
@@ -56,6 +60,16 @@ export function evaluateSocialPostsSetConsistency(input: {
 }): SocialPostsSetQaResult {
   const { truth, spec, declaredTextByAsset, captions, postingOrder } = input;
   const customerMode = truth.outputMode === "customer";
+  const themeLed = isThemeLedSocialPostsTruth(truth);
+  if (themeLed) {
+    const themeSet = evaluateThemeLedSocialSet({
+      truth,
+      assets: spec.assets,
+      declaredTextByAsset,
+      captions,
+    });
+    if (!themeSet.ok) return themeSet;
+  }
 
   if (spec.assets.length !== SOCIAL_POSTS_EXACT_COUNT) {
     return {
@@ -207,6 +221,8 @@ export function evaluateSocialPostsSetConsistency(input: {
       };
     }
 
+    if (themeLed) continue;
+
     const brandOnly = asset.roleAngle === SOCIAL_POST_TRUST_ROLE_ANGLE;
     if (brandOnly) {
       // A brand-trust post may omit price, but must not restate offer facts partially.
@@ -220,14 +236,14 @@ export function evaluateSocialPostsSetConsistency(input: {
       continue;
     }
 
-    if (!text.includes(truth.offerName) && !text.includes("Tune-Up")) {
+    if (!text.includes(truth.offerName)) {
       return {
         ok: false,
         code: "SET_CONSISTENCY_FAILURE",
         message: `Post ${asset.assetId} missing shared offer truth`,
       };
     }
-    if (!text.includes(truth.priceDisplay)) {
+    if (truth.priceDisplay.trim() && !text.includes(truth.priceDisplay)) {
       return {
         ok: false,
         code: "SET_CONSISTENCY_FAILURE",
@@ -287,18 +303,15 @@ export function evaluateSocialPostsSetConsistency(input: {
         };
       }
     }
-    if (asset.roleAngle !== SOCIAL_POST_TRUST_ROLE_ANGLE) {
-      if (!caption.text.includes(truth.priceDisplay)) {
+    if (!themeLed && asset.roleAngle !== SOCIAL_POST_TRUST_ROLE_ANGLE) {
+      if (truth.priceDisplay.trim() && !caption.text.includes(truth.priceDisplay)) {
         return {
           ok: false,
           code: "CAPTION_FAILURE",
           message: `Caption ${caption.captionId} on offer post ${caption.assetId} omits the campaign price`,
         };
       }
-      if (
-        !caption.text.includes(truth.offerName) &&
-        !caption.text.includes("Tune-Up")
-      ) {
+      if (!caption.text.includes(truth.offerName)) {
         return {
           ok: false,
           code: "CAPTION_FAILURE",

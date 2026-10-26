@@ -6,6 +6,7 @@ export {
 export {
   ownerEscalationForException,
   ownerEscalationForOwnerInteraction,
+  ownerEscalationForQualityCategory,
   ownerEscalationForRoutineOperationalEvent,
 } from "./owner-escalation";
 export { projectKitchenCommsLedger } from "./project-events";

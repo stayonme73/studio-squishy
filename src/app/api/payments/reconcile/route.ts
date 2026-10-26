@@ -16,5 +16,7 @@ export async function GET(request: Request) {
   if (!result.ok) {
     return NextResponse.json(result, { status: 422 });
   }
-  return NextResponse.json(result);
+  const response = NextResponse.json(result);
+  response.headers.set("Cache-Control", "no-store");
+  return response;
 }

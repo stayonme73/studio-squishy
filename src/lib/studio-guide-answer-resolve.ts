@@ -6,8 +6,8 @@
 import {
   getConversationRoomGuideQuestion,
   isGuideRelativeDeadlineChoice,
-  type GuideConversationStep,
 } from "@/config/conversation-room-guide-v1";
+import type { GuideConversationStep } from "@/config/studio-guide-conversation-v1";
 import { isAcceptableGuideDeadlineInput } from "@/lib/studio-guide-capture";
 
 export type GuideAnswerResolveInput = {
@@ -38,7 +38,13 @@ export function resolveGuideAnswerFromUi(
     !selectedBubbles.includes("Skip for now")
   ) {
     const fromBubbles = selectedBubbles.join(", ");
-    const answer = typed ? `${fromBubbles} — ${typed}` : fromBubbles;
+    const typedRepeatsBubbles =
+      !typed ||
+      typed === fromBubbles ||
+      (selectedBubbles.length === 1 && typed === selectedBubbles[0]);
+    const answer = typedRepeatsBubbles
+      ? fromBubbles
+      : `${fromBubbles} — ${typed}`;
     return { answer, skipped: false };
   }
   if (selectedBubbles.includes("Skip for now") && !typed) {

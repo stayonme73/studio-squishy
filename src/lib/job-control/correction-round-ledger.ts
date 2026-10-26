@@ -5,15 +5,21 @@
 
 import type { CampaignRecord } from "@/config/studio-board";
 import { getPackageRevisionRounds } from "@/config/studio-guide";
+import { studioRevisionToReviewRoundTripV1 } from "@/config/studio-revision-to-review-round-trip-v1";
 import {
   campaignUsesCustomStudioPlan,
   resolveApprovedPlanRevisionRounds,
   resolveCampaignRevisionRounds,
 } from "@/lib/approved-plan-display";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
+import { studioExtrasRoundUsage } from "@/lib/studio-extras/rounds";
 
 import type { JobReviewFeedback } from "./review-feedback-types";
-import type { JobActivityActor, JobActivityEvent } from "./types";
+import type {
+  JobActivityActor,
+  JobActivityEvent,
+  PurchasedJobRecord,
+} from "./types";
 
 export type RevisionAllowanceSource =
   | "campaign_field"
@@ -74,6 +80,10 @@ export type CorrectionAccountingView = {
   exhausted: boolean;
   history: readonly CorrectionUseRecord[];
   grants: readonly CorrectionExtraGrantRecord[];
+  /** Every revision the customer asked for, whether or not it reached them. */
+  requested: number;
+  /** Asked for, produced or not, but not yet proven to have reached Review. */
+  pending: readonly CorrectionUseRecord[];
 };
 
 export function buildCorrectionUseIdempotencyKey(
@@ -157,29 +167,84 @@ export function ensureWriteOnceRevisionAllowance(
   };
 }
 
+/**
+ * Proof that a requested revision actually reached the customer.
+ *
+ * Owner call 2026-09-15 — a revision is spent when the customer receives revised
+ * work, not when they ask for it. The append-only activity timeline already logs
+ * every spine transition, so reaching Review after the request is the evidence.
+ * A job with no spine history at all cannot prove either way; that counts as
+ * consumed so a missing timeline never hands out free revisions.
+ */
+export function correctionUseReachedReview(
+  events: readonly JobActivityEvent[],
+  use: CorrectionUseRecord,
+  job?: Pick<PurchasedJobRecord, "internalQaReviewAuthorization"> | null,
+): boolean {
+  // The write-once QA pin is set exactly when Review opens, so a pin newer than
+  // the request proves delivery even where spine status was derived rather than
+  // logged as a transition.
+  const authorizedAt = job?.internalQaReviewAuthorization?.authorizedAt;
+  if (authorizedAt && authorizedAt > use.submittedAt) return true;
+
+  const spineHistory = events.filter(
+    (event) => event.jobId === use.jobId && event.kind === "status_change",
+  );
+  if (spineHistory.length === 0) {
+    return studioRevisionToReviewRoundTripV1.unprovableHistoryCountsAsConsumed;
+  }
+  const opensReview = new Set<string>(
+    studioRevisionToReviewRoundTripV1.fulfilledBySpineStatuses,
+  );
+  return spineHistory.some(
+    (event) =>
+      event.spineStatus != null &&
+      opensReview.has(event.spineStatus) &&
+      event.occurredAt > use.submittedAt,
+  );
+}
+
 export function deriveCorrectionAccounting(input: {
   campaign: CampaignRecord;
   envelope: Pick<
     ServerTasksEnvelope,
-    "jobCorrectionUses" | "jobCorrectionExtraGrants"
+    | "jobCorrectionUses"
+    | "jobCorrectionExtraGrants"
+    | "jobActivityEvents"
+    | "jobRecords"
   >;
 }): CorrectionAccountingView {
   const snapshot = ensureWriteOnceRevisionAllowance(input.campaign);
   const included = snapshot.included;
   const history = listCorrectionUses(input.envelope);
   const grants = listCorrectionExtraGrants(input.envelope);
+  const events = input.envelope.jobActivityEvents ?? [];
+  const jobFor = (jobId: string) =>
+    (input.envelope.jobRecords ?? []).find((entry) => entry.jobId === jobId) ?? null;
 
-  const used = history.length;
-  const includedUsed = history.filter((row) => row.consumptionKind === "included")
-    .length;
-  const extraUsed = history.filter((row) => row.consumptionKind === "owner_extra")
+  const consumed = history.filter((row) =>
+    correctionUseReachedReview(events, row, jobFor(row.jobId)),
+  );
+  const pending = history.filter(
+    (row) => !correctionUseReachedReview(events, row, jobFor(row.jobId)),
+  );
+
+  // Studio Extras share the package rounds. An Extras-only round in flight is
+  // reserved so a package revision cannot stack past the allowance.
+  const extrasRounds = studioExtrasRoundUsage(input.campaign.studioExtras);
+  const used = consumed.length + extrasRounds.consumed;
+  const includedUsed =
+    consumed.filter((row) => row.consumptionKind === "included").length +
+    extrasRounds.consumed +
+    extrasRounds.pending;
+  const extraUsed = consumed.filter((row) => row.consumptionKind === "owner_extra")
     .length;
   const extraGranted = grants.reduce((sum, grant) => sum + grant.quantity, 0);
   const extraRemaining = Math.max(0, extraGranted - extraUsed);
 
   const counterUsed = input.campaign.revisionRoundsUsed ?? 0;
   const provisionalLegacyUsed =
-    used === 0 && counterUsed > 0 ? counterUsed : 0;
+    history.length === 0 && counterUsed > 0 ? counterUsed : 0;
   const effectiveUsed = Math.max(used, provisionalLegacyUsed);
 
   const remainingIncluded = Math.max(
@@ -202,6 +267,41 @@ export function deriveCorrectionAccounting(input: {
     exhausted: remaining <= 0,
     history,
     grants,
+    requested: history.length,
+    pending,
+  };
+}
+
+/**
+ * Keep the compatibility counter equal to proven consumption. Only meaningful
+ * once a ledger exists — campaigns still on the bare counter are left alone so
+ * legacy history is never zeroed out.
+ */
+export function syncRevisionRoundsUsedMirror(
+  campaign: CampaignRecord,
+  envelope: Pick<
+    ServerTasksEnvelope,
+    "jobCorrectionUses" | "jobCorrectionExtraGrants" | "jobActivityEvents"
+  >,
+  occurredAt = new Date().toISOString(),
+): { campaign: CampaignRecord; changed: boolean } {
+  if (
+    (envelope.jobCorrectionUses ?? []).length === 0 &&
+    (campaign.studioExtras?.revisionRounds ?? []).length === 0
+  ) {
+    return { campaign, changed: false };
+  }
+  const accounting = deriveCorrectionAccounting({ campaign, envelope });
+  if ((campaign.revisionRoundsUsed ?? 0) === accounting.used) {
+    return { campaign, changed: false };
+  }
+  return {
+    campaign: {
+      ...campaign,
+      revisionRoundsUsed: accounting.used,
+      updatedAt: occurredAt,
+    },
+    changed: true,
   };
 }
 

@@ -2,12 +2,13 @@ import { isNextResponse, requireStaffOrOwner } from "@/lib/auth/require-session"
 import { NextResponse } from "next/server";
 
 import { runLifecycleWatchdogSweep } from "@/lib/studio-lifecycle-email";
+import { lifecycleWatchdogCronAuthorized } from "@/lib/studio-lifecycle-email/watchdog-sweep-eligibility";
 
 function cronSecretAuthorized(request: Request): boolean {
-  const expected = process.env.STUDIO_OPERATING_SWEEP_SECRET?.trim();
-  if (!expected) return false;
-  const provided = request.headers.get("x-studio-operating-secret")?.trim();
-  return Boolean(provided) && provided === expected;
+  return lifecycleWatchdogCronAuthorized(
+    process.env.STUDIO_OPERATING_SWEEP_SECRET,
+    request.headers.get("x-studio-operating-secret"),
+  );
 }
 
 /**
@@ -29,6 +30,7 @@ export async function POST(request: Request) {
     noticesSent: result.noticesSent,
     noticesFailed: result.noticesFailed,
     recoveredMissingNotices: result.recoveredMissingNotices,
+    skippedHistoricalCampaigns: result.skippedHistoricalCampaigns,
     findingKinds: result.findings.map((finding) => finding.kind),
   });
 }

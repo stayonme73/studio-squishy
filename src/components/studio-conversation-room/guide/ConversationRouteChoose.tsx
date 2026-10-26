@@ -1,11 +1,12 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import styles from "@/components/studio-conversation-room/guide/conversation-activity-panel.module.css";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
 import { studioTileClass } from "@/config/studio-customer-tile-system-v1";
 import {
+  getJobsForRoad,
   getRouteMapRoad,
   getSelectableRouteMapRoads,
   type RouteMapRoadId,
@@ -57,6 +58,11 @@ export default function ConversationRouteChoose({
   const v = conversationRoomGuideV1;
   const roads = getSelectableRouteMapRoads();
   const pendingId = previewRoadId ?? recommendedRoadId;
+  const [includesRoadId, setIncludesRoadId] = useState<RouteMapRoadId | null>(
+    null,
+  );
+  const includesJobs = includesRoadId ? getJobsForRoad(includesRoadId) : [];
+  const includesRoad = includesRoadId ? getRouteMapRoad(includesRoadId) : null;
   const pendingRoad = pendingId ? getRouteMapRoad(pendingId) : null;
   const confirmLabel = pendingRoad
     ? `${v.routeConfirmCtaPrefix} ${pendingRoad.customerLabel}`
@@ -98,34 +104,53 @@ export default function ConversationRouteChoose({
         return (
           <div
             key={road.id}
-            className={`${styles.routeExpand} ${
-              active ? studioTileClass.selectedActive : studioTileClass.standardLight
-            }`}
-            data-expanded={active ? "true" : "false"}
+            className={styles.routeLane}
             data-recommended={recommended ? "true" : "false"}
             data-road={road.id}
           >
-            <SamsungRouteCard
-              className={styles.routeCard}
-              pressed={active}
-              label={`${road.customerLabel}. Select this route.`}
-              onActivate={() => onPreviewRoad(road.id)}
+            <div
+              className={`${styles.routeExpand} ${
+                active ? studioTileClass.selectedActive : studioTileClass.standardLight
+              }`}
+              data-expanded={active ? "true" : "false"}
+              data-recommended={recommended ? "true" : "false"}
             >
-              <span className={styles.routeBody}>
-                {recommended ? (
-                  <span className={styles.routeRecommendedBadge}>
-                    {v.routeRecommendedBadge}
+              <SamsungRouteCard
+                className={styles.routeCard}
+                pressed={active}
+                label={`${road.customerLabel}. Select this route.`}
+                onActivate={() => onPreviewRoad(road.id)}
+              >
+                <span className={styles.routeBody}>
+                  {recommended ? (
+                    <span className={styles.routeRecommendedBadge}>
+                      {v.routeRecommendedBadge}
+                    </span>
+                  ) : null}
+                  <span className={styles.routeLabel}>{road.customerLabel}</span>
+                  <span className={styles.routeTagline}>
+                    {roadTagline(road.id, road.tagline)}
                   </span>
-                ) : null}
-                <span className={styles.routeLabel}>{road.customerLabel}</span>
-                <span className={styles.routeTagline}>
-                  {roadTagline(road.id, road.tagline)}
                 </span>
-              </span>
-              <span className={styles.routeArrow} aria-hidden>
-                →
-              </span>
-            </SamsungRouteCard>
+                <span className={styles.routeArrow} aria-hidden>
+                  →
+                </span>
+              </SamsungRouteCard>
+              <button
+                type="button"
+                className={styles.routeIncludesLink}
+                data-route-includes-cta="true"
+                aria-expanded={includesRoadId === road.id}
+                onClick={() => {
+                  onPreviewRoad(road.id);
+                  setIncludesRoadId((current) =>
+                    current === road.id ? null : road.id,
+                  );
+                }}
+              >
+                {v.routePeekJobsHeading}
+              </button>
+            </div>
           </div>
         );
       })}
@@ -182,6 +207,27 @@ export default function ConversationRouteChoose({
       ) : null}
 
       {routeNav}
+
+      {includesRoad ? (
+        <div className={styles.routeExpandBody} data-route-includes="true">
+          <h3 className={styles.routeExpandHeading}>
+            {includesRoad.customerLabel}
+          </h3>
+          <p className={styles.routePeekHint}>{v.routePeekJobsHint}</p>
+          {includesJobs.length === 0 ? (
+            <p className={styles.routeExpandEmpty}>{v.routePeekEmptyJobs}</p>
+          ) : (
+            <ul className={styles.routeIncludesList}>
+              {includesJobs.map((job) => (
+                <li key={job.id}>
+                  <span>{job.name}</span>
+                  <span>{job.priceDisplay}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : null}
 
       {confirmRow}
     </div>

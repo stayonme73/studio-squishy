@@ -26,6 +26,37 @@ export type ClientSubmitPayload = {
   attestationTextVersion?: string;
 };
 
+/** Text controls in Materials Intake. Boolean rights answers are not in this set. */
+export const CLIENT_SUBMIT_TEXT_FIELDS = ["text", "url", "note"] as const;
+
+export type ClientSubmitTextField = (typeof CLIENT_SUBMIT_TEXT_FIELDS)[number];
+
+export function clientSubmitTextFieldsForKind(
+  contentKind: MaterialContentKind,
+): readonly ClientSubmitTextField[] {
+  switch (contentKind) {
+    case "url":
+      return ["url", "note"];
+    case "file-metadata":
+      return ["note"];
+    case "confirmation":
+    case "text":
+      return ["text", "note"];
+    default: {
+      const exhaustive: never = contentKind;
+      return exhaustive;
+    }
+  }
+}
+
+/** Exact text for a text control. Missing text renders as an empty string. */
+export function clientSubmitTextFieldValue(
+  payload: ClientSubmitPayload,
+  field: ClientSubmitTextField,
+): string {
+  return payload[field] ?? "";
+}
+
 const SECRET_PATTERNS: readonly RegExp[] = [
   /\bpassword\b/i,
   /\bpasswd\b/i,

@@ -21,8 +21,11 @@ import type { RouteMapIntakeTemplateId } from "@/catalog/intake/types";
 import { CATALOG_V2_ACTIVATION_LAUNCH_CANDIDATE_SKUS } from "@/catalog/activation";
 import { CATALOG_V2_BATCH1_READY_TO_USE } from "@/catalog/v2/batch1-ready-to-use";
 import { CATALOG_V2_BATCH2_READY_TO_USE } from "@/catalog/v2/batch2-ready-to-use";
+import { CLIP_REPURPOSING_PUBLISH_DRAFTS } from "@/catalog/v2/clip-repurposing-publish";
+import { SHORT_FORM_VIDEO_EDIT_PUBLISH_DRAFTS } from "@/catalog/v2/short-form-video-edit-publish";
 import type { CatalogV2ServiceEntry } from "@/catalog/v2/types";
 import { ROUTE_MAP_REVISION_TEMPLATE } from "@/catalog/route-map-shared-copy";
+import { LEARN_MORE_PURPOSE } from "@/config/studio-short-form-content-pack-public-switch-v1";
 
 const QUICK_FIRST: ServiceTimingWindow = {
   minDays: 3,
@@ -74,7 +77,12 @@ function timingWindowsForLane(lane: ProductionLane): {
 }
 
 const V2_DRAFT_BY_SKU = new Map<string, CatalogV2ServiceEntry>(
-  [...CATALOG_V2_BATCH1_READY_TO_USE, ...CATALOG_V2_BATCH2_READY_TO_USE].map((entry) => [
+  [
+    ...CATALOG_V2_BATCH1_READY_TO_USE,
+    ...CATALOG_V2_BATCH2_READY_TO_USE,
+    ...SHORT_FORM_VIDEO_EDIT_PUBLISH_DRAFTS,
+    ...CLIP_REPURPOSING_PUBLISH_DRAFTS,
+  ].map((entry) => [
     entry.sku,
     entry,
   ]),
@@ -88,6 +96,8 @@ const V2_INTAKE_TEMPLATE_BY_SKU: Record<RouteMapV2ShelfServiceId, RouteMapIntake
   "v2-rtu-promotion-graphics": "rtu-promotion-graphics",
   "v2-rtu-social-posts": "rtu-social-posts",
   "v2-rtu-short-video": "rtu-short-video",
+  "v2-rtu-short-form-video-edit": "rtu-short-form-video-edit",
+  "v2-rtu-clip-repurposing": "rtu-clip-repurposing",
   "v2-rtu-voice": "rtu-voice",
   "v2-rtu-email-kit": "rtu-email-kit",
   "v2-rtu-sms-kit": "rtu-sms-kit",
@@ -96,19 +106,29 @@ const V2_INTAKE_TEMPLATE_BY_SKU: Record<RouteMapV2ShelfServiceId, RouteMapIntake
 
 /** Customer-facing purpose lines for Route Map shelf cards — never scopeRoutingNote or internal routing. */
 const ROUTE_MAP_V2_CUSTOMER_PURPOSE: Record<string, string> = {
-  "v2-rtu-flyer": "One single-sided flyer in one size — ready to print or share online.",
-  "v2-rtu-menu": "One single-page menu with a defined item limit — ready to print or share.",
-  "v2-rtu-service-sheet": "One page with up to ten services and brief descriptions.",
-  "v2-rtu-social-posts": "Four coordinated static posts for one platform — ready for you to upload.",
-  "v2-rtu-promotion-graphics": "Two coordinated static graphics for one campaign or promotion.",
-  "v2-rtu-email-kit": "Up to two finished emails ready for you to send.",
-  "v2-rtu-sms-kit": "Up to four text messages ready for you to send.",
+  "v2-rtu-flyer":
+    "One single-sided digital flyer in one size — share online or print it yourself. This is not a certified 300 DPI print file.",
+  "v2-rtu-menu":
+    "One single-page digital menu — up to 5 sections and 30 items. You supply and verify items, prices, and allergen wording. Share it or print it yourself. This is not a certified 300 DPI print file.",
+  "v2-rtu-service-sheet":
+    "One portrait digital service list — up to ten services. Share it or print it yourself. This is not a certified 300 DPI print file.",
+  "v2-rtu-social-posts":
+    "Four coordinated square static posts (1024×1024) for one theme and one platform, plus one caption per post and a suggested posting order. You post them. Not a carousel, Stories, Reels, portrait, extra sizes, or Studio posting.",
+  "v2-rtu-promotion-graphics":
+    "Two coordinated digital campaign graphics for one theme — one square 1024×1024 and one portrait 1024×1536. You post or share them. This is not a certified 300 DPI print file.",
+  "v2-rtu-email-kit":
+    "Up to two marketing emails you paste into your own email platform. The Studio does not send them.",
+  "v2-rtu-sms-kit":
+    "Up to four text messages you paste into your own texting platform. The Studio does not send them.",
   "v2-rtu-voice":
     "One short announcement — internal AI or approved Studio software voice only; no outside talent.",
   "v2-rtu-short-video":
-    "One basic 15–30 second video edited from your footage or approved Studio assets — no filming.",
+    "One 15–30 second vertical video (1080×1920) assembled from your still photos with on-screen captions and a CTA. You post it. Not footage editing, voice, music, extra sizes, or Studio posting.",
+  "v2-rtu-short-form-video-edit": LEARN_MORE_PURPOSE,
+  "v2-rtu-clip-repurposing":
+    "One 15–60 minute native-vertical English talking-head. The Studio finds three distinct 15–30 second 1080×1920 shorts with spoken-word captions, finished audio, and your CTA. You post them. If fewer than three distinct shorts exist, the price follows the frozen $349 / $449 / cannot-complete rule. This is not stills-to-video, a single $349 edit, landscape reframing, B-roll, stock, music, narration, or Studio posting.",
   "v2-rtu-business-card":
-    "One double-sided business card design — design only, not printing or shipping.",
+    "One double-sided digital business card for one person — 1536×1024 both sides. Front and back PNG plus a PDF you can print yourself. This is not a certified 3.5×2 or 300 DPI print file.",
 };
 
 function customerPurposeForV2Sku(sku: string, draft: CatalogV2ServiceEntry): string {

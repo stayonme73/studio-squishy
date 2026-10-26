@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import ClientAccessGlass from "@/components/auth/ClientAccessGlass";
 import AccessControlDeniedPanel from "@/components/shared/AccessControlDeniedPanel";
 import NoActiveProjectPanel from "@/components/shared/NoActiveProjectPanel";
 import type { NoActiveProjectCopy } from "@/config/access-control";
@@ -31,7 +32,8 @@ export default function ClientAccessStatePanel({ state, onRetry, noActiveProject
   if (state === "auth-required") {
     const content = copy.authRequired;
     return (
-      <div className="utility-page utility-page--access">
+      <div className="utility-page utility-page--access utility-page--client-access">
+        <ClientAccessGlass />
         <div className="utility-access-card-shell">
           <section className="utility-card" aria-labelledby="client-access-title">
             <p className="utility-eyebrow">{content.eyebrow}</p>
@@ -56,10 +58,40 @@ export default function ClientAccessStatePanel({ state, onRetry, noActiveProject
     );
   }
 
+  if (state === "local-unavailable") {
+    const content = copy.localProjectUnavailable;
+    return (
+      <div className="utility-page utility-page--access utility-page--client-access">
+        <ClientAccessGlass />
+        <div className="utility-access-card-shell">
+          <section className="utility-card" aria-labelledby="client-access-title">
+            <p className="utility-eyebrow">{content.eyebrow}</p>
+            <h1 id="client-access-title" className="utility-title">
+              {content.title}
+            </h1>
+            <p className="utility-lead">{content.message}</p>
+            <div className="utility-access-actions">
+              <Link href={routes.studioLobby} className="utility-btn utility-btn--primary">
+                {content.primaryCta}
+              </Link>
+              <Link
+                href={`/sign-in?from=${encodeURIComponent(routes.studioBoard)}`}
+                className="utility-btn utility-btn--secondary"
+              >
+                {content.secondaryCta}
+              </Link>
+            </div>
+          </section>
+        </div>
+      </div>
+    );
+  }
+
   if (state === "error") {
     const content = copy.loadError;
     return (
-      <div className="utility-page utility-page--access">
+      <div className="utility-page utility-page--access utility-page--client-access">
+        <ClientAccessGlass />
         <div className="utility-access-card-shell">
           <section className="utility-card" aria-labelledby="client-access-title">
             <p className="utility-eyebrow">{content.eyebrow}</p>

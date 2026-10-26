@@ -12,10 +12,19 @@ describe("toClientFacingActivityMessage", () => {
       "Added to your Studio Plan: Make My Social Media Posts",
     );
     expect(toClientFacingActivityMessage("Payment received.")).toBe("We received your payment");
+    expect(
+      toClientFacingActivityMessage("Payment confirmed (sandbox — not live money)."),
+    ).toBe("We received your payment");
+    expect(toClientFacingActivityMessage("Payment confirmed by Stripe.")).toBe(
+      "We received your payment",
+    );
     expect(toClientFacingActivityMessage("Discovery received.")).toBe(
       "We received your discovery answers",
     );
     expect(toClientFacingActivityMessage("Vision Intake received.")).toBe(
+      "We received your Project Intake",
+    );
+    expect(toClientFacingActivityMessage("Project Intake received.")).toBe(
       "We received your Project Intake",
     );
     expect(toClientFacingActivityMessage("Project Details received.")).toBe(

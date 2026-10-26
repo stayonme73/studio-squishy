@@ -1,17 +1,25 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
-import { localCustomerOneAuthFixtureCopy } from "@/lib/auth/local-customer-one-fixture-copy";
+import { localCedarLaneReviewCopy } from "@/lib/auth/local-cedar-lane-review-copy";
+import {
+  LOCAL_CUSTOMER_ONE_FIXTURE_ID,
+  localCustomerOneAuthFixtureCopy,
+} from "@/lib/auth/local-customer-one-fixture-copy";
+import { resolveSignInDestinationTitle } from "@/lib/auth/sign-in-destination-copy";
 import { promoteStudioVoiceBoardHandoffToWelcome } from "@/lib/studio-voice-board-handoff";
+import { claimPaidProjectAfterAuth } from "@/lib/studio-project-claim/after-auth-client";
+import { useSamsungActivate } from "@/lib/studio-samsung-activate";
+import ClientAccessGlass from "@/components/auth/ClientAccessGlass";
 import UtilityPasswordField from "@/components/auth/UtilityPasswordField";
 
 const SESSION_PROBE_TIMEOUT_MS = 2500;
 
 const SIGN_IN_LEAD =
-  "Use the account connected to your Studio work to open your Board, Review Room, Project Record, and Final Delivery.";
+  "Use the account connected to your Studio work to open your Board, Review Room, and Final Delivery.";
 
 /** Full navigation — soft router.replace can leave phone/desktop stuck on /sign-in. */
 function goToReturnPath(path: string) {
@@ -39,6 +47,8 @@ export default function SignInScene({
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,7 +68,13 @@ export default function SignInScene({
         const body = (await response.json().catch(() => ({}))) as {
           user?: { id?: string } | null;
         };
-        if (body.user?.id) {
+        if (
+          body.user?.id &&
+          !(
+            showLocalAuthFixture &&
+            body.user.id !== LOCAL_CUSTOMER_ONE_FIXTURE_ID
+          )
+        ) {
           promoteStudioVoiceBoardHandoffToWelcome();
           goToReturnPath(returnTo);
         }
@@ -76,30 +92,56 @@ export default function SignInScene({
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [returnTo]);
+  }, [returnTo, showLocalAuthFixture]);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function handleSubmit(event?: FormEvent<HTMLFormElement>) {
+    event?.preventDefault();
+    if (submittingRef.current) return;
+    const form = formRef.current;
+    if (form && !form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+    const data = form ? new FormData(form) : null;
+    const nextEmail = String(data?.get("email") ?? "").trim() || email.trim();
+    const nextPassword = String(data?.get("password") ?? "") || password;
+    if (!nextEmail || !nextPassword) {
+      form?.reportValidity();
+      return;
+    }
+    submittingRef.current = true;
     setSubmitting(true);
     setError(null);
 
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: nextEmail, password: nextPassword }),
+      });
 
-    if (!response.ok) {
-      const body = (await response.json().catch(() => ({}))) as { error?: string };
-      setError(body.error ?? "Sign-in failed.");
+      if (!response.ok) {
+        const body = (await response.json().catch(() => ({}))) as { error?: string };
+        setError(body.error ?? "Sign-in failed.");
+        submittingRef.current = false;
+        setSubmitting(false);
+        return;
+      }
+
+      await claimPaidProjectAfterAuth();
+      promoteStudioVoiceBoardHandoffToWelcome();
+      goToReturnPath(returnTo);
+    } catch {
+      setError("Sign-in failed.");
+      submittingRef.current = false;
       setSubmitting(false);
-      return;
     }
-
-    promoteStudioVoiceBoardHandoffToWelcome();
-    goToReturnPath(returnTo);
   }
+
+  const submitActivate = useSamsungActivate<HTMLButtonElement>(() => {
+    void handleSubmit();
+  });
 
   async function handleLocalCustomerOneFixture() {
     setSubmitting(true);
@@ -120,21 +162,42 @@ export default function SignInScene({
     goToReturnPath(returnTo);
   }
 
+  async function handleLocalCedarLaneFixture() {
+    setSubmitting(true);
+    setError(null);
+
+    const response = await fetch("/api/auth/local-cedar-lane-review", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      setError("Local test sign-in is unavailable.");
+      setSubmitting(false);
+      return;
+    }
+
+    promoteStudioVoiceBoardHandoffToWelcome();
+    goToReturnPath(returnTo);
+  }
+
   return (
-    <div className="utility-page">
+    <div className="utility-page utility-page--client-access">
+      <ClientAccessGlass />
       <div className="utility-shell utility-shell--narrow">
         <section className="utility-card" aria-labelledby="sign-in-title">
           <p className="utility-eyebrow">Client Access</p>
           <h1 id="sign-in-title" className="utility-title">
-            Sign in to The Studio
+            {resolveSignInDestinationTitle(returnTo)}
           </h1>
           <p className="utility-lead">{lead}</p>
 
-          <form className="utility-form" onSubmit={handleSubmit}>
+          <form ref={formRef} className="utility-form" onSubmit={handleSubmit}>
             <label className="utility-field">
               <span>Email</span>
               <input
                 type="email"
+                name="email"
                 autoComplete="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
@@ -143,6 +206,7 @@ export default function SignInScene({
             </label>
             <UtilityPasswordField
               label="Password"
+              name="password"
               autoComplete="current-password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
@@ -155,9 +219,11 @@ export default function SignInScene({
             </p>
             {error ? <p className="utility-error" role="alert">{error}</p> : null}
             <button
+              ref={submitActivate.ref}
               className="utility-btn utility-btn--primary"
               type="submit"
               disabled={submitting}
+              onClick={submitActivate.onClick}
             >
               {submitting ? "Signing in..." : "Sign in"}
             </button>
@@ -176,6 +242,15 @@ export default function SignInScene({
                 disabled={submitting}
               >
                 {localCustomerOneAuthFixtureCopy.button}
+              </button>
+              <p className="utility-note">{localCedarLaneReviewCopy.note}</p>
+              <button
+                className="utility-btn utility-btn--secondary"
+                type="button"
+                onClick={() => void handleLocalCedarLaneFixture()}
+                disabled={submitting}
+              >
+                {localCedarLaneReviewCopy.button}
               </button>
             </div>
           ) : null}

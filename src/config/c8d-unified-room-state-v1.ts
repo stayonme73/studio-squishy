@@ -30,7 +30,7 @@ export const C8D_ROOM_STATE_COPY = {
       "This work is approved. The Studio is preparing the files you will keep. Downloads appear in Delivery when they are released.",
   },
   delivery: {
-    pageLead: "Delivery — download the files from the version you approved.",
+    pageLead: "Released files for this project appear here.",
     toolsUnavailable:
       "Review tools are not used during Delivery. You can download released files and still message The Studio.",
     workTitle: "Delivery",

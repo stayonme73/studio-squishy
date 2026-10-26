@@ -28,7 +28,7 @@ export const MOBILE_VISUAL_MASTER = {
   glassCreamPct: 32,
   glassOpacityPct: 46,
   glassStrongOpacityPct: 58,
-  /** Must be written literally on backdrop-filter — CSS var form is dropped. */
+  /** Historical Samsung frost recipe. Visual System V2 last-paint disables blur. */
   glassFilterLiteral: "blur(14px) saturate(1.04) brightness(1.1)",
   glassBorderDenimPct: 32,
   denim: "#547C92",
@@ -42,7 +42,7 @@ export const MOBILE_VISUAL_MASTER = {
  * Owner-accepted Voice Choice (Samsung 2026-08-29). Implementation of
  * MOBILE_VISUAL_MASTER — not a second master. Panel / glass / Lounge crop
  * stay frozen. Buttons reuse Let’s Get Started `.lobby-entry-film__cta`.
- * Fill it out myself commits on finger-up and must not start the microphone.
+ * Fill it out myself selects first. Continue commits. Do not start the microphone.
  */
 export const MOBILE_VOICE_CHOICE_OWNER_ACCEPTED = {
   status: "OWNER_ACCEPTED" as const,
@@ -182,7 +182,7 @@ export const MOBILE_BOARD_TYPOGRAPHY_ROLES = {
       "PROJECT SNAPSHOT",
       "YOUR PROJECT JOURNEY",
       "PROJECT COMMUNICATION",
-      "REFUND REQUEST",
+      "BILLING & CANCELLATION",
       "MATERIALS RECEIVED",
       "LOCAL DEVELOPER TEST",
     ],
@@ -248,7 +248,7 @@ export const MOBILE_BOARD_TYPOGRAPHY_ROLES = {
     examples: [
       "View submitted project details",
       "Send message",
-      "Submit refund request",
+      "Request refund review",
       "Save Studio fixture file",
       "Add more (optional)",
     ],

@@ -11,6 +11,7 @@ import {
   sanitizeClientOptionalRequests,
 } from "./client-requests";
 import { materialBlocksProductionUse } from "@/lib/studio-material-use";
+import { isStudioExtraMaterialItem } from "@/lib/studio-extras/inputs";
 
 import { filterClientVisibleItems } from "./promotion";
 import type {
@@ -58,6 +59,7 @@ export function isBlockingMaterialItem(
   item: CampaignMaterialItem,
   campaignId = "unknown-campaign",
 ): boolean {
+  if (isStudioExtraMaterialItem(item)) return false;
   return materialBlocksProductionUse(item, campaignId);
 }
 

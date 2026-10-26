@@ -26,19 +26,6 @@ function formatWhen(iso: string): string {
   });
 }
 
-function reminderBadge(status: string): string | null {
-  switch (status) {
-    case "reminder_due":
-      return OWNER_CONTROL_ROOM_SECTION.reminderDueLabel;
-    case "move_to_tray_due":
-      return OWNER_CONTROL_ROOM_SECTION.moveToTrayLabel;
-    case "refund_eligible":
-      return OWNER_CONTROL_ROOM_SECTION.refundEligibleLabel;
-    default:
-      return null;
-  }
-}
-
 export default function FileRoomOwnerControlRoomPanels({ controlRoom }: Props) {
   const { ownerDesk, needsCommunication, lanes, waitingOnClient, activity, jobCount } =
     controlRoom;
@@ -232,18 +219,15 @@ export default function FileRoomOwnerControlRoomPanels({ controlRoom }: Props) {
         ) : (
           <ul className="fr-control-room-waiting" aria-label="Waiting on Client">
             {waitingOnClient.map((item) => {
-              const badge = reminderBadge(item.reminderStatus);
               return (
                 <li key={item.jobId} className="fr-control-room-waiting__item">
                   <div className="fr-control-room-waiting__head">
                     <span className="fr-control-room-waiting__campaign">{item.campaignName}</span>
                     <span className="fr-control-room-waiting__service">{item.serviceName}</span>
                   </div>
-                  {badge ? (
-                    <p className="fr-control-room-waiting__badge" role="status">
-                      {badge}
-                    </p>
-                  ) : null}
+                  <p className="fr-control-room-waiting__badge" role="status">
+                    {OWNER_CONTROL_ROOM_SECTION.waitingOnMaterialsLabel}
+                  </p>
                   <dl className="fr-control-room-waiting__fields">
                     <div>
                       <dt>{OWNER_CONTROL_ROOM_SECTION.missingItemsLabel}</dt>

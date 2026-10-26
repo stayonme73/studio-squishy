@@ -85,6 +85,8 @@ export const studioGuideConversationV1 = {
   deadlineFormatError:
     "Please enter a clear date (for example September 15, 2026 or 09/15/2026). Compact numbers like 081526 are not accepted.",
 
+  summaryIntroLead: "Here’s what I understood.",
+  summaryIntroAsk: "Is this correct?",
   summaryIntro: "Here’s what I understood. Is this correct?",
   confirmedSummaryIntro: "Here’s what we saved.",
 

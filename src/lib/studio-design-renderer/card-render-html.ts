@@ -6,6 +6,11 @@
 import { readFileSync } from "fs";
 import path from "path";
 
+import {
+  LIVE_HOUSE_FONT_STACK,
+  liveHouseFontCss,
+} from "@/lib/studio-static-creative-lane/house-fonts-live";
+
 import type {
   BusinessCardDesignSpec,
   BusinessCardSideSpec,
@@ -89,6 +94,7 @@ export function renderBusinessCardSideHtml(
 <meta charset="utf-8" />
 <title>Business card ${esc(side.side)} ${esc(spec.skuId)}</title>
 <style>
+  ${liveHouseFontCss(repoRoot)}
   html, body {
     margin: 0;
     padding: 0;
@@ -103,7 +109,7 @@ export function renderBusinessCardSideHtml(
     height: ${spec.canvas.heightPx}px;
     overflow: hidden;
     background: ${esc(side.background.color)};
-    font-family: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-family: ${LIVE_HOUSE_FONT_STACK};
   }
   .layer { position: absolute; box-sizing: border-box; }
   .layer.text {
@@ -137,6 +143,7 @@ export function renderBusinessCardPrintHtml(
 <meta charset="utf-8" />
 <title>Business card print ${esc(spec.skuId)}</title>
 <style>
+  ${liveHouseFontCss(repoRoot)}
   @page { size: ${w}px ${h}px; margin: 0; }
   html, body { margin: 0; padding: 0; }
   .page {
@@ -146,7 +153,7 @@ export function renderBusinessCardPrintHtml(
     overflow: hidden;
     page-break-after: always;
     break-after: page;
-    font-family: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-family: ${LIVE_HOUSE_FONT_STACK};
   }
   .page.front { background: ${esc(spec.front.background.color)}; }
   .page.back { background: ${esc(spec.back.background.color)}; page-break-after: auto; break-after: auto; }

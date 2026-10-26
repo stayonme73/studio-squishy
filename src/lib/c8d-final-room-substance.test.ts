@@ -275,6 +275,14 @@ describe("resolveFinalRoomSubstance — focused-job delivery truth", () => {
     expect(loading.deliveryAvailability.kind).toBe("loading");
     expect(loading.openDelivery.enabled).toBe(false);
 
+    const idle = resolveFinalRoomSubstance({
+      stages: { status: "unavailable" },
+      delivery: { status: "idle" },
+    });
+    expect(idle.deliveryAvailability.kind).toBe("loading");
+    expect(idle.openDelivery.enabled).toBe(false);
+    expect(idle.workReference.detail).toBe(loading.workReference.detail);
+
     const errored = resolveFinalRoomSubstance({
       stages: {
         status: "ready",

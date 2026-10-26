@@ -33,6 +33,14 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
+docs/launch/project-alpha-owner-desk-pin.json
+.ops-bridge-tls/
+.ops-bridge-local-token
+.ops-bridge-public-url
+.ops-bridge-oauth.json
+.ops-bridge-oauth-authorize-audit.json
+.ops-bridge-active-task.json
+tmp/cloudflared.exe
 
 # vercel
 .vercel
@@ -47,6 +55,7 @@ public/welcome-hall/_test_*
 tmp/
 tmp-*
 tmp-tile-crops/
+.playwright-browsers/
 build-out.txt
 scripts/__pycache__/
 src/app/_test-*.css

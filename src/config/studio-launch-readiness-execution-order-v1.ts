@@ -18,6 +18,12 @@
  * missing independent supervision and incident escalation. Not closed.
  * Tagia 2026-08-25: Mobile unparked. Live Samsung run OPEN / IN PROGRESS,
  * not closed, not certified. Stopping point 2026-08-25-STOPPING-POINT-CHECKPOINT.md.
+ * Tagia 2026-09-21: Mobile CLOSED WITH EXPLICIT LIMITS. Area 22A
+ * PASS WITH EXPLICIT LIMITS on a fresh controlled customer. Maya not reminted.
+ * Tagia 2026-09-27: Step 5 COMPLETE BY EVIDENCE REUSE. Room 3 stays
+ * CLOSED. Parked attention console stays PARKED. Next unfinished
+ * locked-sequence item is Voice / Machine / Team stress — not started
+ * from this stamp.
  * Room 4 remains OPEN. Do not start Room 5. Do not assign Room 4D / 4E.
  */
 
@@ -43,8 +49,8 @@ export const studioLaunchReadinessExecutionOrderV1 = {
   currentActiveRoomId: "full-business-rehearsal" as const,
   currentActiveRoomClosed: false as const,
   currentActiveSectionId:
-    "mobile-customer-journey-certification" as const,
-  currentActiveSectionStatus: "OPEN" as const,
+    "owner-console-launch-certification" as const,
+  currentActiveSectionStatus: "NOT_STARTED" as const,
 
   lastCustomerLifePackage: {
     id: "STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1",
@@ -273,8 +279,8 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     configModule:
       "src/config/studio-pre-launch-master-closeout-register-v1.ts" as const,
     recommendedNextPackageId:
-      "STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1" as const,
-    recommendedNextPackageStatus: "OPEN" as const,
+      "STUDIO-OPERATING-FAILURE-RECOVERY-ESCALATION-CERTIFICATION-1" as const,
+    recommendedNextPackageStatus: "NOT_STARTED" as const,
     doNotStartRecommendedNextInThisPackage: false as const,
     doNotOpenNextPackage: true as const,
   },
@@ -313,16 +319,18 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     packageId:
       "STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1" as const,
     title: "Mobile Customer Journey Certification" as const,
-    status: "OPEN" as const,
+    status: "CLOSED WITH EXPLICIT LIMITS" as const,
     parkClassification:
-      "BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION" as const,
-    sectionClosed: false as const,
+      "SUPERVISION_ACCEPTED_STEP_3_RESUME_AUTHORIZED" as const,
+    sectionClosed: true as const,
+    ownerDecision: "ACCEPTED" as const,
+    closedAt: "2026-09-21" as const,
     baseCommit: "15ee699c7d16331b3f410871f02555841fddd4d6" as const,
     openedAt: "2026-08-22" as const,
     parkedAt: "2026-08-23" as const,
     unparkedAt: "2026-08-25" as const,
     readinessTip: "b35c8aa2c2fdc7b1f1f5161d38479fdded0e5361" as const,
-    livePhoneCertification: "IN_PROGRESS_NOT_CERTIFIED" as const,
+    livePhoneCertification: "CLOSED_WITH_EXPLICIT_LIMITS" as const,
     resumeAfterPackageId:
       "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1" as const,
     registerRequirement: "FULL_MOBILE_CUSTOMER_JOURNEY_CERTIFICATION" as const,
@@ -334,7 +342,9 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     doNotReopenRoom4cWithoutDefect: true as const,
     doNotReopenGateXWithoutDefect: true as const,
     doNotExecuteLivePhoneJourneyInOpening: true as const,
-    doNotStampCertificationResult: true as const,
+    doNotStampCertificationResult: false as const,
+    closeoutDoc:
+      "docs/launch/studio-operating-mobile-customer-journey-certification-1/STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CLOSEOUT.md" as const,
     readinessPassComplete: true as const,
     ownerPhoneRunGuideDoc:
       "docs/launch/studio-operating-mobile-customer-journey-certification-1/OWNER-PHONE-RUN-GUIDE.md" as const,

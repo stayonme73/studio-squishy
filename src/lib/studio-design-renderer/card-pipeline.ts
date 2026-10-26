@@ -24,6 +24,8 @@ import { sha256File } from "./bind";
 import { persistBusinessCardArtifacts } from "./card-bind";
 import { captureBusinessCardExports } from "./card-capture";
 import { isDesignRendererBusinessCardSku } from "./card-contracts";
+import { businessCardDeclaredTextPreservesFacts } from "./card-exact-facts";
+import { evaluateBusinessCardSetConsistency } from "./card-set-qa";
 import { BUSINESS_CARD_PROOF_ARTIFACT_ROOT } from "./card-fixtures";
 import {
   assertBusinessCardRequiredTruth,
@@ -40,6 +42,8 @@ import type {
   BusinessCardProjectTruth,
   BusinessCardRendererPipelineResult,
 } from "./card-types";
+import { applySharedLiveLaneEntryGate, sourcePxFromPlate } from "@/lib/studio-static-creative-lane/shared-live-gates";
+
 import { BUSINESS_CARD_CANVAS } from "./card-types";
 import { validateBusinessCardDesignSpec } from "./card-validate";
 
@@ -92,7 +96,9 @@ function buildCardBrief(
       requiredWordmark: truth.wordmark,
       approvedDescriptors: [],
       prohibitedDescriptors: [],
-      approvedLogoVariantIds: [truth.approvedLogoVariantId],
+      approvedLogoVariantIds: truth.materials.some((m) => m.role === "logo")
+        ? [truth.approvedLogoVariantId]
+        : [],
     },
     // Contact-identity card — not a priced campaign offer set.
     // Empty priceToken must not be used (matchPattern("" ) is always true).
@@ -101,7 +107,7 @@ function buildCardBrief(
       { value: truth.phone, expectedKind: "phone" as const },
       ...(host ? [{ value: host, expectedKind: "web" as const }] : []),
     ],
-    requireLogoVariant: true,
+    requireLogoVariant: truth.materials.some((m) => m.role === "logo"),
     requireMultiAssetConsistency: false,
     requireArtifactBinding: true,
     artifactRepoRoot: repoRoot,
@@ -123,6 +129,14 @@ export async function runBusinessCardRendererPipeline(input: {
       "SKU_NOT_SUPPORTED",
       `SKU ${input.truth.skuId} not in business-card renderer scope`,
     );
+  }
+
+  const laneGate = applySharedLiveLaneEntryGate({
+    repoRoot: input.repoRoot,
+    sourcePx: sourcePxFromPlate(BUSINESS_CARD_CANVAS),
+  });
+  if (!laneGate.ok) {
+    return fail(mode, laneGate.code, laneGate.message);
   }
 
   try {
@@ -224,10 +238,31 @@ export async function runBusinessCardRendererPipeline(input: {
     heightPx: capture.front.heightPx,
   });
 
+  const setQa = evaluateBusinessCardSetConsistency(identity);
+  if (!setQa.ok) {
+    return fail(mode, "QA_FAILURE", setQa.message, { designSpec: spec, identity });
+  }
+
   const frontSide = identity.sides.find((s) => s.side === "front")!;
   const backSide = identity.sides.find((s) => s.side === "back")!;
   const declaredTextFront = declaredTextFromCardSide(spec.front);
   const declaredTextBack = declaredTextFromCardSide(spec.back);
+  if (
+    !businessCardDeclaredTextPreservesFacts({
+      declaredText: declaredTextFront,
+      businessName: input.truth.businessName,
+      personName: input.truth.personName,
+      phone: input.truth.phone,
+      email: input.truth.email,
+    })
+  ) {
+    return fail(
+      mode,
+      "QA_FAILURE",
+      "Front contact facts do not match the approved brief exactly",
+      { designSpec: spec, identity },
+    );
+  }
   const logoId = input.truth.approvedLogoVariantId;
   const host = webHostToken(input.truth.webDisplay);
 

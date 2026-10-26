@@ -11,6 +11,7 @@ import {
   C8D_ROOM_STATE_COPY,
   type UnifiedRoomStateId,
 } from "@/config/c8d-unified-room-state-v1";
+import { deliverables } from "@/config/deliverables";
 import { PROJECT_COMMUNICATION_CUSTOMER_V1 } from "@/config/project-communication-customer-v1";
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
 import { resolveFeedbackCampaignTitle } from "@/lib/feedback-studio-view";
@@ -34,13 +35,14 @@ export default function UnifiedRoomStateWorkspace({ roomState, campaign, jobId }
   return (
     <div
       className="fs-page utility-page fs-page--review"
-      aria-label={roomState === "final" ? "Final workspace" : "Delivery workspace"}
+      aria-label={roomState === "final" ? "Final workspace" : "Final Delivery"}
       data-room-state={roomState}
     >
       <UtilityPageHeader
         backHref={studioBoard.routes.studioBoard}
-        activeNav="review-room"
-        title="Review Room"
+        activeNav={roomState === "delivery" ? "deliverables" : "review-room"}
+        title={roomState === "delivery" ? deliverables.pageTitle : "Review Room"}
+        backLabel={`← ${studioBoard.campaignDetails.backLabel}`}
         lead={`${copy.pageLead} — ${campaignTitle}`}
       />
 
@@ -54,6 +56,7 @@ export default function UnifiedRoomStateWorkspace({ roomState, campaign, jobId }
             )}
           </div>
 
+          {roomState === "delivery" ? null : (
           <aside
             className="fs-review__rail"
             aria-label="Review tools and project communication"
@@ -80,6 +83,7 @@ export default function UnifiedRoomStateWorkspace({ roomState, campaign, jobId }
               }}
             />
           </aside>
+          )}
         </div>
       </div>
 

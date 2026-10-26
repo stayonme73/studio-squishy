@@ -1,16 +1,7 @@
-import { Caveat, Inter } from "next/font/google";
+import { studioBoardScriptFont } from "@/fonts/studio-board-script";
 
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-studio-board-sans",
-});
-
-const caveat = Caveat({
-  subsets: ["latin"],
-  weight: ["600", "700"],
-  variable: "--font-studio-board-script",
-});
-
-/** Shared Inter + Caveat variables for all Board Family utility pages. */
-export const utilityPageFontClassName = `${inter.variable} ${caveat.variable}`;
+/**
+ * Local Caveat only. Inter is the one next/font/google load in the root layout
+ * (`--font-studio-board-sans` on the document). Do not add a second Google font here.
+ */
+export const utilityPageFontClassName = studioBoardScriptFont.variable;

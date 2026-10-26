@@ -380,6 +380,43 @@ describe("File Registry + Shared Drive Reference Layer V1", () => {
     ).toBe(false);
   });
 
+  it("keeps same-timestamp final delivery files on distinct registry ids", () => {
+    const first = addJobFileReference(job(), [], {
+      clientId: CLIENT_ID,
+      category: "final_delivery",
+      filename: "flyer-version-16.pdf",
+      fileType: "application/pdf",
+      storageRef: createReferenceOnlyStorageRef({ reference: "Shared Drive/flyer-version-16.pdf" }),
+      visibility: "client_visible",
+      status: "approved_for_release",
+      actor: staffActor,
+      occurredAt: NOW,
+      deliverableKey: "deliverable-2",
+      deliverableLabel: "Print-ready PDF",
+      idPrefix: "final-file",
+    });
+    const second = addJobFileReference(first.job, first.events, {
+      clientId: CLIENT_ID,
+      category: "final_delivery",
+      filename: "flyer-version-16.png",
+      fileType: "image/png",
+      storageRef: createReferenceOnlyStorageRef({ reference: "Shared Drive/flyer-version-16.png" }),
+      visibility: "client_visible",
+      status: "approved_for_release",
+      actor: staffActor,
+      occurredAt: NOW,
+      deliverableKey: "deliverable-3",
+      deliverableLabel: "Digital PNG",
+      idPrefix: "final-file",
+    });
+
+    expect(first.file.id).not.toBe(second.file.id);
+    expect(first.file.id).toContain("deliverable-2");
+    expect(second.file.id).toContain("deliverable-3");
+    const ids = (second.job.fileRegistry ?? []).map((entry) => entry.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
   it("creates activity entries for add, visibility, version, and release events", () => {
     const added = addJobFileReference(job(), [], {
       clientId: CLIENT_ID,

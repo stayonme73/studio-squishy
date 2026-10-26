@@ -20,7 +20,7 @@ export const studioCustomerCurrentStatusV1 = {
     approvedPreparing: "Approved — preparing files",
     deliveryReady: "Final Delivery ready",
     delivered: "Delivered",
-    preparingToStart: "Preparing to start",
+    preparingToStart: "Waiting for a production slot",
     cancelled: "Cancelled",
   },
 
@@ -32,6 +32,8 @@ export const studioCustomerCurrentStatusV1 = {
     deliveryReady: "Your approved files are ready to download in Final Delivery.",
     reviewReady: "Open the Review Room to see what is ready and what happens next.",
     waitingOnYou: "The Studio is waiting on you before this service can continue.",
+    waitingForProductionSlot:
+      "Your project is safely in line. Nothing else is needed from you. Production will begin when a Studio production slot becomes available.",
     cancelled:
       "This work is closed after an Owner decision. This does not confirm that money has been returned.",
   },
@@ -40,6 +42,8 @@ export const studioCustomerCurrentStatusV1 = {
     revisionUnderway: "Nothing is required from you until the revised version is ready.",
     approvedPreparing: "Downloads appear in Final Delivery when the files are ready.",
     waitingOnYou: "Complete the waiting step so The Studio can continue.",
+    waitingForProductionSlot:
+      "The Studio will not invent a start date or a delivery date.",
     cancelled: "Nothing is required from you on this service.",
   },
 
@@ -47,6 +51,7 @@ export const studioCustomerCurrentStatusV1 = {
     revisionUnderway: "Revision in progress",
     approvedPreparing: "Preparing files",
     deliveryReady: "Ready to download",
+    waitingForProductionSlot: "Waiting for a production slot",
   },
 
   activity: {

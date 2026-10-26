@@ -14,19 +14,32 @@
     "seed:studio-self-test": "node scripts/seed-studio-self-test.mjs",
     "test:studio-self-test": "node scripts/run-studio-self-test.mjs",
     "test:studio-coordinator-self-test": "node scripts/run-studio-coordinator-self-test.mjs",
-    "test:package3-certification": "node scripts/run-package3-certification.mjs"
+    "test:package3-certification": "node scripts/run-package3-certification.mjs",
+    "owner-attention:test": "node scripts/owner-attention-alert.mjs --test",
+    "owner-attention:alert": "node scripts/owner-attention-alert.mjs",
+    "work-heartbeat:pulse": "node scripts/work-heartbeat-pulse.mjs",
+    "work-heartbeat:watchdog": "node scripts/work-heartbeat-watchdog.mjs",
+    "work-heartbeat:idle": "node scripts/work-heartbeat-pulse.mjs --idle",
+    "owner-console:self-test": "node scripts/owner-console-self-test.mjs",
+    "ops-bridge:https": "node scripts/ops-bridge-https.mjs",
+    "ops-bridge:https-public": "node scripts/ops-bridge-https-public.mjs",
+    "owner-console:desk": "node scripts/owner-console-desk.mjs",
+    "studio-demo:video-1:quality-return": "node scripts/studio-demo-video-1-quality-return.mjs",
+    "owner-console:away": "node scripts/owner-desk-away.mjs"
   },
   "dependencies": {
     "next": "16.2.9",
+    "pg": "^8.23.1",
     "qrcode": "^1.5.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "stripe": "^17.7.0",
-    "sharp": "^0.35.1"
+    "sharp": "^0.35.1",
+    "stripe": "^17.7.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",

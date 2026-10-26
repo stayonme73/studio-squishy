@@ -304,6 +304,13 @@
   border: 1px solid color-mix(in srgb, #2c3e50 28%, transparent);
 }
 
+.secondary[data-skip-action] {
+  border: 2px solid #d94e2b !important;
+  background: transparent !important;
+  color: #d94e2b !important;
+  -webkit-text-fill-color: #d94e2b !important;
+}
+
 .summary {
   display: flex;
   flex-direction: column;

@@ -27,7 +27,14 @@ import {
 } from "@/lib/job-control/review-room-view";
 import { redactJobFileStorageForClient } from "@/lib/file-storage/redact";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
+import { deliverLifecycleNoticesForCampaign } from "@/lib/studio-lifecycle-email/campaign";
 import { ensureDispatchExecution } from "@/lib/studio-dispatch";
+import { identitySessionFromRequest } from "@/lib/studio-customer-identity-safety-gate/session";
+import {
+  requestStudioExtrasChanges,
+  type StudioExtraChangeRequest,
+} from "@/lib/studio-extras/machine";
+import { isStudioExtraId } from "@/lib/studio-extras/selection";
 
 type RouteContext = {
   params: Promise<{ campaignId: string; jobId: string }>;
@@ -121,11 +128,32 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (access instanceof NextResponse) return access;
   const { user, campaignEnvelope, assignments } = access;
 
-  let body: ReviewRoomPatchBody;
+  let body: ReviewRoomPatchBody & { studioExtraChanges?: readonly { id: string; note: string }[] };
   try {
-    body = (await request.json()) as ReviewRoomPatchBody;
+    body = (await request.json()) as typeof body;
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  // Extra changes ride the package revision round. Checked before the package
+  // revision is recorded so a bad Extras list never half-applies.
+  const extraChanges: StudioExtraChangeRequest[] = [];
+  if (body.action === "request_revision" && (body.studioExtraChanges ?? []).length > 0) {
+    const truth = campaignEnvelope.record.studioExtras;
+    for (const change of body.studioExtraChanges ?? []) {
+      if (!truth || !isStudioExtraId(change.id)) {
+        return NextResponse.json({ error: "That Studio Extra is not part of this order." }, { status: 422 });
+      }
+      extraChanges.push({ id: change.id, note: String(change.note ?? "") });
+    }
+    const dryRun = requestStudioExtrasChanges(truth!, extraChanges, {
+      at: new Date().toISOString(),
+      packageRound: 0,
+      ridesPackageRevision: true,
+    });
+    if (!dryRun.ok) {
+      return NextResponse.json({ error: dryRun.error }, { status: 422 });
+    }
   }
 
   let tasksEnvelope;
@@ -218,6 +246,32 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
   }
 
+  const extrasTruth = campaignEnvelope.record.studioExtras;
+  if (extrasTruth && !skipWrite) {
+    const at = new Date().toISOString();
+    let nextExtras = extrasTruth;
+    if (
+      body.action === "request_revision" &&
+      result.correctionUseCreated &&
+      result.correctionUse &&
+      extraChanges.length > 0
+    ) {
+      const applied = requestStudioExtrasChanges(extrasTruth, extraChanges, {
+        at,
+        packageRound: result.correctionUse.ordinal,
+        ridesPackageRevision: true,
+      });
+      if (applied.ok) nextExtras = applied.truth;
+    }
+    if (nextExtras !== extrasTruth) {
+      campaignToPersist = {
+        ...(campaignToPersist ?? campaignEnvelope.record),
+        studioExtras: nextExtras,
+        updatedAt: at,
+      };
+    }
+  }
+
   if (campaignToPersist) {
     await upsertCampaignRecord(campaignToPersist, user.id);
   }
@@ -225,6 +279,14 @@ export async function PATCH(request: Request, context: RouteContext) {
   const saved = skipWrite
     ? envelopeToPersist
     : await writeTasksEnvelope(envelopeToPersist);
+
+  if (!skipWrite) {
+    try {
+      await deliverLifecycleNoticesForCampaign(campaignId);
+    } catch {
+      // The review decision is already saved. Retry sends the customer email.
+    }
+  }
 
   if (
     body.action === "request_revision" &&
@@ -235,7 +297,10 @@ export async function PATCH(request: Request, context: RouteContext) {
       campaignToPersist ??
       (await readCampaignEnvelope(campaignId))?.record ??
       campaignEnvelope.record;
-    await ensureDispatchExecution(latestCampaign);
+    await ensureDispatchExecution(
+      latestCampaign,
+      identitySessionFromRequest(request, user.id, campaignId),
+    );
   }
 
   const afterDispatch = await readTasksEnvelope(campaignId);

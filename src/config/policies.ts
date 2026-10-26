@@ -1,6 +1,8 @@
 /** Studio policies & FAQ — single source for Help Center (and contextual links elsewhere). */
 
 import { studioBoard } from "@/config/studio-board";
+import { studioExtrasExplainer } from "@/config/studio-extras-v1";
+import { threePackageRevisionCustomerAnswer } from "@/config/studio-three-package-revision-truth-v1";
 
 export type PolicyContentBlock =
   | { kind: "p"; text: string }
@@ -24,11 +26,11 @@ export const studioPolicies = {
     blocks: [
       {
         kind: "p",
-        text: "The Studio creates ready-to-use marketing materials for businesses, organizations, professionals, and entrepreneurs. Choose only the services you need, complete Intake, and we'll build the deliverables you selected.",
+        text: "The Studio creates ready-to-use marketing materials for businesses, organizations, professionals, and entrepreneurs. Choose only the services you need, complete Build Your Project, and we'll build the deliverables you selected.",
       },
       {
         kind: "p",
-        text: "Your path through The Studio: Lobby → Conversation Room → Payment → Intake → Studio Board → Review Room → Final Delivery.",
+        text: "Your path through The Studio: Home → Package Detail → Build Your Project → Review & Pay → Project Intake → My Studio → Final Delivery.",
       },
       {
         kind: "ul",
@@ -44,7 +46,7 @@ export const studioPolicies = {
         intro: "What you receive:",
         items: [
           "Deliverables scoped to the services you selected",
-          "Status updates on your Studio Board and Project Record",
+          "Status updates in My Studio and on your Project Record",
           "Review Room when work is ready for your feedback",
           "Approved files through Final Delivery",
         ] as const,
@@ -74,9 +76,9 @@ export const studioPolicies = {
         },
         {
           kind: "p",
-          text: "In the Conversation Room, The Studio suggests a starting route from what you shared. You choose the services to purchase.",
+          text: "From the Home page, The Studio shows the packages it can start now. You choose the package to purchase.",
         },
-        { kind: "p", text: "You choose what to purchase, share Project Details, and review finished work in Review Room." },
+        { kind: "p", text: "You choose what to purchase, complete Project Intake, and review finished work in Review Room." },
         { kind: "p", text: "The Studio recommends." },
         { kind: "p", text: "You decide." },
       ] as const,
@@ -89,11 +91,11 @@ export const studioPolicies = {
       },
       {
         id: "multiple-services",
-        question: "CAN I ORDER MORE THAN ONE SERVICE?",
+        question: "CAN I ORDER MORE THAN ONE PACKAGE?",
         blocks: [
           {
             kind: "p",
-            text: "Yes. Multiple services can become one project when appropriate.",
+            text: "You choose one package. On Build Your Project you can add up to two Studio Extras, or skip them. Studio Extras do not replace the package.",
           },
         ] as const,
       },
@@ -117,15 +119,23 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "After payment in the Conversation Room, complete Intake so The Studio knows what to create and which materials are required.",
+            text: "Card entry happens on Stripe. The Studio page does not collect your card. Payment is complete only after Stripe confirms it. You then complete Project Intake. If you need an account, you sign in or create one. You add the actual files in My Studio. Adding a file does not start production.",
           },
           {
             kind: "p",
-            text: "Your path through The Studio: Lobby → Conversation Room → Payment → Intake → Studio Board → Review Room → Final Delivery.",
+            text: "Production begins only when payment is confirmed, Project Intake is complete, the required materials have been reviewed and accepted, and the work has been moved into production.",
           },
           {
             kind: "p",
-            text: "Monitor progress on your Studio Board and Project Record. Status updates appear as your project moves forward.",
+            text: "The Studio checks the file type and the file size. It does not automatically check length, audio clarity, or how many people are speaking.",
+          },
+          {
+            kind: "p",
+            text: "Your path through The Studio: Home → Package Detail → Build Your Project → Review & Pay → Project Intake → My Studio → Final Delivery.",
+          },
+          {
+            kind: "p",
+            text: "Follow progress in My Studio and on your Project Record. Status updates appear as your project moves forward.",
           },
         ] as const,
       },
@@ -135,15 +145,15 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "Estimated production timelines are shown on your Project Record and Studio Board.",
+            text: "The Studio does not promise a delivery date.",
           },
           {
             kind: "p",
-            text: "Delivery depends on the services you selected, project complexity, and receipt of required client materials.",
+            text: "How long the work takes depends on the package, the materials The Studio still needs, and your responses during review.",
           },
           {
             kind: "p",
-            text: "Timelines pause while a service is Waiting on Client for required information or materials.",
+            text: "If The Studio still needs materials or a review response, that part of the project waits.",
           },
         ] as const,
       },
@@ -153,15 +163,15 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "Project progress is shown on your Studio Board. Email notices are a courtesy when they are sent. Your Studio Board is the source of truth.",
+            text: "Project progress is shown in My Studio. Email notices are a courtesy when they are sent. My Studio is the source of truth.",
           },
           {
             kind: "p",
-            text: "After payment and Project Details, return to your Studio Board for status updates, open Review Room when work is ready, and collect approved files in Final Delivery when your project is complete.",
+            text: "After payment and Project Intake, return to My Studio for status updates, open Review Room when work is ready, and collect approved files in Final Delivery when your project is complete.",
           },
           {
             kind: "p",
-            text: "If you received an email or a link, use it only as a reminder to sign in. Your official next step is always shown on the Studio Board.",
+            text: "If you received an email or a link, use it only as a reminder to sign in. Your official next step is always shown in My Studio.",
           },
         ] as const,
       },
@@ -183,7 +193,7 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "See the Refund Policy below for Waiting on Client and the 14-calendar-day rule.",
+            text: "See the Refund Policy below.",
           },
         ] as const,
       },
@@ -193,7 +203,7 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "Your project is created using the information you provide in Project Details and any required materials.",
+            text: "Your project uses the information you provide in Project Intake and any required materials.",
           },
           {
             kind: "p",
@@ -243,11 +253,11 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "Included revisions depend on the service you purchased — not on a fixed package tier.",
+            text: threePackageRevisionCustomerAnswer,
           },
           {
             kind: "p",
-            text: "Your Project Record shows the revision policy details for each service, including revisions included, used, and remaining where applicable.",
+            text: "My Studio shows how many revision rounds are included and how many remain.",
           },
         ] as const,
       },
@@ -261,7 +271,7 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "Use the Review Room to open proofs via link, leave feedback, approve, or request revisions.",
+            text: "Open Review Room to see the work, leave feedback, approve, or request a revision.",
           },
           {
             kind: "p",
@@ -276,6 +286,84 @@ export const studioPolicies = {
           {
             kind: "p",
             text: "After final payment and delivery, the approved client-facing deliverables are yours.",
+          },
+        ] as const,
+      },
+      {
+        id: "current-packages",
+        question: "WHAT ARE THE CURRENT PACKAGES?",
+        blocks: [
+          {
+            kind: "p",
+            text: "Clip Repurposing is $373.75. Short-Form Video Editing is $186.25. Social & Promo Graphics is $199. Campaign Launch Kit is $349. Each package includes three revision rounds. The 20% Studio Thank-You is applied at payment.",
+          },
+          {
+            kind: "p",
+            text: "Clip uses one qualifying recording. Short-Form uses up to 3 selected English clips or marked moments. Social & Promo Graphics uses your business facts, a logo if you have one, photos if you have them, prices or disclosures, and a call to action if you have one. There is no video requirement for Social & Promo Graphics. Campaign Launch Kit is a fixed set: one promotional flyer with a print-yourself PDF, one paste-ready email, two paste-ready text messages, and one square plus one portrait graphic. You send and post them. A short usage guide is included and is not a fifth piece. Actual files are added in My Studio after checkout.",
+          },
+          {
+            kind: "p",
+            text: studioExtrasExplainer().whatYouCanAdd,
+          },
+          {
+            kind: "p",
+            text: studioExtrasExplainer().promise,
+          },
+          {
+            kind: "p",
+            text: studioExtrasExplainer().revisions,
+          },
+        ] as const,
+      },
+      {
+        id: "passwords",
+        question: "DO I NEED TO GIVE YOU MY PASSWORDS?",
+        blocks: [
+          {
+            kind: "p",
+            text: "No. The Studio does not take passwords and does not log into your social, ads, email, review, or Google Business accounts. The Studio creates the work and delivers the files. You decide where and when to publish them.",
+          },
+        ] as const,
+      },
+      {
+        id: "short-form-content-pack-difference",
+        question: "What is the difference between Short-Form Video Editing and Clip Repurposing?",
+        blocks: [
+          {
+            kind: "p",
+            text: "Short-Form Video Editing polishes up to 3 English clips or marked moments you already chose. Each one should be 45 seconds or less. The Studio may look slightly before or after a marked moment so the opening, ending, or thought is complete. It does not search a long recording for moments.",
+          },
+          {
+            kind: "p",
+            text: "Clip Repurposing is where The Studio searches one recording. That recording should be 15–60 minutes, filmed vertically, in English, with one primary speaker, and clear enough to follow.",
+          },
+        ] as const,
+      },
+      {
+        id: "short-form-content-pack-four-minute",
+        question: "How long can each Short-Form clip be?",
+        blocks: [
+          {
+            kind: "p",
+            text: "Each source clip or marked moment should be in English and 45 seconds or less. The Studio does not measure that length for you. You confirm that the clip fits. If you want The Studio to search a longer recording and choose the moments, that is Clip Repurposing.",
+          },
+        ] as const,
+      },
+      {
+        id: "short-form-content-pack-contract",
+        question: "What does Short-Form Video Editing include?",
+        blocks: [
+          {
+            kind: "p",
+            text: "You provide up to 3 English source clips or marked moments, each up to 45 seconds, plus any facts and call-to-action wording the videos need. You add the actual files in My Studio after checkout.",
+          },
+          {
+            kind: "p",
+            text: "The Studio delivers up to 3 polished short-form videos, matching captions, cover and title graphics, and a simple guide for posting or using the finished videos. Pacing and audio may be improved where appropriate. Three revision rounds are included.",
+          },
+          {
+            kind: "p",
+            text: "Three finished videos are not guaranteed if the material you marked cannot produce three clean, complete shorts. The Studio will not add weak filler just to reach a number.",
           },
         ] as const,
       },
@@ -324,11 +412,11 @@ export const studioPolicies = {
           { kind: "p", text: "Payment is required before work can proceed." },
           {
             kind: "p",
-            text: "Production is tracked per service. Paying through Secure Checkout reserves your selected services but does not, by itself, start creative production on any service.",
+            text: "Production is tracked per service. Paying on Review & Pay reserves your selected package but does not, by itself, start creative production.",
           },
           {
             kind: "p",
-            text: "Submitting Project Details does not begin production on any service.",
+            text: "Completing Project Intake does not begin production.",
           },
         ] as const,
       },
@@ -348,7 +436,7 @@ export const studioPolicies = {
             kind: "ul",
             items: [
               "Payment has been received.",
-              "Project Details for that service are complete.",
+              "Project Intake is complete.",
               "Required materials for that service have been reviewed and accepted.",
               "The service has been moved into production.",
             ] as const,
@@ -363,7 +451,7 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "Timeline estimates depend on required client materials being submitted, reviewed, and accepted, and on timely client responses during Review Room.",
+            text: "The Studio does not promise a delivery date. Timing depends on required materials being reviewed and accepted, and on your responses in Review Room.",
           },
         ] as const,
       },
@@ -373,19 +461,15 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "Some services require client materials before production can begin. Your Project Record shows what is required and what is still missing.",
+            text: "Some services require materials before production can begin. My Studio shows what is required and what is still missing.",
           },
           {
             kind: "p",
-            text: "If required materials are still missing, The Studio sends a reminder after 48 hours.",
+            text: "If required materials are still missing, that part of the project waits. Other work in the same project can continue.",
           },
           {
             kind: "p",
-            text: "If required materials are still missing after 72 hours, the service moves to Waiting on Client. Only that service pauses — your other services can continue independently.",
-          },
-          {
-            kind: "p",
-            text: "While a service is Waiting on Client, its timeline pauses until the required information or materials are received.",
+            text: "When the required materials are received, that part of the project can continue.",
           },
         ] as const,
       },
@@ -399,15 +483,11 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "When a service is Waiting on Client, production on that service pauses and its timeline pauses with it.",
+            text: "When a service is Waiting on Client, that service waits until you provide what is needed.",
           },
           {
             kind: "p",
-            text: "Returning the required information or materials allows that service to re-enter the production queue.",
-          },
-          {
-            kind: "p",
-            text: "If there is no client response for 14 calendar days while a service is Waiting on Client and production has not started on that service, a full refund may be eligible. See the Refund Policy.",
+            text: "Providing the required information or materials allows that service to continue.",
           },
         ] as const,
       },
@@ -417,15 +497,15 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "Estimated production timelines are shown on your Project Record and Studio Board.",
+            text: "The Studio does not promise a delivery date.",
           },
           {
             kind: "p",
-            text: "Delivery depends on the services you selected, project complexity, and receipt of required client materials.",
+            text: "How long the work takes depends on the package, the materials The Studio still needs, and your responses during review.",
           },
           {
             kind: "p",
-            text: "Timelines may shift when required client materials, feedback, or approvals are delayed.",
+            text: "The work can take longer when required materials, feedback, or approvals are delayed.",
           },
           {
             kind: "p",
@@ -439,11 +519,11 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "Included revisions depend on the service you purchased. Your Project Record shows what is included for each service.",
+            text: threePackageRevisionCustomerAnswer,
           },
           {
             kind: "p",
-            text: "A revision adjusts work already created within the scope of your selected service.",
+            text: "My Studio shows how many revision rounds remain.",
           },
           {
             kind: "p",
@@ -470,11 +550,7 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "If you become unresponsive while required information or materials are missing, the service may move to Waiting on Client. After 14 calendar days without the required response, a full refund may be eligible if production has not started on that service.",
-          },
-          {
-            kind: "p",
-            text: "Paying or submitting Project Details alone does not start production on any service and does not remove refund eligibility by itself.",
+            text: "Paying or completing Project Intake alone does not start production and does not remove refund eligibility by itself.",
           },
         ] as const,
       },
@@ -502,7 +578,7 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "Deliverables are created using the information you submit in Project Details, required materials, and approved feedback in Review Room.",
+            text: "Deliverables are created using the information you submit in Project Intake, required materials, and approved feedback in Review Room.",
           },
           {
             kind: "p",
@@ -548,7 +624,7 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "Use the Review Room to open proofs via link, leave feedback, approve, or request revisions.",
+            text: "Open Review Room to see the work, leave feedback, approve, or request a revision.",
           },
           {
             kind: "p",

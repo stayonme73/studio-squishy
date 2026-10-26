@@ -69,7 +69,7 @@ describe("STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1", (
     expect(conversationRoomGuideV1.routeRecommendedBadge).toBe(
       "Suggested starting point",
     );
-    expect(conversationRoomGuideV1.routePanelLead).toMatch(/you can choose a different path/i);
+    expect(conversationRoomGuideV1.routePanelChoice).toMatch(/you can choose a different path/i);
     expect(conversationRoomGuideV1.routeDirectTagline).not.toMatch(/squishy/i);
     expect(conversationRoomGuideV1.checkoutOpenPanelCta).toBe("Open checkout");
     expect(conversationRoomGuideV1.checkoutOpenPanelCta).not.toBe(
@@ -91,7 +91,7 @@ describe("STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1", (
   it("does not tell customers checkout is unfinished, emails are off, or Stripe env secrets leaked", () => {
     expect(payment.whatsNext.emailReassurance).not.toMatch(THIS_BUILD);
     expect(payment.whatsNext.emailReassurance).not.toMatch(/not sent/i);
-    expect(payment.whatsNext.emailReassurance).toMatch(/studio board is the source of truth/i);
+    expect(payment.whatsNext.emailReassurance).toMatch(/my studio is the source of truth/i);
     expect(payment.summary.cardProcessingDisclosureNote).not.toMatch(THIS_BUILD);
     expect(payment.summary.cardProcessingDisclosureNote).not.toMatch(/server-side/i);
     expect(payment.summary.cardProcessingDisclosureNote).toMatch(/stripe/i);

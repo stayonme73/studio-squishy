@@ -20,19 +20,16 @@ export type Sm001NSelectInput = {
   hasSecondaryProofPoint: boolean;
 };
 
-export function collectSm001NSelectSignals(
-  truth: Pick<
-    Sm001ProjectTruth,
-    | "materials"
-    | "offerName"
-    | "priceDisplay"
-    | "cta"
-    | "dateWindow"
-    | "body"
-    | "headline"
-    | "wasPriceDisplay"
-  >,
-): Sm001NSelectInput {
+export function collectSm001NSelectSignals(truth: {
+  materials: Sm001ProjectTruth["materials"];
+  offerName?: string;
+  priceDisplay?: string;
+  cta?: string;
+  dateWindow?: string;
+  body?: string;
+  headline?: string;
+  wasPriceDisplay?: string;
+}): Sm001NSelectInput {
   const hasLogo = truth.materials.some((m) => m.role === "logo");
   const hasOfferFacts = Boolean(
     truth.offerName?.trim() &&

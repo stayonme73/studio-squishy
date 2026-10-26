@@ -51,10 +51,11 @@ describe("project-builder studio plan summary", () => {
       "i75",
     );
 
-    expect(model.overallTimelineDisplay).toMatch(/3–5 business days after all required materials are received/i);
+    expect(model.overallTimelineDisplay).toMatch(/production slot is available/i);
+    expect(model.overallTimelineDisplay).not.toMatch(/business days/i);
     expect(model.deliverableTimelines).toEqual([
-      { title: "Make Me a Flyer", timingDisplay: "2–3 business days" },
-      { title: "Make My Social Media Posts", timingDisplay: "3–5 business days" },
+      { title: "Make Me a Flyer", timingDisplay: "When a production slot is available" },
+      { title: "Make My Social Media Posts", timingDisplay: "When a production slot is available" },
     ]);
   });
 

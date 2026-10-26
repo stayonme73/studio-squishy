@@ -6,6 +6,7 @@ type Props = {
   label: string;
   value: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
+  onFocus?: InputHTMLAttributes<HTMLInputElement>["onFocus"];
   autoComplete?: InputHTMLAttributes<HTMLInputElement>["autoComplete"];
   required?: boolean;
   minLength?: number;
@@ -22,6 +23,7 @@ export default function UtilityPasswordField({
   label,
   value,
   onChange,
+  onFocus,
   autoComplete = "current-password",
   required,
   minLength,
@@ -43,6 +45,7 @@ export default function UtilityPasswordField({
           autoComplete={autoComplete}
           value={value}
           onChange={onChange}
+          onFocus={onFocus}
           required={required}
           minLength={minLength}
           maxLength={maxLength}

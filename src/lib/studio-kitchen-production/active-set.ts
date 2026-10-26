@@ -26,6 +26,13 @@ export const ROUTE_MAP_V1_SHELF_SKUS = [
   "rm-j008",
 ] as const satisfies readonly ServiceId[];
 
+/** Internal unpublished SELL NOW — production contracts only. Not a Route Map shelf. */
+export const INTERNAL_STAGING_LAUNCH_SKUS = [
+  "v2-rtu-short-form-video-edit",
+  "v2-rtu-clip-repurposing",
+  "v2-creative-qa-finish",
+] as const satisfies readonly ServiceId[];
+
 /** Route Map V2 RTU shelf (limited). */
 export const ROUTE_MAP_V2_RTU_SHELF_SKUS = [
   "v2-rtu-flyer",
@@ -48,6 +55,7 @@ export const ACTIVE_CUSTOMER_FACING_SKUS = [
 ] as const satisfies readonly ServiceId[];
 
 const ACTIVE_SET = new Set<string>(ACTIVE_CUSTOMER_FACING_SKUS);
+const STAGING_SET = new Set<string>(INTERNAL_STAGING_LAUNCH_SKUS);
 
 /** Explicitly out of launch production-contract scope (not exhaustive of whole catalog). */
 export const EXPLICITLY_EXCLUDED_FROM_CAPABILITY_SET = {
@@ -92,6 +100,10 @@ export const EXPLICITLY_EXCLUDED_FROM_CAPABILITY_SET = {
 
 export function isActiveCustomerFacingSku(skuId: string): skuId is ServiceId {
   return ACTIVE_SET.has(skuId);
+}
+
+export function isInternalStagingLaunchSku(skuId: string): skuId is ServiceId {
+  return STAGING_SET.has(skuId);
 }
 
 export function activeCustomerFacingSkuCount(): number {

@@ -14,6 +14,7 @@ import { fileRoomDownloadResponse } from "@/lib/file-storage/responses";
 import { createServerFileRoomStorageAdapter } from "@/lib/file-storage/server";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { isApprovedReviewProofReference } from "@/lib/file-registry/job-files";
+import { findReviewAccessFeedback } from "@/lib/job-control/review-room-view";
 
 type RouteContext = {
   params: Promise<{ fileId: string }>;
@@ -31,11 +32,14 @@ export async function GET(request: Request, context: RouteContext) {
 
   const assignments = await readCampaignAssignments();
   const internalAccess = internalCampaignAccessAllowed(user, match.file.campaignId, assignments);
+  const feedback = findReviewAccessFeedback(match.tasksEnvelope, match.job.jobId);
   if (!internalAccess) {
     const decision = canClientAccessReviewProofFile({
       user,
       job: match.job,
       file: match.file,
+      campaignClientUserId: match.campaignEnvelope?.clientUserId,
+      feedback,
     });
     if (!decision.allowed) {
       return NextResponse.json({ error: "File not available." }, { status: 403 });
@@ -57,6 +61,8 @@ export async function GET(request: Request, context: RouteContext) {
           user,
           job: match.job,
           file: match.file,
+          campaignClientUserId: match.campaignEnvelope?.clientUserId,
+          feedback,
         });
 
     if (!result.ok) {

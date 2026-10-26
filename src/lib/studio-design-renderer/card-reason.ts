@@ -28,7 +28,6 @@ export function assertBusinessCardRequiredTruth(
   if (!truth.personName?.trim()) missing.push("personName");
   if (!truth.phone?.trim()) missing.push("phone");
   if (!truth.email?.trim()) missing.push("email");
-  if (!truth.materials.some((m) => m.role === "logo")) missing.push("logo");
   if (missing.length) {
     throw new Error(
       `MISSING_REQUIRED_TRUTH: ${missing.join(", ")}`,
@@ -42,9 +41,6 @@ export function reasonBusinessCardDesignSpecDeterministic(
   assertBusinessCardRequiredTruth(truth);
   const c = truth.brandColors;
   const logo = truth.materials.find((m) => m.role === "logo");
-  if (!logo) {
-    throw new Error("MISSING_REQUIRED_MATERIAL: logo");
-  }
 
   const W = BUSINESS_CARD_CANVAS.widthPx;
   const H = BUSINESS_CARD_CANVAS.heightPx;
@@ -60,28 +56,32 @@ export function reasonBusinessCardDesignSpecDeterministic(
       height: H,
       fill: c.primary,
     },
-    {
-      type: "shape" as const,
-      id: "front-logo-plate",
-      role: "logo_plate" as const,
-      x: 72,
-      y: 72,
-      width: 160,
-      height: 160,
-      fill: "#FFFFFF",
-      borderRadiusPx: 12,
-    },
-    {
-      type: "image" as const,
-      id: "front-logo",
-      role: "logo" as const,
-      materialId: logo.materialId,
-      x: 88,
-      y: 88,
-      width: 128,
-      height: 128,
-      fit: "contain" as const,
-    },
+    ...(logo
+      ? [
+          {
+            type: "shape" as const,
+            id: "front-logo-plate",
+            role: "logo_plate" as const,
+            x: 72,
+            y: 72,
+            width: 160,
+            height: 160,
+            fill: "#FFFFFF",
+            borderRadiusPx: 12,
+          },
+          {
+            type: "image" as const,
+            id: "front-logo",
+            role: "logo" as const,
+            materialId: logo.materialId,
+            x: 88,
+            y: 88,
+            width: 128,
+            height: 128,
+            fit: "contain" as const,
+          },
+        ]
+      : []),
     textLayer({
       id: "front-wordmark",
       role: "wordmark",
@@ -209,28 +209,32 @@ export function reasonBusinessCardDesignSpecDeterministic(
       height: H,
       fill: c.primary,
     },
-    {
-      type: "shape" as const,
-      id: "back-logo-plate",
-      role: "logo_plate" as const,
-      x: (W - 220) / 2,
-      y: 220,
-      width: 220,
-      height: 220,
-      fill: "#FFFFFF",
-      borderRadiusPx: 16,
-    },
-    {
-      type: "image" as const,
-      id: "back-logo",
-      role: "logo" as const,
-      materialId: logo.materialId,
-      x: (W - 180) / 2,
-      y: 240,
-      width: 180,
-      height: 180,
-      fit: "contain" as const,
-    },
+    ...(logo
+      ? [
+          {
+            type: "shape" as const,
+            id: "back-logo-plate",
+            role: "logo_plate" as const,
+            x: (W - 220) / 2,
+            y: 220,
+            width: 220,
+            height: 220,
+            fill: "#FFFFFF",
+            borderRadiusPx: 16,
+          },
+          {
+            type: "image" as const,
+            id: "back-logo",
+            role: "logo" as const,
+            materialId: logo.materialId,
+            x: (W - 180) / 2,
+            y: 240,
+            width: 180,
+            height: 180,
+            fit: "contain" as const,
+          },
+        ]
+      : []),
     textLayer({
       id: "back-wordmark",
       role: "wordmark",
@@ -244,6 +248,16 @@ export function reasonBusinessCardDesignSpecDeterministic(
       color: "#F7F4EF",
       align: "center",
     }),
+    {
+      type: "shape" as const,
+      id: "back-divider",
+      role: "divider" as const,
+      x: (W - 240) / 2,
+      y: 560,
+      width: 240,
+      height: 3,
+      fill: c.secondary,
+    },
     ...(truth.backDescriptor?.trim()
       ? [
           textLayer({

@@ -1,9 +1,6 @@
 import { randomUUID } from "crypto";
 
-import { JOB_CONTROL_POLICY } from "@/config/job-control";
-import { resolveWaitingOnClientReminderStatus } from "@/lib/job-control/waiting-on-client";
-
-import { CONFUSION_INTERACTION_KINDS } from "./config";
+import { CONFUSION_INTERACTION_KINDS, INTERACTION_RECENCY_WINDOW_HOURS } from "./config";
 import type {
   CoordinatorExecutionState,
   CoordinatorObservation,
@@ -41,33 +38,12 @@ function countRecentInteractions(
   predicate: (entry: IncomingInteractionRecord) => boolean,
   nowMs: number,
 ): number {
-  const windowHours = JOB_CONTROL_POLICY.moveToWaitingOnClientHours;
   return interactions.filter(
     (entry) =>
       entry.campaignId === campaignId &&
       predicate(entry) &&
-      withinPolicyHours(entry.occurredAt, nowMs, windowHours),
+      withinPolicyHours(entry.occurredAt, nowMs, INTERACTION_RECENCY_WINDOW_HOURS),
   ).length;
-}
-
-function detectStalled(
-  state: CoordinatorExecutionState,
-  nowMs: number,
-): Omit<CoordinatorObservation, "id"> | null {
-  for (const job of state.jobs) {
-    if (job.spineStatus !== "waiting_on_client" || !job.waitingOnClientSince) continue;
-    const hours = hoursSince(job.waitingOnClientSince, nowMs);
-    if (hours < JOB_CONTROL_POLICY.moveToWaitingOnClientHours) continue;
-    return {
-      campaignId: state.campaign.campaignId,
-      jobId: job.jobId,
-      kind: "stalled",
-      summary: `Job has been waiting on client beyond ${JOB_CONTROL_POLICY.moveToWaitingOnClientHours} hours.`,
-      signalRef: "job-control:JOB_CONTROL_POLICY.moveToWaitingOnClientHours",
-      occurredAt: new Date(nowMs).toISOString(),
-    };
-  }
-  return null;
 }
 
 function detectRepeatedConfusion(
@@ -155,20 +131,13 @@ function detectUnusualDelay(
     (record) => record.kind === "deadline_risk" && record.status !== "resolved",
   );
   const waitingJob = state.jobs.find((job) => job.spineStatus === "waiting_on_client");
-  if (!deadlineRisk || !waitingJob?.waitingOnClientSince) return null;
-
-  const reminderStatus = resolveWaitingOnClientReminderStatus(
-    waitingJob.waitingOnClientSince,
-    waitingJob.lastClientResponseAt ?? null,
-    nowMs,
-  );
-  if (reminderStatus === "none") return null;
+  if (!deadlineRisk || !waitingJob) return null;
 
   return {
     campaignId: state.campaign.campaignId,
     jobId: waitingJob.jobId,
     kind: "unusual_delay",
-    summary: `Deadline risk overlaps with client waiting state (${reminderStatus}).`,
+    summary: "Deadline risk overlaps with a service waiting on client materials.",
     signalRef: "job-control:waiting-on-client",
     occurredAt: new Date(nowMs).toISOString(),
   };
@@ -192,7 +161,6 @@ export function detectCoordinatorObservations(
 ): { session: CoordinatorSession; observations: CoordinatorObservation[] } {
   const campaignId = state.campaign.campaignId;
   const candidates = [
-    detectStalled(state, nowMs),
     detectRepeatedConfusion(session, campaignId, nowMs),
     detectElevatedClientTone(session, campaignId, nowMs),
     detectRecurringProductionIssue(state, nowMs),

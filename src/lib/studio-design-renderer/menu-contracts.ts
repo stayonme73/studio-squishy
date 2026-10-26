@@ -21,11 +21,17 @@ export const MENU_PROOF_CONTRACT = {
   layoutModes: ["single_column", "two_column"] as const,
   multiPageExcluded: true,
   bifoldExcluded: true,
+  name: "Make Me a Menu",
+  promisedOutput:
+    "One single-page digital menu — up to 5 sections and 30 items. You supply and verify items, prices, and allergen wording. Share it or print it yourself. This is not a certified 300 DPI print file.",
+  requiredDeliverableFormats: ["png", "pdf"] as const,
   allergenVerificationExcluded: true,
+  studioDoesNotVerifyAllergensPricesOrLegal: true as const,
   /** PNG satisfies catalog “PNG or JPG”; JPG not required. */
-  digitalPreview: "png_or_jpg" as const,
+  digitalPreview: "png" as const,
   printReadyMeaning:
-    "Flattened single-page PDF for customer print/share — not bleed/CMYK/vendor imposition.",
+    "Flattened single-page PDF the customer prints — digital CERT plate, not a certified 300 DPI print file.",
+  note: "HARDEN #5 LIGHT — type-led single page. Customer facts stay exact. Overflow fail-closes. Owner does not finish the menu.",
   ownerRoutineProduction: "NONE" as const,
   canvaRequired: false,
   makeRequired: false,

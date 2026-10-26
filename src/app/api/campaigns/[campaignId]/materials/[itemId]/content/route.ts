@@ -6,6 +6,7 @@ import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { createServerFileRoomStorageAdapter } from "@/lib/file-storage/server";
 import { canDownloadStoredCustomerMaterial, canReadMaterials } from "@/lib/materials/access";
 import { downloadStoredCustomerMaterialBytes } from "@/lib/materials/client-file-store";
+import { createStoredMaterialContentResponse } from "@/lib/materials/stored-material-content-response";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
 
 type RouteContext = {
@@ -48,16 +49,10 @@ export async function GET(request: Request, context: RouteContext) {
     return NextResponse.json({ error: downloaded.error }, { status: downloaded.status });
   }
 
-  const filename = (item.fileName ?? "material").replace(/[\r\n"\\]/g, "_");
-  return new Response(downloaded.body, {
-    status: 200,
-    headers: {
-      "cache-control": "private, no-store",
-      "content-type": downloaded.contentType,
-      "content-disposition": `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
-      "x-content-type-options": "nosniff",
-      "content-length": String(downloaded.body.byteLength),
-      "x-studio-material-checksum": downloaded.checksumSha256,
-    },
+  return createStoredMaterialContentResponse({
+    body: downloaded.body,
+    contentType: downloaded.contentType,
+    checksumSha256: downloaded.checksumSha256,
+    fileName: item.fileName,
   });
 }

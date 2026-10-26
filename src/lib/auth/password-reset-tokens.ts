@@ -9,6 +9,12 @@ import { createHash, randomBytes } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 
+import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
+import {
+  pgConsumePasswordResetToken,
+  pgIssuePasswordResetToken,
+} from "@/lib/studio-durable-persistence/postgres-identity";
+
 const TOKENS_PATH = path.join(
   process.cwd(),
   "data",
@@ -90,6 +96,10 @@ export async function issuePasswordResetToken(
       token.supersededAt = stamped;
     }
   }
+  if (isPostgresPersistenceEnabled()) {
+    await pgIssuePasswordResetToken(record);
+    return { rawToken, record };
+  }
   tokens.push(record);
   await writeTokens(tokens);
   return { rawToken, record };
@@ -117,6 +127,17 @@ export async function consumePasswordResetToken(
   }
 
   const tokenHash = hashPasswordResetToken(trimmed);
+  if (isPostgresPersistenceEnabled()) {
+    const consumed = await pgConsumePasswordResetToken(tokenHash);
+    if (!consumed.ok) {
+      return { ok: false, code: consumed.code };
+    }
+    return {
+      ok: true,
+      userId: consumed.record.userId,
+      record: consumed.record,
+    };
+  }
   const tokens = await readTokens();
   const index = tokens.findIndex((token) => token.tokenHash === tokenHash);
   if (index === -1) {

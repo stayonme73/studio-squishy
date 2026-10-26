@@ -7,6 +7,7 @@
  */
 
 import { PROMO_SQUARE_PLATE } from "./promo-types";
+import type { ThemeLedCampaignTruth } from "./theme-led-campaign";
 
 export const DESIGN_RENDERER_SOCIAL_POSTS_SKU = "v2-rtu-social-posts" as const;
 export type DesignRendererSocialPostsSku =
@@ -48,6 +49,20 @@ export const SOCIAL_POST_ROLE_ANGLES = [
 ] as const;
 
 export type SocialPostRoleAngle = (typeof SOCIAL_POST_ROLE_ANGLES)[number];
+
+/**
+ * Theme-led layout templates: theme hero, two customer steps, and a brand
+ * close carrying the third step. Used when price, dates, call to action, and
+ * contact are optional and the customer left them blank.
+ */
+export const SOCIAL_POST_THEME_LED_ROLE_ANGLES = [
+  "theme_hero",
+  "theme_step_first",
+  "theme_step_second",
+  "theme_brand_close",
+] as const;
+
+export type SocialPostsContentMode = "offer" | "theme_led";
 
 /** The one layout template allowed to omit campaign price/date facts on-asset. */
 export const SOCIAL_POST_TRUST_ROLE_ANGLE = "trust_brand" as const;
@@ -149,6 +164,9 @@ export type SocialPostsProjectTruth = {
   fixtureId: string;
   label: string;
   outputMode: SocialPostsOutputMode;
+  /** Absent means "offer" — the proven price/dates/CTA/contact layouts. */
+  contentMode?: SocialPostsContentMode;
+  themeLed?: ThemeLedCampaignTruth;
   businessName: string;
   wordmark: string;
   descriptor: string;

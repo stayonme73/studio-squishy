@@ -1,6 +1,7 @@
 import type { StudioUser } from "@/lib/campaign-store/types";
 import { isSupabasePrivateStorageRef } from "@/lib/file-registry/job-files";
 import type { StudioFileReference } from "@/lib/file-registry/types";
+import type { JobReviewFeedback } from "@/lib/job-control/review-feedback-types";
 import type { JobClientDeliveryFile, PurchasedJobRecord } from "@/lib/job-control/types";
 
 import {
@@ -21,6 +22,7 @@ export async function downloadClientFinalFile(input: {
   job: PurchasedJobRecord;
   file: StudioFileReference;
   clientDeliveryFile?: JobClientDeliveryFile;
+  campaignClientUserId?: string | null;
 }): Promise<FileRoomDownloadResult> {
   const decision = canClientAccessFinalDeliveryFile(input);
   if (!decision.allowed) return { ok: false, status: 403, error: decision.reason };
@@ -40,6 +42,8 @@ export async function downloadClientReviewProofFile(input: {
   user: StudioUser | null;
   job: PurchasedJobRecord;
   file: StudioFileReference;
+  campaignClientUserId?: string | null;
+  feedback?: JobReviewFeedback | null;
 }): Promise<FileRoomDownloadResult> {
   const decision = canClientAccessReviewProofFile(input);
   if (!decision.allowed) return { ok: false, status: 403, error: decision.reason };

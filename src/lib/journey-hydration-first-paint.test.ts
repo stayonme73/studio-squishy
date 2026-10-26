@@ -8,7 +8,7 @@ import {
 } from "@/lib/auth/safe-return-path";
 
 const GENERIC_SIGN_IN_LEAD =
-  "Use the account connected to your Studio work to open your Board, Review Room, Project Record, and Final Delivery.";
+  "Use the account connected to your Studio work to open your Board, Review Room, and Final Delivery.";
 
 /** Mirrors SignInScene lead selection from server-passed props. */
 function resolveSignInLead(showProjectCreatedLead: boolean): string {
@@ -23,14 +23,21 @@ function resolveSignInLead(showProjectCreatedLead: boolean): string {
  */
 export function resolveBoardProjectPaintState(input: {
   ready: boolean;
-  accessState: "ready" | "no-active-project" | "auth-required" | "denied" | "error";
+  accessState:
+    | "ready"
+    | "no-active-project"
+    | "auth-required"
+    | "denied"
+    | "error"
+    | "local-unavailable";
   hasCampaign: boolean;
 }): "loading" | "active" | "empty" | "blocked" {
   if (!input.ready) return "loading";
   if (
     input.accessState === "auth-required" ||
     input.accessState === "denied" ||
-    input.accessState === "error"
+    input.accessState === "error" ||
+    input.accessState === "local-unavailable"
   ) {
     return "blocked";
   }
@@ -74,6 +81,26 @@ describe("Journey hydration — Board project paint", () => {
         hasCampaign: true,
       }),
     ).toBe("active");
+  });
+
+  it("blocks another customer's stored project instead of leaving the board loading", () => {
+    expect(
+      resolveBoardProjectPaintState({
+        ready: true,
+        accessState: "local-unavailable",
+        hasCampaign: true,
+      }),
+    ).toBe("blocked");
+    expect(studioBoard.clientAccess.localProjectUnavailable.title).toBe(
+      "This project can't be opened",
+    );
+    expect(studioBoard.clientAccess.localProjectUnavailable.message).toMatch(
+      /left unchanged/,
+    );
+    expect(studioBoard.clientAccess.localProjectUnavailable.message).not.toMatch(
+      /Customer-One|Harbor/i,
+    );
+    expect(studioBoard.routes.studioLobby).toBe("/studio-lobby");
   });
 });
 

@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 
+import { helpCenterHref } from "@/config/help-center";
 import { REFUND_REQUEST_CUSTOMER_V1 as copy } from "@/config/refund-request-customer-v1";
 import type { CampaignRecord } from "@/config/studio-board";
 import type { RefundRequestCustomerView } from "@/lib/campaign-tasks/refund-request-status-view";
 import {
   mapRefundRequestSubmitFailure,
   mapRefundRequestSubmitSuccess,
+  refundEligibilityCustomerMessage,
 } from "@/lib/campaign-tasks/refund-request-customer-ui";
 import { useProjectJobStatus } from "@/lib/use-project-job-status";
 
@@ -34,6 +36,7 @@ export default function StudioBoardRefundRequestSection({
   const detailsId = useId();
   const statusId = useId();
   const persistentStatusId = useId();
+  const bodyId = useId();
 
   const campaignId = campaign?.campaignId ?? null;
   const paymentReceived = Boolean(campaign?.paymentReceivedAt);
@@ -60,9 +63,14 @@ export default function StudioBoardRefundRequestSection({
   const effectiveJobId =
     jobId || (selectableJobs.length === 1 ? selectableJobs[0]!.jobId : "");
   const selectedJob = selectableJobs.find((job) => job.jobId === effectiveJobId) ?? null;
-  const productionStarted = Boolean(selectedJob?.hasProductionStarted);
+  const productionStarted = selectedJob
+    ? Boolean(selectedJob.hasProductionStarted)
+    : selectableJobs.length > 0 &&
+      selectableJobs.every((job) => job.hasProductionStarted);
   const hasPersistentStatus = Boolean(refundStatus);
   const formLocked = lockedAfterSubmit || hasPersistentStatus;
+  const policyHref = helpCenterHref(copy.helpPolicyAnchor, "studio-board");
+  const eligibilityMessage = refundEligibilityCustomerMessage({ productionStarted });
 
   const canSubmit =
     Boolean(campaignId && effectiveJobId && reason.trim() && requestedOutcome.trim()) &&
@@ -124,10 +132,14 @@ export default function StudioBoardRefundRequestSection({
         className="sb-card sb-card--refund-request bf-material bf-material-paper"
         aria-labelledby={titleId}
       >
-        <p id={titleId} className="sb-card__tab">
-          {copy.sectionTitle}
-        </p>
-        <p className="sb-refund-request__lead">{copy.unavailable}</p>
+        <details className="sb-refund-request" data-refund-disclosure="">
+          <summary className="sb-refund-request__summary" id={titleId}>
+            {copy.disclosureLabel}
+          </summary>
+          <div className="sb-refund-request__body" id={bodyId}>
+            <p className="sb-refund-request__lead">{copy.unavailable}</p>
+          </div>
+        </details>
       </article>
     );
   }
@@ -208,168 +220,169 @@ export default function StudioBoardRefundRequestSection({
       className="sb-card sb-card--refund-request bf-material bf-material-paper"
       aria-labelledby={titleId}
     >
-      <p id={titleId} className="sb-card__tab">
-        {copy.sectionTitle}
-      </p>
-      <p className="sb-refund-request__lead">{copy.sectionLead}</p>
-      <p className="sb-refund-request__policy sb-status-copy-repeat">{copy.policyNote}</p>
-      <p className="sb-refund-request__help">
-        <Link href={copy.helpCenterHref} className="sb-refund-request__help-link">
-          {copy.helpCenterHint}
-        </Link>
-      </p>
-
-      {jobsLoading ? (
-        <p className="sb-refund-request__meta">{copy.jobLoading}</p>
-      ) : jobsError ? (
-        <p className="sb-refund-request__error" role="alert">
-          {copy.jobLoadFailed}
-        </p>
-      ) : selectableJobs.length === 0 ? (
-        <p className="sb-refund-request__meta">{copy.jobEmpty}</p>
-      ) : (
-        <form
-          className="sb-refund-request__form"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void submit();
-          }}
-        >
-          {selectableJobs.length > 1 ? (
-            <>
-              <label className="sb-refund-request__label" htmlFor={jobFieldId}>
-                {copy.jobLabel}
-              </label>
-              <select
-                id={jobFieldId}
-                className="sb-refund-request__select"
-                value={effectiveJobId}
-                disabled={busy}
-                onChange={(event) => {
-                  setJobId(event.target.value);
-                  setError(null);
-                  setSuccess(null);
-                  setLockedAfterSubmit(false);
-                }}
-              >
-                <option value="">{copy.jobSelectPlaceholder}</option>
-                {selectableJobs.map((job) => (
-                    <option key={job.jobId} value={job.jobId}>
-                      {job.serviceName}
-                    </option>
-                  ))}
-              </select>
-            </>
-          ) : (
-            <p className="sb-refund-request__meta">
-              {selectableJobs[0]!.serviceName}
+      <details className="sb-refund-request" data-refund-disclosure="">
+        <summary className="sb-refund-request__summary" id={titleId}>
+          {copy.disclosureLabel}
+        </summary>
+        <div className="sb-refund-request__body" id={bodyId}>
+          {!jobsLoading && !jobsError ? (
+            <p className="sb-refund-request__eligibility" role="status">
+              {eligibilityMessage}
             </p>
+          ) : null}
+          <p className="sb-refund-request__help">
+            <Link href={policyHref} className="sb-refund-request__help-link">
+              {copy.helpCenterHint}
+            </Link>
+          </p>
+
+          {jobsLoading ? (
+            <p className="sb-refund-request__meta">{copy.jobLoading}</p>
+          ) : jobsError ? (
+            <p className="sb-refund-request__error" role="alert">
+              {copy.jobLoadFailed}
+            </p>
+          ) : selectableJobs.length === 0 ? (
+            <p className="sb-refund-request__meta">{copy.jobEmpty}</p>
+          ) : (
+            <form
+              className="sb-refund-request__form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void submit();
+              }}
+            >
+              {selectableJobs.length > 1 ? (
+                <>
+                  <label className="sb-refund-request__label" htmlFor={jobFieldId}>
+                    {copy.jobLabel}
+                  </label>
+                  <select
+                    id={jobFieldId}
+                    className="sb-refund-request__select"
+                    value={effectiveJobId}
+                    disabled={busy}
+                    onChange={(event) => {
+                      setJobId(event.target.value);
+                      setError(null);
+                      setSuccess(null);
+                      setLockedAfterSubmit(false);
+                    }}
+                  >
+                    <option value="">{copy.jobSelectPlaceholder}</option>
+                    {selectableJobs.map((job) => (
+                      <option key={job.jobId} value={job.jobId}>
+                        {job.serviceName}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              ) : (
+                <p className="sb-refund-request__meta">
+                  {selectableJobs[0]!.serviceName}
+                </p>
+              )}
+
+              {effectiveJobId && statusLoading ? (
+                <p className="sb-refund-request__meta">{copy.statusLoading}</p>
+              ) : null}
+              {effectiveJobId && statusLoadFailed ? (
+                <p className="sb-refund-request__error" role="alert">
+                  {copy.statusLoadFailed}
+                </p>
+              ) : null}
+              {refundStatus ? (
+                <div
+                  id={persistentStatusId}
+                  className="sb-refund-request__persistent-status"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <p className="sb-refund-request__status-heading">{copy.statusHeading}</p>
+                  <p className="sb-refund-request__status-body">{refundStatus.statusLabel}</p>
+                </div>
+              ) : null}
+
+              {!hasPersistentStatus ? (
+                <>
+                  <label className="sb-refund-request__label" htmlFor={reasonId}>
+                    {copy.reasonLabel}
+                  </label>
+                  <textarea
+                    id={reasonId}
+                    className="sb-refund-request__textarea"
+                    value={reason}
+                    maxLength={REASON_MAX}
+                    rows={3}
+                    placeholder={copy.reasonPlaceholder}
+                    disabled={busy || formLocked}
+                    onChange={(event) => {
+                      setReason(event.target.value);
+                      if (success) setSuccess(null);
+                    }}
+                    aria-describedby={statusId}
+                  />
+
+                  <label className="sb-refund-request__label" htmlFor={outcomeId}>
+                    {copy.outcomeLabel}
+                  </label>
+                  <textarea
+                    id={outcomeId}
+                    className="sb-refund-request__textarea"
+                    value={requestedOutcome}
+                    maxLength={OUTCOME_MAX}
+                    rows={2}
+                    placeholder={copy.outcomePlaceholder}
+                    disabled={busy || formLocked}
+                    onChange={(event) => {
+                      setRequestedOutcome(event.target.value);
+                      if (success) setSuccess(null);
+                    }}
+                  />
+
+                  <label className="sb-refund-request__label" htmlFor={detailsId}>
+                    {copy.detailsLabel.replace(/\s*\(optional\)$/i, "")}{" "}
+                    <span className="sb-refund-request__optional">(optional)</span>
+                  </label>
+                  <textarea
+                    id={detailsId}
+                    className="sb-refund-request__textarea"
+                    value={supportingDetails}
+                    maxLength={DETAILS_MAX}
+                    rows={2}
+                    placeholder={copy.detailsPlaceholder}
+                    disabled={busy || formLocked}
+                    onChange={(event) => setSupportingDetails(event.target.value)}
+                  />
+
+                  <div className="sb-refund-request__footer">
+                    <button
+                      type="submit"
+                      className="utility-btn utility-btn--primary sb-refund-request__submit"
+                      disabled={!canSubmit}
+                    >
+                      {busy ? copy.submitBusyLabel : copy.submitLabel}
+                    </button>
+                  </div>
+                </>
+              ) : null}
+            </form>
           )}
 
-          {effectiveJobId && statusLoading ? (
-            <p className="sb-refund-request__meta">{copy.statusLoading}</p>
-          ) : null}
-          {effectiveJobId && statusLoadFailed ? (
-            <p className="sb-refund-request__error" role="alert">
-              {copy.statusLoadFailed}
-            </p>
-          ) : null}
-          {refundStatus ? (
-            <div
-              id={persistentStatusId}
-              className="sb-refund-request__persistent-status"
-              role="status"
-              aria-live="polite"
-            >
-              <p className="sb-refund-request__status-heading">{copy.statusHeading}</p>
-              <p className="sb-refund-request__status-body">{refundStatus.statusLabel}</p>
-            </div>
-          ) : null}
-
-          {productionStarted && !hasPersistentStatus ? (
-            <p className="sb-refund-request__warning" role="status">
-              {copy.productionStartedNote}
-            </p>
-          ) : null}
-
-          {!hasPersistentStatus ? (
-            <>
-              <label className="sb-refund-request__label" htmlFor={reasonId}>
-                {copy.reasonLabel}
-              </label>
-              <textarea
-                id={reasonId}
-                className="sb-refund-request__textarea"
-                value={reason}
-                maxLength={REASON_MAX}
-                rows={3}
-                placeholder={copy.reasonPlaceholder}
-                disabled={busy || formLocked}
-                onChange={(event) => {
-                  setReason(event.target.value);
-                  if (success) setSuccess(null);
-                }}
-                aria-describedby={statusId}
-              />
-
-              <label className="sb-refund-request__label" htmlFor={outcomeId}>
-                {copy.outcomeLabel}
-              </label>
-              <textarea
-                id={outcomeId}
-                className="sb-refund-request__textarea"
-                value={requestedOutcome}
-                maxLength={OUTCOME_MAX}
-                rows={2}
-                placeholder={copy.outcomePlaceholder}
-                disabled={busy || formLocked}
-                onChange={(event) => {
-                  setRequestedOutcome(event.target.value);
-                  if (success) setSuccess(null);
-                }}
-              />
-
-              <label className="sb-refund-request__label" htmlFor={detailsId}>
-                {copy.detailsLabel.replace(/\s*\(optional\)$/i, "")}{" "}
-                <span className="sb-refund-request__optional">(optional)</span>
-              </label>
-              <textarea
-                id={detailsId}
-                className="sb-refund-request__textarea"
-                value={supportingDetails}
-                maxLength={DETAILS_MAX}
-                rows={2}
-                placeholder={copy.detailsPlaceholder}
-                disabled={busy || formLocked}
-                onChange={(event) => setSupportingDetails(event.target.value)}
-              />
-
-              <div className="sb-refund-request__footer">
-                <button
-                  type="submit"
-                  className="sb-refund-request__submit"
-                  disabled={!canSubmit}
-                >
-                  {busy ? copy.submitBusyLabel : copy.submitLabel}
-                </button>
-              </div>
-            </>
-          ) : null}
-        </form>
-      )}
-
-      <div id={statusId} className="sb-refund-request__status" aria-live="polite">
-        {error ? (
-          <p className="sb-refund-request__error" role="alert">
-            {error}
-          </p>
-        ) : null}
-        {success ? (
-          <p className="sb-refund-request__success" role="status">
-            {success}
-          </p>
-        ) : null}
-      </div>
+          <div id={statusId} className="sb-refund-request__status" aria-live="polite">
+            {error ? (
+              <p className="sb-refund-request__error" role="alert">
+                {error}
+              </p>
+            ) : null}
+            {success ? (
+              <p className="sb-refund-request__success" role="status">
+                {success}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </details>
     </article>
   );
 }

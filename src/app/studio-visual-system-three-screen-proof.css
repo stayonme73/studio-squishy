@@ -291,7 +291,7 @@ html:has([data-visual-proof]) :is(
   .route-map-primary-btn,
   label:has(input[type="radio"]),
   label:has(input[type="checkbox"])
-):not(.owner-qa):not(.owner-qa *):not(:has(:is(button, a, [role="button"], [role="tab"], [type="button"], [type="submit"], .studio-tile, [class*="chip"], label):active)):is(:active, .is-pressed, [data-pressed="true"]) {
+):not(.owner-qa):not(.owner-qa *):not([class*="intakeCheck"]):not([data-panel="intake"] .route-map-social-intake__chip):not(:has(:is(button, a, [role="button"], [role="tab"], [type="button"], [type="submit"], .studio-tile, [class*="chip"], label):active)):is(:active, .is-pressed, [data-pressed="true"]) {
   background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
   border: var(--studio-border-width) solid #bfd8f2 !important;
   color: #ffffff !important;

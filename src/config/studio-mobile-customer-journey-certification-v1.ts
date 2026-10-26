@@ -1,10 +1,12 @@
 /**
  * Mobile Customer Journey Certification.
- * Unparked 2026-08-25 for a live Samsung run. OPEN / IN PROGRESS.
- * Not closed. Real-phone certification not stamped.
- * Stopping point: 2026-08-25-STOPPING-POINT-CHECKPOINT.md.
- * Readiness tip b35c8aa2. Room 4 only. Do not assign Room 4D / 4E.
- * Do not merge. Do not start Room 5.
+ * CLOSED WITH EXPLICIT LIMITS 2026-09-21.
+ * Owner accepted Samsung journey, aligned rooms, shared status, Help nav, MJ-D38.
+ * Explicit limit: no fabricated live Review proof on the current flyer. Do not remint Maya.
+ * Do not reopen unless a genuine regression appears.
+ * Next: Area 22A / shared live-production gates — report only, no implementation from this stamp.
+ * Room 4 remains OPEN. Do not start Room 5. Do not assign Room 4D / 4E.
+ * Do not merge. Do not push.
  */
 
 export const studioMobileCustomerJourneyCertificationV1 = {
@@ -15,13 +17,18 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   roomId: "full-business-rehearsal" as const,
   sectionId: "mobile-customer-journey-certification" as const,
   title: "Mobile Customer Journey Certification" as const,
-  status: "OPEN" as const,
+  status: "CLOSED WITH EXPLICIT LIMITS" as const,
   parkClassification:
-    "BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION" as const,
-  sectionClosed: false as const,
+    "SUPERVISION_ACCEPTED_STEP_3_RESUME_AUTHORIZED" as const,
+  sectionClosed: true as const,
+  ownerDecision: "ACCEPTED" as const,
+  closedAt: "2026-09-21" as const,
   parkedAt: "2026-08-23" as const,
   unparkedAt: "2026-08-25" as const,
-  livePhoneCertification: "IN_PROGRESS_NOT_CERTIFIED" as const,
+  livePhoneCertification: "CLOSED_WITH_EXPLICIT_LIMITS" as const,
+  step3AuthorizedAt: "2026-09-16" as const,
+  currentLanIp: "10.1.10.208" as const,
+  supervisionAcceptedForSequencing: true as const,
   readinessTip: "b35c8aa2c2fdc7b1f1f5161d38479fdded0e5361" as const,
   resumeAfterPackageId:
     "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1" as const,
@@ -56,7 +63,10 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   doNotExecuteLivePhoneJourneyInOpening: true as const,
   doNotStampCertificationResultInOpening: true as const,
   doNotExecuteLivePhoneJourneyUntilOwnerAuthorization: true as const,
-  doNotStampCertificationResult: true as const,
+  doNotStampCertificationResult: false as const,
+  doNotReopenUnlessGenuineRegression: true as const,
+  doNotRemintMaya: true as const,
+  doNotFabricateReviewStateForTheater: true as const,
   responsiveCoverageDoesNotProvePath: true as const,
   room4RemainsOpen: true as const,
   room4cRemainsClosed: true as const,
@@ -129,7 +139,7 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   stoppingPointCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-25-STOPPING-POINT-CHECKPOINT.md" as const,
   nextPhoneAction:
-    "STOP. Studio Board presentation / typography-color-hierarchy pass is OWNER ACCEPTED. Do not start Review Room. Do not begin another Board styling pass. Do not rebuild Maya. Package is not closed." as const,
+    "Mobile is CLOSED WITH EXPLICIT LIMITS. Do not reopen unless a genuine regression appears. Do not remint Maya. Do not fabricate Review state for theater." as const,
   parkAndResumeDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/PARK-AND-RESUME.md" as const,
   supervisionDependencyAuditDoc:
@@ -142,7 +152,7 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   journeyRouteMapDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/JOURNEY-ROUTE-AND-CONTROL-MAP.md" as const,
   recommendedFirstExecutionStep:
-    "STOP. Studio Board presentation / typography-color-hierarchy pass is OWNER ACCEPTED. Do not start Review Room. Do not begin another Board styling pass. Do not rebuild Maya. Package is not closed." as const,
+    "STOP. Mobile is closed. Next is Area 22A status only. Do not start implementation from this stamp." as const,
   visualMaster: "MOBILE_VISUAL_MASTER" as const,
   voiceChoiceStatus: "OWNER_ACCEPTED" as const,
   voiceChoiceAcceptedAt: "2026-08-29" as const,
@@ -158,7 +168,16 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   businessNameAcceptedAt: "2026-08-29" as const,
   visualSystemCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/MOBILE-VISUAL-SYSTEM-CHECKPOINT.md" as const,
-  nextMobileScreen: "stopped-after-board-presentation-pass" as const,
+  nextMobileScreen: "local-customer-one-maya-review" as const,
+  localCustomerOneMayaReviewPath: "/local-customer-one-maya-review" as const,
+  currentMayaProofVersion: "flyer-v16" as const,
+  mayaCampaignId: "716a15b6-d8d6-436c-8f84-9e8b40d2f959" as const,
+  mayaJobId: "716a15b6-d8d6-436c-8f84-9e8b40d2f959:v2-rtu-flyer" as const,
+  theStudioCampaignId: "9c6c25f2-2562-4192-97a5-44536e45cd18" as const,
+  historicalMayaInspectLabel: "Version 4 remains on the record only. It is not current." as const,
+  doNotReplaceStudioVersion18: true as const,
+  defectMjd25WrongReviewTarget: "MJ-D25" as const,
+  defectMjd28BoardLostMayaBinding: "MJ-D28" as const,
   samsungAcceptance20260906Doc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md" as const,
   mjd16ManualEntryStatus: "OWNER_ACCEPTED" as const,
@@ -205,4 +224,14 @@ export const studioMobileCustomerJourneyCertificationV1 = {
     doc: "docs/launch/studio-operating-mobile-customer-journey-certification-1/SELF-CHECK-BEFORE-OWNER-HANDOFF.md" as const,
     cursorRule: ".cursor/rules/mobile-self-check-before-owner-handoff.mdc" as const,
   },
+
+  closeoutDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CLOSEOUT.md" as const,
+  explicitLimit:
+    "Fully active Review Room with a genuine live proof was not manufactured on the current Customer-One flyer." as const,
+  nextPackageAfterClose:
+    "STUDIO-OPERATING-REVISION-TO-REVIEW-ROUND-TRIP-CERTIFICATION-1" as const,
+  nextPackageAfterCloseLabel: "AREA_22A_SHARED_LIVE_PRODUCTION_GATES" as const,
+  nextPackageAfterCloseNotStarted: true as const,
+  doNotStartNextPackageImplementationFromThisStamp: true as const,
 } as const;

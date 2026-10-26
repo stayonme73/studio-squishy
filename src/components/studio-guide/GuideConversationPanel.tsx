@@ -580,6 +580,7 @@ export default function GuideConversationPanel({
                     <button
                       type="submit"
                       className={styles.secondary}
+                      data-skip-action="true"
                       name="gact"
                       value={GUIDE_HARD_NAV.actSkip}
                     >

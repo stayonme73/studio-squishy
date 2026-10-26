@@ -1,14 +1,9 @@
-import { Caveat, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
+import { studioBoardScriptFont } from "@/fonts/studio-board-script";
 
 import BoardTextureExploration from "@/components/studio-board/BoardTextureExploration";
 
 import "../../studio-board-textures.css";
-
-const caveat = Caveat({
-  subsets: ["latin"],
-  weight: ["600", "700"],
-  variable: "--font-studio-board-script",
-});
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,7 +15,7 @@ const inter = Inter({
 export default function StudioBoardTexturesPage() {
   return (
     <main
-      className={`${inter.variable} ${caveat.variable} journey-shell flex min-h-[100dvh] flex-1 flex-col overflow-auto bg-[var(--board-family-cream)]`}
+      className={`${inter.variable} ${studioBoardScriptFont.variable} journey-shell flex min-h-[100dvh] flex-1 flex-col overflow-auto bg-[var(--board-family-cream)]`}
     >
       <BoardTextureExploration />
     </main>

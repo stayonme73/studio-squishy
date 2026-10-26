@@ -315,14 +315,7 @@ export function resolveQaSummary(qaRecords: readonly QaRecord[] | undefined) {
   };
 }
 
-export function qaRecordsForTask(
-  qaRecords: readonly QaRecord[] | undefined,
-  taskId: string,
-): readonly QaRecord[] {
-  return (qaRecords ?? []).filter(
-    (record) => record.taskId === taskId || record.routedTaskId === taskId,
-  );
-}
+export { qaRecordsForTask } from "./task-record-summary";
 
 export function stripInternalQaFields(
   envelope: ServerTasksEnvelope,

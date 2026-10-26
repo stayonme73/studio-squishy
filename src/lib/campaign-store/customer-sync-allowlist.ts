@@ -83,6 +83,9 @@ export function mergeCustomerOwnedCampaignSync(
       bootstrapped.projectDetailsSubmittedAt = incoming.projectDetailsSubmittedAt;
     }
 
+    delete bootstrapped.testPaymentIsolation;
+    delete bootstrapped.disposableKitStripeTestProof;
+
     return bootstrapped;
   }
 
@@ -137,6 +140,16 @@ export function mergeCustomerOwnedCampaignSync(
     merged.sm001MonthlyProductionCycles = existing.sm001MonthlyProductionCycles;
   } else {
     delete merged.sm001MonthlyProductionCycles;
+  }
+  if (existing.testPaymentIsolation) {
+    merged.testPaymentIsolation = existing.testPaymentIsolation;
+  } else {
+    delete merged.testPaymentIsolation;
+  }
+  if (existing.disposableKitStripeTestProof) {
+    merged.disposableKitStripeTestProof = existing.disposableKitStripeTestProof;
+  } else {
+    delete merged.disposableKitStripeTestProof;
   }
   if (existing.revisionRoundsIncluded == null && incoming.revisionRoundsIncluded != null) {
     merged.revisionRoundsIncluded = incoming.revisionRoundsIncluded;

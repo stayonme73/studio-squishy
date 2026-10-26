@@ -184,6 +184,7 @@ export default function GuideSsrBootShell({
                   type="submit"
                   name="gact"
                   value={GUIDE_HARD_NAV.actSkip}
+                  data-skip-action="true"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -191,9 +192,9 @@ export default function GuideSsrBootShell({
                     minHeight: "2.85rem",
                     padding: "0.6rem 1rem",
                     borderRadius: "8px",
-                    border: "1px solid rgba(44, 62, 80, 0.28)",
+                    border: "2px solid #d94e2b",
                     background: "transparent",
-                    color: "#2c3e50",
+                    color: "#d94e2b",
                     fontSize: "0.95rem",
                     fontWeight: 700,
                     cursor: "pointer",

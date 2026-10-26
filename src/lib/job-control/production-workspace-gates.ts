@@ -6,6 +6,9 @@ import {
   isEligibleForReview,
 } from "@/lib/studio-review-eligibility";
 
+import { generalDesignReviewDeliverableKey } from "@/lib/studio-general-design-review-bind/customer-facing";
+import { requiredGeneralDesignReviewMemberIds } from "@/lib/studio-general-design-review-bind/members";
+
 import { hasAcceptedAcceptanceReview } from "./acceptance-review";
 import type { ProductionLaneView } from "./capacity";
 import { blockingMaterialsForSku } from "./resolve-jobs";
@@ -41,6 +44,26 @@ export function allRequiredDeliverablesPrepared(
   if (requiredDeliverables.length === 0) return true;
   const keys = resolveRequiredDeliverableKeys(requiredDeliverables);
   return keys.every((entry) => isDeliverablePrepared(job, entry.key));
+}
+
+/** Machine-presented general-design proofs use gd-review:member keys, not catalog deliverable-N. */
+export function generalDesignReviewSetPrepared(job: PurchasedJobRecord): boolean {
+  const members = requiredGeneralDesignReviewMemberIds(job.skuId);
+  if (members.length === 0) return false;
+  return members.every((memberId) =>
+    isDeliverablePrepared(job, generalDesignReviewDeliverableKey(memberId)),
+  );
+}
+
+/** Review Room prepared set: catalog keys or the general-design members the customer actually sees. */
+export function reviewDeliverableSetPrepared(
+  job: PurchasedJobRecord,
+  requiredDeliverables: readonly string[],
+): boolean {
+  return (
+    allRequiredDeliverablesPrepared(job, requiredDeliverables) ||
+    generalDesignReviewSetPrepared(job)
+  );
 }
 
 export function laneHasCapacityForJob(

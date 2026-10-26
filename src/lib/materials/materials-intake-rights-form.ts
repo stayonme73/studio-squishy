@@ -1,9 +1,9 @@
 import { studioCustomerContentRightsAttestationV1 } from "@/config/studio-customer-content-rights-attestation-v1";
-import type { MaterialCategory } from "@/lib/materials/types";
 import { customerFileRequiresRightsCertification } from "@/lib/studio-customer-content-intake/rights-record";
 import type { CustomerContentRightsInput } from "@/lib/studio-customer-content-intake/types";
 
 import type { ClientSubmitPayload } from "./payload-validation";
+import type { MaterialCategory } from "./types";
 
 export const FILE_RIGHTS_FORM_FIELDS = [
   "useAuthorizationBasis",
@@ -22,6 +22,15 @@ export function fileUploadRequiresRightsCertification(category: MaterialCategory
   return customerFileRequiresRightsCertification(category);
 }
 
+/** Rights questions belong to a real file, not to an empty upload slot. */
+export function fileRightsFieldsAreRelevant(input: {
+  selectionKind?: "selected" | "error" | null;
+  storedFileName?: string | null;
+}): boolean {
+  if (input.selectionKind === "selected") return true;
+  return Boolean(input.storedFileName?.trim());
+}
+
 export function createEmptyFileRightsDraft(): ClientSubmitPayload {
   return {};
 }
@@ -37,6 +46,34 @@ export function rightsDraftHasNoPrecheckedDefaults(draft: ClientSubmitPayload | 
     draft.thirdPartyMaterialPresent === undefined &&
     draft.thirdPartyRightsConfirmed !== true
   );
+}
+
+export function mergeCustomerUploadRightsPayload(input: {
+  useAuthorizationBasis?: ClientSubmitPayload["useAuthorizationBasis"];
+  rightsInput?: CustomerContentRightsInput;
+}): ClientSubmitPayload {
+  const basis = input.useAuthorizationBasis ?? input.rightsInput?.useAuthorizationBasis;
+  return {
+    useAuthorizationBasis: basis,
+    cropAdaptPermitted: input.rightsInput?.cropAdaptPermitted,
+    commercialUsePermitted: input.rightsInput?.commercialUsePermitted,
+    recognizablePeoplePresent: input.rightsInput?.recognizablePeoplePresent,
+    likenessConsentConfirmed: input.rightsInput?.likenessConsentConfirmed,
+    thirdPartyMaterialPresent: input.rightsInput?.thirdPartyMaterialPresent,
+    thirdPartyRightsConfirmed: input.rightsInput?.thirdPartyRightsConfirmed,
+    attestationTextVersion: input.rightsInput?.attestationTextVersion,
+  };
+}
+
+/** Gate X — server must enforce the same attestation rules as Materials Intake UI. */
+export function validateServerMaterialUploadRights(
+  category: MaterialCategory,
+  input: {
+    useAuthorizationBasis?: ClientSubmitPayload["useAuthorizationBasis"];
+    rightsInput?: CustomerContentRightsInput;
+  },
+): { ok: true } | { ok: false; error: string } {
+  return validateFileRightsDraft(mergeCustomerUploadRightsPayload(input), category);
 }
 
 export function validateFileRightsDraft(

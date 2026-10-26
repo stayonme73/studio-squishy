@@ -33,6 +33,8 @@ export type ProjectIntakeTabletStatus = {
   nextLine: string;
   ready: boolean;
   hasMaterialsDeferred: boolean;
+  paymentReceived: boolean;
+  servicesConfirmed: boolean;
 };
 
 function fieldDisplayLabel(
@@ -122,6 +124,8 @@ export function buildProjectIntakeTabletStatus(input: {
     nextLine,
     ready,
     hasMaterialsDeferred,
+    paymentReceived,
+    servicesConfirmed,
   };
 }
 

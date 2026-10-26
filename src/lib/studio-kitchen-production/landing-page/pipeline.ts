@@ -1,3 +1,4 @@
+import "server-only";
 import { writeFileSync, mkdirSync } from "fs";
 import path from "path";
 

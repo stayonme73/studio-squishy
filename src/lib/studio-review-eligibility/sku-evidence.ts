@@ -6,9 +6,10 @@
 import { studioReviewEligibilityV1 } from "@/config/studio-review-eligibility-v1";
 import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
 import type { CampaignTaskItem, QaRecord } from "@/lib/campaign-tasks/types";
-import { LANDING_PAGE_SKU } from "@/lib/studio-kitchen-production/landing-page";
-
 import type { ReviewEligibilityBlockCode } from "./types";
+
+/** Keep this literal here. Do not import the landing-page folder from client code. */
+const LANDING_PAGE_SKU = "rm-j005";
 
 /** Closeout METHOD COVERED SKUs that inherit certified Canva/design method. */
 export const METHOD_COVERED_DESIGN_SKUS = [

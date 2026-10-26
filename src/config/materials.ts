@@ -45,7 +45,7 @@ export const materialsConfig = {
     blocked_from_use: "Cannot be used as provided",
   } satisfies Record<MaterialReviewStatus, string>,
   clientNeedsClarificationBody:
-    "Our team reviewed what you sent and needs an updated version. Please send revised details below.",
+    "The Studio reviewed this and needs an update. Add the revised details below.",
   clientUnderReviewBody:
     "We received this and our team is reviewing it. No further action is needed right now.",
   requirementLabels: {
@@ -56,15 +56,15 @@ export const materialsConfig = {
     "Access is shared through platform admin tools — passwords are not stored here.",
   intakePanelTitle: "Materials we still need",
   intakePanelBody:
-    "Share a link or a brief description for now. Our team reviews each item before production uses it.",
+    "Add the files and details for this package here. The Studio reviews each item before using it. Optional items can wait.",
   intakePanelCompleteTitle: "Materials caught up",
   intakePanelCompleteBody:
     "Required materials are submitted or approved. Optional items stay available under Add more.",
   intakeSyncingBody:
     "We are syncing the required materials for this project. Refresh the Board in a moment if the request list does not appear.",
   addMoreLabel: "Add more (optional)",
-  clientSubmitLabel: "Send to Studio",
-  clientSubmitSuccess: "Submitted — our team will review shortly.",
+  clientSubmitLabel: "Add to this project",
+  clientSubmitSuccess: "Added. The Studio will review it.",
   /**
    * Logo/photo use attestation — shown only for clearance-required file intake.
    * Operational confirmation, not a legal guarantee.
@@ -72,7 +72,7 @@ export const materialsConfig = {
   clientUseAuthorizationLabel:
     "I own this, or I have permission to use it for this project.",
   clientUseAuthorizationRequired:
-    "Please confirm you own this file or have permission to use it before sending.",
+    "Please confirm you own this file or have permission to use it before adding it.",
   teamReviewApproveLabel: "Approve for use",
   teamReviewClarifyLabel: "Request clarification",
   teamReviewNotNeededLabel: "Not needed",

@@ -25,7 +25,7 @@ export function isJobControlTemplateCommunicationEventType(
  * - Decision Core: outgoing communication is an effect; `humanReviewRequired: false`
  *   for sync-enqueued notices (`evaluators/outgoing-communication.ts`)
  * - Owner Console responsibility map: template + rule outcomes are not Owner Desk decisions
- * - job-control templates + `JOB_CONTROL_POLICY` windows authorize which notices exist
+ * - job-control templates + `AUTHORIZED_LIFECYCLE_EMAIL_EVENT_TYPES` authorize which notices exist
  *
  * `pending_owner_send` remains a transport/storage fact only.
  * It never alone establishes owner_required.

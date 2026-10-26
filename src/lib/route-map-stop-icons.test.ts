@@ -21,6 +21,8 @@ const ALL_INTAKE_TEMPLATE_IDS = [
   "rtu-sms-kit",
   "rtu-voice",
   "rtu-short-video",
+  "rtu-short-form-video-edit",
+  "rtu-clip-repurposing",
   "rtu-business-card",
 ] as const satisfies readonly RouteMapIntakeTemplateId[];
 

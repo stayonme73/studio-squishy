@@ -37,6 +37,78 @@ import {
 import type { ProjectBuilderStudioPlanSummaryModel } from "@/lib/project-builder-studio-plan-summary";
 import { useSamsungActivate } from "@/lib/studio-samsung-activate";
 
+function isPhoneServicesReady(input: {
+  phoneLayout: boolean;
+  isServicesStage: boolean;
+  selectedRoadId: RouteMapRoadId | null;
+  onAddJob?: (jobId: RouteMapJobId) => void;
+  onRemoveJob?: (jobId: RouteMapJobId) => void;
+  onReviewStudioPlan?: () => void;
+  onChangeRoute?: () => void;
+}): input is {
+  phoneLayout: boolean;
+  isServicesStage: boolean;
+  selectedRoadId: RouteMapRoadId;
+  onAddJob: (jobId: RouteMapJobId) => void;
+  onRemoveJob: (jobId: RouteMapJobId) => void;
+  onReviewStudioPlan: () => void;
+  onChangeRoute: () => void;
+} {
+  return Boolean(
+    input.phoneLayout &&
+      input.isServicesStage &&
+      input.selectedRoadId != null &&
+      input.onAddJob != null &&
+      input.onRemoveJob != null &&
+      input.onReviewStudioPlan != null &&
+      input.onChangeRoute != null,
+  );
+}
+
+function isPhoneCheckoutReady(input: {
+  phoneLayout: boolean;
+  isCheckoutStage: boolean;
+  selectedRoadId: RouteMapRoadId | null;
+  onBackToStudioPlanFromCheckout?: () => void;
+  onCheckoutPaymentComplete?: () => void | Promise<void>;
+}): input is {
+  phoneLayout: boolean;
+  isCheckoutStage: boolean;
+  selectedRoadId: RouteMapRoadId;
+  onBackToStudioPlanFromCheckout: () => void;
+  onCheckoutPaymentComplete: () => void | Promise<void>;
+} {
+  return Boolean(
+    input.phoneLayout &&
+      input.isCheckoutStage &&
+      input.selectedRoadId != null &&
+      input.onBackToStudioPlanFromCheckout != null &&
+      input.onCheckoutPaymentComplete != null,
+  );
+}
+
+function isPhoneIntakeReady(input: {
+  phoneLayout: boolean;
+  isIntakeStage: boolean;
+  onIntakeSubmitSuccess?: () => void | Promise<void>;
+  intakeSubmitCtaLabel?: string;
+  intakeNextStepBlurb?: string;
+}): input is {
+  phoneLayout: boolean;
+  isIntakeStage: boolean;
+  onIntakeSubmitSuccess: () => void | Promise<void>;
+  intakeSubmitCtaLabel: string;
+  intakeNextStepBlurb: string;
+} {
+  return Boolean(
+    input.phoneLayout &&
+      input.isIntakeStage &&
+      input.onIntakeSubmitSuccess != null &&
+      input.intakeSubmitCtaLabel != null &&
+      input.intakeNextStepBlurb != null,
+  );
+}
+
 export type StudioGuideTabletViewProps = {
   step: GuideConversationStep;
   /** Desk stage — only `opening` keeps Guide question controls actionable. */
@@ -95,6 +167,8 @@ export type StudioGuideTabletViewProps = {
   onOpenPlanExtraDetails?: () => void;
   planBridgeError?: string | null;
   /** Live Intake tablet status — derived from answers, not static lists. */
+  /** Paid condensed package name. Outranks a generic intake heading. */
+  intakePackageName?: string | null;
   intakeTabletStatus?: {
     completed: readonly string[];
     stillNeeded: readonly string[];
@@ -104,6 +178,10 @@ export type StudioGuideTabletViewProps = {
   } | null;
   /** Speak / type / Continue for the active opening question. */
   answerDock?: ReactNode;
+  /** Free-form Ask is open. The dock asks a business question instead of the guide step. */
+  askMode?: boolean;
+  onAskQuestion?: () => void;
+  onCloseAsk?: () => void;
   /** Compact Voice On / Off — already chosen, shown with the question. */
   modeControls?: ReactNode;
   /** Voice On parks the mic under the toggle. Voice Off parks typing in the dock. */
@@ -167,8 +245,12 @@ export default function StudioGuideTabletView({
   onLooksGoodPlan,
   onOpenPlanExtraDetails,
   planBridgeError = null,
+  intakePackageName = null,
   intakeTabletStatus = null,
   answerDock = null,
+  askMode = false,
+  onAskQuestion,
+  onCloseAsk,
   modeControls = null,
   voiceMode = "off",
   answerAccepted: _answerAccepted = false,
@@ -185,26 +267,35 @@ export default function StudioGuideTabletView({
   const isPlanStage = stage === "plan";
   const isCheckoutStage = stage === "checkout";
   const isIntakeStage = stage === "intake";
-  const phoneServicesPage =
-    phoneLayout &&
-    isServicesStage &&
-    selectedRoadId != null &&
-    onAddJob != null &&
-    onRemoveJob != null &&
-    onReviewStudioPlan != null &&
-    onChangeRoute != null;
-  const phoneCheckoutPage =
-    phoneLayout &&
-    isCheckoutStage &&
-    selectedRoadId != null &&
-    onBackToStudioPlanFromCheckout != null &&
-    onCheckoutPaymentComplete != null;
-  const phoneIntakePage =
-    phoneLayout &&
-    isIntakeStage &&
-    onIntakeSubmitSuccess != null &&
-    intakeSubmitCtaLabel != null &&
-    intakeNextStepBlurb != null;
+  const servicesInput = {
+    phoneLayout,
+    isServicesStage,
+    selectedRoadId,
+    onAddJob,
+    onRemoveJob,
+    onReviewStudioPlan,
+    onChangeRoute,
+  };
+  const servicesReady = isPhoneServicesReady(servicesInput) ? servicesInput : null;
+  const checkoutInput = {
+    phoneLayout,
+    isCheckoutStage,
+    selectedRoadId,
+    onBackToStudioPlanFromCheckout,
+    onCheckoutPaymentComplete,
+  };
+  const checkoutReady = isPhoneCheckoutReady(checkoutInput) ? checkoutInput : null;
+  const intakeInput = {
+    phoneLayout,
+    isIntakeStage,
+    onIntakeSubmitSuccess,
+    intakeSubmitCtaLabel,
+    intakeNextStepBlurb,
+  };
+  const intakeReady = isPhoneIntakeReady(intakeInput) ? intakeInput : null;
+  const phoneServicesPage = servicesReady != null;
+  const phoneCheckoutPage = checkoutReady != null;
+  const phoneIntakePage = intakeReady != null;
   const tabletOwnsChrome =
     isRouteStage ||
     isPlanStage ||
@@ -296,7 +387,7 @@ export default function StudioGuideTabletView({
             onViewScope={onViewPlanScope}
             extrasInPlace={phoneLayout}
             hideActions={phoneLayout}
-            topControls={phoneLayout ? modeControls : null}
+            topControls={modeControls}
             bridgeError={planBridgeError}
             onDeckBack={onDeckBack}
             deckBackLabel={deckBackLabel}
@@ -307,16 +398,16 @@ export default function StudioGuideTabletView({
           <p className={styles.eyebrow}>{v.eyebrow}</p>
         ) : null}
 
-        {phoneServicesPage && selectedRoadId && onAddJob && onRemoveJob && onReviewStudioPlan && onChangeRoute ? (
+        {servicesReady ? (
           <ConversationServiceList
             phonePage
-            roadId={selectedRoadId}
+            roadId={servicesReady.selectedRoadId}
             selectedJobIds={selectedJobIds ?? new Set()}
             onClose={() => undefined}
-            onBackToRoutes={onChangeRoute}
-            onAddJob={onAddJob}
-            onRemoveJob={onRemoveJob}
-            onReviewStudioPlan={onReviewStudioPlan}
+            onBackToRoutes={servicesReady.onChangeRoute}
+            onAddJob={servicesReady.onAddJob}
+            onRemoveJob={servicesReady.onRemoveJob}
+            onReviewStudioPlan={servicesReady.onReviewStudioPlan}
             topControls={modeControls}
           />
         ) : null}
@@ -359,17 +450,14 @@ export default function StudioGuideTabletView({
           </>
         ) : null}
 
-        {phoneCheckoutPage &&
-        selectedRoadId &&
-        onBackToStudioPlanFromCheckout &&
-        onCheckoutPaymentComplete ? (
+        {checkoutReady ? (
           <ConversationCheckoutPanel
             phonePage
-            roadId={selectedRoadId}
+            roadId={checkoutReady.selectedRoadId}
             selectedJobIds={selectedJobIds ?? new Set()}
             onClose={() => undefined}
-            onBackToStudioPlan={onBackToStudioPlanFromCheckout}
-            onPaymentComplete={onCheckoutPaymentComplete}
+            onBackToStudioPlan={checkoutReady.onBackToStudioPlanFromCheckout}
+            onPaymentComplete={checkoutReady.onCheckoutPaymentComplete}
             onSandboxConfirm={onSandboxCheckoutConfirm}
             onAuthorizePayment={onAuthorizeCheckoutPayment}
             paymentHonestyMessage={planBridgeError}
@@ -413,19 +501,16 @@ export default function StudioGuideTabletView({
           </>
         ) : null}
 
-        {phoneIntakePage &&
-        onIntakeSubmitSuccess &&
-        intakeSubmitCtaLabel &&
-        intakeNextStepBlurb ? (
+        {intakeReady ? (
           <ConversationIntakePanel
             phonePage
             onClose={() => undefined}
-            onSubmitSuccess={onIntakeSubmitSuccess}
+            onSubmitSuccess={intakeReady.onIntakeSubmitSuccess}
             onRecoverPayment={onRecoverIntakePayment}
             prefillBusinessName={intakePrefillBusinessName}
             onAnswersChange={onIntakeAnswersChange}
-            submitCtaLabel={intakeSubmitCtaLabel}
-            nextStepBlurb={intakeNextStepBlurb}
+            submitCtaLabel={intakeReady.intakeSubmitCtaLabel}
+            nextStepBlurb={intakeReady.intakeNextStepBlurb}
             topControls={modeControls}
             onDeckBack={onDeckBack}
             deckBackLabel={deckBackLabel}
@@ -453,7 +538,10 @@ export default function StudioGuideTabletView({
               </SamsungDeckBack>
             ) : null}
             {modeControls}
-            <h1 className={styles.question}>{v.intakeTabletTitle}</h1>
+            <h1 className={styles.question}>{intakePackageName || v.intakeTabletTitle}</h1>
+            {intakePackageName ? (
+              <p className={styles.body}>Project Intake</p>
+            ) : null}
             <p className={styles.body}>{v.intakeTabletLead}</p>
 
             <section
@@ -512,7 +600,17 @@ export default function StudioGuideTabletView({
         ) : null}
 
 
-        {isAsk && question ? (
+        {askMode ? (
+          <div className={styles.askCluster} data-freeform-ask="true">
+            {modeControls}
+            <button type="button" className={styles.deckBack} onClick={onCloseAsk}>
+              ← Back to this question
+            </button>
+            <h1 className={styles.question}>Ask a question</h1>
+            {answerDock}
+            {error ? <p className={styles.error}>{error}</p> : null}
+          </div>
+        ) : isAsk && question ? (
           <>
           {onDeckBack && deckBackLabel ? (
             <SamsungDeckBack
@@ -545,6 +643,18 @@ export default function StudioGuideTabletView({
             >
               {renderGuideQuestionTitle(question)}
             </h1>
+
+            {onAskQuestion ? (
+              <div className={styles.actions}>
+                <button
+                  type="button"
+                  className={`${styles.btnSecondary} ${styles.btnSkipNow}`}
+                  onClick={onAskQuestion}
+                >
+                  Ask a question
+                </button>
+              </div>
+            ) : null}
 
             {question.bubbles.length > 0 ? (
               <div className={styles.chipRow} role="list">

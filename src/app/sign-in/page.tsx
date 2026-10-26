@@ -1,4 +1,5 @@
 import SignInScene from "@/components/auth/SignInScene";
+import { studioBuildManrope } from "@/fonts/studio-build-manrope";
 import StudioMobileLoungeShell from "@/components/shared/StudioMobileLoungeShell";
 import { isLocalAuthFixtureAvailable } from "@/lib/auth/local-auth-fixture-gate";
 import {
@@ -7,7 +8,7 @@ import {
 } from "@/lib/auth/safe-return-path";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
-import "../mobile-route-fixes.css";
+import "../studio-customer-last-paint.css";
 
 export const metadata = {
   title: "Client Sign In",
@@ -35,7 +36,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
 
   return (
     <StudioMobileLoungeShell
-      className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
+      className={`${studioBuildManrope.className} ${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
     >
       <SignInScene
         returnTo={returnTo}

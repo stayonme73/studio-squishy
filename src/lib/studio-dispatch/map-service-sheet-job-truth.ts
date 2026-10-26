@@ -15,7 +15,8 @@ import type {
   ServiceSheetProjectTruth,
 } from "@/lib/studio-design-renderer";
 
-import { resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
+import { requirePresentLogoMaterial, resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
+import { flattenSkuIntakeAnswers } from "./sku-intake-answers";
 import type { JobDispatchRecord } from "./types";
 
 export type ServiceSheetTruthMapResult =
@@ -274,7 +275,10 @@ export function mapServiceSheetProjectTruthFromJob(input: {
     };
   }
 
-  const answers = input.campaign.routeMapIntake?.answers ?? {};
+  const answers = flattenSkuIntakeAnswers(
+    input.campaign.routeMapIntake?.answers,
+    DESIGN_RENDERER_SERVICE_SHEET_SKU,
+  );
   const businessName = String(
     answers.businessName ?? input.campaign.campaignName ?? "",
   ).trim();
@@ -306,12 +310,12 @@ export function mapServiceSheetProjectTruthFromJob(input: {
     return { ok: false, code: "MISSING_REQUIRED_TRUTH", message: parsed.message };
   }
 
-  const logo = resolveApprovedLogoMaterial({
+  const logo = requirePresentLogoMaterial(resolveApprovedLogoMaterial({
     repoRoot: input.repoRoot,
     items: input.materials,
     skuId: DESIGN_RENDERER_SERVICE_SHEET_SKU,
     stagedLogoRelativePath: input.stagedLogoRelativePath,
-  });
+  }));
   if (!logo.ok) {
     return { ok: false, code: logo.code, message: logo.message };
   }

@@ -10,10 +10,12 @@ export function toClientFacingActivityMessage(message: string): string {
     [/^Route Map job selected:\s*(.+)$/i, "Added to your Studio Plan: $1"],
     [/^Route Map job selected$/i, "Added to your Studio Plan"],
     [/^Payment received$/i, "We received your payment"],
+    [/^Payment confirmed.*$/i, "We received your payment"],
     [/^Discovery received$/i, "We received your discovery answers"],
     [/^Discovery complete$/i, "Your Project Summary is ready"],
     [/^Vision Intake received$/i, "We received your Project Intake"],
     [/^Intake received$/i, "We received your Project Intake"],
+    [/^Project Intake received$/i, "We received your Project Intake"],
     [/^Project Details received$/i, "We received your Project Intake"],
     [/^Vision Intake updated$/i, "We updated your Project Intake"],
     [/^Project Details updated$/i, "We updated your Project Intake"],
@@ -59,6 +61,15 @@ export const MATERIALS_STILL_NEED_AWAITING_REQUESTS =
 
 export const MATERIALS_STILL_NEED_NONE_CURRENTLY_NEEDED =
   "No additional materials are currently needed.";
+
+/** Raw API / HTTP language must never appear in Materials We Still Need. */
+export function isLeakedMaterialsBoardError(message: string | null | undefined): boolean {
+  const text = message?.trim() ?? "";
+  if (!text) return false;
+  return /forbidden|unauthorized|authentication required|access denied|request failed\s*\(\d+\)|\b40[13]\b/i.test(
+    text,
+  );
+}
 
 export type MaterialsStillNeedEmptyKind =
   | "incomplete_intake"

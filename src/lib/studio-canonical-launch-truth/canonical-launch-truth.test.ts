@@ -8,13 +8,22 @@ import { STUDIO_THANK_YOU_DISCOUNT_V1, studioThankYouAmount } from "@/config/stu
 describe("canonical launch truth", () => {
   const truth = studioCanonicalLaunchTruthV1;
 
-  it("is the three-package door only, unpublished, with nothing deployed", () => {
-    expect(truth.canonicalCustomerFacingMenu).toBe("three_package_door");
+  it("is the four-package door, unpublished, with nothing deployed", () => {
+    expect(truth.canonicalCustomerFacingMenu).toBe("four_package_door");
+    expect(truth.customerFacingLaunchPackageCount).toBe(4);
     expect(truth.packages).toHaveLength(truth.customerFacingLaunchPackageCount);
     expect(truth.deployedPublicly).toBe(false);
     expect(truth.publicationAuthorized).toBe(false);
     for (const pkg of truth.packages) expect(pkg.launchPublishState).toBe("UNPUBLISHED");
     expect(truth.legacyElevenServiceShelf.customerFacingLaunchAuthority).toBe(false);
+  });
+
+  it("does not invent a Social-style freeze for Campaign Launch Kit", () => {
+    const kit = truth.packages.find((pkg) => pkg.packageId === "campaign_launch_kit");
+    expect(kit).toBeDefined();
+    expect(kit!.certificationState).toBe("ENGINEERING_AND_CONTRACT_EVIDENCED_WITH_EXPLICIT_GAPS");
+    expect(kit!.freezeState).toBe("NO_SOCIAL_STYLE_PACKAGE_FREEZE_DOCUMENT_ON_FILE");
+    expect(kit!.record).toContain("FOUR-PACKAGE-CAMPAIGN-LAUNCH-KIT-349-RECORD.md");
   });
 
   it("does not contradict the owner price lock or the Thank-You amount", () => {

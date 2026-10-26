@@ -12,7 +12,7 @@ export const STUDIO_VISUAL_SYSTEM_V2_PACKAGE_ID =
 
 export const studioVisualSystemV2 = {
   packageId: STUDIO_VISUAL_SYSTEM_V2_PACKAGE_ID,
-  schemaVersion: 22 as const,
+  schemaVersion: 23 as const,
   pass: "five-screen-shared-glass" as const,
   ownerAccepted: true as const,
   frozen: true as const,
@@ -98,6 +98,13 @@ export const studioVisualSystemV2 = {
   noBackdropBlur: true as const,
   noFrostedGlass: true as const,
   uniformMobileAndLaptop: true as const,
+  desks: {
+    rule: "One paint, two desks. Shared tokens only. Do not let a laptop layout rule edit the phone desk.",
+    sharedPaintOnly: true as const,
+    phoneMaxWidthPx: 960 as const,
+    laptopMinWidthPx: 1025 as const,
+    laptopLayoutMustNotEditPhone: true as const,
+  } as const,
   throughoutMeansWholeSite: true as const,
   doNotChangeCustomerFacts: true as const,
   doNotRedesignAcceptedSurfaces: true as const,

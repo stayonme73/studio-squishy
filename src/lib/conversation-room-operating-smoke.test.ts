@@ -125,6 +125,13 @@ describe("Conversation Room operating-smoke regressions", () => {
     ]);
     expect(business?.canSkip).toBe(true);
 
+    const deadline = getConversationRoomGuideQuestion("ask_deadline");
+    expect(deadline?.bubbles.slice(-3)).toEqual([
+      "More than 1 month",
+      "No deadline yet",
+      "I have a specific date",
+    ]);
+
     const skipped = applyGuideAnswerToDraft(
       createEmptyGuideCaptureDraft(),
       "ask_business_name",

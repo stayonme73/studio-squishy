@@ -22,8 +22,7 @@ export function lifecycleCustomerSurfaceLinks(
   };
   switch (eventType) {
     case "intake_incomplete_materials_needed":
-    case "reminder_48_hour":
-    case "waiting_on_client_72_hour":
+    case "waiting_on_client":
       return [board, { label: "Project Intake", href: CONVERSATION_ROOM_INTAKE_HREF }];
     case "ready_for_review":
     case "revision_ready_again":
@@ -38,11 +37,21 @@ export function lifecycleCustomerSurfaceLinks(
   }
 }
 
+function isLocalOnlyOrigin(origin: string): boolean {
+  try {
+    const host = new URL(origin).hostname;
+    return host === "localhost" || host === "127.0.0.1" || host === "::1";
+  } catch {
+    return true;
+  }
+}
+
 export function lifecycleCustomerSurfaceAbsoluteLinks(
   eventType: JobCommunicationEventType,
 ): Array<LifecycleCustomerSurfaceLink & { url: string }> {
   const origin = resolvePublicAppOrigin();
-  if (!origin) return [];
+  // A localhost origin works on this computer only. Omit the link until a public site address is set.
+  if (!origin || isLocalOnlyOrigin(origin)) return [];
   return lifecycleCustomerSurfaceLinks(eventType).map((link) => ({
     ...link,
     url: new URL(link.href, `${origin}/`).toString(),

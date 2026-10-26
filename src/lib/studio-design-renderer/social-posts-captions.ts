@@ -7,6 +7,10 @@
  */
 
 import {
+  isThemeLedSocialPostsTruth,
+  reasonThemeLedSocialPostCaptions,
+} from "./social-posts-theme-led";
+import {
   SOCIAL_POSTS_EXACT_COUNT,
   SOCIAL_POST_TRUST_ROLE_ANGLE,
   type SocialPostAssetSpec,
@@ -21,6 +25,25 @@ export type SocialPostCaptionValidation =
 
 /** Fixture wording belongs on the disclaimer plate, never in a customer caption. */
 const FIXTURE_LEAKAGE_PATTERN = /CERTIFICATION FIXTURE|INTERNAL TEST|\(CERT\)/i;
+
+/**
+ * Business-claim language captions may use only when the approved brief already
+ * contains the same phrase. Inventing testimonials, guarantees, or results is
+ * a CAPTION_FAILURE — not a copy-agency flourish.
+ */
+const INVENTED_CLAIM_PHRASES = [
+  "testimonial",
+  "guarantee",
+  "guaranteed",
+  "money-back",
+  "money back",
+  "results guaranteed",
+  "#1",
+  "five-star",
+  "five star",
+  "we doubled",
+  "we tripled",
+] as const;
 
 const MONEY_PATTERN = /\$\s*\d[\d,]*(?:\.\d+)?/g;
 const PERCENT_PATTERN = /\d[\d,]*(?:\.\d+)?\s*%/g;
@@ -51,6 +74,8 @@ function truthCorpus(truth: SocialPostsProjectTruth): string {
     truth.webDisplay,
     truth.webUrl,
     truth.platformLabel,
+    truth.themeLed?.theme ?? "",
+    truth.themeLed?.coreMessage ?? "",
     ...truth.requiredTextTokens,
   ].join(" \u2022 ");
 }
@@ -91,6 +116,16 @@ export function validateCaptionFacts(
   }
 
   const corpus = truthCorpus(truth);
+  const corpusLower = corpus.toLowerCase();
+  for (const phrase of INVENTED_CLAIM_PHRASES) {
+    if (text.toLowerCase().includes(phrase) && !corpusLower.includes(phrase)) {
+      return {
+        ok: false,
+        code: "CAPTION_FAILURE",
+        message: `Caption ${caption.captionId} invents a business claim "${phrase}" that is not in the campaign record`,
+      };
+    }
+  }
   const corpusMoney = new Set(
     (corpus.match(MONEY_PATTERN) ?? []).map(normalizeMoney),
   );
@@ -134,19 +169,71 @@ export function validateCaptionFacts(
   return { ok: true };
 }
 
+/** Customer-facing captions.txt — posting order + caption text, no internal IDs. */
+export function formatSocialPostsCustomerCaptionFile(
+  captions: readonly SocialPostCaption[],
+): string {
+  const ordered = [...captions].sort((a, b) => a.orderIndex - b.orderIndex);
+  return `${ordered.map((caption) => `Post ${caption.orderIndex}\n${caption.text.trim()}`).join("\n\n")}\n`;
+}
+
+/** Customer-facing posting-order.txt — suggested order, not a calendar. */
+export function formatSocialPostsCustomerOrderFile(
+  captions: readonly SocialPostCaption[],
+  platformLabel: string,
+): string {
+  const ordered = [...captions].sort((a, b) => a.orderIndex - b.orderIndex);
+  const lines = [
+    "Suggested posting order — you post these yourself. This is not a calendar.",
+    platformLabel.trim() ? `Platform: ${platformLabel.trim()}` : "",
+    "",
+    ...ordered.map((caption) => `${caption.orderIndex}. Post ${caption.orderIndex}`),
+  ].filter((line, index, list) => !(line === "" && list[index - 1] === ""));
+  return `${lines.join("\n")}\n`;
+}
+
+function captionContactLead(truth: SocialPostsProjectTruth): string {
+  const cta = truth.cta.trim();
+  const phone = truth.phone.trim();
+  const web = truth.webDisplay.trim();
+  if (cta && phone && web) return `${cta}: ${phone} or ${web}`;
+  if (cta && phone) return `${cta}: ${phone}`;
+  if (cta && web) return `${cta}. ${web}`;
+  if (phone && web) return `${phone} or ${web}`;
+  if (phone) return phone;
+  if (web) return web;
+  return cta;
+}
+
 function captionTextForRole(
   truth: SocialPostsProjectTruth,
   roleAngle: string,
 ): string {
+  const priceClause = truth.priceDisplay.trim()
+    ? ` is ${truth.priceDisplay}`
+    : "";
+  const dateClause = truth.dateWindow.trim()
+    ? truth.priceDisplay.trim()
+      ? ` The offer runs ${truth.dateWindow}.`
+      : ` Runs ${truth.dateWindow}.`
+    : "";
   switch (roleAngle) {
     case "offer_lead":
-      return `${truth.offerName} is ${truth.priceDisplay} at ${truth.businessName}. The offer runs ${truth.dateWindow}.`;
-    case "cta_book":
-      return `${truth.cta}: ${truth.phone} or ${truth.webDisplay}. ${truth.offerName} is ${truth.priceDisplay} at ${truth.businessName}.`;
-    case "dates_window":
-      return `${truth.businessName}: ${truth.offerName} runs ${truth.dateWindow} for ${truth.priceDisplay}. ${truth.body}`;
+      return `${truth.offerName}${priceClause} at ${truth.businessName}.${dateClause}`.trim();
+    case "cta_book": {
+      const lead = captionContactLead(truth);
+      const contact = lead.trim() ? `${lead}. ` : "";
+      return `${contact}${truth.offerName}${priceClause} at ${truth.businessName}.`.trim();
+    }
+    case "dates_window": {
+      const priceTail = truth.priceDisplay.trim() ? ` for ${truth.priceDisplay}` : "";
+      const window = truth.dateWindow.trim()
+        ? `${truth.businessName}: ${truth.offerName} runs ${truth.dateWindow}${priceTail}.`
+        : `${truth.businessName}: ${truth.offerName}.`;
+      return `${window} ${truth.body}`.trim();
+    }
     case SOCIAL_POST_TRUST_ROLE_ANGLE:
-      return `${truth.businessName}. ${truth.headline}. ${truth.cta}: ${truth.phone}.`;
+      return `${truth.businessName}. ${truth.headline}. ${captionContactLead(truth)}.`;
     default:
       throw new Error(
         `CAPTION_FAILURE: no Studio caption pattern for roleAngle "${roleAngle}" — do not improvise copy for an unproven angle`,
@@ -162,6 +249,9 @@ export function reasonSocialPostCaptionsDeterministic(
   truth: SocialPostsProjectTruth,
   assets: readonly SocialPostAssetSpec[],
 ): SocialPostsQuad<SocialPostCaption> {
+  if (isThemeLedSocialPostsTruth(truth)) {
+    return reasonThemeLedSocialPostCaptions(truth, assets);
+  }
   if (assets.length !== SOCIAL_POSTS_EXACT_COUNT) {
     throw new Error(
       `CAPTION_FAILURE: captions require exactly ${SOCIAL_POSTS_EXACT_COUNT} posts, received ${assets.length}`,

@@ -1,14 +1,21 @@
 import { createHash } from "crypto";
+import { Readable } from "node:stream";
 
 import {
   isAllowedCustomerMaterialFile,
+  isCustomerTalkingHeadVideoFile,
+  maxBytesForCustomerMaterialFile,
   studioMaterialsUploadV1,
 } from "@/config/studio-materials-upload-v1";
 import type { CampaignRecord } from "@/config/studio-board";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import { addJobFileReference } from "@/lib/file-registry/job-files";
-import type { FileRoomStorageAdapter } from "@/lib/file-storage/types";
+import type { StudioFileSupabaseStorageReference } from "@/lib/file-registry/types";
+import type {
+  FileRoomStorageAdapter,
+  FileRoomStorageDownloadResult,
+} from "@/lib/file-storage/types";
 import { buildJobId } from "@/lib/job-control/lane-map";
 import { resolveCampaignCommunicationClientId } from "@/lib/job-control/communication";
 import { appendJobActivityEvent } from "@/lib/job-control/activity-log";
@@ -18,13 +25,18 @@ import {
   newContentCertificationId,
   type CustomerContentRightsInput,
 } from "@/lib/studio-customer-content-intake";
+import { buildUseAuthorization, categoryRequiresUseClearance } from "@/lib/studio-material-use";
+import { applyMaterialUseDecisionToItem } from "@/lib/studio-material-use/evaluate";
 import {
   canReplaceStoredCustomerFile,
   prepareSupersessionArchive,
 } from "@/lib/studio-customer-content-intake/supersession";
 
+import { validateImageFileBytes } from "./image-file-bytes";
+
 import { parseConsolidatedRequestId } from "./client-requests";
 import { applyClientSubmitConsolidated, applyClientSubmitItem } from "./actions";
+import { validateServerMaterialUploadRights } from "./materials-intake-rights-form";
 import type { CampaignMaterialItem, ServerMaterialsEnvelope } from "./types";
 
 export function validateCustomerMaterialFile(file: File): { ok: true } | { ok: false; error: string } {
@@ -35,8 +47,13 @@ export function validateCustomerMaterialFile(file: File): { ok: true } | { ok: f
   if (file.size <= 0) {
     return { ok: false, error: copy.emptyFile };
   }
-  if (file.size > studioMaterialsUploadV1.maxFileBytes) {
-    return { ok: false, error: copy.tooLarge };
+  if (file.size > maxBytesForCustomerMaterialFile(file.name, file.type)) {
+    return {
+      ok: false,
+      error: isCustomerTalkingHeadVideoFile(file.name, file.type)
+        ? copy.videoTooLarge
+        : copy.tooLarge,
+    };
   }
   if (!isAllowedCustomerMaterialFile(file.name, file.type)) {
     return { ok: false, error: copy.unsupportedType };
@@ -44,7 +61,12 @@ export function validateCustomerMaterialFile(file: File): { ok: true } | { ok: f
   return { ok: true };
 }
 
-export function isPrivateStoredMaterial(item: CampaignMaterialItem): boolean {
+export function isPrivateStoredMaterial(
+  item: CampaignMaterialItem,
+): item is CampaignMaterialItem & {
+  uploadStatus: "stored";
+  storageRef: StudioFileSupabaseStorageReference & { checksumSha256: string };
+} {
   return (
     item.uploadStatus === "stored" &&
     item.storageRef?.provider === "supabase_storage" &&
@@ -88,10 +110,17 @@ function bucketItems(
     return item ? [item] : [];
   }
   if (!input.consolidatedItemId) return [];
+  const isolated = envelope.items.find(
+    (entry) => entry.id === input.consolidatedItemId && entry.isolatedSlot === true,
+  );
+  if (isolated) return [isolated];
   const parsed = parseConsolidatedRequestId(input.consolidatedItemId);
   if (!parsed) return [];
   return envelope.items.filter(
-    (item) => item.category === parsed.category && item.contentKind === parsed.contentKind,
+    (item) =>
+      item.isolatedSlot !== true &&
+      item.category === parsed.category &&
+      item.contentKind === parsed.contentKind,
   );
 }
 
@@ -176,6 +205,10 @@ export async function storeAndAttachCustomerMaterialFile(input: {
   }
 
   const bytes = Buffer.from(await input.file.arrayBuffer());
+  const imageBytesCheck = validateImageFileBytes(input.file.name, input.file.type, bytes);
+  if (!imageBytesCheck.ok) {
+    return { ok: false, error: imageBytesCheck.error, status: 400 };
+  }
   const checksum = sha256Hex(bytes);
 
   const already = targets.find(
@@ -211,6 +244,14 @@ export async function storeAndAttachCustomerMaterialFile(input: {
   const isReplacement = attachable.length === 0 && replaceable.length > 0;
   const occurredAt = new Date().toISOString();
   const newCertificationId = newContentCertificationId(occurredAt);
+
+  const uploadRightsCheck = validateServerMaterialUploadRights(firstItem.category, {
+    useAuthorizationBasis: input.useAuthorizationBasis,
+    rightsInput: input.rightsInput,
+  });
+  if (!uploadRightsCheck.ok) {
+    return { ok: false, error: uploadRightsCheck.error, status: 400 };
+  }
 
   let contentCertificationArchive = firstItem.contentCertificationArchive ?? [];
   let replacesCertificationId: string | undefined;
@@ -362,23 +403,49 @@ export async function storeAndAttachCustomerMaterialFile(input: {
     messageRef: registry.file.id,
   });
 
-  const items = workingMaterials.items.map((item) =>
-    ids.includes(item.id)
-      ? {
-          ...item,
-          // Stored is not approved for use. Team still reviews fitness.
-          reviewStatus: "submitted" as const,
-          uploadStatus: "stored" as const,
-          fileName: input.file.name,
-          mimeType: metadata.contentType,
-          sizeBytes: retrieved,
-          storageRef: boundRef,
-          fileRegistryRefs: [registry.file],
-          contentCertification,
-          contentCertificationArchive,
-        }
-      : item,
-  );
+  const items = workingMaterials.items.map((item) => {
+    if (!ids.includes(item.id)) return item;
+    const storedItem: CampaignMaterialItem = {
+      ...item,
+      // Stored is not approved for use. Team still reviews fitness.
+      reviewStatus: "submitted",
+      uploadStatus: "stored",
+      fileName: input.file.name,
+      mimeType: metadata.contentType,
+      sizeBytes: retrieved,
+      storageRef: boundRef,
+      fileRegistryRefs: [registry.file],
+      contentCertification,
+      contentCertificationArchive,
+      useAuthorization: input.useAuthorizationBasis
+        ? buildUseAuthorization({
+            basis: input.useAuthorizationBasis,
+            attestedAt: occurredAt,
+            attestedBy: {
+              role: "client",
+              userId: input.user.id,
+              displayName: input.user.displayName ?? input.user.email,
+            },
+          })
+        : item.useAuthorization,
+    };
+    const withDecision = applyMaterialUseDecisionToItem({
+      item: storedItem,
+      campaignId: workingMaterials.campaignId,
+      evaluatedAt: occurredAt,
+    });
+    // Bind useDecision to the completed stored identity; keep team-review gate for clearance categories.
+    if (
+      categoryRequiresUseClearance(withDecision.category) &&
+      withDecision.uploadStatus === "stored"
+    ) {
+      return {
+        ...withDecision,
+        reviewStatus: "submitted" as const,
+      };
+    }
+    return withDecision;
+  });
 
   const nextJobs = (input.tasks.jobRecords ?? []).map((row) =>
     row.jobId === nextJob.jobId ? nextJob : row,
@@ -404,6 +471,57 @@ export async function storeAndAttachCustomerMaterialFile(input: {
   };
 }
 
+function copyBytes(bytes: Uint8Array): Uint8Array {
+  return Uint8Array.from(bytes);
+}
+
+function concatChunks(chunks: readonly Uint8Array[]): Uint8Array {
+  const total = chunks.reduce((sum, chunk) => sum + chunk.byteLength, 0);
+  const out = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    out.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return out;
+}
+
+/** Copy a stored download into owned bytes. Text-encoded Node streams fail closed. */
+export async function bytesFromStoredDownloadBody(
+  body: FileRoomStorageDownloadResult["body"],
+): Promise<Uint8Array> {
+  if (Buffer.isBuffer(body)) return copyBytes(body);
+  if (body instanceof ArrayBuffer) return copyBytes(new Uint8Array(body));
+  if (body instanceof Uint8Array) return copyBytes(body);
+  if (typeof Blob !== "undefined" && body instanceof Blob) {
+    return copyBytes(new Uint8Array(await body.arrayBuffer()));
+  }
+  if (typeof ReadableStream !== "undefined" && body instanceof ReadableStream) {
+    const reader = body.getReader();
+    const chunks: Uint8Array[] = [];
+    for (;;) {
+      const next = await reader.read();
+      if (next.done) break;
+      chunks.push(next.value);
+    }
+    return concatChunks(chunks);
+  }
+  if (body instanceof Readable) {
+    const chunks: Uint8Array[] = [];
+    for await (const chunk of body) {
+      if (typeof chunk === "string") {
+        throw new Error("Stored download stream is text-encoded.");
+      }
+      if (!Buffer.isBuffer(chunk) && !(chunk instanceof Uint8Array)) {
+        throw new Error("Unsupported stored download stream chunk.");
+      }
+      chunks.push(copyBytes(chunk));
+    }
+    return concatChunks(chunks);
+  }
+  throw new Error("Unsupported stored download body.");
+}
+
 export async function downloadStoredCustomerMaterialBytes(input: {
   adapter: FileRoomStorageAdapter;
   item: CampaignMaterialItem;
@@ -413,15 +531,7 @@ export async function downloadStoredCustomerMaterialBytes(input: {
   }
   try {
     const download = await input.adapter.downloadObject({ storageRef: input.item.storageRef });
-    const bytes = Buffer.from(
-      download.body instanceof ArrayBuffer
-        ? download.body
-        : download.body instanceof Uint8Array
-          ? download.body
-          : Buffer.isBuffer(download.body)
-            ? download.body
-            : await new Response(download.body as BodyInit).arrayBuffer(),
-    );
+    const bytes = await bytesFromStoredDownloadBody(download.body);
     if (bytes.byteLength <= 0) {
       return { ok: false, error: "Stored file is not available.", status: 404 };
     }
@@ -429,7 +539,7 @@ export async function downloadStoredCustomerMaterialBytes(input: {
       ok: true,
       body: bytes,
       contentType: download.contentType ?? input.item.mimeType ?? "application/octet-stream",
-      checksumSha256: input.item.storageRef.checksumSha256!,
+      checksumSha256: input.item.storageRef.checksumSha256,
     };
   } catch {
     return { ok: false, error: "Stored file is not available.", status: 502 };

@@ -16,11 +16,12 @@ import {
   jobCountsTowardLaneCapacity,
   syncJobRecordsFromCampaign,
 } from "./resolve-jobs";
+import * as waitingOnClientModule from "./waiting-on-client";
 import {
   applyWaitingOnClientPolicies,
-  resolveWaitingOnClientReminderStatus,
   shouldMoveJobToWaitingOnClient,
 } from "./waiting-on-client";
+import { JOB_CONTROL_POLICY } from "@/config/job-control";
 import { resolveOwnerDeskItems } from "./owner-desk";
 import type { PurchasedJobRecord } from "./types";
 
@@ -138,6 +139,14 @@ describe("job-level tracking", () => {
     expect(isJobIntakeComplete(record)).toBe(false);
     expect(jobs.every((j) => !j.intakeComplete)).toBe(true);
     expect(jobCountsTowardLaneCapacity(jobs[0], [])).toBe(false);
+  });
+
+  it("submitted Project Intake counts as complete without a leftover route-map context", () => {
+    const record = campaign({
+      projectDetailsSubmittedAt: undefined,
+      routeMapIntakeSubmittedAt: "2026-10-02T21:42:47.417Z",
+    });
+    expect(isJobIntakeComplete(record)).toBe(true);
   });
 
   it("derives different spine statuses per job under one campaign", () => {
@@ -285,10 +294,9 @@ describe("lane capacity", () => {
 });
 
 describe("waiting on client policies", () => {
-  it("flags 48h reminder due", () => {
-    const now = new Date("2026-07-03T12:00:00.000Z").getTime();
-    const since = new Date("2026-07-01T10:00:00.000Z").toISOString();
-    expect(resolveWaitingOnClientReminderStatus(since, null, now)).toBe("reminder_due");
+  it("has no reminder, waiting, owner follow-up, or refund clock", () => {
+    expect(Object.keys(JOB_CONTROL_POLICY)).toEqual([]);
+    expect("resolveWaitingOnClientReminderStatus" in waitingOnClientModule).toBe(false);
   });
 
   it("moves to waiting on client as soon as a blocking request exists", () => {
@@ -339,6 +347,23 @@ describe("waiting on client policies", () => {
     expect(cleared[0].waitingOnClientSince).toBeNull();
     expect(cleared[0].returnLane).toBeUndefined();
   });
+
+  it("keeps presented review proofs ready for review instead of burying them after a materials false-block", () => {
+    const job = syncJobRecordsFromCampaign(campaign(), [], [], [])[0];
+    const presented: PurchasedJobRecord = {
+      ...job,
+      spineStatus: "building_concepts",
+      fileRegistry: [
+        {
+          id: "proof-1",
+          category: "review_proof",
+          visibility: "client_visible",
+        } as PurchasedJobRecord["fileRegistry"] extends readonly (infer T)[] ? T : never,
+      ],
+    };
+    const synced = syncJobRecordsFromCampaign(campaign(), [], [], [], [presented]);
+    expect(synced[0].spineStatus).toBe("ready_for_review");
+  });
 });
 
 describe("activity log", () => {
@@ -368,7 +393,7 @@ describe("activity log", () => {
           kind: "refund",
           occurredAt: "2026-07-02T00:00:00.000Z",
           actor: { role: "owner" },
-          reason: "14-day policy",
+          reason: "Production has not started",
         },
       ],
       [],
@@ -464,7 +489,7 @@ describe("owner desk", () => {
     expect(releasedDesk.some((item) => item.reason === "approval_before_delivery")).toBe(false);
   });
 
-  it("includes heavy lane full when at capacity with queued heavy job", () => {
+  it("does not page Owner for routine Heavy overflow", () => {
     const now = "2026-07-03T12:00:00.000Z";
     const heavyJob = (id: string) => ({
       jobId: `${id}:vp-001`,
@@ -496,6 +521,49 @@ describe("owner desk", () => {
         campaignId: "b",
         campaignName: "B",
         jobs: [heavyJob("b")],
+        exceptions: [],
+        laneViews,
+      },
+    ]);
+
+    expect(desk.some((d) => d.reason === "heavy_lane_full")).toBe(false);
+  });
+
+  it("pages Owner for Heavy overflow only when a priority bump is requested", () => {
+    const now = "2026-07-03T12:00:00.000Z";
+    const heavyJob = (id: string, bump = false) => ({
+      jobId: `${id}:vp-001`,
+      campaignId: id,
+      skuId: "vp-001" as const,
+      serviceName: "Video",
+      spineStatus: "building_concepts" as const,
+      productionLane: "heavy" as const,
+      intakeComplete: true,
+      laneQueuedAt: now,
+      updatedAt: now,
+      heavyLaneBumpRequested: bump,
+    });
+
+    const live = heavyJob("a");
+    const waiting = heavyJob("b", true);
+    const laneViews = resolveProductionLaneViews([
+      {
+        campaignName: "A",
+        job: live,
+        tasks: [task("vp-001", "creative", "in_progress")],
+      },
+      {
+        campaignName: "B",
+        job: { ...waiting, spineStatus: "ready_for_queue" as const },
+        tasks: [task("vp-001", "creative", "in_progress")],
+      },
+    ]);
+
+    const desk = resolveOwnerDeskItems([
+      {
+        campaignId: "b",
+        campaignName: "B",
+        jobs: [{ ...waiting, spineStatus: "ready_for_queue" as const }],
         exceptions: [],
         laneViews,
       },

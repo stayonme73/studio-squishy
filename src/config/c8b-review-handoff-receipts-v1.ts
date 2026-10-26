@@ -28,6 +28,8 @@ export const c8bReviewHandoffReceiptsV1 = {
     lead: (versionLabel: string) =>
       `You are approving ${versionLabel}. This is the version The Studio will prepare for delivery.`,
     actionLabel: "Approve this version",
+    packageLabel: "Package",
+    itemsLabel: "You are approving",
     confirmCta: "Yes, approve this version",
     cancelCta: "Keep reviewing",
   },

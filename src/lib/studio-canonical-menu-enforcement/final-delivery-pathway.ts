@@ -23,6 +23,8 @@ const COMPLEMENT_BESIDE_CLIP: Partial<Record<CanonicalLaunchPackage["packageId"]
   short_form_video_editing: "The Studio does not search a long recording for moments.",
   social_and_promo_graphics:
     "No posting, scheduling, or account management. No passwords. No performance guarantee. Designed for digital use, not professional print production.",
+  campaign_launch_kit:
+    "One fixed campaign: flyer, email, two texts, and square plus portrait graphics. It does not include video.",
 };
 
 export const CLIP_DELIVERY_PATHWAY_CLOSING =

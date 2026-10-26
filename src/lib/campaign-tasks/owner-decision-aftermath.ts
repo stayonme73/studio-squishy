@@ -3,12 +3,17 @@
  * Records stay durable. Machine carries the next step. Tagia is not the dispatcher.
  */
 
-import { OWNER_HELD_EXCEPTION_KINDS } from "@/config/campaign-exceptions";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import { applyJobSpineStatusChange } from "@/lib/job-control/actions";
 import { enqueueJobCommunicationRecord } from "@/lib/job-control/communication";
 import type { JobActivityActor, JobSpineStatus, PurchasedJobRecord } from "@/lib/job-control/types";
-import type { CustomerLifeStall } from "@/lib/studio-customer-life/types";
+import {
+  extractAskClientWording,
+  latestAskedClientMessage,
+  ownerAskCustomerStalls,
+  ownerAskReturnKind,
+  shouldReturnOwnerAskException,
+} from "@/lib/campaign-tasks/owner-ask-customer-stalls";
 
 import {
   appendExceptionEvent,
@@ -17,9 +22,10 @@ import {
 } from "./exceptions";
 import type {
   CampaignExceptionEvent,
-  CampaignExceptionKind,
   CampaignExceptionRecord,
 } from "./exceptions-types";
+
+export { extractAskClientWording, ownerAskCustomerStalls };
 import type { OwnerDecisionInteractionRecord } from "./owner-decision-interaction-types";
 import { CAMPAIGN_TASKS_SCHEMA_VERSION } from "./plan-change";
 import type { ServerTasksEnvelope } from "./types";
@@ -30,8 +36,6 @@ const STUDIO_MACHINE_USER: StudioUser = {
   displayName: "The Studio",
   roles: [],
 };
-
-const OWNER_ASK_RETURN_KIND_SET = new Set<CampaignExceptionKind>(OWNER_HELD_EXCEPTION_KINDS);
 
 export type OwnerDecisionRecordProof = {
   choice: string;
@@ -306,7 +310,7 @@ export function recoverOwnerDecisionAftermath(
 
     if (
       record.status === "resolved" &&
-      OWNER_ASK_RETURN_KIND_SET.has(record.kind) &&
+      ownerAskReturnKind(record.kind) &&
       record.resolvedAt &&
       Date.now() - Date.parse(record.resolvedAt) <= RECENT_RESOLVED_RECOVERY_MS
     ) {
@@ -352,40 +356,6 @@ export function recoverOwnerDecisionAftermath(
   }
 
   return { envelope: next, recoveredIds };
-}
-
-function latestAskedClientMessage(
-  envelope: ServerTasksEnvelope,
-  exceptionId: string,
-): string | null {
-  const events = (envelope.exceptionEvents ?? []).filter(
-    (event) => event.exceptionId === exceptionId && event.action === "asked_client",
-  );
-  if (events.length === 0) return null;
-  const latest = events.reduce((current, event) =>
-    event.createdAt.localeCompare(current.createdAt) >= 0 ? event : current,
-  );
-  return latest.resolutionNotes?.trim() || extractAskClientWording(latest.notes) || null;
-}
-
-export function extractAskClientWording(notes?: string): string | null {
-  const text = notes?.trim();
-  if (!text) return null;
-  const marker = "Owner ask-client";
-  const index = text.lastIndexOf(marker);
-  if (index >= 0) {
-    const afterPrefix = text.slice(index);
-    const colon = afterPrefix.indexOf(": ");
-    if (colon >= 0) return afterPrefix.slice(colon + 2).trim() || null;
-  }
-  return text;
-}
-
-function shouldReturnOwnerAskException(record: CampaignExceptionRecord): boolean {
-  if (record.status !== "waiting_client") return false;
-  if (record.promotion) return false;
-  if (!OWNER_ASK_RETURN_KIND_SET.has(record.kind)) return false;
-  return true;
 }
 
 function shouldReturnOwnerAskInteraction(
@@ -513,56 +483,6 @@ export function applyReturnOwnerAsksOnCustomerReply(
     },
     resumedIds,
   };
-}
-
-export function ownerAskCustomerStalls(
-  envelope: ServerTasksEnvelope | null | undefined,
-): CustomerLifeStall[] {
-  if (!envelope) return [];
-  const stalls: CustomerLifeStall[] = [];
-
-  for (const record of envelope.exceptionRecords ?? []) {
-    if (!shouldReturnOwnerAskException(record) && record.status !== "waiting_client") continue;
-    if (record.status !== "waiting_client") continue;
-    if (record.kind === "missing_client_fact") continue;
-    const prompt =
-      latestAskedClientMessage(envelope, record.id) ??
-      "The Studio needs a reply from you before this work can continue.";
-    stalls.push({
-      id: `owner_ask:${record.id}`,
-      summary: prompt,
-      recoveryClass: "waiting_on_customer",
-    });
-  }
-
-  for (const interaction of envelope.ownerDecisionInteractions ?? []) {
-    if (interaction.status !== "waiting_client") continue;
-    const prompt =
-      extractAskClientWording(interaction.resolutionNotes) ??
-      "The Studio needs a little more information from you before this request can continue.";
-    stalls.push({
-      id: `owner_ask_interaction:${interaction.id}`,
-      summary: prompt,
-      recoveryClass: "waiting_on_customer",
-    });
-  }
-
-  for (const job of envelope.jobRecords ?? []) {
-    if (!job.ownerAskResumeGate) continue;
-    const prompt =
-      [...(envelope.jobCommunicationRecords ?? [])]
-        .reverse()
-        .find((record) => record.jobId === job.jobId && record.eventType === "owner_ask_client")
-        ?.messageContent ??
-      "The Studio needs a reply from you before this work can continue.";
-    stalls.push({
-      id: `owner_ask_gate:${job.jobId}`,
-      summary: prompt,
-      recoveryClass: "waiting_on_customer",
-    });
-  }
-
-  return stalls;
 }
 
 export function ownerDecisionRecordProof(

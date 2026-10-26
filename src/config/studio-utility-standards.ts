@@ -59,6 +59,7 @@ const UTILITY_BACKDROP_NAV_IDS = new Set<UtilityNavId>([
   "review-room",
   "deliverables",
   "payment",
+  "campaign-details",
 ]);
 
 /** Route paths that receive the lobby backdrop (documentation / guards). */
@@ -77,6 +78,6 @@ export function utilityPageUsesBackdrop(navId: UtilityNavId): boolean {
   return UTILITY_BACKDROP_NAV_IDS.has(navId);
 }
 
-export function utilityPageUsesSecondaryNav(navId: UtilityNavId): boolean {
-  return navId !== "studio-board";
+export function utilityPageUsesSecondaryNav(_navId: UtilityNavId): boolean {
+  return true;
 }

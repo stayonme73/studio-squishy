@@ -18,6 +18,7 @@ import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import { redactJobFileStorageForClient } from "@/lib/file-storage/redact";
 import { deliverLifecycleNoticesForCampaign } from "@/lib/studio-lifecycle-email/campaign";
+import { runApprovedRefundExecution } from "@/lib/studio-payment/refund-execution-run";
 
 type RouteContext = {
   params: Promise<{ campaignId: string; jobId: string }>;
@@ -133,6 +134,21 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: result.status });
+  }
+
+  if (result.refundExecutionPlan) {
+    const refund = await runApprovedRefundExecution({
+      envelope: result.envelope,
+      campaign: campaignEnvelope.record,
+      clientId,
+      plan: result.refundExecutionPlan,
+    });
+    await deliverLifecycleNoticesForCampaign(campaignId);
+    return NextResponse.json({
+      job: redactJobFileStorageForClient(refund.job),
+      syncedAt: refund.envelope.syncedAt,
+      refundStage: refund.stage,
+    });
   }
 
   const saved = await writeTasksEnvelope(result.envelope);

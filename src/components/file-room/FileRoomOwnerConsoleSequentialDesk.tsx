@@ -35,6 +35,7 @@ import {
   FileRoomOwnerConsoleDecisionDetail,
   FileRoomOwnerConsoleDecisionPanels,
 } from "./FileRoomOwnerConsolePanels";
+import { OwnerDeskSquishyAsk } from "./OwnerDeskSquishyAsk";
 import type { useOwnerConsoleActions } from "./useOwnerConsoleActions";
 
 type OwnerConsoleActions = ReturnType<typeof useOwnerConsoleActions>;
@@ -176,6 +177,12 @@ export function CoordinatorFolderBrief({
         {briefing.squishySays}
       </p>
       <p className="fr-owner-sequential__coordinator-why">{briefing.whyReached}</p>
+      <OwnerDeskSquishyAsk
+        campaignName={briefing.facts.campaignName ?? item.campaignName}
+        title={item.title}
+        squishySays={briefing.squishySays}
+        whyReached={briefing.whyReached}
+      />
     </section>
   );
 }

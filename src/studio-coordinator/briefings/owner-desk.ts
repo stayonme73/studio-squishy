@@ -713,7 +713,7 @@ export function resolveOwnerRefundPostDecisionBriefing(
     case "owner_approve_refund":
       return {
         destination: "closed",
-        message: `Refund approved. This folder left your desk — the work is closed and The Studio will notify the client with the approved template. ${ownerConfirmationSuffix()}`,
+        message: `Refund approved and sent to Stripe for the amount paid. The work closes once Stripe accepts it, and the client sees each refund status. If Stripe cannot complete it, this folder returns to your desk. ${ownerConfirmationSuffix()}`,
       };
     case "owner_deny_refund":
       return {

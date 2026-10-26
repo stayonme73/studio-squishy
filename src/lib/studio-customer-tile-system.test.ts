@@ -83,8 +83,8 @@ describe("Studio customer tile system V1", () => {
       ),
       "utf8",
     );
-    expect(summary).toContain("studioTileClass.standardLight");
     expect(summary).toContain("styles.summaryRow");
+    expect(summary).not.toContain("${styles.summaryRow} ${studioTileClass.standardLight}");
     const route = readFileSync(
       join(
         process.cwd(),

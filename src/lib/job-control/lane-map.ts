@@ -25,7 +25,7 @@ export function mapCatalogLaneToControlLane(
   }
 }
 
-export function buildJobId(campaignId: string, skuId: ServiceId): string {
+export function buildJobId(campaignId: string, skuId: string): string {
   return `${campaignId}:${skuId}`;
 }
 

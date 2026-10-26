@@ -116,6 +116,41 @@ describe("route-map-intake-continuity", () => {
     expect(INTAKE_CONTINUITY_COPY.alreadySubmittedTitle).toContain("already been submitted");
   });
 
+  it("reopens only flyer production fields for a submitted materials-only flyer Intake", () => {
+    const campaign = paidSocialCampaign({
+      campaignName: "Maya’s Mobile Boutique",
+      approvedStudioPlan: {
+        selectedServiceIds: ["v2-rtu-flyer"],
+        includedServiceIds: ["v2-rtu-flyer"],
+        additionalServiceIds: [],
+        additionalCostUsd: 0,
+        oneTimeTotalCents: 6900,
+        monthlyTotalCents: 0,
+        amountDueTodayCents: 6900,
+        lineItems: [],
+        approvedAt: now,
+      },
+      routeMapContext: {
+        roadId: "i20",
+        jobId: "v2-rtu-flyer",
+        selectedServiceIds: ["v2-rtu-flyer"],
+        currentStep: "intake",
+        selectedAt: now,
+      },
+      routeMapIntakeSubmittedAt: now,
+      routeMapIntake: {
+        submittedAt: now,
+        answers: { "shared:materials": "I do not have this yet" },
+      },
+    });
+    const surface = resolveIntakeEntrySurface(campaign, "intake");
+    expect(surface?.kind).toBe("form");
+    if (surface?.kind !== "form") return;
+    expect(surface.flyerProductionCorrection).toBe(true);
+    expect(surface.draftAnswers?.["shared:materials"]).toBe("I do not have this yet");
+    expect(INTAKE_CONTINUITY_COPY.flyerCorrectionTitle).toContain("flyer details");
+  });
+
   it("routes unpaid customers to Checkout recovery", () => {
     const campaign = paidSocialCampaign({ paymentReceivedAt: undefined });
     const surface = resolveIntakeEntrySurface(campaign, "intake");
@@ -129,6 +164,24 @@ describe("route-map-intake-continuity", () => {
     if (surface?.kind === "missing-plan") {
       expect(surface.recoveryHref).toBe("/studio-conversation-room?stage=plan");
       expect(surface.recoveryLabel).toBe("Return to Studio Plan");
+    }
+  });
+
+  it("opens Intake from approved plan when the job id is missing but the road is known", () => {
+    const campaign = paidSocialCampaign({
+      routeMapContext: {
+        roadId: "i20",
+        jobId: undefined as never,
+        selectedServiceIds: undefined,
+        currentStep: "intake",
+        selectedAt: now,
+      },
+    });
+    const surface = resolveIntakeEntrySurface(campaign, "intake");
+    expect(surface?.kind).toBe("form");
+    if (surface?.kind === "form") {
+      expect(surface.jobId).toBe("v2-rtu-social-posts");
+      expect(surface.roadId).toBe("i20");
     }
   });
 
@@ -202,5 +255,13 @@ describe("route-map-intake-continuity", () => {
     expect(merged.routeMapIntake?.answers["shared:materials"]).toBe(
       "I do not have this yet",
     );
+  });
+
+  it("keeps a missing campaign on the missing-context path", () => {
+    const surface = resolveIntakeEntrySurface(null, "intake");
+    expect(surface?.kind).toBe("missing-context");
+    if (surface?.kind === "missing-context") {
+      expect(surface.recoveryLabel).toBe("Return to Conversation Room");
+    }
   });
 });

@@ -12,7 +12,7 @@ export const customerVisibilityContinuityV1 = {
     nextStep: "Next step",
     whoActs: "Who acts next",
     target: "Target or checkpoint",
-    risk: "Risks or blockers",
+    risk: "Anything in the way",
   },
   actors: {
     customer: "You",
@@ -21,7 +21,7 @@ export const customerVisibilityContinuityV1 = {
   },
   empty: {
     nothingNeeded: "Nothing is required from you right now.",
-    noRisk: "No risk or blocker is recorded.",
+    noRisk: "Nothing is holding this up.",
     targetNotSet: "Not set yet",
     noCampaign: "Start or resume a project to see your project status here.",
   },

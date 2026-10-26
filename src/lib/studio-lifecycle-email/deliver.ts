@@ -67,16 +67,23 @@ export function isLifecycleTransportDue(
   return nowMs - last >= cfg.retry.minIntervalMs;
 }
 
+const CERTIFICATION_CAMPAIGN_PREFIX = "studio-email-cert-";
+const CERTIFICATION_BANNER =
+  "This is a Studio delivery test. It is not a customer project, and it has no project link.";
+
 export function composeCustomerEmail(record: JobCommunicationRecord): {
   subject: string;
   text: string;
   html: string;
 } {
+  const certification = record.campaignId.startsWith(CERTIFICATION_CAMPAIGN_PREFIX);
   const links = lifecycleCustomerSurfaceAbsoluteLinks(record.eventType);
   const linkText = links.length
     ? ["", ...links.map((link) => `${link.label}: ${link.url}`)].join("\n")
     : "";
+  const subject = certification ? `Studio test — ${record.reason}` : record.reason;
   const text = [
+    certification ? CERTIFICATION_BANNER : null,
     record.messageContent.trim(),
     linkText,
     "",
@@ -84,9 +91,11 @@ export function composeCustomerEmail(record: JobCommunicationRecord): {
     "",
     "— The Studio",
   ]
+    .filter((part) => part != null)
     .join("\n")
     .replace(/\n{3,}/g, "\n\n");
   const html = [
+    certification ? `<p>${escapeHtml(CERTIFICATION_BANNER)}</p>` : "",
     `<p>${escapeHtml(record.messageContent.trim())}</p>`,
     ...links.map(
       (link) =>
@@ -95,7 +104,7 @@ export function composeCustomerEmail(record: JobCommunicationRecord): {
     `<p>${escapeHtml(cfg.customerFooter)}</p>`,
     "<p>— The Studio</p>",
   ].join("");
-  return { subject: record.reason, text, html };
+  return { subject, text, html };
 }
 
 export async function deliverAuthorizedLifecycleNotices(input: {
@@ -104,6 +113,8 @@ export async function deliverAuthorizedLifecycleNotices(input: {
   userId?: string;
   nowMs?: number;
   send?: LifecycleEmailSend;
+  /** When set, a false result is left untouched and is not sent. */
+  noticeMaySend?: (record: JobCommunicationRecord) => boolean;
 }): Promise<{
   envelope: ServerTasksEnvelope;
   attempted: number;
@@ -121,6 +132,9 @@ export async function deliverAuthorizedLifecycleNotices(input: {
   let skipped = 0;
 
   for (const record of envelope.jobCommunicationRecords ?? []) {
+    if (input.noticeMaySend && !input.noticeMaySend(record)) {
+      continue;
+    }
     if (!isLifecycleTransportDue(record, nowMs)) {
       if (isAuthorizedLifecycleNotice(record) && record.deliveryStatus !== "sent") {
         skipped += 1;

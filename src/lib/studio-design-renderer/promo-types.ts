@@ -4,6 +4,8 @@
  * Does not generalize to unlimited packs. primaryTool remapping is out of scope.
  */
 
+import type { ThemeLedCampaignTruth } from "./theme-led-campaign";
+
 export const DESIGN_RENDERER_PROMO_SKU = "v2-rtu-promotion-graphics" as const;
 export type DesignRendererPromoSku = typeof DESIGN_RENDERER_PROMO_SKU;
 
@@ -139,6 +141,9 @@ export type PromoProjectTruth = {
   fixtureId: string;
   label: string;
   outputMode: PromoOutputMode;
+  /** Absent means "offer" — the proven price/dates/CTA/contact layouts. */
+  contentMode?: "offer" | "theme_led";
+  themeLed?: ThemeLedCampaignTruth;
   businessName: string;
   wordmark: string;
   descriptor: string;
@@ -164,6 +169,8 @@ export type PromoProjectTruth = {
   approvedLogoVariantId: string;
   requiredTextTokens: readonly string[];
   prohibitedClaimPatterns: readonly string[];
+  /** Customer revision note for this package. Blank on the first production. */
+  revisionInstruction?: string;
   /** Exactly two assets — semantic ids + explicit purposes. */
   assets: readonly [PromoAssetTruth, PromoAssetTruth];
   /**

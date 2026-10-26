@@ -8,6 +8,7 @@ import {
 } from "@/lib/campaign-store/access";
 import { FixtureCampaignBlockedError } from "@/lib/campaign-store/fixture-guard";
 import { mergeCustomerOwnedCampaignSync } from "@/lib/campaign-store/customer-sync-allowlist";
+import { applyServerCampaignIsolationWritePolicy } from "@/lib/studio-payment/server-campaign-isolation-write-policy";
 import {
   readCampaignEnvelope,
   upsertCampaignRecord,
@@ -23,10 +24,12 @@ import { linkClientCampaign, updateUserCurrentCampaign } from "@/lib/auth/users"
 import type { CampaignRecord } from "@/config/studio-board";
 import { logAccessEvent } from "@/lib/security/access-log";
 import { resolveCustomerCurrentCampaign } from "@/lib/campaign-store/customer-current-campaign";
+import { identitySessionFromRequest } from "@/lib/studio-customer-identity-safety-gate/session";
 import {
   recoverPaidOperatingChain,
   wakePaidCampaignEnvelope,
 } from "@/lib/studio-paid-activation-recovery";
+import { claimCampaignForVerifiedClient } from "@/lib/studio-project-claim/claim";
 
 export async function GET(request: Request) {
   const user = await requireSession(request);
@@ -49,7 +52,14 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Access denied" }, { status: 403 });
   }
 
-  const woken = await wakePaidCampaignEnvelope(envelope);
+  const woken = await wakePaidCampaignEnvelope(
+    envelope,
+    identitySessionFromRequest(
+      request,
+      resolved.user.id,
+      envelope.campaignId,
+    ),
+  );
   const response = NextResponse.json({ campaign: woken });
   response.headers.set("Cache-Control", "no-store");
   const currentChanged = resolved.user.currentCampaignId !== user.currentCampaignId;
@@ -89,7 +99,9 @@ export async function PATCH(request: Request) {
       );
       if (claim instanceof NextResponse) return claim;
 
-      // Paid unowned projects require verified email (Project Claim gate).
+      // Paid unowned projects bind through Project Claim (receipt or same-browser
+      // possession). Do not silently stamp clientUserId, and do not wait on
+      // parked inbox verification when the paying device holds the project.
       const existingForPaidGate = await readCampaignEnvelope(record.campaignId);
       const paid = Boolean(
         existingForPaidGate?.record.paymentReceivedAt ||
@@ -97,33 +109,38 @@ export async function PATCH(request: Request) {
           record.paymentReceivedAt ||
           record.paymentTruth?.status === "confirmed",
       );
-      if (
-        isClientUser(user) &&
-        paid &&
-        !existingForPaidGate?.clientUserId &&
-        !user.emailVerifiedAt
-      ) {
-        logAccessEvent({
-          kind: "campaign_claim_denied",
-          route: "/api/campaigns/current",
+      if (isClientUser(user) && paid && !existingForPaidGate?.clientUserId) {
+        const claimed = await claimCampaignForVerifiedClient({
           user,
           campaignId: record.campaignId,
-          reason: "email_unverified",
+          allowLocalPossession: user.currentCampaignId === record.campaignId,
         });
-        return NextResponse.json(
-          {
-            error: "Verify your email before claiming a paid Studio project.",
-            code: "email_unverified",
-          },
-          { status: 403 },
-        );
+        if (!claimed.ok) {
+          logAccessEvent({
+            kind: "campaign_claim_denied",
+            route: "/api/campaigns/current",
+            user,
+            campaignId: record.campaignId,
+            reason: claimed.code,
+          });
+          return NextResponse.json(
+            {
+              error: claimed.message,
+              code: claimed.code,
+            },
+            { status: 403 },
+          );
+        }
       }
     }
 
     const existingEnvelope = await readCampaignEnvelope(record.campaignId);
     const recordToUpsert = isClientUser(user)
       ? mergeCustomerOwnedCampaignSync(existingEnvelope?.record ?? null, record)
-      : record;
+      : applyServerCampaignIsolationWritePolicy(
+          existingEnvelope?.record ?? null,
+          record,
+        );
 
     const envelope = await upsertCampaignRecord(
       recordToUpsert,
@@ -131,7 +148,13 @@ export async function PATCH(request: Request) {
     );
 
     if (envelope.record.paymentTruth?.status === "confirmed") {
-      await recoverPaidOperatingChain(envelope.record);
+      await recoverPaidOperatingChain(envelope.record, {
+        identitySession: identitySessionFromRequest(
+          request,
+          user.id,
+          record.campaignId,
+        ),
+      });
     }
 
     let updatedUser = user;

@@ -12,14 +12,16 @@ import FeedbackStudioRevisionStatus from "@/components/feedback-studio/FeedbackS
 import FeedbackStudioSubmissionReceipt from "@/components/feedback-studio/FeedbackStudioSubmissionReceipt";
 import FeedbackStudioSubmitConfirm from "@/components/feedback-studio/FeedbackStudioSubmitConfirm";
 import JobReviewDeliverablePreview from "@/components/feedback-studio/JobReviewDeliverablePreview";
+import JobReviewPhoneCustomerDock from "@/components/feedback-studio/JobReviewPhoneCustomerDock";
 import StudioBoardProjectCommunicationSection from "@/components/studio-board/StudioBoardProjectCommunicationSection";
+import StudioExtrasPanel from "@/components/studio-extras/StudioExtrasPanel";
 import type {
   FeedbackSectionId,
   FeedbackSession,
   FeedbackTool,
   StickyNoteColorId,
 } from "@/config/feedback-studio";
-import { feedbackStudio, resolveFeedbackSectionLabel } from "@/config/feedback-studio";
+import { feedbackStudio, isJobReviewClosedSpine, resolveFeedbackSectionLabel } from "@/config/feedback-studio";
 import { PROJECT_COMMUNICATION_CUSTOMER_V1 } from "@/config/project-communication-customer-v1";
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
 import {
@@ -28,6 +30,7 @@ import {
   buildStudioSubmissionReceipt,
 } from "@/lib/job-control/review-handoff-receipts";
 import type { ClientReviewView } from "@/lib/job-control/review-room-view";
+import { sortProofsByAddedAtDesc } from "@/lib/job-control/version-compare";
 import { hasClientRevisionIntent, canApproveJobForDelivery } from "@/lib/job-control/review-room-gates";
 import {
   deliverableKeyToSectionId,
@@ -35,6 +38,15 @@ import {
   jobReviewFeedbackToFeedbackSession,
   patchJobReview,
 } from "@/lib/review-room-client";
+import {
+  buildPhoneRevisionSubmitSession,
+  erasePhoneProofMarks,
+  hasPhoneRevisionSendContent,
+  resolveLaptopReviewDeskState,
+  summarizeApprovalConfirmScope,
+  summarizePhoneRevisionConfirm,
+  type PhoneRevisionConfirmSummary,
+} from "@/lib/studio-review-revision/phone-revision-composer";
 
 type Props = {
   review: ClientReviewView;
@@ -69,8 +81,16 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
   const [highlightProofId, setHighlightProofId] = useState<string | null>(null);
   const [textCommentProofId, setTextCommentProofId] = useState<string | null>(null);
   const [stickyOpen, setStickyOpen] = useState(false);
+  const [composerKind, setComposerKind] = useState<"none" | "revision" | "sticky">("none");
+  const [changeOpen, setChangeOpen] = useState(false);
+  const [askOpen, setAskOpen] = useState(false);
   const [stickyColor, setStickyColor] = useState<StickyNoteColorId>("yellow");
   const [stickyDraft, setStickyDraft] = useState("");
+  const [pendingStickyAnchor, setPendingStickyAnchor] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const [drawResetKey, setDrawResetKey] = useState(0);
   const [erasing, setErasing] = useState(false);
   const [recording, setRecording] = useState(false);
   const [recordingSec, setRecordingSec] = useState(0);
@@ -80,6 +100,11 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
   const [confirmMode, setConfirmMode] = useState<"revision" | "approval" | null>(
     null,
   );
+  const [phoneSurface, setPhoneSurface] = useState(false);
+  const [phoneConfirmSummary, setPhoneConfirmSummary] =
+    useState<PhoneRevisionConfirmSummary | null>(null);
+  const [extraDrafts, setExtraDrafts] = useState<Record<string, string>>({});
+  const [extrasRefreshKey, setExtrasRefreshKey] = useState(0);
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const recordStartRef = useRef<number>(0);
@@ -89,6 +114,8 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
   const receiveAckRef = useRef<string | null>(null);
   const sessionRef = useRef(session);
   sessionRef.current = session;
+  const phoneChangeOpenedAtRef = useRef<string | null>(null);
+  const phoneDrewThisChangeRef = useRef(false);
   const draftKey = `${review.jobId}:${review.feedback.packageId ?? "open"}`;
   const draftKeyRef = useRef<string | null>(null);
 
@@ -112,6 +139,14 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
       if (noticeTimerRef.current) window.clearTimeout(noticeTimerRef.current);
       if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
     };
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1024px)");
+    const sync = () => setPhoneSurface(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
   }, []);
 
   // C8b — record authorized customer open via authenticated POST (not GET/prefetch).
@@ -203,6 +238,7 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
         );
 
   function markDraw(sectionId: FeedbackSectionId) {
+    if (changeOpen) phoneDrewThisChangeRef.current = true;
     if (session.drawSections.includes(sectionId)) return;
     debouncedPersist({ ...session, drawSections: [...session.drawSections, sectionId] });
   }
@@ -231,6 +267,126 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
     flashSaveNotice(feedbackStudio.feedbackPanel.saved.skip(focusedSectionLabel));
   }
 
+  const phoneCopy = feedbackStudio.feedbackPanel.phoneCustomerRevision;
+  const revisionWorking =
+    submitted && review.spineStatus === "revision_requested";
+  const canOfferChange =
+    !submitted && accounting.remaining > 0 && !revisionWorking;
+  const phoneCanSend =
+    canOfferChange &&
+    canRequestRevisionNow &&
+    hasPhoneRevisionSendContent(session, stickyDraft);
+
+  useEffect(() => {
+    if (!canOfferChange && changeOpen) {
+      setChangeOpen(false);
+      setActiveTool("none");
+      setPendingStickyAnchor(null);
+      setStickyOpen(false);
+      setErasing(false);
+    }
+  }, [canOfferChange, changeOpen]);
+
+  function handlePhoneRequestChange() {
+    if (!canOfferChange) return;
+    if (changeOpen) {
+      setChangeOpen(false);
+      setActiveTool("none");
+      setPendingStickyAnchor(null);
+      setStickyOpen(false);
+      setErasing(false);
+      return;
+    }
+    phoneChangeOpenedAtRef.current = new Date().toISOString();
+    phoneDrewThisChangeRef.current = false;
+    if (!stickyDraft.trim()) {
+      const lastNote = [...session.stickyNotes]
+        .filter((note) => note.text.trim())
+        .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+        .at(-1);
+      if (lastNote) setStickyDraft(lastNote.text);
+    }
+    setStickyColor("yellow");
+    setComposerKind("revision");
+    setStickyOpen(false);
+    setActiveTool("none");
+    setErasing(false);
+    setChangeOpen(true);
+    setAskOpen(false);
+    setPendingStickyAnchor(null);
+    flashSaveNotice(phoneCopy.changeOpened);
+  }
+
+  function handlePhoneApprove() {
+    const sectionStatuses = {
+      ...sessionRef.current.sectionStatuses,
+      ...Object.fromEntries(visibleSectionIds.map((id) => [id, "approved" as const])),
+    };
+    const next = { ...sessionRef.current, sectionStatuses };
+    sessionRef.current = next;
+    setSession(next);
+    setChangeOpen(false);
+    if (saveTimerRef.current) {
+      window.clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+    void persistToServer(next);
+    setConfirmMode("approval");
+  }
+
+  function openPhoneRevisionConfirm() {
+    const openedAt = phoneChangeOpenedAtRef.current ?? new Date().toISOString();
+    const next = buildPhoneRevisionSubmitSession({
+      session: sessionRef.current,
+      focusedSection,
+      draft: stickyDraft,
+      changeOpenedAt: openedAt,
+      noteId: `sticky-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      includeDrawing: phoneDrewThisChangeRef.current,
+    });
+    sessionRef.current = next;
+    setSession(next);
+    setPhoneConfirmSummary(summarizePhoneRevisionConfirm(next));
+    setStickyDraft(next.stickyNotes[0]?.text ?? "");
+    setPendingStickyAnchor(null);
+    if (saveTimerRef.current) {
+      window.clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+    void persistToServer(next);
+    setConfirmMode("revision");
+  }
+
+  function handleAskStudio() {
+    setAskOpen(true);
+    setChangeOpen(false);
+    requestAnimationFrame(() => {
+      document.getElementById("fs-ask-studio")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }
+
+  function handlePhoneErase() {
+    setStickyDraft("");
+    setPendingStickyAnchor(null);
+    setActiveTool("none");
+    setStickyOpen(false);
+    setErasing(false);
+    setDrawResetKey((key) => key + 1);
+    phoneDrewThisChangeRef.current = false;
+    const next = erasePhoneProofMarks(sessionRef.current, focusedSection);
+    sessionRef.current = next;
+    setSession(next);
+    if (saveTimerRef.current) {
+      window.clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+    void persistToServer(next);
+  }
+
   function handleStickySave() {
     if (!stickyDraft.trim()) return;
     const note = {
@@ -239,9 +395,13 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
       color: stickyColor,
       text: stickyDraft.trim(),
       createdAt: new Date().toISOString(),
+      ...(pendingStickyAnchor
+        ? { anchorX: pendingStickyAnchor.x, anchorY: pendingStickyAnchor.y }
+        : {}),
     };
     debouncedPersist({ ...session, stickyNotes: [...session.stickyNotes, note] });
     setStickyDraft("");
+    setPendingStickyAnchor(null);
     setStickyOpen(false);
     setActiveTool("none");
     flashSaveNotice(feedbackStudio.feedbackPanel.saved.sticky);
@@ -254,20 +414,6 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
     }
 
     if (!navigator.mediaDevices?.getUserMedia) {
-      const fallbackSec = 3;
-      debouncedPersist({
-        ...session,
-        voiceNotes: [
-          ...session.voiceNotes,
-          {
-            id: `voice-${Date.now()}`,
-            sectionId: focusedSection,
-            durationSec: fallbackSec,
-            createdAt: new Date().toISOString(),
-          },
-        ],
-      });
-      flashSaveNotice(feedbackStudio.feedbackPanel.saved.voice(fallbackSec));
       return;
     }
 
@@ -318,11 +464,30 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
     setBusy(true);
     setError(null);
     try {
-      const feedback = feedbackSessionToJobReviewFeedback(sessionRef.current, review);
+      const submitting = phoneSurface
+        ? buildPhoneRevisionSubmitSession({
+            session: sessionRef.current,
+            focusedSection,
+            draft: stickyDraft,
+            changeOpenedAt: phoneChangeOpenedAtRef.current ?? new Date().toISOString(),
+            noteId: `sticky-${Date.now()}`,
+            createdAt: new Date().toISOString(),
+            includeDrawing: phoneDrewThisChangeRef.current,
+          })
+        : sessionRef.current;
+      sessionRef.current = submitting;
+      setSession(submitting);
+      const feedback = feedbackSessionToJobReviewFeedback(submitting, review);
+      const studioExtraChanges = Object.entries(extraDrafts)
+        .filter(([, note]) => note.trim().length > 0)
+        .map(([id, note]) => ({ id, note }));
       const result = await patchJobReview(review.campaignId, review.jobId, {
         action: "request_revision",
         feedback,
+        ...(studioExtraChanges.length > 0 ? { studioExtraChanges } : {}),
       });
+      if (studioExtraChanges.length > 0) setExtraDrafts({});
+      setExtrasRefreshKey((key) => key + 1);
       if (result.review) {
         onReviewUpdated(result.review);
         setSession(jobReviewFeedbackToFeedbackSession(result.review));
@@ -333,6 +498,11 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
         }));
       }
       setConfirmMode(null);
+      setChangeOpen(false);
+      setActiveTool("none");
+      setPendingStickyAnchor(null);
+      setStickyOpen(false);
+      setErasing(false);
       flashSaveNotice(feedbackStudio.jobReview.submittedRevision);
     } catch (submitError) {
       const message =
@@ -393,6 +563,17 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
     [session, review],
   );
 
+  const approvalScope = useMemo(
+    () =>
+      summarizeApprovalConfirmScope({
+        packageName: review.serviceName,
+        visibleSectionIds,
+        sectionLabels,
+        sectionStatuses: session.sectionStatuses,
+      }),
+    [review.serviceName, visibleSectionIds, sectionLabels, session.sectionStatuses],
+  );
+
   const lockedPackageReceipt = useMemo(() => {
     if (!review.feedback.submittedAt) return null;
     const senderEvent = [...review.activity]
@@ -409,10 +590,159 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
     });
   }, [review]);
 
+  function toggleLaptopTool(tool: FeedbackTool) {
+    setActiveTool((current) => (current === tool ? "none" : tool));
+    setStickyOpen(false);
+    setErasing(false);
+    const deliverable =
+      review.deliverables.find((item) => deliverableKeyToSectionId(item.key) === focusedSection) ??
+      review.deliverables[0];
+    const currentProof = deliverable ? sortProofsByAddedAtDesc(deliverable.proofFiles)[0] : null;
+    if (tool === "highlight" && currentProof) setHighlightProofId(currentProof.id);
+    if (tool === "textComment" && currentProof) setTextCommentProofId(currentProof.id);
+  }
+
+  function saveLaptopMessage() {
+    const text = stickyDraft.trim();
+    if (!text || submitted) return;
+    const deliverable =
+      review.deliverables.find((item) => deliverableKeyToSectionId(item.key) === focusedSection) ??
+      review.deliverables[0];
+    const currentProof = deliverable ? sortProofsByAddedAtDesc(deliverable.proofFiles)[0] : null;
+    if (!deliverable || !currentProof) return;
+    const now = new Date().toISOString();
+    debouncedPersist({
+      ...session,
+      textComments: [
+        ...(session.textComments ?? []),
+        {
+          id: `message-${Date.now()}`,
+          jobId: review.jobId,
+          deliverableKey: deliverable.key,
+          proofFileId: currentProof.id,
+          versionLabel: currentProof.versionLabel,
+          text,
+          createdAt: now,
+          updatedAt: now,
+        },
+      ],
+    });
+    setStickyDraft("");
+    flashSaveNotice("Message saved");
+  }
+
+  const reviewClosed = isJobReviewClosedSpine(review.spineStatus);
+  const laptopDesk = feedbackStudio.feedbackPanel.laptopWorkDesk;
+  const hasReviewAsset = review.deliverables.some((item) => item.proofFiles.length > 0);
+  const deskState = resolveLaptopReviewDeskState({
+    hasReviewAsset,
+    submitted,
+    reviewClosed,
+    canRequestRevision: canRequestRevisionNow,
+    hasValidReviewInput: hasPhoneRevisionSendContent(session, stickyDraft),
+  });
+
   return (
     <div className="fs-review fs-review--workspace">
-      <div className="fs-review__layout">
-        <div className="fs-review__main">
+      <div className="rd-shell__layout rd-shell__layout--room">
+        <div className="rd-shell__side">
+          <header className="rd-shell__summary">
+            <p className="rd-shell__project">{campaign?.campaignName ?? review.campaignName}</p>
+          </header>
+          <div className="rd-shell__jobs">
+            <p className="rd-shell__jobs-heading">
+              {reviewClosed
+                ? "Review closed"
+                : review.spineStatus === "revision_requested"
+                  ? "Revision requested"
+                  : feedbackStudio.jobReview.deliverableReady}
+            </p>
+            <p className="rd-job-list__name">{review.serviceName}</p>
+          </div>
+        </div>
+        <div className={`rd-shell__desk${deskState.toolsUsable ? "" : " rd-shell__desk--empty"}`}>
+          <div className="rd-shell__tools" role="toolbar" aria-label="Review tools">
+            <button
+              type="button"
+              className={`rd-shell__tool${deskState.toolsUsable ? "" : " is-muted"}${activeTool === "draw" ? " is-selected" : ""}`}
+              aria-pressed={activeTool === "draw"}
+              disabled={!deskState.toolsUsable}
+              tabIndex={deskState.toolsUsable ? 0 : -1}
+              onClick={() => {
+                if (!deskState.toolsUsable) return;
+                toggleLaptopTool("draw");
+              }}
+            >
+              {laptopDesk.marker}
+            </button>
+            <button
+              type="button"
+              className={`rd-shell__tool${deskState.toolsUsable ? "" : " is-muted"}${activeTool === "highlight" ? " is-selected" : ""}`}
+              aria-pressed={activeTool === "highlight"}
+              disabled={!deskState.toolsUsable}
+              tabIndex={deskState.toolsUsable ? 0 : -1}
+              onClick={() => {
+                if (!deskState.toolsUsable) return;
+                toggleLaptopTool("highlight");
+              }}
+            >
+              {laptopDesk.highlighter}
+            </button>
+            <button
+              type="button"
+              className={`rd-shell__tool${deskState.toolsUsable ? "" : " is-muted"}${recording ? " is-selected" : ""}`}
+              aria-pressed={recording}
+              disabled={!deskState.toolsUsable}
+              tabIndex={deskState.toolsUsable ? 0 : -1}
+              onClick={() => {
+                if (!deskState.toolsUsable) return;
+                void handleVoiceToggle();
+              }}
+            >
+              {laptopDesk.voice}
+            </button>
+            <button
+              type="button"
+              className={`rd-shell__tool${deskState.toolsUsable ? "" : " is-muted"}${activeTool === "textComment" ? " is-selected" : ""}`}
+              aria-pressed={activeTool === "textComment"}
+              disabled={!deskState.toolsUsable}
+              tabIndex={deskState.toolsUsable ? 0 : -1}
+              onClick={() => {
+                if (!deskState.toolsUsable) return;
+                toggleLaptopTool("textComment");
+              }}
+            >
+              {laptopDesk.message}
+            </button>
+          </div>
+          {activeTool === "textComment" && !reviewClosed && !submitted ? (
+            <div className="rd-shell__message">
+              <label className="rd-shell__message-label" htmlFor="rd-work-message">
+                {laptopDesk.message}
+              </label>
+              <textarea
+                id="rd-work-message"
+                className="rd-shell__message-input"
+                rows={3}
+                value={stickyDraft}
+                onChange={(event) => setStickyDraft(event.target.value)}
+                placeholder={laptopDesk.messagePlaceholder}
+              />
+              <button
+                type="button"
+                className="rd-shell__message-save"
+                onClick={saveLaptopMessage}
+                disabled={!stickyDraft.trim()}
+              >
+                {laptopDesk.saveMessage}
+              </button>
+            </div>
+          ) : null}
+          <h2 id="rd-work-area-heading" className="rd-shell__jobs-heading">
+            {laptopDesk.workArea}
+          </h2>
+          <div className="fs-review__layout">
+        <div className="fs-review__main fs-review__stage">
           <JobReviewDeliverablePreview
             reviewTitle={review.campaignName}
             serviceName={review.serviceName}
@@ -447,12 +777,79 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
             onTextCommentsChange={(next) => {
               debouncedPersist({ ...session, textComments: [...next] });
             }}
+            onCompareToggle={() => {
+              setActiveTool((tool) => (tool === "compare" ? "none" : "compare"));
+              setStickyOpen(false);
+              setErasing(false);
+            }}
+            stickyPlaceActive={false}
+            pendingStickyAnchor={null}
+            stickyDraft={stickyDraft}
+            drawResetKey={drawResetKey}
+          />
+
+          <div className="rd-shell__submit-row">
+            <button
+              type="button"
+              className={`rd-shell__submit${deskState.submitActive ? "" : " is-muted"}`}
+              disabled={!deskState.submitActive || busy}
+              tabIndex={deskState.submitActive ? 0 : -1}
+              onClick={() => {
+                if (!deskState.submitActive || busy) return;
+                if (saveTimerRef.current) {
+                  window.clearTimeout(saveTimerRef.current);
+                  saveTimerRef.current = null;
+                  void persistToServer(sessionRef.current);
+                }
+                setConfirmMode("revision");
+              }}
+            >
+              {laptopDesk.submit}
+            </button>
+            <button
+              type="button"
+              className="utility-btn utility-btn--primary fs-review__action fs-review__action--approve"
+              disabled={busy || !deskState.approveActive}
+              onClick={() => {
+                if (busy || !deskState.approveActive) return;
+                handlePhoneApprove();
+              }}
+            >
+              {feedbackStudio.feedbackPanel.approveForDelivery}
+            </button>
+          </div>
+
+          <JobReviewPhoneCustomerDock
+            submitted={submitted}
+            busy={busy}
+            canSendRevision={phoneCanSend}
+            canOfferChange={canOfferChange}
+            revisionWorking={revisionWorking}
+            changeOpen={changeOpen}
+            askOpen={askOpen}
+            stickyDraft={stickyDraft}
+            activeTool={activeTool}
+            recording={recording}
+            recordingSec={recordingSec}
+            hasDrawnMarks={session.drawSections.includes(focusedSection)}
+            onApprove={handlePhoneApprove}
+            onRequestChange={handlePhoneRequestChange}
+            onAskStudio={handleAskStudio}
+            onStickyDraft={setStickyDraft}
+            onSendRevision={openPhoneRevisionConfirm}
+            onDrawToggle={() => {
+              setActiveTool((tool) => (tool === "draw" ? "none" : "draw"));
+              setErasing(false);
+              setPendingStickyAnchor(null);
+            }}
+            onVoiceToggle={() => void handleVoiceToggle()}
+            onErase={handlePhoneErase}
           />
 
           <div className="fs-review__choose fs-review__choose--job">
             <button
               type="button"
-              className="utility-btn utility-btn--secondary"
+              className="utility-btn fs-review__action fs-review__action--revision"
               disabled={busy || submitted || !canRequestRevisionNow}
               onClick={() => {
                 if (saveTimerRef.current) {
@@ -467,7 +864,7 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
             </button>
             <button
               type="button"
-              className="utility-btn utility-btn--primary"
+              className="utility-btn utility-btn--primary fs-review__action fs-review__action--approve"
               disabled={busy || submitted || !canApproveNow}
               onClick={() => {
                 if (saveTimerRef.current) {
@@ -491,12 +888,24 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
             </p>
           ) : null}
 
+          <StudioExtrasPanel
+            campaignId={review.campaignId}
+            placement="review"
+            drafts={extraDrafts}
+            onDraftsChange={setExtraDrafts}
+            refreshKey={extrasRefreshKey}
+            bare
+          />
+
           {confirmMode ? (
             <FeedbackStudioSubmitConfirm
               mode={confirmMode}
               inventory={packageInventory}
               versionLabel={packageInventory.versionLabel}
               busy={busy}
+              surface={phoneSurface ? "phone" : "desktop"}
+              phoneSummary={phoneConfirmSummary}
+              approvalScope={approvalScope}
               onCancel={() => setConfirmMode(null)}
               onConfirm={() => {
                 if (confirmMode === "revision") {
@@ -510,19 +919,77 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
         </div>
 
         <aside className="fs-review__rail" aria-label="Review status, tools, and project communication">
-          <FeedbackStudioHandoffStatus review={review} />
-          <FeedbackStudioUpdateHistory items={review.updateHistory ?? []} />
-          {submissionReceipt && !submitted ? (
-            <FeedbackStudioSubmissionReceipt receipt={submissionReceipt} />
-          ) : null}
-          {submitted && lockedPackageReceipt ? (
-            <FeedbackStudioLockedPackageReceipt receipt={lockedPackageReceipt} />
-          ) : null}
-          <FeedbackStudioCorrectionAccounting
-            accounting={review.correctionAccounting}
-            exhaustedWording={review.exhaustedWording}
-          />
-          <FeedbackStudioRevisionStatus status={revisionStatus} />
+          <p className="fs-review__phone-glance" role="status">
+            {phoneCopy.revisionGlance(
+              accounting.included,
+              accounting.remaining,
+            )}
+          </p>
+
+          <div
+            id="fs-ask-studio"
+            className={`fs-review__ask${askOpen ? " fs-review__ask--open" : ""}`}
+          >
+            <StudioBoardProjectCommunicationSection
+              campaign={campaign}
+              hasCampaign={Boolean(campaign)}
+              campaignLookupPending={false}
+              jobId={review.jobId}
+              presentation={{
+                sectionTitle: PROJECT_COMMUNICATION_CUSTOMER_V1.reviewRoomSectionTitle,
+                sectionLead: PROJECT_COMMUNICATION_CUSTOMER_V1.reviewRoomSectionLead,
+                titleId: "fs-project-communication-title",
+                rootClassName:
+                  "fs-project-communication bf-material bf-material-paper",
+                autoFocusComposer: askOpen,
+              }}
+            />
+          </div>
+
+          <details className="fs-review__phone-fold">
+            <summary className="fs-review__phone-fold-summary">{phoneCopy.projectDetails}</summary>
+            <p className="fs-review__phone-fold-body">{feedbackStudio.jobReview.pickerLead}</p>
+            {review.deliverables.map((deliverable) => (
+              <p key={deliverable.key} className="fs-review__phone-fold-body">
+                {deliverable.label}
+              </p>
+            ))}
+          </details>
+
+          <details className="fs-review__phone-fold fs-review__phone-fold--history">
+            <summary className="fs-review__phone-fold-summary">{phoneCopy.projectHistory}</summary>
+            <div className="fs-review__desktop-audit">
+              <FeedbackStudioHandoffStatus review={review} />
+              <FeedbackStudioUpdateHistory items={review.updateHistory ?? []} />
+              {submissionReceipt && !submitted ? (
+                <FeedbackStudioSubmissionReceipt receipt={submissionReceipt} />
+              ) : null}
+              {submitted && lockedPackageReceipt ? (
+                <FeedbackStudioLockedPackageReceipt receipt={lockedPackageReceipt} />
+              ) : null}
+              <FeedbackStudioCorrectionAccounting
+                accounting={review.correctionAccounting}
+                exhaustedWording={review.exhaustedWording}
+              />
+              <FeedbackStudioRevisionStatus status={revisionStatus} />
+            </div>
+          </details>
+
+          <div className="fs-review__desktop-rail">
+            <FeedbackStudioHandoffStatus review={review} />
+            <FeedbackStudioUpdateHistory items={review.updateHistory ?? []} />
+            {submissionReceipt && !submitted ? (
+              <FeedbackStudioSubmissionReceipt receipt={submissionReceipt} />
+            ) : null}
+            {submitted && lockedPackageReceipt ? (
+              <FeedbackStudioLockedPackageReceipt receipt={lockedPackageReceipt} />
+            ) : null}
+            <FeedbackStudioCorrectionAccounting
+              accounting={review.correctionAccounting}
+              exhaustedWording={review.exhaustedWording}
+            />
+            <FeedbackStudioRevisionStatus status={revisionStatus} />
+          </div>
 
           <FeedbackStudioFeedbackPanel
             mode="job"
@@ -534,13 +1001,17 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
             stickyColor={stickyColor}
             stickyDraft={stickyDraft}
             stickyOpen={stickyOpen}
+            composerKind={composerKind}
             erasing={erasing}
             recording={recording}
             recordingSec={recordingSec}
             session={session}
             submitted={submitted}
             saveNotice={saveNotice}
+            canSendRevision={phoneCanSend}
             onStickyOpen={() => {
+              setComposerKind("sticky");
+              setStickyColor("coral");
               setStickyOpen((open) => !open);
               setActiveTool("sticky");
             }}
@@ -550,6 +1021,7 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
             onStickyCancel={() => {
               setStickyOpen(false);
               setStickyDraft("");
+              setComposerKind("none");
               setActiveTool("none");
             }}
             onDrawToggle={() => {
@@ -587,24 +1059,14 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
             onVoiceToggle={() => void handleVoiceToggle()}
             onApprove={handleApprove}
             onRevision={handleRevision}
+            onRequestChange={handlePhoneRequestChange}
+            onSendRevision={openPhoneRevisionConfirm}
             onSkip={handleSkip}
             onSubmit={() => undefined}
           />
-
-          <StudioBoardProjectCommunicationSection
-            campaign={campaign}
-            hasCampaign={Boolean(campaign)}
-            campaignLookupPending={false}
-            jobId={review.jobId}
-            presentation={{
-              sectionTitle: PROJECT_COMMUNICATION_CUSTOMER_V1.reviewRoomSectionTitle,
-              sectionLead: PROJECT_COMMUNICATION_CUSTOMER_V1.reviewRoomSectionLead,
-              titleId: "fs-project-communication-title",
-              rootClassName:
-                "fs-project-communication bf-material bf-material-paper",
-            }}
-          />
         </aside>
+      </div>
+        </div>
       </div>
     </div>
   );

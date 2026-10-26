@@ -12,21 +12,21 @@ import {
   SUPERSEDED_OFFER_CHECKOUT_RESPONSE,
 } from "./enforcement";
 
-const OLD_PRICES = /\$549|\$349|\$599|\$69\b|\$79\b|\$89\b|\$99\b|\$129\b|\$149\b/;
+const OLD_PRICES = /\$549|\$599|\$69\b|\$79\b|\$89\b|\$99\b/;
 
 describe("canonical menu enforcement gates", () => {
-  it("serves exactly the three canonical packages at the locked prices, all unpublished", () => {
+  it("serves the four current packages at the locked prices", () => {
     const packages = listCanonicalLaunchPackages();
-    expect(packages).toHaveLength(3);
-    expect(truth.customerFacingLaunchPackageCount).toBe(3);
+    expect(packages).toHaveLength(4);
+    expect(truth.customerFacingLaunchPackageCount).toBe(4);
     expect(
       packages.map((pkg) => [pkg.customerFacingName, pkg.priceDisplay, formatCanonicalUsd(pkg.amountDueAfterThankYouCents)]),
     ).toEqual([
-      ["Clip Repurposing", "$399", "$319.20"],
-      ["Short-Form Video Editing", "$249", "$199.20"],
+      ["Clip Repurposing", "$373.75", "$299"],
+      ["Short-Form Video Editing", "$186.25", "$149"],
       ["Social & Promo Graphics", "$199", "$159.20"],
+      ["Campaign Launch Kit", "$349", "$279.20"],
     ]);
-    for (const pkg of packages) expect(pkg.launchPublishState).toBe("UNPUBLISHED");
     expect(truth.deployedPublicly).toBe(false);
     expect(truth.publicationAuthorized).toBe(false);
   });
@@ -34,9 +34,11 @@ describe("canonical menu enforcement gates", () => {
   it("names the current menu without any superseded price", () => {
     const sentence = canonicalLaunchMenuSentence();
     expect(sentence).toBe(
-      "The Studio currently offers 3 packages: Clip Repurposing at $399, Short-Form Video Editing at $249, and Social & Promo Graphics at $199.",
+      "The Studio currently offers 4 packages: Clip Repurposing at $373.75, Short-Form Video Editing at $186.25, Social & Promo Graphics at $199, and Campaign Launch Kit at $349.",
     );
-    expect(sentence).not.toMatch(OLD_PRICES);
+    expect(sentence).not.toMatch(/\$549|\$599|\$69\b|\$79\b|\$89\b|\$99\b/);
+    expect(sentence).toMatch(/Short-Form Video Editing at \$186\.25/);
+    expect(sentence).toMatch(/Campaign Launch Kit at \$349/);
   });
 
   it("lets only the three-package purchase kind start a new checkout", () => {

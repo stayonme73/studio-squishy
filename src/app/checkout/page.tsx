@@ -1,8 +1,13 @@
-import { redirect } from "next/navigation";
+import ReviewAndPayPage from "@/components/studio-journey/ReviewAndPayPage";
 
-import { legacyRouteQuarantineV1 } from "@/config/legacy-route-quarantine-v1";
+import "../studio-customer-last-paint.css";
 
-/** Legacy standalone Secure Checkout route: certified payment lives in Conversation Room. */
+export const metadata = {
+  title: "Review & Pay",
+  description: "Review the package, project details, and price before payment.",
+};
+
+/** Condensed Review & Pay — existing checkout plus project review. */
 export default function CheckoutPage() {
-  redirect(legacyRouteQuarantineV1.activeCheckout);
+  return <ReviewAndPayPage />;
 }

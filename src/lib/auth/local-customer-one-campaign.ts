@@ -3,6 +3,7 @@
  */
 
 import type { CampaignRecord } from "@/config/studio-board";
+import { MAYA_PROTECTED_CAMPAIGN_ID } from "@/config/studio-production-team-workforce-v1";
 import type { ServerCampaignEnvelope } from "@/lib/campaign-store/types";
 
 export function isLocalCustomerOnePaidFlyerCampaign(
@@ -15,6 +16,27 @@ export function isLocalCustomerOnePaidFlyerCampaign(
   return (record.approvedStudioPlan?.selectedServiceIds ?? []).includes(
     "v2-rtu-flyer",
   );
+}
+
+/** Latest paid campaign this client owns that is not the frozen Maya job. */
+export function pickOwnedPaidNonMayaCampaign(
+  envelopes: readonly ServerCampaignEnvelope[],
+  userId: string,
+): ServerCampaignEnvelope | null {
+  const matches = envelopes.filter((envelope) => {
+    if (envelope.clientUserId !== userId) return false;
+    if (envelope.campaignId === MAYA_PROTECTED_CAMPAIGN_ID) return false;
+    const record = envelope.record;
+    if (!record?.paymentReceivedAt) return false;
+    if (isLocalCustomerOnePaidFlyerCampaign(record)) return false;
+    return true;
+  });
+  if (matches.length === 0) return null;
+  return [...matches].sort((a, b) => {
+    const aPaid = new Date(a.record.paymentReceivedAt ?? 0).getTime();
+    const bPaid = new Date(b.record.paymentReceivedAt ?? 0).getTime();
+    return bPaid - aPaid;
+  })[0] ?? null;
 }
 
 /** Latest existing paid Maya flyer. Does not create campaigns. */

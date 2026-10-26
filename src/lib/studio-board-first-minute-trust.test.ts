@@ -1,14 +1,17 @@
 import { describe, expect, it } from "vitest";
 
+import type { CampaignRecord } from "@/config/studio-board";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
 import { isExplicitStudioBoardFrom } from "@/lib/auth/safe-return-path";
 import {
   BOARD_NEUTRAL_GREETING,
+  resolveBoardBoundCustomerDisplayName,
   resolveBoardCustomerDisplayName,
   resolveBoardHeaderGreeting,
   resolveStudioNoteGreetingLine,
 } from "@/lib/studio-board-customer-greeting";
 import {
+  isLeakedMaterialsBoardError,
   MATERIALS_STILL_NEED_AWAITING_REQUESTS,
   MATERIALS_STILL_NEED_INCOMPLETE_INTAKE,
   MATERIALS_STILL_NEED_NONE_CURRENTLY_NEEDED,
@@ -16,7 +19,7 @@ import {
 } from "@/lib/studio-board-client-copy";
 
 const GENERIC_SIGN_IN_LEAD =
-  "Use the account connected to your Studio work to open your Board, Review Room, Project Record, and Final Delivery.";
+  "Use the account connected to your Studio work to open your Board, Review Room, and Final Delivery.";
 
 /** Mirrors SignInScene — explicit allowlisted Board `from` only, not navigational fallback. */
 function resolveSignInLeadFromFromParam(from: string | null): string {
@@ -31,6 +34,59 @@ describe("studio-board-customer-greeting", () => {
     expect(resolveBoardCustomerDisplayName("   ")).toBeNull();
     expect(resolveBoardCustomerDisplayName(null)).toBeNull();
     expect(resolveBoardCustomerDisplayName(undefined)).toBeNull();
+  });
+
+  it("does not greet Maya when the bound campaign is a fresh non-Maya project", () => {
+    expect(
+      resolveBoardBoundCustomerDisplayName({
+        sessionDisplayName: "Maya",
+        campaign: {
+          campaignId: "customer-one-fresh-board-bind",
+          campaignName: "Harbor & Co.",
+          campaignStatus: "PAYMENT_RECEIVED",
+          campaignDescription: "Paid",
+          estimatedCompletion: "Soon",
+          packageId: "custom-studio-plan",
+          packageLabel: "Custom Studio Plan",
+          paymentReceivedAt: "2026-09-12T18:00:00.000Z",
+          createdAt: "2026-09-12T18:00:00.000Z",
+          updatedAt: "2026-09-12T18:00:00.000Z",
+          deliverablesDelivered: {},
+        },
+      } as CampaignRecord),
+    ).toBeNull();
+  });
+
+  it("keeps Maya’s greeting on Maya’s own campaign", () => {
+    expect(
+      resolveBoardBoundCustomerDisplayName({
+        sessionDisplayName: "Maya",
+        campaign: {
+          campaignId: "716a15b6-d8d6-436c-8f84-9e8b40d2f959",
+          campaignName: "Maya’s Mobile Boutique",
+          campaignStatus: "READY_FOR_REVIEW",
+          campaignDescription: "Frozen",
+          estimatedCompletion: "Frozen",
+          packageId: "custom-studio-plan",
+          packageLabel: "Custom Studio Plan",
+          paymentReceivedAt: "2026-09-06T22:28:33.080Z",
+          createdAt: "2026-09-06T10:00:00.000Z",
+          updatedAt: "2026-09-08T20:00:00.000Z",
+          deliverablesDelivered: {},
+          approvedStudioPlan: {
+            selectedServiceIds: ["v2-rtu-flyer"],
+            includedServiceIds: ["v2-rtu-flyer"],
+            additionalServiceIds: [],
+            additionalCostUsd: 0,
+            oneTimeTotalCents: 6900,
+            monthlyTotalCents: 0,
+            amountDueTodayCents: 6900,
+            lineItems: [],
+            approvedAt: "2026-09-06T22:28:33.080Z",
+          },
+        },
+      } as CampaignRecord),
+    ).toBe("Maya");
   });
 
   it("named greeting after session + period resolve", () => {
@@ -103,6 +159,15 @@ describe("studio-board-customer-greeting", () => {
     expect(resolveStudioNoteGreetingLine("Ada")).toBe("Hi Ada,");
     expect(resolveStudioNoteGreetingLine("")).toBe("Hello,");
     expect(resolveStudioNoteGreetingLine(null)).toBe("Hello,");
+  });
+});
+
+describe("isLeakedMaterialsBoardError", () => {
+  it("treats Forbidden and HTTP access language as a leak", () => {
+    expect(isLeakedMaterialsBoardError("Forbidden")).toBe(true);
+    expect(isLeakedMaterialsBoardError("Unauthorized")).toBe(true);
+    expect(isLeakedMaterialsBoardError("Request failed (403)")).toBe(true);
+    expect(isLeakedMaterialsBoardError(MATERIALS_STILL_NEED_AWAITING_REQUESTS)).toBe(false);
   });
 });
 

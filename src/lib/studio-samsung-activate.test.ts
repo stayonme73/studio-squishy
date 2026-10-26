@@ -2,6 +2,28 @@ import { describe, expect, it } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
+import {
+  beginStudioPointerSettle,
+  isStudioPointerSettling,
+  STUDIO_POINTER_SETTLE_MS,
+} from "@/lib/studio-samsung-activate";
+
+describe("shared leftover-tap settle", () => {
+  it("swallows pointer and click events until the next screen is idle", () => {
+    beginStudioPointerSettle();
+    expect(isStudioPointerSettling()).toBe(true);
+    expect(STUDIO_POINTER_SETTLE_MS).toBe(450);
+    if (typeof window !== "undefined") {
+      const click = new Event("click", { bubbles: true, cancelable: true });
+      const down = new Event("pointerdown", { bubbles: true, cancelable: true });
+      window.dispatchEvent(click);
+      window.dispatchEvent(down);
+      expect(click.defaultPrevented).toBe(true);
+      expect(down.defaultPrevented).toBe(true);
+    }
+  });
+});
+
 describe("useSamsungActivate", () => {
   it("binds a stable native pointerdown and does not skip mouse-emulated taps", () => {
     const source = readFileSync(
@@ -17,6 +39,12 @@ describe("useSamsungActivate", () => {
     expect(source).toContain("if (!lastAt.current) return");
     expect(source).toContain("if (!sawPointerDown.current) return");
     expect(source).toContain("event?.detail === 0");
+    expect(source).toContain("beginStudioPointerSettle");
+    expect(source).toContain('addEventListener("pointerdown", swallowClick, true)');
+    expect(source).toContain("mountedDuringSettle");
+    expect(source).toContain("STUDIO_POINTER_SETTLE_MS");
+    expect(source).toContain("blockStudioPointerId");
+    expect(source).toContain("isBlockedStudioPointerId");
     expect(source).toContain("RefCallback");
     expect(source).not.toContain('pointerType === "mouse"');
     expect(source).not.toContain("useLayoutEffect");
@@ -57,6 +85,16 @@ describe("Voice Choice Fill it out myself (Samsung tap)", () => {
     expect(gate).toContain("data-voice-choice-action={action}");
     expect(gate).toContain('action="off"');
     expect(gate).toContain("voiceChoiceButtonClass(selected)");
+    expect(gate).toContain("data-voice-choice-continue");
+    expect(gate).toContain("conversationRoomGuideV1.continueLabel");
+    expect(gate).toContain("function select(");
+    expect(gate).toContain("continueArmedRef");
+    expect(gate).toContain("suppressSameGestureFollowUp");
+    expect(gate).toContain("beginStudioPointerSettle");
+    expect(gate).toContain("StudioPointerSettleShield");
+    expect(gate).toContain("continueArmed");
+    expect(gate).toContain("pointerEvents");
+    expect(gate).not.toContain("onChoose(value);");
     expect(gate).toContain('href="#studio-voice-choice"');
     const activate = readFileSync(
       join(process.cwd(), "src/lib/studio-samsung-activate.ts"),

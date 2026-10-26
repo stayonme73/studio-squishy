@@ -4,10 +4,10 @@ import ClaimProjectScene from "@/components/auth/ClaimProjectScene";
 import StudioMobileLoungeShell from "@/components/shared/StudioMobileLoungeShell";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
-import "../mobile-route-fixes.css";
+import "../studio-customer-last-paint.css";
 
 export const metadata = {
-  title: "Claim Project | The Studio",
+  title: "Claim Project",
   description: "Link your paid Studio project to this account.",
 };
 

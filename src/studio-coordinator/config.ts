@@ -81,6 +81,9 @@ function isCampaignExceptionKind(value: string): value is CampaignExceptionKind 
   ].includes(value);
 }
 
+/** Look-back for counting repeated client messages. Not a Waiting on Client, reminder, or refund clock. */
+export const INTERACTION_RECENCY_WINDOW_HOURS = 72;
+
 export const CONFUSION_INTERACTION_KINDS = new Set<CustomerInteractionKind>([
   "clarification_request",
   "status_inquiry",

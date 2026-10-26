@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import ProjectBuilderJobDetailBlocks from "@/components/project-builder/ProjectBuilderJobDetailBlocks";
 import "@/components/project-builder/project-builder-job-details.css";
@@ -57,6 +57,8 @@ export type ConversationActivityPanelProps = {
   intakeNextStepBlurb: string;
   /** Back label when Learn More was opened from Studio Plan vs Builder. */
   learnMoreBackLabel: string;
+  /** Voice On/Off — same control the tablet shows on every Conversation desk. */
+  topControls?: ReactNode;
 };
 
 function roadTaglineForPeek(roadId: RouteMapRoadId, fallback: string): string {
@@ -290,6 +292,7 @@ export default function ConversationActivityPanel({
   intakeSubmitCtaLabel,
   intakeNextStepBlurb,
   learnMoreBackLabel,
+  topControls = null,
 }: ConversationActivityPanelProps) {
   if (panel === "route" && selectedRoadId && onConfirmRoute) {
     return (
@@ -311,6 +314,7 @@ export default function ConversationActivityPanel({
         onAddJob={onAddJob}
         onRemoveJob={onRemoveJob}
         onReviewStudioPlan={onReviewStudioPlan}
+        topControls={topControls}
       />
     );
   }
@@ -394,6 +398,7 @@ export default function ConversationActivityPanel({
         onSandboxConfirm={onSandboxCheckoutConfirm}
         onAuthorizePayment={onAuthorizeCheckoutPayment}
         paymentHonestyMessage={paymentHonestyMessage}
+        topControls={topControls}
       />
     );
   }
@@ -408,6 +413,7 @@ export default function ConversationActivityPanel({
         onAnswersChange={onIntakeAnswersChange}
         submitCtaLabel={intakeSubmitCtaLabel}
         nextStepBlurb={intakeNextStepBlurb}
+        topControls={topControls}
       />
     );
   }

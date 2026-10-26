@@ -8,7 +8,7 @@ import { isKitchenFixtureDemoRequested } from "@/lib/studio-kitchen";
 import { loadKitchenProjectionBoard } from "@/lib/studio-kitchen/load-projection";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
-import "../mobile-route-fixes.css";
+import "../studio-customer-last-paint.css";
 
 export const dynamic = "force-dynamic";
 

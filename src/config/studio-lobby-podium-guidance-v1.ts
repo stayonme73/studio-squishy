@@ -6,8 +6,11 @@
  * quickly. Voice plays with the chrome label, then at most once every 30s while
  * they still have not started.
  *
- * Deferred: final Studio voice personality / certified greeting copy.
+ * Step 3B: greeting reduced so Voice does not claim it can answer everything
+ * from start to finish.
  */
+
+import { studioVoiceLaunchBlockerHardeningV1 } from "@/config/studio-voice-launch-blocker-hardening-v1";
 
 export const studioLobbyPodiumGuidanceV1 = {
   /** Lightweight first-visit flag (localStorage). */
@@ -18,7 +21,7 @@ export const studioLobbyPodiumGuidanceV1 = {
    * studioLobbyVisited flag re-arm.
    */
   guidanceEpochKey: "studioLobbyGuidanceEpoch",
-  guidanceEpoch: "8",
+  guidanceEpoch: "9",
 
   /**
    * Brief beat so a customer who taps the podium immediately stays quiet.
@@ -35,13 +38,12 @@ export const studioLobbyPodiumGuidanceV1 = {
    */
   hesitationPrompt: {
     title: "Welcome to The Studio.",
-    body: 'I\'m Studio Voice. I\'ll help you choose the right services, answer your questions, and guide you through your project from start to finish. Whenever you\'re ready, select "Let\'s Get Started" on the podium. I\'ll take it from there.',
+    body: studioVoiceLaunchBlockerHardeningV1.lobbyHesitationBody,
   },
 
   /**
-   * Lobby greeting — LOCKED (Tagia 2026-07-19).
+   * Lobby greeting — honest Step 3B revision (Tagia 2026-09-26).
    * Spoken with the label (and on cooldown while still waiting).
    */
-  spokenLine:
-    'Welcome to The Studio. I\'m Studio Voice. I\'ll help you choose the right services, answer your questions, and guide you through your project from start to finish. Whenever you\'re ready, select Let\'s Get Started on the podium. I\'ll take it from there.',
+  spokenLine: studioVoiceLaunchBlockerHardeningV1.lobbySpokenLine,
 } as const;

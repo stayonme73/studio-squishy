@@ -5,6 +5,7 @@ import type { CampaignMaterialItem } from "@/lib/materials/types";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import { isOwnerUser, isStaffUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
+import type { RefundExecutionPlan } from "@/lib/studio-payment/refund-execution";
 import {
   addJobFileReference,
   createReferenceOnlyStorageRef,
@@ -13,6 +14,7 @@ import {
 
 import { appendJobActivityEvent } from "./activity-log";
 import { applyJobSpineStatusChange } from "./actions";
+import { admitQuickLaneProduction } from "./quick-lane-admission";
 import { buildAcceptedAcceptanceReview } from "./acceptance-review";
 import { enqueueJobCommunicationRecord } from "./communication";
 import type { ProductionLaneView } from "./capacity";
@@ -148,7 +150,14 @@ export type ProductionWorkspacePatchBody =
   | { action: "owner_assign_heavy_lane"; note: string; ownerNotes?: string };
 
 export type ProductionWorkspacePatchResult =
-  | { ok: true; envelope: ServerTasksEnvelope; job: PurchasedJobRecord; updatedCampaign?: CampaignRecord }
+  | {
+      ok: true;
+      envelope: ServerTasksEnvelope;
+      job: PurchasedJobRecord;
+      updatedCampaign?: CampaignRecord;
+      /** Present only after canonical refund approval; the caller must run Stripe execution. */
+      refundExecutionPlan?: RefundExecutionPlan;
+    }
   | { ok: false; error: string; status: number };
 
 function actorFromUser(user: StudioUser): JobActivityActor {
@@ -293,6 +302,7 @@ export function applyProductionWorkspacePatch(
   laneViews: readonly ProductionLaneView[],
   clientId = `unclaimed-client:${campaign.campaignId}`,
   tasks: readonly CampaignTaskItem[] = [],
+  options: { repoRoot?: string } = {},
 ): ProductionWorkspacePatchResult {
   const parsed = parseJobId(jobId);
   if (!parsed || parsed.campaignId !== campaign.campaignId) {
@@ -356,6 +366,32 @@ export function applyProductionWorkspacePatch(
           error: gate.reasons.map((reason) => reason.message).join(" "),
           status: 422,
         };
+      }
+
+      const lane = job.returnLane ?? job.productionLane;
+      const admissionRoot =
+        options.repoRoot ?? (process.env.NODE_ENV === "test" ? undefined : process.cwd());
+      if (lane === "quick" && admissionRoot) {
+        const evidenceJobIds =
+          laneViews.find((view) => view.lane === "quick")?.activeJobs.map((active) => active.jobId) ??
+          [];
+        const admitted = admitQuickLaneProduction({
+          repoRoot: admissionRoot,
+          jobId: job.jobId,
+          campaignId: job.campaignId,
+          evidenceJobIds,
+          capacity: laneViews.find((view) => view.lane === "quick")?.capacity,
+        });
+        if (!admitted.ok) {
+          return {
+            ok: false,
+            error:
+              admitted.reason === "lane_full"
+                ? "quick lane has no available capacity."
+                : "quick lane could not reserve a production slot. Try again shortly.",
+            status: admitted.reason === "lane_full" ? 422 : 503,
+          };
+        }
       }
 
       const result = applyJobSpineStatusChange(job, events, {
@@ -1340,51 +1376,15 @@ export function applyProductionWorkspacePatch(
       };
     }
 
-    case "issue_refund": {
-      if (!isOwnerUser(user)) {
-        return { ok: false, error: "Owner role required.", status: 403 };
-      }
-      if (job.productionStartedAt || job.nonRefundable) {
-        return {
-          ok: false,
-          error: "Production has started for this job, so it is nonrefundable.",
-          status: 422,
-        };
-      }
-
-      const reason = body.reason.trim();
-      if (!reason) {
-        return { ok: false, error: "Refund reason is required.", status: 400 };
-      }
-
-      const refundResult = applyJobSpineStatusChange(job, events, {
-        job,
-        nextStatus: "refunded_cancelled",
-        actor,
-        reason,
-        occurredAt,
-      });
-      job = {
-        ...refundResult.job,
-        refundEligibleAt: job.refundEligibleAt ?? occurredAt,
-      };
-      events = refundResult.events;
-      envelope = enqueueJobCommunicationRecord(
-        { ...envelope, jobActivityEvents: events },
-        {
-          campaign,
-          clientId,
-          job,
-          eventType: "refund_issued",
-          sender: actor,
-          occurredAt,
-          idempotencyKey: occurredAt,
-          reason,
-        },
+    case "issue_refund":
+      return applyOwnerApproveRefund(
+        envelope,
+        campaign,
+        jobId,
+        { reason: body.reason },
+        user,
+        clientId,
       );
-      events = envelope.jobActivityEvents ?? [];
-      break;
-    }
 
     case "owner_approve_refund":
       return applyOwnerApproveRefund(

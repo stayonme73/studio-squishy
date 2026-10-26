@@ -1,6 +1,13 @@
-import { redirect } from "next/navigation";
+import BuildYourProjectPage from "@/components/studio-journey/BuildYourProjectPage";
 
-/** Legacy Build Your Project route: sealed from the customer journey. */
+import "../studio-customer-last-paint.css";
+
+export const metadata = {
+  title: "Build Your Project",
+  description: "Add the details The Studio needs before review and payment.",
+};
+
+/** Condensed Build Your Project — one page, existing card language. */
 export default function ProjectBuilderPage() {
-  redirect("/studio-conversation-room");
+  return <BuildYourProjectPage />;
 }

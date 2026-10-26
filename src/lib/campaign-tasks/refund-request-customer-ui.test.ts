@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import { REFUND_REQUEST_CUSTOMER_V1 as copy } from "@/config/refund-request-customer-v1";
 import {
   mapRefundRequestSubmitFailure,
   mapRefundRequestSubmitSuccess,
+  refundEligibilityCustomerMessage,
   refundProductionStartedCustomerNote,
 } from "./refund-request-customer-ui";
 
@@ -55,6 +58,43 @@ describe("refund-request-customer-ui", () => {
   it("preserves may-be policy softness in customer config", () => {
     expect(copy.sectionLead).toMatch(/may be eligible/);
     expect(copy.policyNote).toMatch(/may be approved/);
+    expect(copy.eligibilityAfterProduction).toMatch(/may be limited/);
     expect(copy.sectionLead.toLowerCase()).not.toMatch(/will be refunded|money returned/);
+  });
+
+  it("uses stage-based Board eligibility copy without promising money returned", () => {
+    expect(refundEligibilityCustomerMessage({ productionStarted: false })).toBe(
+      copy.eligibilityBeforeProduction,
+    );
+    expect(refundEligibilityCustomerMessage({ productionStarted: true })).toBe(
+      copy.eligibilityAfterProduction,
+    );
+    expect(copy.eligibilityBeforeProduction.toLowerCase()).not.toMatch(
+      /will be refunded|money returned/,
+    );
+    expect(copy.eligibilityAfterProduction.toLowerCase()).not.toMatch(
+      /will be refunded|money returned/,
+    );
+  });
+
+  it("collapses Board refund access instead of removing it", () => {
+    const source = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-board/StudioBoardRefundRequestSection.tsx",
+      ),
+      "utf8",
+    );
+    expect(source).toContain("data-refund-disclosure");
+    expect(source).toContain("<details");
+    expect(source).not.toMatch(/<details[^>]*\sopen/);
+    expect(source).toContain("copy.disclosureLabel");
+    expect(source).toContain("refundEligibilityCustomerMessage");
+    expect(source).toContain("helpCenterHref(copy.helpPolicyAnchor");
+    expect(source).toContain("copy.submitLabel");
+    expect(source).not.toContain("REFUND REQUEST");
+    expect(copy.disclosureLabel).toBe("Billing & cancellation");
+    expect(copy.submitLabel).toBe("Request refund review");
+    expect(copy.helpPolicyAnchor).toBe("policy-refund-policy");
   });
 });

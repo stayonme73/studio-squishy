@@ -11,6 +11,7 @@ import {
 import { buildServiceScopeSnapshot } from "@/lib/plan-pricing";
 import { buildRouteMapTimingLabel } from "@/catalog/route-map-shared-copy";
 import type { ServiceId } from "@/catalog/types";
+import { LAUNCH_MENU_HONEST_TIMING_LABEL } from "@/config/studio-menu-readiness-and-demand-freeze-v1";
 
 const MONTHLY_CYCLE_LABEL =
   "First batch 6–8 business days after direction/materials are complete; later batches follow the monthly production calendar.";
@@ -110,7 +111,8 @@ describe("route-map-display accessors", () => {
   it("returns V2 turnaround labels from catalog seeds", () => {
     const flyer = getServiceById("v2-rtu-flyer");
     expect(flyer?.routeMapTurnaroundLabel?.toLowerCase()).toContain("2–3 business days");
-    expect(getRouteMapTurnaroundLabel(flyer!)).toBe(flyer!.routeMapTurnaroundLabel);
+    expect(getRouteMapTurnaroundLabel(flyer!)).toBe(LAUNCH_MENU_HONEST_TIMING_LABEL);
+    expect(getCheckoutTimingLabel(flyer!)).toBe(LAUNCH_MENU_HONEST_TIMING_LABEL);
   });
 
   it("returns intake template keys from catalog seeds", () => {

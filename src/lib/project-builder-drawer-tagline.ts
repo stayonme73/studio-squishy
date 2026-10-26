@@ -2,21 +2,21 @@ import type { RouteMapJob } from "@/config/route-map-v1";
 
 const DRAWER_PURPOSE_BY_JOB_ID: Partial<Record<string, string>> = {
   "v2-rtu-business-card":
-    "One double-sided business card design for one person or version — design only, not printing or shipping. Give customers a simple, professional way to remember and contact your business.",
+    "One double-sided digital business card for one person — 1536×1024 both sides. Front and back PNG plus a PDF you can print yourself. This is not a certified 3.5×2 or 300 DPI print file.",
   "v2-rtu-flyer":
-    "One single-sided flyer for one clear message, offer, or event — one agreed size, ready to print or share online.",
+    "One single-sided digital flyer for one clear message, offer, or event — one agreed size. Share it online or print it yourself. This is not a certified 300 DPI print file.",
   "v2-rtu-service-sheet":
-    "One page listing up to ten services with brief descriptions you provide — one agreed size, ready to print or share.",
+    "One portrait digital service list — up to ten services you provide. Share it or print it yourself. This is not a certified 300 DPI print file.",
   "v2-rtu-menu":
-    "One single-page menu with a defined item limit — your final items and prices, one agreed size, ready to print or share.",
+    "One single-page digital menu — up to 5 sections and 30 items. You supply and verify items, prices, and allergen wording. Share it or print it yourself. This is not a certified 300 DPI print file.",
   "v2-rtu-promotion-graphics":
-    "Two coordinated static graphics for one campaign, offer, event, or launch — same theme, one agreed format per graphic.",
+    "Two coordinated digital campaign graphics for one theme — one square and one portrait. You post or share them. This is not a certified 300 DPI print file.",
   "v2-rtu-social-posts":
-    "Four coordinated static post graphics for one platform — captions included, ready for you to upload and post yourself.",
+    "Four coordinated square static posts (1024×1024) for one theme and one platform, plus one caption per post and a suggested posting order. You post them. Not a carousel, Stories, Reels, portrait, extra sizes, or Studio posting.",
   "v2-rtu-voice":
     "One short announcement from your approved script and facts — using customer-provided audio or an approved in-house or licensed Studio voice method. No outside voice talent.",
   "v2-rtu-short-video":
-    "One basic 15–30 second video for one campaign focus — built from your usable footage or approved Studio assets, with captions and a clear call to action.",
+    "One 15–30 second vertical video (1080×1920) assembled from your still photos with on-screen captions and a CTA. You post it. Not footage editing, voice, music, extra sizes, or Studio posting.",
   "rm-j002":
     "A complete setup kit for one Facebook, Instagram, or TikTok profile — bio/about copy, contact/URL field map, profile and cover assets where applicable, and exact setup instructions you apply. No posting, login-based mutation, or account management.",
   "rm-j005":
@@ -50,9 +50,9 @@ export function resolveProjectBuilderDrawerTagline(job: RouteMapJob): string {
     case "rtu-voice":
       return "One polished voice announcement with a clear message.";
     case "rtu-email-kit":
-      return "Finished emails ready for you to send.";
+      return "Up to two marketing emails you paste into your own email platform.";
     case "rtu-sms-kit":
-      return "Finished text messages ready for you to send.";
+      return "Up to four text messages you paste into your own texting platform.";
     case "rtu-business-card":
       return "Businesses that want a professional way to share contact details.";
     case "page":

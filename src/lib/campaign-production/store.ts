@@ -2,8 +2,15 @@ import { promises as fs } from "fs";
 import path from "path";
 
 import type { CampaignRecord } from "@/config/studio-board";
+import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
 import { readCampaignEnvelope } from "@/lib/campaign-store/store";
+import { atomicReplaceFile, withCampaignWriteLock } from "@/lib/campaign-store/file-io";
 import { computePlanFingerprint } from "@/lib/campaign-tasks/generate";
+import {
+  pgMutateProductionEnvelope,
+  pgReadProductionEnvelope,
+  pgWriteProductionEnvelope,
+} from "@/lib/studio-durable-persistence/postgres-activity-production";
 
 import { emptyProductionRecord, syncProductionWithPlan } from "./plan-sync";
 import type { CampaignProductionRecord, ServerProductionEnvelope } from "./types";
@@ -21,6 +28,9 @@ async function ensureProductionDir(): Promise<void> {
 export async function readProductionEnvelope(
   campaignId: string,
 ): Promise<ServerProductionEnvelope | null> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgReadProductionEnvelope(campaignId);
+  }
   try {
     const raw = await fs.readFile(productionPath(campaignId), "utf8");
     return JSON.parse(raw) as ServerProductionEnvelope;
@@ -33,13 +43,35 @@ export async function readProductionEnvelope(
 export async function writeProductionEnvelope(
   envelope: ServerProductionEnvelope,
 ): Promise<ServerProductionEnvelope> {
-  await ensureProductionDir();
-  await fs.writeFile(
-    productionPath(envelope.campaignId),
-    JSON.stringify(envelope, null, 2),
-    "utf8",
-  );
-  return envelope;
+  if (isPostgresPersistenceEnabled()) {
+    return pgWriteProductionEnvelope(envelope);
+  }
+  return withCampaignWriteLock(envelope.campaignId, async () => {
+    await ensureProductionDir();
+    await atomicReplaceFile(productionPath(envelope.campaignId), JSON.stringify(envelope, null, 2));
+    return envelope;
+  });
+}
+
+/** Read-modify-write under campaign lock (Postgres `FOR UPDATE` or in-process FS lock). */
+export async function mutateProductionEnvelope<T>(
+  campaignId: string,
+  mutate: (current: ServerProductionEnvelope | null) => {
+    envelope: ServerProductionEnvelope;
+    value: T;
+  },
+): Promise<T> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgMutateProductionEnvelope(campaignId, mutate);
+  }
+
+  return withCampaignWriteLock(campaignId, async () => {
+    const current = await readProductionEnvelope(campaignId);
+    const { envelope, value } = mutate(current);
+    await ensureProductionDir();
+    await atomicReplaceFile(productionPath(envelope.campaignId), JSON.stringify(envelope, null, 2));
+    return value;
+  });
 }
 
 /**
@@ -62,9 +94,7 @@ export async function getOrInitializeProduction(
   const plan = record.approvedStudioPlan;
   const planFingerprint = plan ? computePlanFingerprint(plan) : "";
   const existing = await readProductionEnvelope(campaignId);
-  const base =
-    existing ??
-    emptyProductionRecord(campaignId, planFingerprint);
+  const base = existing ?? emptyProductionRecord(campaignId, planFingerprint);
 
   const synced = syncProductionWithPlan(base, record);
   const envelope = { ...synced, syncedAt: new Date().toISOString() };

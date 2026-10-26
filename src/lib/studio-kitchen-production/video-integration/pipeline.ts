@@ -45,6 +45,8 @@ export type ShotstackPipelineResult =
         | "PACKET_INVALID"
         | "INGEST_FAILED"
         | "SUBMIT_FAILED"
+        | "POLL_FAILED"
+        | "RENDER_TIMEOUT"
         | "RENDER_FAILED"
         | "DOWNLOAD_FAILED"
         | "BIND_FAILED";
@@ -178,8 +180,18 @@ export async function runShotstackWorkPacketPipeline(input: {
   if (!poll.ok) {
     return {
       ok: false,
-      verdict: "RENDER_FAILED",
+      verdict: "POLL_FAILED",
       message: poll.message,
+      job: {
+        jobId,
+        provider: "shotstack",
+        providerRenderId: submit.providerRenderId,
+        status: "failed",
+        submittedAt,
+        failureCode: poll.code,
+        failureMessage: poll.message,
+        requestHash,
+      },
     };
   }
 
@@ -196,7 +208,7 @@ export async function runShotstackWorkPacketPipeline(input: {
       failureMessage: poll.error,
     });
     writeRenderJobManifest(input.repoRoot, job, input.packet.exportRelativePath);
-    return { ok: false, verdict: "RENDER_FAILED", message: poll.error ?? "timed_out", job };
+    return { ok: false, verdict: "RENDER_TIMEOUT", message: poll.error ?? "timed_out", job };
   }
 
   if (poll.status === "failed" || !poll.outputUrl) {

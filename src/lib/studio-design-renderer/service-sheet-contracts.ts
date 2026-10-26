@@ -12,12 +12,16 @@ import {
 export const SERVICE_SHEET_PROOF_CONTRACT = {
   packageId: "STUDIO-OPERATING-DESIGN-SERVICE-SHEET-PROOF-1",
   skuId: DESIGN_RENDERER_SERVICE_SHEET_SKU,
+  name: "Make Me a Service Sheet",
+  promisedOutput:
+    "One portrait digital service list — up to ten services. Share it or print it yourself. This is not a certified 300 DPI print file.",
   maxServices: SERVICE_SHEET_MAX_SERVICES,
   canvas: SERVICE_SHEET_CANVAS,
+  requiredDeliverableFormats: ["png", "pdf"] as const,
   layoutModes: ["single_column"] as const,
   priceModes: ["listed", "contact_for_pricing", "omitted"] as const,
   note:
-    "DELTA B — optional pricing modes on sealed portrait list spine. primaryTool remains Canva until Owner-authorized hook.",
+    "HARDEN #3 LIGHT — type-led portrait list. Customer prints. Not a certified 300 DPI print file.",
 } as const;
 
 export function isDesignRendererServiceSheetSku(

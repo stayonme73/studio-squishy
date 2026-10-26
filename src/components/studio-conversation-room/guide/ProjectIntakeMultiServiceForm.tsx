@@ -11,6 +11,10 @@ import {
 import type { RouteMapIntakeAnswers, RouteMapIntakeField } from "@/catalog/intake";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
 import {
+  condensedIntakeWelcomeFor,
+  isCondensedHeadlineId,
+} from "@/config/studio-customer-journey-condense-v1";
+import {
   INTAKE_MATERIALS_AVAILABILITY_OPTIONS,
   INTAKE_MATERIALS_HAVE_NOW,
   parseMaterialsPathAnswer,
@@ -25,6 +29,7 @@ import {
   flyerMustIncludeHasProductionFacts,
   flyerIntakeAnswerKey,
   FLYER_MUST_INCLUDE_PRODUCTION_HINT,
+  visibleKeysUseFlyerCorrection,
 } from "@/lib/project-intake-flyer-production";
 import {
   buildProjectIntakePlan,
@@ -38,9 +43,6 @@ import "@/app/route-map/route-map.css";
 import "@/app/studio-visual-system-v2.css";
 import styles from "@/components/studio-conversation-room/guide/conversation-activity-panel.module.css";
 
-/** Same materials requirement, shorter on a phone. */
-const PHONE_MATERIALS_HINT =
-  "A logo is not required. Name a logo or photo you have, or say to use the business name as a wordmark. You can send files later from the Studio Board.";
 const INTAKE_LIVE_STATUS_DEBOUNCE_MS = 280;
 
 export type ProjectIntakeMultiServiceFormProps = {
@@ -56,9 +58,15 @@ export type ProjectIntakeMultiServiceFormProps = {
   phoneLayout?: boolean;
   /** Show only these answer keys — used for flyer production correction. */
   visibleAnswerKeys?: readonly string[] | null;
+  /** Shown with the required keys. Empty answers do not block continue. */
+  optionalAnswerKeys?: readonly string[] | null;
   submitError?: string | null;
+  /** Shown after the unpaid preview saves. Not a failure. */
+  statusNote?: string | null;
   /** Truthful handoff — must match real next destination. */
   submitCtaLabel: string;
+  /** When set, skip catalog schema lookup and render this plan. */
+  intakePlan?: ProjectIntakePlan | null;
   nextStepBlurb: string;
 };
 
@@ -233,10 +241,7 @@ function FieldCard({
   ) : (
     <span className="route-map-intake__opt">Optional</span>
   );
-  const hint =
-    compactCopy && field.role === "materials"
-      ? PHONE_MATERIALS_HINT
-      : field.hint;
+  const hint = field.hint;
 
   if (field.role === "materials" && onMaterialsAvailability && onMaterialsDetail) {
     const parsed = parseMaterialsPathAnswer(value);
@@ -259,7 +264,9 @@ function FieldCard({
         />
         {describeOpen ? (
           <label className={styles.intakeTypeWell} data-intake-type-well="true">
-            <span>Describe filenames, links, colors, or references</span>
+            <span>
+              {field.placeholder ?? "Describe filenames, links, colors, or references"}
+            </span>
             <IntakePlainTextField
               key={`${field.id}-describe`}
               paintKey={`${step}d`}
@@ -273,6 +280,25 @@ function FieldCard({
             />
           </label>
         ) : null}
+      </article>
+    );
+  }
+
+  if (field.type === "checkbox") {
+    const checked = value.trim() === field.label;
+    return (
+      <article className="route-map-social-intake__card">
+        <label className={styles.intakeCheck}>
+          <input
+            type="checkbox"
+            checked={checked}
+            required={field.required}
+            onChange={(event) => onChange(event.target.checked ? field.label : "")}
+          />
+          <span>
+            {field.label} {requiredMark}
+          </span>
+        </label>
       </article>
     );
   }
@@ -337,15 +363,29 @@ export default function ProjectIntakeMultiServiceForm({
   onDraftStatusChange,
   onAnswersChange,
   submitError = null,
+  statusNote = null,
   submitCtaLabel,
   nextStepBlurb,
+  intakePlan = null,
   phoneLayout = false,
   visibleAnswerKeys = null,
+  optionalAnswerKeys = null,
 }: ProjectIntakeMultiServiceFormProps) {
   const plan: ProjectIntakePlan = useMemo(
-    () => buildProjectIntakePlan(selectedServiceIds),
-    [selectedServiceIds],
+    () => intakePlan ?? buildProjectIntakePlan(selectedServiceIds),
+    [intakePlan, selectedServiceIds],
   );
+  const condensedPackageName =
+    plan.services.length === 1 && isCondensedHeadlineId(plan.services[0]?.serviceId)
+      ? plan.services[0]?.title
+      : null;
+  const intakeWelcome = condensedIntakeWelcomeFor(
+    plan.services.length === 1 ? plan.services[0]?.serviceId : null,
+  );
+  const guidedIntake = Boolean(phoneLayout && intakeWelcome);
+  const guidedPackageName = guidedIntake
+    ? plan.services[0]?.title ?? null
+    : condensedPackageName;
 
   const [answers, setAnswers] = useState<RouteMapIntakeAnswers>(() =>
     prefillProjectIntakeAnswers(plan, initialDraftAnswers, {
@@ -353,6 +393,26 @@ export default function ProjectIntakeMultiServiceForm({
     }),
   );
   const [submitting, setSubmitting] = useState(false);
+
+  const touchedAnswerKeys = useRef(new Set<string>());
+
+  useEffect(() => {
+    const seeded = prefillProjectIntakeAnswers(plan, initialDraftAnswers, {
+      businessName: prefillBusinessName,
+    });
+    setAnswers((prev) => {
+      let changed = false;
+      const next = { ...prev };
+      for (const [key, value] of Object.entries(seeded)) {
+        if (touchedAnswerKeys.current.has(key)) continue;
+        if (String(next[key] ?? "").trim()) continue;
+        if (!String(value ?? "").trim()) continue;
+        next[key] = value;
+        changed = true;
+      }
+      return changed ? next : prev;
+    });
+  }, [initialDraftAnswers, plan, prefillBusinessName]);
 
   const onAnswersChangeRef = useRef(onAnswersChange);
   const onSaveDraftRef = useRef(onSaveDraft);
@@ -387,9 +447,10 @@ export default function ProjectIntakeMultiServiceForm({
   }, [answers]);
 
   const correctionKeys = visibleAnswerKeys;
-  const isCorrection = Boolean(correctionKeys?.length);
+  const isCorrection = visibleKeysUseFlyerCorrection(correctionKeys);
+  const optionalKeys = optionalAnswerKeys ?? [];
   const isVisibleKey = (key: string) =>
-    !correctionKeys || correctionKeys.includes(key);
+    !correctionKeys || correctionKeys.includes(key) || optionalKeys.includes(key);
 
   const progress = isCorrection
     ? {
@@ -410,6 +471,7 @@ export default function ProjectIntakeMultiServiceForm({
     : nextStepBlurb;
 
   function setAnswer(key: string, value: string) {
+    touchedAnswerKeys.current.add(key);
     setAnswers((prev) => ({ ...prev, [key]: value }));
   }
 
@@ -444,7 +506,30 @@ export default function ProjectIntakeMultiServiceForm({
       data-intake-layout={phoneLayout ? "phone" : "desktop"}
     >
       <div className="route-map-social-intake__header">
-        {phoneLayout ? (
+        {guidedPackageName ? (
+          <div>
+            {guidedIntake ? null : (
+              <p className="route-map-social-intake__eyebrow">Project Intake</p>
+            )}
+            <h2
+              id="project-intake-title"
+              className={
+                guidedIntake
+                  ? "studio-journey__intake-name"
+                  : "route-map-social-intake__title"
+              }
+            >
+              {guidedPackageName}
+            </h2>
+            {guidedIntake && intakeWelcome ? (
+              <>
+                <p className="studio-homepage__card-detail">{intakeWelcome.detailsLabel}</p>
+                <p className="studio-homepage__card-detail">{intakeWelcome.filesNote}</p>
+                <p className="studio-homepage__card-detail">{intakeWelcome.savedNote}</p>
+              </>
+            ) : null}
+          </div>
+        ) : phoneLayout ? (
             <h2 id="project-intake-title" className={styles.intakeVisuallyHidden}>
               Project materials
             </h2>
@@ -461,14 +546,14 @@ export default function ProjectIntakeMultiServiceForm({
             </p>
           </div>
         )}
-        <div className="route-map-social-intake__progress" aria-live="polite">
-          <strong>
-            {progress.completed} of {progress.total}
-          </strong>
-          <span>
-            {phoneLayout ? "questions answered" : "sections ready to submit"}
-          </span>
-        </div>
+        {guidedIntake ? null : (
+          <div className="route-map-social-intake__progress" aria-live="polite">
+            <strong>
+              {progress.completed} of {progress.total}
+            </strong>
+            <span>sections ready to submit</span>
+          </div>
+        )}
       </div>
 
       {phoneLayout ? null : (
@@ -484,7 +569,7 @@ export default function ProjectIntakeMultiServiceForm({
       >
             {plan.sharedFields.some((shared) => isVisibleKey(shared.answerKey)) ? (
           <div className={styles.intakeSectionBlock}>
-            {isCorrection ? null : (
+            {isCorrection || guidedIntake ? null : (
               <h3 className={styles.intakeSectionHeading}>Shared for this project</h3>
             )}
             {plan.sharedFields.map((shared) => {
@@ -544,8 +629,10 @@ export default function ProjectIntakeMultiServiceForm({
           if (visibleFields.length === 0) return null;
           return (
           <div key={section.serviceId} className={styles.intakeSectionBlock}>
-            <h3 className={styles.intakeSectionHeading}>{section.title}</h3>
-            {phoneLayout || isCorrection ? null : (
+            {guidedIntake && section.title === guidedPackageName ? null : (
+              <h3 className={styles.intakeSectionHeading}>{section.title}</h3>
+            )}
+            {phoneLayout || isCorrection || condensedPackageName ? null : (
               <p className={styles.intakeSectionLead}>{section.jobName}</p>
             )}
             {visibleFields.map((field) => {
@@ -594,7 +681,7 @@ export default function ProjectIntakeMultiServiceForm({
             onClick={handleSaveDraft}
             disabled={submitting}
           >
-            SAVE DRAFT
+            Save draft
           </button>
           <button
             type="submit"
@@ -606,6 +693,11 @@ export default function ProjectIntakeMultiServiceForm({
             {submitCtaLabel}
           </button>
         </div>
+        {statusNote ? (
+          <p data-intake-preview-status="saved" role="status">
+            {statusNote}
+          </p>
+        ) : null}
         {submitError ? (
           <p className="route-map-social-intake__submit-error" role="alert">
             {submitError}

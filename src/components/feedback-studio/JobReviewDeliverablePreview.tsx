@@ -15,8 +15,10 @@ import { studioReviewRevisionFullLoopV1 } from "@/config/studio-review-revision-
 import type { ClientReviewDeliverable } from "@/lib/job-control/review-feedback-types";
 import { deliverableKeyToSectionId } from "@/lib/review-room-client";
 import { sortProofsByAddedAtDesc } from "@/lib/job-control/version-compare";
+import { isCopyReviewProofFile } from "@/lib/studio-copy-review-bind/customer-facing";
 
 import FeedbackStudioDrawLayer from "./FeedbackStudioDrawLayer";
+import ReviewCopyReading from "./ReviewCopyReading";
 import JobReviewVersionCompare from "./JobReviewVersionCompare";
 import JobReviewHighlightBoard from "./JobReviewHighlightBoard";
 import JobReviewTextCommentPanel from "./JobReviewTextCommentPanel";
@@ -49,6 +51,12 @@ type Props = {
   onHighlightsChange: (next: readonly JobReviewHighlight[]) => void;
   onTextCommentSelectProof: (id: string) => void;
   onTextCommentsChange: (next: readonly JobReviewTextComment[]) => void;
+  onCompareToggle?: () => void;
+  stickyPlaceActive?: boolean;
+  pendingStickyAnchor?: { x: number; y: number } | null;
+  stickyDraft?: string;
+  onPlaceSticky?: (x: number, y: number) => void;
+  drawResetKey?: number;
 };
 
 export default function JobReviewDeliverablePreview({
@@ -75,6 +83,12 @@ export default function JobReviewDeliverablePreview({
   onHighlightsChange,
   onTextCommentSelectProof,
   onTextCommentsChange,
+  onCompareToggle,
+  stickyPlaceActive = false,
+  pendingStickyAnchor = null,
+  stickyDraft = "",
+  onPlaceSticky,
+  drawResetKey = 0,
 }: Props) {
   const deliverableByKey = new Map<string, ClientReviewDeliverable>(
     deliverables.map((entry) => [deliverableKeyToSectionId(entry.key), entry]),
@@ -91,14 +105,19 @@ export default function JobReviewDeliverablePreview({
     : spineStatus === "revision_requested"
       ? feedbackStudio.jobReview.submittedRevision
       : feedbackStudio.jobReview.deliverableReady;
+  const currentVersionLabel =
+    sortProofsByAddedAtDesc(deliverables[0]?.proofFiles ?? [])[0]?.versionLabel ?? null;
+  const phoneCopy = feedbackStudio.feedbackPanel.phoneCustomerRevision;
 
   return (
     <div className="fs-preview fs-preview--workspace">
       <header className="fs-preview__header">
-        <p className="fs-preview__eyebrow">
-          {feedbackStudio.jobReview.serviceLabel} · {serviceName}
-        </p>
+        <p className="fs-preview__eyebrow fs-preview__eyebrow--desktop">{serviceName}</p>
         <h2 className="fs-preview__title">{reviewTitle}</h2>
+        <p className="fs-preview__phone-meta">
+          {serviceName}
+          {currentVersionLabel ? ` • ${currentVersionLabel}` : ""}
+        </p>
         <p className="fs-preview__summary">{summary}</p>
       </header>
 
@@ -119,14 +138,9 @@ export default function JobReviewDeliverablePreview({
             focused={focused}
             status={status}
             onFocus={() => onFocusSection(sectionId)}
-            drawActive={activeTool === "draw" && focused}
-            erasing={erasing}
-            onDrawStroke={() => onDrawStroke(sectionId)}
             stickies={session.stickyNotes.filter((note) => note.sectionId === sectionId)}
           >
             <div className="fs-mock fs-mock--deliverable fs-mock--large">
-              <p className="fs-mock__headline">{deliverable.label}</p>
-              <p className="fs-mock__subhead">{subhead}</p>
               {currentProof ? (
                 <p className="fs-mock__meta">
                   {reviewClosed
@@ -137,16 +151,38 @@ export default function JobReviewDeliverablePreview({
                         currentProof.versionLabel,
                       )}
                 </p>
-              ) : deliverable.preparedAt ? (
-                <p className="fs-mock__meta">
-                  Prepared {new Date(deliverable.preparedAt).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </p>
-              ) : null}
+              ) : (
+                <>
+                  <p className="fs-mock__headline">{deliverable.label}</p>
+                  <p className="fs-mock__subhead">{subhead}</p>
+                  {deliverable.preparedAt ? (
+                    <p className="fs-mock__meta">
+                      Prepared {new Date(deliverable.preparedAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </p>
+                  ) : null}
+                </>
+              )}
               {currentProof?.accessHref ? (
-                <figure className="fs-review-proof">
+                <figure
+                  className={`fs-review-proof${stickyPlaceActive && focused ? " fs-review-proof--place" : ""}${
+                    activeTool === "draw" && focused ? " fs-review-proof--draw" : ""
+                  }`}
+                  onClick={(event) => {
+                    if (!stickyPlaceActive || !onPlaceSticky || !focused) return;
+                    if (activeTool === "draw") return;
+                    const target = event.target;
+                    if (target instanceof HTMLElement && target.closest("textarea, .fs-sticky")) {
+                      return;
+                    }
+                    const rect = event.currentTarget.getBoundingClientRect();
+                    const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+                    const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
+                    onPlaceSticky(x, y);
+                  }}
+                >
                   {currentProof.fileType === "video/mp4" ||
                   currentProof.fileType.startsWith("video/") ||
                   /\.mp4$/i.test(currentProof.filename) ? (
@@ -156,23 +192,54 @@ export default function JobReviewDeliverablePreview({
                       preload="metadata"
                       src={currentProof.accessHref}
                       className="fs-review-proof__video"
-                      aria-label={studioReviewRevisionFullLoopV1.customerCopy.reviewProofAlt(
-                        reviewTitle,
-                        currentProof.versionLabel,
-                      )}
+                      aria-label={`${serviceName}, ${label}, ${currentProof.versionLabel}.`}
                     >
                       Your browser cannot play this video. Use the download link under Versions of this work.
                     </video>
+                  ) : isCopyReviewProofFile(currentProof.fileType, currentProof.filename) ? (
+                    <ReviewCopyReading
+                      url={currentProof.accessHref}
+                      title={`${serviceName}, ${label}, ${currentProof.versionLabel}.`}
+                    />
                   ) : (
                     <img
                       src={currentProof.accessHref}
-                      alt={studioReviewRevisionFullLoopV1.customerCopy.reviewProofAlt(
-                        reviewTitle,
-                        currentProof.versionLabel,
-                      )}
+                      alt={`${serviceName}, ${label}, ${currentProof.versionLabel}.`}
                       className="fs-review-proof__image"
                     />
                   )}
+                  {session.stickyNotes
+                    .filter((note) => note.sectionId === sectionId)
+                    .map((note) =>
+                      typeof note.anchorX === "number" && typeof note.anchorY === "number" ? (
+                        <div
+                          key={note.id}
+                          className={`fs-sticky fs-sticky--${note.color} fs-sticky--anchored`}
+                          style={{ left: `${note.anchorX * 100}%`, top: `${note.anchorY * 100}%` }}
+                        >
+                          {note.text}
+                        </div>
+                      ) : null,
+                    )}
+                  {stickyPlaceActive && focused && pendingStickyAnchor ? (
+                    <div
+                      className="fs-sticky fs-sticky--phone fs-sticky--anchored fs-sticky--pending"
+                      style={{
+                        left: `${pendingStickyAnchor.x * 100}%`,
+                        top: `${pendingStickyAnchor.y * 100}%`,
+                      }}
+                    >
+                      {stickyDraft.trim() || "Note"}
+                    </div>
+                  ) : null}
+                  {activeTool === "draw" && focused ? (
+                    <FeedbackStudioDrawLayer
+                      key={drawResetKey}
+                      active
+                      erasing={erasing}
+                      onStroke={() => onDrawStroke(sectionId)}
+                    />
+                  ) : null}
                 </figure>
               ) : null}
               {activeTool === "compare" && focused ? (
@@ -207,37 +274,35 @@ export default function JobReviewDeliverablePreview({
                 />
               ) : null}
               {deliverable.proofFiles.length > 0 ? (
-                <div className="fs-proof-refs" aria-label={`${deliverable.label} recorded versions`}>
-                  <p className="fs-proof-refs__label">
-                    {studioReviewRevisionFullLoopV1.customerCopy.proofRefsLabel}
-                  </p>
-                  <ul>
-                    {deliverable.proofFiles.map((file) => {
-                      const isCurrent = currentProof?.id === file.id;
-                      const versionState = isCurrent
-                        ? feedbackStudio.versionCompare.currentLabel
-                        : feedbackStudio.versionCompare.priorLabel;
-                      const formatLabel = customerVisibleFileFormatLabel(
-                        file.fileType,
-                        file.filename,
-                      );
-                      return (
-                      <li key={file.id}>
-                        {file.accessHref ? (
-                          <a href={file.accessHref} target="_blank" rel="noreferrer">
-                            {file.filename}
-                          </a>
-                        ) : (
-                          <span>{file.filename}</span>
-                        )}
-                        <span>
-                          {versionState} · {file.versionLabel} · {formatLabel}
-                        </span>
-                      </li>
-                      );
-                    })}
-                  </ul>
-                </div>
+                <>
+                  <details className="fs-proof-refs fs-proof-refs--phone" aria-label={`${deliverable.label} recorded versions`}>
+                    <summary className="fs-proof-refs__summary">
+                      {currentProof?.versionLabel ?? studioReviewRevisionFullLoopV1.customerCopy.proofRefsLabel}
+                    </summary>
+                    <ProofVersionList
+                      proofFiles={deliverable.proofFiles}
+                      currentProofId={currentProof?.id ?? null}
+                    />
+                    {onCompareToggle && deliverable.proofFiles.length > 1 ? (
+                      <button
+                        type="button"
+                        className="utility-btn utility-btn--secondary fs-proof-refs__compare"
+                        onClick={onCompareToggle}
+                      >
+                        {phoneCopy.compareVersions}
+                      </button>
+                    ) : null}
+                  </details>
+                  <details className="fs-proof-refs fs-proof-refs--desktop" aria-label={`${deliverable.label} recorded versions`}>
+                    <summary className="fs-proof-refs__summary">
+                      {studioReviewRevisionFullLoopV1.customerCopy.proofRefsLabel}
+                    </summary>
+                    <ProofVersionList
+                      proofFiles={deliverable.proofFiles}
+                      currentProofId={currentProof?.id ?? null}
+                    />
+                  </details>
+                </>
               ) : null}
               <div className="fs-mock__hero-art fs-mock__hero-art--deliverable" aria-hidden />
             </div>
@@ -248,15 +313,46 @@ export default function JobReviewDeliverablePreview({
   );
 }
 
+function ProofVersionList({
+  proofFiles,
+  currentProofId,
+}: {
+  proofFiles: ClientReviewDeliverable["proofFiles"];
+  currentProofId: string | null;
+}) {
+  return (
+    <ul>
+      {proofFiles.map((file) => {
+        const isCurrent = currentProofId === file.id;
+        const versionState = isCurrent
+          ? feedbackStudio.versionCompare.currentLabel
+          : feedbackStudio.versionCompare.priorLabel;
+        const formatLabel = customerVisibleFileFormatLabel(file.fileType, file.filename);
+        return (
+          <li key={file.id}>
+            {file.accessHref ? (
+              <a href={file.accessHref} target="_blank" rel="noreferrer">
+                {file.filename}
+              </a>
+            ) : (
+              <span>{file.filename}</span>
+            )}
+            <span>
+              {versionState} · {file.versionLabel} · {formatLabel}
+            </span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 function PreviewSection({
   sectionId,
   label,
   focused,
   status,
   onFocus,
-  drawActive,
-  erasing,
-  onDrawStroke,
   stickies,
   children,
 }: {
@@ -265,9 +361,6 @@ function PreviewSection({
   focused: boolean;
   status: SectionReviewStatus;
   onFocus: () => void;
-  drawActive: boolean;
-  erasing: boolean;
-  onDrawStroke: () => void;
   stickies: FeedbackStickyNote[];
   children: ReactNode;
 }) {
@@ -294,7 +387,9 @@ function PreviewSection({
 
       <div className="fs-preview__section-body">
         {children}
-        {stickies.map((note) => (
+        {stickies
+          .filter((note) => typeof note.anchorX !== "number" || typeof note.anchorY !== "number")
+          .map((note) => (
           <div
             key={note.id}
             className={`fs-sticky fs-sticky--${note.color}`}
@@ -303,9 +398,6 @@ function PreviewSection({
             {note.text}
           </div>
         ))}
-        {drawActive ? (
-          <FeedbackStudioDrawLayer active erasing={erasing} onStroke={onDrawStroke} />
-        ) : null}
       </div>
     </section>
   );

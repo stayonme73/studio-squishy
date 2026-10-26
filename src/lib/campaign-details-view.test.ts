@@ -2,7 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import type { CampaignRecord } from "@/config/studio-board";
 import type { ProjectDetailsFormValues } from "@/config/project-details";
-import { resolveCampaignDetailsView } from "@/lib/campaign-details-view";
+import {
+  resolveCampaignDetailsView,
+  resolveRecordEstimatedCompletion,
+} from "@/lib/campaign-details-view";
+import { PROJECT_INTAKE_RECEIVED_STATUS } from "@/lib/post-submit-customer-signals";
+import type { CustomerJobStatusSummary } from "@/lib/project-record-status";
+import type { ServiceId } from "@/catalog/types";
 import {
   RECORD_EMPTY_ANSWER,
   RECORD_MISSING_SECTION_TITLE,
@@ -275,5 +281,69 @@ describe("resolveCampaignDetailsView", () => {
       expect(missingSection.items.every((item) => item.value === RECORD_EMPTY_ANSWER)).toBe(true);
       expect(missingSection.items.some((item) => item.value === "Required")).toBe(false);
     }
+  });
+
+  it("unifies Record status, journey, timeline, and ETA with Board intake-received truth", () => {
+    const campaign = mockCampaign({
+      campaignName: "Make Me A Flyer",
+      estimatedCompletion: "In progress",
+      approvedStudioPlan: {
+        selectedServiceIds: ["v2-rtu-flyer"],
+        includedServiceIds: ["v2-rtu-flyer"],
+        additionalServiceIds: [],
+        additionalCostUsd: 0,
+        oneTimeTotalCents: 45000,
+        monthlyTotalCents: 0,
+        amountDueTodayCents: 45000,
+        lineItems: [
+          {
+            skuId: "v2-rtu-flyer",
+            serviceName: "Make Me a Flyer",
+            billingType: "one_time",
+            exactPriceCents: 45000,
+            priceDisplay: "$450",
+            deliverables: ["Flyer"],
+            exclusions: [],
+            timingWindowLabel: "2 weeks",
+            revisionRule: "1 round",
+            clientResponsibilities: [],
+            executionResponsibility: "studio",
+          },
+        ],
+        approvedAt: "2026-06-28T12:00:00.000Z",
+      },
+    });
+    const jobs: CustomerJobStatusSummary[] = [
+      {
+        jobId: "job-flyer",
+        campaignId: campaign.campaignId,
+        skuId: "v2-rtu-flyer" as ServiceId,
+        serviceName: "Make Me a Flyer",
+        statusLabel: "Building Concepts",
+        isWaitingOnClient: false,
+        hasProductionStarted: false,
+        deliveredAt: null,
+        clientDeadline: null,
+      },
+    ];
+
+    const view = resolveCampaignDetailsView(campaign, { jobs });
+    const currentStep = view.progressSteps.find((step) => step.state === "current");
+
+    expect(view.statusLabel).toBe(PROJECT_INTAKE_RECEIVED_STATUS);
+    expect(view.estimatedCompletion).toBe("Timeline appears after production starts");
+    expect(
+      view.timeline.some(
+        (entry) => entry.label === "Current status" && entry.date === PROJECT_INTAKE_RECEIVED_STATUS,
+      ),
+    ).toBe(true);
+    expect(view.statusJobs.map((job) => job.statusLabel)).toEqual([PROJECT_INTAKE_RECEIVED_STATUS]);
+    expect(currentStep?.label).not.toBe("Building Concepts");
+    expect(currentStep?.detail).toBe(PROJECT_INTAKE_RECEIVED_STATUS);
+  });
+
+  it("does not treat In progress as an estimated completion date", () => {
+    const campaign = mockCampaign({ estimatedCompletion: "In progress" });
+    expect(resolveRecordEstimatedCompletion(campaign, null)).toBe("Not scheduled yet");
   });
 });

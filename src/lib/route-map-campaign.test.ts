@@ -29,6 +29,7 @@ import {
   saveRouteMapJourneyStep,
   selectRouteMapJob,
   submitRouteMapIntake,
+  mergeSubmittedFlyerIntakeCorrection,
 } from "@/lib/route-map-campaign";
 import { resolveCustomerJourneySteps } from "@/lib/customer-journey";
 import { hasCampaignCreativeBrief } from "@/lib/campaign-brief-source";
@@ -69,11 +70,15 @@ describe("route-map-v1 config", () => {
     const ids = ROUTE_MAP_V1.jobs.map((job) => job.id);
     expect(ids).toContain("v2-rtu-flyer");
     expect(ids).toContain("v2-rtu-social-posts");
-    expect(ids).toContain("rm-j005");
+    expect(ids).not.toContain("rm-j005");
+    expect(ids).not.toContain("v2-rtu-voice");
+    expect(ids).not.toContain("rm-j002");
+    expect(ids).not.toContain("rm-j007");
+    expect(ids).not.toContain("rm-j008");
     expect(ids).not.toContain("rm-j003");
     expect(ids).not.toContain("rm-j004");
     expect(ids).not.toContain("rm-j006");
-    expect(ROUTE_MAP_V1.jobs.length).toBe(14);
+    expect(ROUTE_MAP_V1.jobs.length).toBe(11);
   });
 
   it("I-285 perimeter has no assigned lane jobs — visual loop only", () => {
@@ -85,8 +90,6 @@ describe("route-map-v1 config", () => {
     const jobs = getJobsForRoad("update");
     expect(jobs.map((job) => job.id).sort()).toEqual(
       [
-        "rm-j007",
-        "rm-j008",
         "v2-rtu-flyer",
         "v2-rtu-menu",
         "v2-rtu-promotion-graphics",
@@ -112,7 +115,7 @@ describe("route-map-v1 config", () => {
   it("Random Exit shelf excludes Route Start", () => {
     const jobs = getJobsForRoad("random-exit");
     expect(jobs.some((job) => job.isRouteStart)).toBe(false);
-    expect(jobs.length).toBe(13);
+    expect(jobs.length).toBe(10);
   });
 
   it("email/SMS kits appear on I-20 and Random Exit only — not I-75 or Update", () => {
@@ -120,7 +123,7 @@ describe("route-map-v1 config", () => {
     const i20Ids = getJobsForRoad("i20").map((job) => job.id);
     const updateIds = getJobsForRoad("update").map((job) => job.id);
 
-    expect(i75Ids).toHaveLength(10);
+    expect(i75Ids).toHaveLength(9);
     expect(i75Ids[0]).toBe("v2-rtu-flyer");
     expect(i75Ids[1]).toBe("v2-rtu-business-card");
     expect(i75Ids).not.toContain("v2-rtu-email-kit");
@@ -164,6 +167,8 @@ describe("route-map catalog SKUs", () => {
       "v2-rtu-social-posts",
       "v2-rtu-email-kit",
       "v2-rtu-short-video",
+      "v2-rtu-short-form-video-edit",
+      "v2-rtu-clip-repurposing",
     ] as const) {
       const catalog = getServiceById(id);
       const job = getRouteMapJob(id);
@@ -195,8 +200,9 @@ describe("route-map catalog SKUs", () => {
 
   it("V2 RTU jobs read turnaround from V2 draft — not global 7-day copy", () => {
     const flyer = getRouteMapJob("v2-rtu-flyer");
-    expect(flyer?.timingLabel.toLowerCase()).toContain("2–3 business days");
+    expect(flyer?.timingLabel.toLowerCase()).toContain("production slot is available");
     expect(flyer?.timingLabel.toLowerCase()).not.toContain("7 business");
+    expect(flyer?.timingLabel.toLowerCase()).not.toContain("2–3 business days");
   });
 
   it("uses job-specific timing for continuing V1 jobs", () => {
@@ -1027,6 +1033,47 @@ describe("route-map intake E2E paths (programmatic)", () => {
         "Social Profile Kit Intake",
       );
       expect(job.name).toBe("Make Me a Social Profile Setup Kit");
+    } finally {
+      restore();
+    }
+  });
+
+  it("merges flyer production fields onto submitted Intake without rewriting submittedAt or materials", () => {
+    const submittedAt = "2026-09-09T00:19:37.586Z";
+    let campaign = createCampaignFromRouteMapJob("v2-rtu-flyer", "i20")!;
+    campaign = {
+      ...campaign,
+      paymentReceivedAt: "2026-09-06T22:28:33.080Z",
+      approvedStudioPlan: buildApprovedPlanFromRouteMapJob(getRouteMapJob("v2-rtu-flyer")!),
+      routeMapIntakeSubmittedAt: submittedAt,
+      routeMapIntake: {
+        submittedAt,
+        answers: { "shared:materials": "I do not have this yet" },
+      },
+    };
+    const restore = mockStorageCampaign(campaign);
+    try {
+      const merged = mergeSubmittedFlyerIntakeCorrection({
+        "v2-rtu-flyer:flyerPurpose": "Grand opening flyer for Maya’s Mobile Boutique",
+        "v2-rtu-flyer:mustInclude":
+          "Grand Opening — 20% off first styling appointment. $45. Call (804) 555-0142 or visit mayasmobileboutique.example.",
+        "v2-rtu-flyer:intendedUse": "Both print and digital",
+        "shared:materials": "do not overwrite",
+      });
+      expect(merged).not.toBeNull();
+      expect(merged?.routeMapIntakeSubmittedAt).toBe(submittedAt);
+      expect(merged?.routeMapIntake?.submittedAt).toBe(submittedAt);
+      expect(merged?.routeMapIntake?.answers["shared:materials"]).toBe(
+        "I do not have this yet",
+      );
+      expect(merged?.routeMapIntake?.answers["v2-rtu-flyer:flyerPurpose"]).toBe(
+        "Grand opening flyer for Maya’s Mobile Boutique",
+      );
+      expect(merged?.routeMapIntake?.answers["v2-rtu-flyer:mustInclude"]).toContain("$45");
+      expect(merged?.routeMapIntake?.answers["v2-rtu-flyer:mustInclude"]).not.toContain("$69");
+      expect(merged?.routeMapIntake?.answers["v2-rtu-flyer:intendedUse"]).toBe(
+        "Both print and digital",
+      );
     } finally {
       restore();
     }

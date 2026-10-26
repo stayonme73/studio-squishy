@@ -217,10 +217,11 @@ describe("coherent Studio Voice project summary", () => {
 
   it("production ready does not claim work started or assignment", () => {
     const campaign = withIntake(mayaCampaign());
-    const answer = ask(campaign, tasksFor(campaign));
-    expect(answer.phase).toBe("producing");
-    expect(answer.text).toBe(copy.customerCopy.statusProductionReady);
+    const answer = ask(campaign, tasksFor(campaign, { spine: "ready_for_queue" }));
+    expect(answer.phase).toBe("awaiting_production_slot");
+    expect(answer.text).toBe(copy.customerCopy.statusWaitingForProductionSlot);
     expect(answer.text).not.toMatch(/assigned|work has started|email/i);
+    expect(answer.text).not.toMatch(/preparing/i);
   });
 
   it("production underway is the current state", () => {

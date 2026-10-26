@@ -1,8 +1,33 @@
 import { customerJourneyStepName } from "@/config/customer-journey-v1";
 import { studioPolicies } from "@/config/policies";
 import { studioBoard } from "@/config/studio-board";
+import { STUDIO_THREE_PACKAGE_REVISION_TRUTH_V1 } from "@/config/studio-three-package-revision-truth-v1";
 
-export type HelpCenterFrom = "campaign-details" | "studio-board" | "payment" | "route-map";
+/** Known safe Help return origins — never accept an arbitrary `from=` path. */
+export const HELP_CENTER_FROM_WHITELIST = [
+  "studio-lobby",
+  "route-map",
+  "conversation-room",
+  "payment",
+  "package-detail",
+  "short-form-package-detail",
+  "social-package-detail",
+  "creative-qa-package-detail",
+  "campaign-launch-package-detail",
+  "project-builder",
+  "checkout",
+  "studio-board",
+  "campaign-details",
+  "review-room",
+  "deliverables",
+  "final-delivery-room",
+] as const;
+
+export type HelpCenterFrom = (typeof HELP_CENTER_FROM_WHITELIST)[number];
+
+export function isHelpCenterFrom(value: string | null | undefined): value is HelpCenterFrom {
+  return Boolean(value && (HELP_CENTER_FROM_WHITELIST as readonly string[]).includes(value));
+}
 
 export function helpCenterAnchor(
   section: "philosophy" | "faq" | "policies",
@@ -14,7 +39,7 @@ export function helpCenterAnchor(
 }
 
 export function helpCenterHref(anchor?: string, from?: HelpCenterFrom) {
-  const params = from ? `?from=${from}` : "";
+  const params = from && isHelpCenterFrom(from) ? `?from=${from}` : "";
   const hash = anchor ? `#${anchor}` : "";
   return `${studioBoard.routes.helpCenter}${params}${hash}`;
 }
@@ -25,14 +50,34 @@ export const helpCenter = {
   lead: "Studio rules, policies, and answers — your reference desk for how The Studio works.",
   routes: {
     home: studioBoard.routes.helpCenter,
+    studioLobby: studioBoard.routes.studioLobby,
     studioBoard: studioBoard.routes.studioBoard,
     campaignDetails: studioBoard.routes.campaignDetails,
+    conversationRoom: studioBoard.routes.studioGuide,
+    packageDetail: "/package/clip-repurposing",
+    shortFormPackageDetail: "/package/short-form-video-editing",
+    socialPackageDetail: "/package/social-promo-graphics",
+    creativeQaPackageDetail: "/package/creative-qa-finish",
+    campaignLaunchPackageDetail: "/package/campaign-launch-kit",
+    projectBuilder: "/project-builder",
+    checkout: "/checkout",
+    reviewRoom: studioBoard.routes.feedbackStudio,
+    deliverables: studioBoard.routes.deliverables,
+    finalDeliveryRoom: "/final-delivery-room",
   },
   backLabels: {
-    studioBoard: "Back to Studio Board",
+    studioLobby: "Back to Home",
+    studioBoard: "Back to My Studio",
     campaignDetails: "Back to Project Record",
+    conversationRoom: "Back to Conversation Room",
     payment: "Back to Conversation Room",
     routeMap: "Back to Conversation Room",
+    packageDetail: "Back to Package Detail",
+    projectBuilder: "Back to Build Your Project",
+    checkout: "Back to Review & Pay",
+    reviewRoom: "Back to Review Room",
+    deliverables: "Back to Final Delivery",
+    finalDeliveryRoom: "Back to Final Delivery",
   },
   toc: {
     title: "On this page",
@@ -59,7 +104,7 @@ export const helpCenter = {
         id: "starting-project",
         situation: "Starting a Project",
         summary:
-          "Begin in the Conversation Room, complete payment, then finish Intake so The Studio can prepare your work.",
+          "Start on the Home page, choose a package, complete Build Your Project, then pay. Card entry is on Stripe. After payment is confirmed, complete Project Intake and add your files in My Studio.",
         anchor: "faq-after-payment",
         learnMoreLabel: "What happens after I pay?",
       },
@@ -73,21 +118,22 @@ export const helpCenter = {
       {
         id: "production-begins",
         situation: "Production Begins",
-        summary: "Per service: payment received, Project Details complete, materials accepted, service moved into production. Then non-refundable.",
+        summary:
+          "Per service: payment received, Project Intake complete, required materials reviewed and accepted, and the service moved into production. Adding a file does not start production by itself. Then non-refundable.",
         anchor: "policy-production-policy",
         learnMoreLabel: "Production policy",
       },
       {
         id: "missing-materials",
         situation: "Missing Materials",
-        summary: "48-hour reminder, then 72-hour Waiting on Client if required materials are still missing.",
+        summary: "If required materials are still missing, that part of the project waits. My Studio shows what is still needed.",
         anchor: "policy-missing-materials-policy",
         learnMoreLabel: "Missing materials policy",
       },
       {
         id: "waiting-on-client",
         situation: "Waiting on Client",
-        summary: "That service pauses until required information or materials are received. Timeline pauses with it.",
+        summary: "That service waits until the required information or materials are received.",
         anchor: "policy-waiting-on-client-policy",
         learnMoreLabel: "Waiting on Client policy",
       },
@@ -95,14 +141,14 @@ export const helpCenter = {
         id: "review-room",
         situation: "Review Room",
         summary:
-          "Open proofs via link, leave feedback, approve, or request revisions in the Review Room.",
+          "Open Review Room to see the work, leave feedback, approve, or request a revision.",
         anchor: "policy-creative-room-policy",
         learnMoreLabel: "Review Room policy",
       },
       {
         id: "revisions",
         situation: "Revisions",
-        summary: "Included revisions depend on the service you purchased. See your Project Record.",
+        summary: `${STUDIO_THREE_PACKAGE_REVISION_TRUTH_V1.packageCount} ${STUDIO_THREE_PACKAGE_REVISION_TRUTH_V1.oneRound}`,
         anchor: "policy-revision-policy",
         learnMoreLabel: "Revision policy",
       },
@@ -123,7 +169,8 @@ export const helpCenter = {
       {
         id: "timeline",
         situation: "Timeline",
-        summary: "Estimates depend on services, materials, and timely client responses.",
+        summary:
+          "The Studio does not promise a delivery date. Timing depends on the package, required materials, and your responses.",
         anchor: "policy-timeline-policy",
         learnMoreLabel: "Timeline policy",
       },
@@ -140,6 +187,8 @@ export const helpCenter = {
         "after-payment",
         "campaign-timeline",
         "email-notifications",
+        "current-packages",
+        "passwords",
       ] as const,
     },
     {
@@ -158,6 +207,15 @@ export const helpCenter = {
       ] as const,
     },
     {
+      id: "short-form-content-pack",
+      label: "Short-Form Video Editing",
+      faqIds: [
+        "short-form-content-pack-difference",
+        "short-form-content-pack-four-minute",
+        "short-form-content-pack-contract",
+      ] as const,
+    },
+    {
       id: "expectations",
       label: "Expectations",
       faqIds: ["results-expectations"] as const,
@@ -166,7 +224,7 @@ export const helpCenter = {
   footer: {
     campaignHint:
       "Questions about your active project? Check your Project Record for status and progress.",
-    studioBoardLabel: "Studio Board",
+    studioBoardLabel: "My Studio",
     campaignDetailsLabel: customerJourneyStepName("project-record"),
     helpCenterLabel: customerJourneyStepName("help-center"),
   },
@@ -196,7 +254,6 @@ export const helpCenter = {
         label: "What counts as a revision?",
         anchor: helpCenterAnchor("faq", "revision-definition"),
       },
-      { label: "Revision policy", anchor: helpCenterAnchor("policies", "revision-policy") },
     ],
     timeline: [
       {

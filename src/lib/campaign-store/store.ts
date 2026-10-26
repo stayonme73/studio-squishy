@@ -8,8 +8,16 @@ import {
   seedCustomerFieldTokensFromProjectDetails,
 } from "@/lib/customer-field-tokens";
 
+import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
+import {
+  pgListCampaignEnvelopes,
+  pgReadCampaignEnvelope,
+  pgWriteCampaignEnvelope,
+} from "@/lib/studio-durable-persistence/postgres-spine";
+
 import { assertCampaignSyncAllowed } from "./fixture-guard";
 import { atomicReplaceFile, withCampaignWriteLock } from "./file-io";
+import { preserveProtectedRevisionEntitlement } from "./protected-campaign-guard";
 import type { ServerCampaignEnvelope } from "./types";
 
 const CAMPAIGNS_DIR = path.join(process.cwd(), "data", "campaigns");
@@ -24,6 +32,9 @@ async function ensureCampaignsDir(): Promise<void> {
 export async function readCampaignEnvelope(
   campaignId: string,
 ): Promise<ServerCampaignEnvelope | null> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgReadCampaignEnvelope(campaignId);
+  }
   try {
     const raw = await fs.readFile(campaignPath(campaignId), "utf8");
     try {
@@ -48,6 +59,9 @@ export async function writeCampaignEnvelope(
 ): Promise<ServerCampaignEnvelope> {
   return withCampaignWriteLock(envelope.campaignId, async () => {
     assertCampaignSyncAllowed(envelope.campaignId);
+    if (isPostgresPersistenceEnabled()) {
+      return pgWriteCampaignEnvelope(envelope);
+    }
     await ensureCampaignsDir();
     const target = campaignPath(envelope.campaignId);
     const payload = JSON.stringify(envelope, null, 2);
@@ -57,6 +71,9 @@ export async function writeCampaignEnvelope(
 }
 
 export async function listCampaignEnvelopes(): Promise<ServerCampaignEnvelope[]> {
+  if (isPostgresPersistenceEnabled()) {
+    return pgListCampaignEnvelopes();
+  }
   await ensureCampaignsDir();
   let files: string[];
   try {
@@ -101,6 +118,8 @@ export async function upsertCampaignRecord(
   } else {
     mergedRecord = ensureCustomerFieldTokensBackfill(mergedRecord);
   }
+
+  mergedRecord = preserveProtectedRevisionEntitlement(mergedRecord).record;
 
   const envelope: ServerCampaignEnvelope = {
     campaignId: mergedRecord.campaignId,

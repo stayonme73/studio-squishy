@@ -20,9 +20,14 @@ export {
   attachShortVideoArtifactToCustomerJob,
   bindShortVideoIdentityToQaRecords,
   ensureShortVideoMachineReviewBind,
+  ensureShortVideoMachineReviewBindFromCampaign,
   latestShortVideoQaIsUnresolvedFail,
+  readShortVideoHookReceipt,
   resolveShortVideoMp4AbsolutePath,
 } from "./machine-short-video-review-bind";
+export { ensureFootageEditingMachineReviewBindFromCampaign } from "./machine-footage-editing-review-bind";
+export { ensureClipRepurposingMachineReviewBindFromCampaign } from "./machine-clip-repurposing-review-bind";
+export { ensureCopyMachineReviewBind } from "./machine-copy-review-bind";
 export {
   askCustomerLifeFromStore,
   handleCustomerBoardQuestion,

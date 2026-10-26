@@ -395,6 +395,41 @@ describe("STUDIO-OPERATING-POST-PAY-ACTIVATION-CONSUMER-1", () => {
     expect(merged.postPayActivation).toBeUndefined();
   });
 
+  it("restores production line items from payment truth when approved plan is missing", async () => {
+    const campaignId = `ppa-restore-plan-${Date.now()}`;
+    ids.push(campaignId);
+    const campaign = paidReadyCampaign(campaignId, {
+      approvedStudioPlan: undefined,
+    });
+    await upsertCampaignRecord(campaign);
+
+    const result = await ensurePostPayActivation(campaign);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.campaign.approvedStudioPlan?.lineItems?.length).toBe(2);
+    expect(result.activation.jobIds).toHaveLength(2);
+  });
+
+  it("fails closed when paid campaign lacks restorable production scope", async () => {
+    const campaignId = `ppa-scope-fail-${Date.now()}`;
+    ids.push(campaignId);
+    const campaign = paidReadyCampaign(campaignId, {
+      approvedStudioPlan: undefined,
+      paymentTruth: {
+        ...paidReadyCampaign(campaignId).paymentTruth!,
+        selectedServiceIds: [],
+      },
+    });
+    await upsertCampaignRecord(campaign);
+
+    const result = await ensurePostPayActivation(campaign);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toBe("production_scope_ambiguous");
+    expect(result.campaign.postPayActivation?.status).toBe("pending_retry");
+    expect(result.campaign.postPayActivation?.lastError).toMatch(/selectedServiceIds/);
+  });
+
   it("durable activation survives re-read without staff surfaces", async () => {
     const campaignId = `ppa-durable-${Date.now()}`;
     ids.push(campaignId);

@@ -150,6 +150,7 @@ export function startConversationDictation(
   recognition.continuous = false;
   recognition.interimResults = true;
   recognition.lang = "en-US";
+  let settled = false;
 
   recognition.onstart = () => handlers.onListeningStarted();
 
@@ -163,11 +164,15 @@ export function startConversationDictation(
       else interim += piece;
     }
     if (interim) handlers.onInterim(interim.trim());
-    if (finalText.trim()) handlers.onFinal(finalText.trim());
+    if (finalText.trim()) {
+      settled = true;
+      handlers.onFinal(finalText.trim());
+    }
   };
 
   recognition.onerror = (event) => {
     const code = event.error ?? "provider_error";
+    settled = true;
     if (code === "not-allowed" || code === "service-not-allowed") {
       handlers.onPermissionDenied();
       return;
@@ -181,6 +186,7 @@ export function startConversationDictation(
 
   recognition.onend = () => {
     if (activeRecognition === recognition) activeRecognition = null;
+    if (!settled) handlers.onFinal("");
     handlers.onEnded();
   };
 

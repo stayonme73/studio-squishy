@@ -191,7 +191,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
         quantity: 2,
         unit: "emails",
         label:
-          "Up to two finished marketing emails for one campaign — subject lines, preview text, finished body copy, CTA, and simple layout direction for each",
+          "Up to two marketing emails for one campaign — subject, preview, body, and call to action for each. You paste them into your own email platform.",
       },
       {
         key: "email_content_files",
@@ -212,6 +212,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "More than one campaign goal or offer",
       "Performance guarantees",
       "More than one revision round",
+      "Owner or Scout rewriting the emails after QA exhausts",
     ],
     revisionLimit: 1,
     turnaround: buildRouteMapTimingLabel("within 3–5 business days"),
@@ -253,19 +254,14 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
         quantity: 4,
         unit: "messages",
         label:
-          "Up to four client-ready SMS messages for one campaign goal — promotion, event, reminder, offer, launch, or follow-up",
-      },
-      {
-        key: "sms_sequence",
-        quantity: 1,
-        unit: "document",
-        label: "Suggested sending order/sequence and timing document",
+          "Up to four text messages for one campaign goal — promotion, event, reminder, offer, launch, or follow-up. You paste them into your own texting platform.",
       },
       {
         key: "sms_message_file",
         quantity: 1,
         unit: "file",
-        label: "Plain-text message file with all approved SMS copy ready to paste into the client's SMS platform",
+        label:
+          "Plain-text message file with suggested sending order, ready to paste into the client's texting platform",
       },
     ],
     exclusions: [
@@ -279,11 +275,12 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "More than one campaign goal",
       "Performance guarantees",
       "More than one revision round",
+      "Owner or Scout rewriting the messages after QA exhausts",
     ],
     revisionLimit: 1,
     turnaround: buildRouteMapTimingLabel("within 2–3 business days"),
     billingType: "one_time",
-    sourceLaunchStatus: "paused",
+    sourceLaunchStatus: "active",
     productionLane: "quick_turn",
     sourceExecutionMode: "creation_delivery",
     intakeTemplateFieldsTbd: [
@@ -383,7 +380,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-short-video",
     clientResponsibilities: [
-      "Provide organized, usable footage, photos, logo, and source materials when using your own visuals",
+      "Provide 1–4 still photos you own or have permission to use, plus the exact on-screen words and CTA",
       "Upload, post, or distribute the finished video yourself through your own account or tools",
     ],
     scopeRoutingNote: CATALOG_V2_SCOPE_OVERFLOW_NOTE,
@@ -393,14 +390,14 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
         quantity: 1,
         unit: "video",
         label:
-          "One basic short-form video, 15–30 seconds — one format only: vertical, square, or landscape; one campaign, offer, event, or promotion focus",
+          "One 15–30 second vertical video (1080×1920) assembled from your still photos with on-screen captions and a CTA",
       },
       {
         key: "video_mp4",
         quantity: 1,
         unit: "file",
         label:
-          "Final MP4 with basic edit, on-screen captions, and CTA treatment — using customer-provided usable footage or approved Studio assets",
+          "Final vertical MP4 1080×1920 — still photos, captions, and CTA",
       },
       {
         key: "qc_review",
@@ -410,18 +407,24 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       },
     ],
     exclusions: [
+      "Customer footage editing",
+      "Studio-created footage",
+      "Stock footage or AI visuals",
+      "Narration or voice",
+      "Studio music",
+      "Landscape or square versions",
       "On-site filming, drone footage, or talent casting",
       "Outside freelancers, voice actors, printers, or production vendors",
       "Photography or custom illustration source creation",
       "Advanced custom animation or motion graphics",
       "Multiple aspect ratios, cuts, or versions",
       "Video longer than 30 seconds",
-      "Music licensing outside approved tools",
       "Paid ads, placement, or influencer work",
       "Posting, publishing, or scheduling",
       "Ongoing edits or daily content",
       "Performance guarantees",
       "More than one revision round",
+      "Owner or Scout finishing the video after QA exhausts",
     ],
     revisionLimit: 1,
     turnaround: buildRouteMapTimingLabel("within 3–5 business days"),
@@ -431,8 +434,8 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     sourceExecutionMode: "creation_delivery",
     intakeTemplateFieldsTbd: [
       "Video purpose (campaign, offer, event, service, or promotion focus)",
-      "One format choice: vertical, square, or landscape",
-      "Client footage OR approved Studio/stock/AI visuals — photos, logo, and source materials as applicable",
+      "Vertical 1080×1920 only",
+      "1–4 customer-owned or permissioned still photos (PNG or JPG)",
       "Exact on-screen text, offer details, dates, and CTA",
       "Brand colors, fonts, or style references",
       "Any required disclaimers or legal wording (client-supplied)",

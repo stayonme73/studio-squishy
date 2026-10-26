@@ -33,6 +33,48 @@ describe("studio payment sandbox query", () => {
     ).toBe("/studio-conversation-room");
   });
 
+  it("does not read sessionStorage when stamping hrefs (SSR first paint)", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/lib/studio-payment/sandbox-query.ts"),
+      "utf8",
+    );
+    const start = source.indexOf("export function withStudioPaymentSandboxQuery");
+    const end = source.indexOf("export const CONVERSATION_ROOM_SANDBOX_HREF");
+    expect(source.slice(start, end)).not.toContain("sessionHasStudioPaymentSandbox");
+    const lobby = readFileSync(
+      join(process.cwd(), "src/components/entrance/WelcomeHallWelcomeScene.tsx"),
+      "utf8",
+    );
+    expect(lobby).toContain("const [sandboxSearch, setSandboxSearch]");
+    expect(lobby).toContain("sandboxSearch,");
+  });
+
+  it("remembers the existing query opt-in in this tab without inventing a new payment path", () => {
+    const runtime = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationRoomRuntime.tsx",
+      ),
+      "utf8",
+    );
+    const lobby = readFileSync(
+      join(process.cwd(), "src/components/entrance/WelcomeHallWelcomeScene.tsx"),
+      "utf8",
+    );
+    const checkout = readFileSync(
+      join(process.cwd(), "src/components/payment/SecureCheckoutGrid.tsx"),
+      "utf8",
+    );
+    expect(runtime).toContain("rememberStudioPaymentSandbox");
+    expect(runtime).toContain("restoreStudioPaymentSandboxQuery");
+    expect(lobby).toContain("sessionHasStudioPaymentSandbox");
+    expect(checkout).toContain("rememberStudioPaymentSandbox");
+    expect(checkout).toContain("restoreStudioPaymentSandboxQuery");
+    expect(checkout).toContain("compactPaymentHonesty ? sandboxPanel");
+    expect(runtime).toContain("preferSandbox: true");
+    expect(runtime).toContain('started.mode !== "stripe"');
+  });
+
   it("does not treat other query values as the sandbox opt-in", () => {
     expect(
       withStudioPaymentSandboxQuery(
@@ -91,7 +133,7 @@ describe("studio payment sandbox query", () => {
     expect(source).not.toContain("guideHasReviewableAnswers(loadGuideDraft())");
   });
 
-  it("places Studio Review in Studio Controls instead of a floating Conversation Room pill", () => {
+  it("keeps Conversation Room controls in the side rail without a global Studio Review shortcut", () => {
     const css = readFileSync(join(process.cwd(), "src/app/owner-qa.css"), "utf8");
     expect(css).toContain("body:has([data-layout=\"one-tablet\"]) .owner-qa");
     expect(css).toContain("@media (min-width: 961px)");
@@ -104,12 +146,8 @@ describe("studio payment sandbox query", () => {
       ),
       "utf8",
     );
-    expect(nav).toContain('data-studio-review-placement="studio-controls"');
-    expect(nav).toContain("Studio Review");
-    expect(nav).toContain("<StudioReviewControl onOpen={closeDrawer} />");
-    expect(nav.indexOf("<StudioReviewControl onOpen={closeDrawer} />")).toBeGreaterThan(
-      nav.indexOf("Help Center"),
-    );
+    expect(nav).not.toContain("Studio Review");
+    expect(nav).not.toContain("StudioReviewControl");
     expect(nav).toContain("CONVERSATION_ROOM_TABLET_HREF");
     expect(nav).toContain('data-session-action="review-answers"');
     expect(nav).toContain('data-session-action="change-answer"');
@@ -118,7 +156,7 @@ describe("studio payment sandbox query", () => {
     expect(nav).toContain("onClick={reviewActivate.onClick}");
   });
 
-  it("opening questions use one in-tablet Continue instead of a second hunt-below Continue", () => {
+  it("opening questions use one Continue — tablet Continue only when the dock is absent", () => {
     const source = readFileSync(
       join(
         process.cwd(),

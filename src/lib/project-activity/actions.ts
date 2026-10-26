@@ -21,7 +21,11 @@ import {
 
 import { assessSuggestedClassification } from "./classify";
 import { bridgeProjectChangeToOwnerDesk } from "@/lib/project-change/escalate";
-import { getOrInitializeProjectActivity, writeProjectActivityEnvelope } from "./store";
+import {
+  getOrInitializeProjectActivity,
+  mutateProjectActivityEnvelope,
+  writeProjectActivityEnvelope,
+} from "./store";
 import type {
   ActivitySourceType,
   InformationUpdateRequest,
@@ -131,18 +135,7 @@ export async function submitInformationUpdateRequest(params: {
     };
   }
 
-  let envelope = await getOrInitializeProjectActivity(campaignId);
-  const existing = findRequestByIdempotency(envelope, idempotencyKey);
-  if (existing) {
-    if (!idempotencyPayloadMatches(existing, targetKey, requestedValue, note)) {
-      return {
-        ok: false,
-        error: "Idempotency key already used with a different payload.",
-        status: 409,
-      };
-    }
-    return { ok: true, request: existing, envelope };
-  }
+  await getOrInitializeProjectActivity(campaignId);
 
   const requestId = randomUUID();
   const submittedAt = nowIso();
@@ -159,53 +152,79 @@ export async function submitInformationUpdateRequest(params: {
 
   const status = isFreeform || suggested ? "needs_studio_review" : "request_received";
 
-  const request: InformationUpdateRequest = {
-    id: requestId,
-    campaignId,
-    idempotencyKey,
-    targetKey,
-    targetLabel: requestTargetLabel(targetKey),
-    previousValueCaptured: previousValue,
-    requestedValue: requestedValue.trim(),
-    note: note?.trim() || undefined,
-    fieldTokenAtCapture,
-    status,
-    classification: null,
-    suggestedClassification: suggested ?? undefined,
-    submittedBy: { userId: user.id, displayName: user.displayName },
-    submittedAt,
-  };
+  type SubmitResult =
+    | { ok: true; request: InformationUpdateRequest; envelope: ProjectActivityEnvelope }
+    | { ok: false; error: string; status: number };
 
-  envelope = {
-    ...envelope,
-    requests: [...envelope.requests, request],
-    updatedAt: submittedAt,
-    version: envelope.version + 1,
-  };
+  return mutateProjectActivityEnvelope(campaignId, (envelope) => {
+    const existing = findRequestByIdempotency(envelope, idempotencyKey);
+    if (existing) {
+      if (!idempotencyPayloadMatches(existing, targetKey, requestedValue, note)) {
+        return {
+          envelope,
+          value: {
+            ok: false,
+            error: "Idempotency key already used with a different payload.",
+            status: 409,
+          } satisfies SubmitResult,
+        };
+      }
+      return {
+        envelope,
+        value: { ok: true, request: existing, envelope } satisfies SubmitResult,
+      };
+    }
 
-  const detailParts = [
-    request.targetLabel,
-    previousValue ? `${previousValue} → ${request.requestedValue}` : request.requestedValue,
-  ].filter(Boolean);
+    const request: InformationUpdateRequest = {
+      id: requestId,
+      campaignId,
+      idempotencyKey,
+      targetKey,
+      targetLabel: requestTargetLabel(targetKey),
+      previousValueCaptured: previousValue,
+      requestedValue: requestedValue.trim(),
+      note: note?.trim() || undefined,
+      fieldTokenAtCapture,
+      status,
+      classification: null,
+      suggestedClassification: suggested ?? undefined,
+      submittedBy: { userId: user.id, displayName: user.displayName },
+      submittedAt,
+    };
 
-  envelope = appendActivityEvent(envelope, {
-    kind: "request_received",
-    sourceType: "information_update_request",
-    sourceId: requestId,
-    actor: actorFromUser(user),
-    requestId,
-    headline: "Request received",
-    detail: detailParts.join(" — "),
-    payload: {
-      targetLabel: request.targetLabel,
-      previousValue: previousValue,
-      requestedValue: request.requestedValue,
-      status: request.status,
-    },
+    let next: ProjectActivityEnvelope = {
+      ...envelope,
+      requests: [...envelope.requests, request],
+      updatedAt: submittedAt,
+      version: envelope.version + 1,
+    };
+
+    const detailParts = [
+      request.targetLabel,
+      previousValue ? `${previousValue} → ${request.requestedValue}` : request.requestedValue,
+    ].filter(Boolean);
+
+    next = appendActivityEvent(next, {
+      kind: "request_received",
+      sourceType: "information_update_request",
+      sourceId: requestId,
+      actor: actorFromUser(user),
+      requestId,
+      headline: "Request received",
+      detail: detailParts.join(" — "),
+      payload: {
+        targetLabel: request.targetLabel,
+        previousValue: previousValue,
+        requestedValue: request.requestedValue,
+        status: request.status,
+      },
+    });
+
+    return {
+      envelope: next,
+      value: { ok: true, request, envelope: next } satisfies SubmitResult,
+    };
   });
-
-  const saved = await writeProjectActivityEnvelope(envelope);
-  return { ok: true, request, envelope: saved };
 }
 
 export async function classifyInformationUpdateRequest(params: {

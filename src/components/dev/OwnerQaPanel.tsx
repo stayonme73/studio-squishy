@@ -5,15 +5,19 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import OwnerQaStudioSystem from "@/components/dev/OwnerQaStudioSystem";
 import { performDevClientTestReset } from "@/lib/dev-reset-client-test-state";
 import { ownerQa } from "@/config/owner-qa";
 import { studioLobbyEntryV1 } from "@/config/studio-lobby-entry-v1";
 import { applyOwnerQaJourneySeed } from "@/lib/owner-qa-campaign";
+import { buildOwnerQaJourneyView } from "@/lib/owner-qa-journey-view";
+import { readCurrentCampaign } from "@/lib/studio-board-campaign";
 import { withStudioPaymentSandboxQuery } from "@/lib/studio-payment/sandbox-query";
 import {
   StudioMobileControlsSlot,
   useStudioMobileUtility,
 } from "@/components/dev/studio-mobile-utility";
+import type { CampaignRecord } from "@/config/studio-board";
 
 type DevicePreview = {
   pageLabel: string;
@@ -50,6 +54,7 @@ export default function OwnerQaPanel() {
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
   const [usePhoneSheet, setUsePhoneSheet] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
+  const [campaign, setCampaign] = useState<CampaignRecord | null>(null);
   const mobileUtility = useStudioMobileUtility();
   const ownerTools = process.env.NODE_ENV === "development";
   const showTab = ownerTools || Boolean(mobileUtility?.controlsRegistered);
@@ -77,6 +82,10 @@ export default function OwnerQaPanel() {
     // closeReview reads the current path/query via replace.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mobileUtility, pathname, searchParams]);
+
+  useEffect(() => {
+    setCampaign(readCurrentCampaign());
+  }, [open, pathname]);
 
   useEffect(() => {
     setPortalReady(true);
@@ -218,155 +227,42 @@ export default function OwnerQaPanel() {
 
   if (!showTab) return null;
 
+  /* Isolate the proof tab until after mount so Link/button cannot hydrate-mismatch. */
+  if (!portalReady) {
+    return (
+      <div
+        className="owner-qa studio-review-mobile-tab"
+        data-studio-review-mobile-tab=""
+      />
+    );
+  }
+
+  const journeyView = buildOwnerQaJourneyView({
+    pathname,
+    search: searchParams.toString(),
+    campaign,
+  });
+
   const panelBody = (
     <>
       {usePhoneSheet ? <StudioMobileControlsSlot /> : null}
       {ownerTools ? (
-        <>
-      <p className="owner-qa__title">Studio Review</p>
-      <p className="owner-qa__hint">{ownerQa.panelHint}</p>
-
-      <section className="owner-qa__section" aria-label="Samsung device preview">
-        <h2 className="owner-qa__section-title">Phone review (QR)</h2>
-        <p className="owner-qa__device-page">
-          {devicePreview?.pageLabel ?? "Current page"}
-        </p>
-        {devicePreviewLoading ? (
-          <p className="owner-qa__device-note">Building QR for this page…</p>
-        ) : null}
-        {devicePreviewError ? (
-          <p className="owner-qa__device-note owner-qa__device-note--warn">
-            {devicePreviewError}
-          </p>
-        ) : null}
-        {devicePreview ? (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              className="owner-qa__qr"
-              src={devicePreview.qrDataUrl}
-              alt={`QR code for ${devicePreview.pageLabel}`}
-              width={220}
-              height={220}
-            />
-            <p className="owner-qa__device-url">{devicePreview.url}</p>
-            {devicePreview.note ? (
-              <p className="owner-qa__device-note owner-qa__device-note--warn">
-                {devicePreview.note}
-              </p>
-            ) : (
-              <p className="owner-qa__device-note">
-                Scan with your Samsung camera to open this page (Lobby view — Studio Review
-                stays closed). Phone and computer must be on the same Wi‑Fi.
-              </p>
-            )}
-            <div className="owner-qa__device-actions">
-              <button
-                type="button"
-                className="owner-qa__action"
-                onClick={handleCopyPreviewUrl}
-              >
-                {copyState === "copied"
-                  ? "Copied"
-                  : copyState === "failed"
-                    ? "Copy failed"
-                    : "Copy URL"}
-              </button>
-              <button type="button" className="owner-qa__action" onClick={closeReview}>
-                Close
-              </button>
-            </div>
-          </>
-        ) : null}
-      </section>
-
-      <section className="owner-qa__section">
-        <h2 className="owner-qa__section-title">{ownerQa.customerJourneySectionTitle}</h2>
-        <div className="owner-qa__presets">
-          {ownerQa.journeyPresets.map((preset) => (
-            <a
-              key={preset.id}
-              href={preset.href}
-              className="owner-qa__preset"
-              onClick={(event) => {
-                event.preventDefault();
-                handleJourney(preset.href, preset.seed);
-              }}
-            >
-              <span className="owner-qa__preset-label">{preset.label}</span>
-              {preset.description ? (
-                <span className="owner-qa__preset-desc">{preset.description}</span>
-              ) : null}
-            </a>
-          ))}
-        </div>
-      </section>
-
-      <section className="owner-qa__section">
-        <h2 className="owner-qa__section-title">Shortcuts</h2>
-        <div className="owner-qa__links">
-          {ownerQa.shortcuts.map((shortcut) =>
-            shortcut.kind === "reset" ? (
-              <button
-                key={shortcut.id}
-                type="button"
-                className="owner-qa__action owner-qa__action--danger"
-                onClick={handleResetRequest}
-                aria-expanded={confirmResetOpen}
-                aria-controls={confirmId}
-              >
-                {shortcut.label}
-              </button>
-            ) : (
-              <a
-                key={shortcut.id}
-                href={shortcut.href}
-                className="owner-qa__link"
-                onClick={(event) => {
-                  event.preventDefault();
-                  handleShortcutLink(shortcut.href);
-                }}
-              >
-                <span className="owner-qa__preset-label">{shortcut.label}</span>
-                {shortcut.description ? (
-                  <span className="owner-qa__preset-desc">{shortcut.description}</span>
-                ) : null}
-              </a>
-            ),
-          )}
-        </div>
-      </section>
-
-      {confirmResetOpen ? (
-        <div
-          id={confirmId}
-          className="owner-qa__confirm"
-          role="alertdialog"
-          aria-labelledby={`${confirmId}-title`}
-          aria-describedby={`${confirmId}-desc`}
-        >
-          <p id={`${confirmId}-title`} className="owner-qa__confirm-title">
-            Reset campaign?
-          </p>
-          <p id={`${confirmId}-desc`} className="owner-qa__confirm-desc">
-            Clears discovery answers, approved plan, payment state, project details, uploads,
-            and all other campaign data in this browser. You will return to a clean Studio Lobby.
-          </p>
-          <div className="owner-qa__confirm-actions">
-            <button type="button" className="owner-qa__action" onClick={handleResetCancel}>
-              Cancel
-            </button>
-            <button
-              type="button"
-              className="owner-qa__action owner-qa__action--danger"
-              onClick={handleResetConfirm}
-            >
-              Reset campaign
-            </button>
-          </div>
-        </div>
-      ) : null}
-        </>
+        <OwnerQaStudioSystem
+          view={journeyView}
+          confirmId={confirmId}
+          confirmResetOpen={confirmResetOpen}
+          devicePreview={devicePreview}
+          devicePreviewError={devicePreviewError}
+          devicePreviewLoading={devicePreviewLoading}
+          copyState={copyState}
+          onClose={closeReview}
+          onCopyUrl={handleCopyPreviewUrl}
+          onJourney={handleJourney}
+          onShortcut={handleShortcutLink}
+          onResetRequest={handleResetRequest}
+          onResetCancel={handleResetCancel}
+          onResetConfirm={handleResetConfirm}
+        />
       ) : (
         <button type="button" className="owner-qa__action" onClick={closeReview}>
           Close
@@ -375,6 +271,18 @@ export default function OwnerQaPanel() {
     </>
   );
 
+  const isCustomerHomepage = pathname === "/" || pathname === "/studio-lobby";
+  if (isCustomerHomepage && !ownerTools) {
+    return null;
+  }
+  const homepageLocalOnly = isCustomerHomepage && ownerTools;
+  const reviewToggleLabel = !ownerTools
+    ? "Studio Controls"
+    : homepageLocalOnly
+      ? "local"
+      : "Studio Review";
+  const reviewAriaLabel = ownerTools ? "Studio Review" : "Studio Controls";
+
   const phoneLayer =
     open && usePhoneSheet && portalReady
       ? createPortal(
@@ -382,7 +290,7 @@ export default function OwnerQaPanel() {
             <button
               type="button"
               className="owner-qa-phone-layer__scrim"
-              aria-label="Close Studio Review"
+              aria-label={ownerTools ? "Close Studio Review" : "Close Studio Controls"}
               onClick={closeReview}
             />
             <div
@@ -390,7 +298,7 @@ export default function OwnerQaPanel() {
               className="owner-qa__panel owner-qa__panel--phone"
               role="dialog"
               aria-modal="true"
-              aria-label="Studio Review"
+              aria-label={reviewAriaLabel}
               onClick={(event) => event.stopPropagation()}
               onPointerDown={(event) => event.stopPropagation()}
             >
@@ -405,11 +313,11 @@ export default function OwnerQaPanel() {
     <>
       <div
         ref={rootRef}
-        className={`owner-qa studio-review-mobile-tab${open ? " owner-qa--open" : ""}`}
+        className={`owner-qa studio-review-mobile-tab${open ? " owner-qa--open" : ""}${homepageLocalOnly ? " owner-qa--homepage-local" : ""}`}
         data-studio-review-mobile-tab=""
       >
         {open && !usePhoneSheet ? (
-          <div id={panelId} className="owner-qa__panel" role="dialog" aria-label="Studio Review">
+          <div id={panelId} className="owner-qa__panel" role="dialog" aria-label={reviewAriaLabel}>
             {panelBody}
           </div>
         ) : null}
@@ -422,7 +330,7 @@ export default function OwnerQaPanel() {
             aria-controls={panelId}
             onClick={closeReview}
           >
-            Studio Review
+            {reviewToggleLabel}
           </button>
         ) : (
           <Link
@@ -431,8 +339,9 @@ export default function OwnerQaPanel() {
             className="owner-qa__toggle"
             aria-expanded={false}
             aria-controls={panelId}
+            aria-label={homepageLocalOnly ? "Local Studio Review" : reviewAriaLabel}
           >
-            Studio Review
+            {reviewToggleLabel}
           </Link>
         )}
       </div>

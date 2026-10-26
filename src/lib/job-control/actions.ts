@@ -1,5 +1,7 @@
 import type { JobActivityActor, JobSpineStatus, PurchasedJobRecord } from "./types";
 import { recordJobStatusChange } from "./activity-log";
+import { releaseQuickLaneReservation } from "./quick-lane-admission";
+import { occupiesLaneCapacity } from "./status-spine";
 import type { JobActivityEvent } from "./types";
 
 export type SetJobSpineStatusInput = {
@@ -8,6 +10,7 @@ export type SetJobSpineStatusInput = {
   actor: JobActivityActor;
   reason: string;
   occurredAt?: string;
+  repoRoot?: string;
 };
 
 /** Apply an explicit spine transition — always logged; no silent changes. */
@@ -30,12 +33,12 @@ export function applyJobSpineStatusChange(
           returnLane: job.returnLane ?? job.productionLane,
         }
       : {}),
-    ...(input.nextStatus === "building_concepts" && job.spineStatus === "waiting_on_client"
+    ...(job.spineStatus === "waiting_on_client" && input.nextStatus !== "waiting_on_client"
       ? {
           waitingOnClientSince: null,
-          laneQueuedAt: occurredAt,
+          ...(input.nextStatus === "building_concepts" ? { laneQueuedAt: occurredAt } : {}),
         }
-      : {}),
+      : {})
   };
 
   const nextEvents = recordJobStatusChange(
@@ -45,6 +48,11 @@ export function applyJobSpineStatusChange(
     input.reason,
     occurredAt,
   );
+
+  const lane = job.returnLane ?? job.productionLane;
+  if (lane === "quick" && !occupiesLaneCapacity(input.nextStatus)) {
+    releaseQuickLaneReservation({ jobId: job.jobId, repoRoot: input.repoRoot });
+  }
 
   return { job: updated, events: nextEvents };
 }

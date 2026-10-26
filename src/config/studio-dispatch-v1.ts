@@ -22,6 +22,7 @@ export const studioDispatchV1 = {
     evaluated: "evaluated",
     deferred: "deferred",
     pendingRetry: "pending_retry",
+    identityBlocked: "identity_blocked",
   } as const,
 
   routineOwnerAction: "NONE" as const,

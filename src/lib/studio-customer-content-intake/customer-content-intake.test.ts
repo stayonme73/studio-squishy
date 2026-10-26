@@ -244,7 +244,7 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
     expect(inspection.sha256).toBe(checksum);
   });
 
-  it("routes fake PNG bytes to technical review while still allowing storage on live path", async () => {
+  it("rejects fake PNG bytes on the live store path before ledger binding", async () => {
     const adapter = createMockFileRoomStorageAdapter();
     const stored = await storeAndAttachCustomerMaterialFile({
       adapter,
@@ -261,17 +261,11 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
       file: syntheticFakePngFile(),
       itemId: "logo-slot",
       useAuthorizationBasis: "customer_owns",
-      rightsInput: {
-        useAuthorizationBasis: "customer_owns",
-        cropAdaptPermitted: true,
-        commercialUsePermitted: true,
-      },
+      rightsInput: fullClearanceRightsInput({ useAuthorizationBasis: "customer_owns" }),
     });
-    expect(stored.ok).toBe(true);
-    if (!stored.ok) return;
-    const cert = stored.materials.items[0]?.contentCertification;
-    expect(cert?.routingState).toBe("QUARANTINED");
-    expect(cert?.productionCleared).toBe(false);
+    expect(stored.ok).toBe(false);
+    if (stored.ok) return;
+    expect(stored.status).toBe(400);
   });
 
   it("rejects corrupt PNG uploads before storage", async () => {
@@ -285,6 +279,7 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
       user: client,
       file: syntheticCorruptPngFile(),
       itemId: "photo-video-slot",
+      rightsInput: fullClearanceRightsInput(),
     });
     expect(stored.ok).toBe(false);
     if (stored.ok) return;
@@ -390,7 +385,7 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
     expect(result.certification.productionCleared).toBe(false);
   });
 
-  it("requires rights information when clearance category lacks attestation", async () => {
+  it("rejects clearance-category uploads when file-rights attestation is missing", async () => {
     const adapter = createMockFileRoomStorageAdapter();
     const stored = await storeAndAttachCustomerMaterialFile({
       adapter,
@@ -402,35 +397,27 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
       file: syntheticPngFile(),
       consolidatedItemId: "photo-video:file-metadata",
     });
-    expect(stored.ok).toBe(true);
-    if (!stored.ok) return;
-    const item = stored.materials.items[0]!;
-    expect(item.contentCertification?.routingState).toBe("RIGHTS_INFORMATION_REQUIRED");
-    expect(isCustomerContentClearedForProduction(item)).toBe(false);
-    expect(materialBlocksProductionUse(item, CAMPAIGN_ID)).toBe(true);
+    expect(stored.ok).toBe(false);
+    if (stored.ok) return;
+    expect(stored.status).toBe(400);
   });
 
   it("hard-blocks production workspace when required photo content is uncleared", async () => {
-    const adapter = createMockFileRoomStorageAdapter();
-    const stored = await storeAndAttachCustomerMaterialFile({
-      adapter,
-      campaign: campaign(),
-      campaignClientUserId: client.id,
-      tasks: tasks(),
-      materials: materials([photoItem()]),
-      user: client,
-      file: syntheticPngFile(),
-      consolidatedItemId: "photo-video:file-metadata",
-    });
+    const stored = await storeClearedPhoto();
     expect(stored.ok).toBe(true);
     if (!stored.ok) return;
-    const item = stored.materials.items[0]!;
-    expect(item.contentCertification?.routingState).toBe("RIGHTS_INFORMATION_REQUIRED");
+
+    const withdrawn = applyCustomerWithdrawFile(stored.materials, stored.materials.items[0]!.id);
+    expect(withdrawn.ok).toBe(true);
+    if (!withdrawn.ok) return;
+
+    const item = withdrawn.envelope.items[0]!;
+    expect(isCustomerContentClearedForProduction(item)).toBe(false);
     expect(materialBlocksProductionUse(item, CAMPAIGN_ID)).toBe(true);
 
     const gate = canTransitionToBuildingConcepts(
-      tasks().jobRecords![0]!,
-      stored.materials.items,
+      stored.tasks.jobRecords![0]!,
+      withdrawn.envelope.items,
       [{ lane: "quick", availableSlots: 2, activeJobs: [] }],
     );
     expect(gate.allowed).toBe(false);
@@ -507,7 +494,7 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
     expect(isCustomerContentClearedForProduction(item)).toBe(true);
   });
 
-  it("uncleared replacement cannot inherit prior clearance", async () => {
+  it("rejects replacement uploads that omit required file-rights attestation", async () => {
     const adapter = createMockFileRoomStorageAdapter();
     const first = await storeClearedPhoto(adapter);
     expect(first.ok).toBe(true);
@@ -523,14 +510,13 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
       file: syntheticReplacementPngFile(),
       consolidatedItemId: "photo-video:file-metadata",
     });
-    expect(second.ok).toBe(true);
-    if (!second.ok) return;
+    expect(second.ok).toBe(false);
+    if (second.ok) return;
+    expect(second.status).toBe(400);
 
-    const item = second.materials.items[0]!;
-    expect(item.contentCertification?.routingState).toBe("RIGHTS_INFORMATION_REQUIRED");
-    expect(isCustomerContentClearedForProduction(item)).toBe(false);
-    expect(item.contentCertificationArchive?.[0]?.routingState).toBe("SUPERSEDED");
-    expect(item.contentCertificationArchive?.[0]?.productionCleared).toBe(false);
+    const item = first.materials.items[0]!;
+    expect(isCustomerContentClearedForProduction(item)).toBe(true);
+    expect(item.contentCertificationArchive?.length ?? 0).toBe(0);
   });
 
   it("team technical approval cannot fabricate missing customer rights", () => {

@@ -16,6 +16,9 @@ import {
   enqueueJobCommunicationRecord,
   resolveCampaignCommunicationClientId,
 } from "@/lib/job-control/communication";
+import { syncRevisionRoundsUsedMirror } from "@/lib/job-control/correction-round-ledger";
+import { escalateRevisionReworkToOwner } from "@/lib/job-control/revision-rework-escalation";
+import type { PurchasedJobRecord } from "@/lib/job-control/types";
 import { DESIGN_RENDERER_PROOF_SKU } from "@/lib/studio-design-renderer";
 import type { DesignQualityEvidence } from "@/lib/studio-kitchen-production/design-quality";
 import {
@@ -99,19 +102,12 @@ function readDesignQaEvidence(pngRelativePath: string | undefined): DesignQualit
       evaluation?: DesignQualityEvidence["evaluation"];
       attestations?: DesignQualityEvidence["attestations"];
     };
-    if (!parsed.ok || !parsed.evaluation) return null;
+    if (!parsed.evaluation) return null;
+    if (!parsed.attestations) return null;
     return {
       evaluation: parsed.evaluation,
-      attestations: parsed.attestations ?? {
-        hierarchyReviewed: true,
-        readabilityReviewed: true,
-        spacingCompositionReviewed: true,
-        brandFitReviewed: true,
-        genericnessRejected: true,
-        exportReadinessReviewed: true,
-        notes: "Imported from sealed Machine renderer design-qa.json.",
-      },
-      gatePassed: true,
+      attestations: parsed.attestations,
+      gatePassed: parsed.ok === true && parsed.evaluation.ok === true,
     };
   } catch {
     return null;
@@ -230,7 +226,7 @@ export function bindFlyerIdentityToQaRecords(input: {
   }
 
   if (!evidencePassed) {
-    let nextJob = {
+    let nextJob: PurchasedJobRecord = {
       ...job,
       internalQaReviewAuthorization: undefined,
     };
@@ -245,15 +241,24 @@ export function bindFlyerIdentityToQaRecords(input: {
       nextJob = moved.job;
       events = moved.events;
     }
+    let failedEnvelope: ServerTasksEnvelope = {
+      ...envelope,
+      jobRecords: (envelope.jobRecords ?? []).map((entry) =>
+        entry.jobId === job.jobId ? nextJob : entry,
+      ),
+      jobActivityEvents: events,
+      updatedAt: new Date().toISOString(),
+    };
+    // The customer is waiting on a change they asked for. Do not go quiet.
+    const escalated = escalateRevisionReworkToOwner({
+      campaign: input.campaign,
+      envelope: failedEnvelope,
+      job: nextJob,
+      clientUserId: input.clientUserId,
+    });
+    failedEnvelope = escalated.envelope;
     return {
-      envelope: {
-        ...envelope,
-        jobRecords: (envelope.jobRecords ?? []).map((entry) =>
-          entry.jobId === job.jobId ? nextJob : entry,
-        ),
-        jobActivityEvents: events,
-        updatedAt: new Date().toISOString(),
-      },
+      envelope: failedEnvelope,
       bound: true,
       alreadyBound: false,
       qaAction,
@@ -274,7 +279,20 @@ export function bindFlyerIdentityToQaRecords(input: {
   });
   const authorization = buildInternalQaReviewAuthorization(decision);
   if (!authorization) {
-    return { envelope, bound: true, alreadyBound: false, qaAction };
+    // Renderer identity is sound but Review will not open. Same stranding risk
+    // as a failed gate, so a waiting customer still gets told.
+    const blocked = escalateRevisionReworkToOwner({
+      campaign: input.campaign,
+      envelope,
+      job,
+      clientUserId: input.clientUserId,
+    });
+    return {
+      envelope: blocked.envelope,
+      bound: true,
+      alreadyBound: false,
+      qaAction,
+    };
   }
 
   const truth = assembleCustomerLifeTruth({
@@ -283,7 +301,7 @@ export function bindFlyerIdentityToQaRecords(input: {
   });
   const now = new Date().toISOString();
   const wasRevision = job.spineStatus === "revision_requested";
-  let nextJob = {
+  let nextJob: PurchasedJobRecord = {
     ...job,
     internalQaReviewAuthorization: authorization,
     productionStartedAt: job.productionStartedAt ?? now,
@@ -325,7 +343,12 @@ export function bindFlyerIdentityToQaRecords(input: {
       };
     }),
   };
-  if (nextJob.spineStatus === "ready_for_review") {
+  // Never announce work the customer cannot open. An Owner hold from an earlier
+  // rework escalation keeps Review closed until a human clears it.
+  if (
+    nextJob.spineStatus === "ready_for_review" &&
+    nextJob.ownerApprovalPending !== "before_review"
+  ) {
     envelope = enqueueJobCommunicationRecord(envelope, {
       campaign: input.campaign,
       clientId: resolveCampaignCommunicationClientId(
@@ -346,7 +369,7 @@ export async function ensureFlyerMachineReviewBind(
 ): Promise<CampaignRecord> {
   const observer = campaign.dispatchExecution?.designRendererObserver;
   const flyer = observer?.results.find(
-    (result) => result.skuId === DESIGN_RENDERER_PROOF_SKU && result.ok && result.pngContentSha256,
+    (result) => result.skuId === DESIGN_RENDERER_PROOF_SKU && result.pngContentSha256,
   );
   if (!flyer?.pngContentSha256) return campaign;
 
@@ -411,6 +434,12 @@ export async function ensureFlyerMachineReviewBind(
       },
       latest?.clientUserId,
     );
+    record = saved.record;
+  }
+  // Review just opened, so any revision the customer was waiting on is now spent.
+  const mirrored = syncRevisionRoundsUsedMirror(record, nextEnvelope);
+  if (mirrored.changed) {
+    const saved = await upsertCampaignRecord(mirrored.campaign, latest?.clientUserId);
     record = saved.record;
   }
   return record;

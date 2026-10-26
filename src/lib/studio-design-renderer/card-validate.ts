@@ -215,11 +215,12 @@ export function validateBusinessCardDesignSpec(
 
   const frontHasLogo = spec.front.layers.some((l) => l.type === "image");
   const backHasLogo = spec.back.layers.some((l) => l.type === "image");
-  if (!frontHasLogo || !backHasLogo) {
+  const hasLogoMaterial = spec.materials.some((m) => m.role === "logo");
+  if (hasLogoMaterial && (!frontHasLogo || !backHasLogo)) {
     return {
       ok: false,
       code: "INVALID_DESIGN_SPEC",
-      message: "Both front and back must include logo image layers",
+      message: "When a customer logo is supplied, both front and back must include it",
     };
   }
 

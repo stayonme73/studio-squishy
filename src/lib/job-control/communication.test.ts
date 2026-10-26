@@ -3,6 +3,10 @@ import { describe, expect, it } from "vitest";
 import type { CampaignRecord } from "@/config/studio-board";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
+import {
+  applyMaterialUseDecisionToItem,
+  materialBlocksProductionUse,
+} from "@/lib/studio-material-use/evaluate";
 
 import { applyProductionWorkspacePatch } from "./production-workspace-actions";
 import { resolveProductionLaneViews } from "./capacity";
@@ -126,39 +130,49 @@ function syncFor(
 }
 
 describe("job communication outbox", () => {
-  it("creates a 48-hour reminder record and timeline receipt", () => {
+  it("never queues a timed reminder, however long a job has waited", () => {
     const record = campaign();
     const [job] = syncJobRecordsFromCampaign(record, [], [], []);
     const waitingJob: PurchasedJobRecord = {
       ...job,
       spineStatus: "waiting_on_client",
-      waitingOnClientSince: "2026-07-01T10:00:00.000Z",
-      updatedAt: "2026-07-01T10:00:00.000Z",
+      waitingOnClientSince: "2026-06-01T10:00:00.000Z",
+      updatedAt: "2026-06-01T10:00:00.000Z",
     };
 
     const result = syncFor(
       record,
       envelope([waitingJob]),
-      [material("ma-flyer-v2", "2026-07-01T10:00:00.000Z")],
+      [material("ma-flyer-v2", "2026-06-01T10:00:00.000Z")],
       new Date("2026-07-03T12:00:00.000Z").getTime(),
     );
+    const eventTypes = new Set(
+      (result.envelope.jobCommunicationRecords ?? []).map((entry) => entry.eventType as string),
+    );
 
-    expect(result.envelope.jobCommunicationRecords?.some((entry) => entry.eventType === "reminder_48_hour")).toBe(true);
-    expect(result.envelope.jobActivityEvents?.some((entry) => entry.communicationEventType === "reminder_48_hour")).toBe(true);
+    for (const retired of ["reminder_48_hour", "waiting_on_client_72_hour", "refund_eligibility_14_day"]) {
+      expect(eventTypes.has(retired)).toBe(false);
+    }
+    expect(result.envelope.jobCommunicationRecords?.filter((entry) => entry.eventType === "waiting_on_client")).toHaveLength(1);
   });
 
-  it("moves to Waiting on Client at 72 hours and creates a notice", () => {
+  it("moves to Waiting on Client immediately when required materials are missing, with a plain notice", () => {
     const record = campaign();
     const result = syncFor(
       record,
       envelope(),
-      [material("ma-flyer-v2", "2026-06-30T12:00:00.000Z")],
-      new Date("2026-07-03T12:00:00.000Z").getTime(),
+      [material("ma-flyer-v2", NOW)],
+      new Date(NOW).getTime(),
     );
     const flyer = result.jobs.find((job) => job.skuId === "ma-flyer-v2");
+    const notice = result.envelope.jobCommunicationRecords?.find(
+      (entry) => entry.eventType === "waiting_on_client" && entry.jobId === flyer?.jobId,
+    );
 
     expect(flyer?.spineStatus).toBe("waiting_on_client");
-    expect(result.envelope.jobCommunicationRecords?.some((entry) => entry.eventType === "waiting_on_client_72_hour")).toBe(true);
+    expect(result.jobs.find((job) => job.skuId === "sm-001")?.spineStatus).not.toBe("waiting_on_client");
+    expect(notice?.messageContent).toContain("waiting on required materials from you");
+    expect(notice?.messageContent).not.toMatch(/\b\d+\s*(hour|day)s?\b|refund|deadline to respond/i);
   });
 
   it("records materials received and returns only that job to queue", () => {
@@ -176,21 +190,26 @@ describe("job communication outbox", () => {
       spineStatusSetAt: "2026-07-02T12:00:00.000Z",
     };
 
-    const result = syncFor(
-      record,
-      envelope([waitingFlyer, reviewSocial]),
-      [
-        {
-          ...material("ma-flyer-v2", "2026-06-30T12:00:00.000Z", "submitted"),
-          uploadStatus: "stored",
-          useAuthorization: {
-            basis: "customer_has_permission",
-            attestedAt: NOW,
-            attestedBy: { role: "client", userId: CLIENT_ID, displayName: "Client" },
-          },
+    const received = applyMaterialUseDecisionToItem({
+      item: {
+        ...material("ma-flyer-v2", "2026-06-30T12:00:00.000Z", "submitted"),
+        uploadStatus: "stored",
+        useAuthorization: {
+          basis: "customer_has_permission",
+          attestedAt: NOW,
+          attestedBy: { role: "client", userId: CLIENT_ID, displayName: "Client" },
         },
-      ],
-    );
+        contentCertification: {
+          routingState: "CLEARED_FOR_PRODUCTION",
+          productionCleared: true,
+        } as CampaignMaterialItem["contentCertification"],
+      },
+      campaignId: record.campaignId,
+      evaluatedAt: NOW,
+    });
+    expect(materialBlocksProductionUse(received, record.campaignId)).toBe(false);
+
+    const result = syncFor(record, envelope([waitingFlyer, reviewSocial]), [received]);
 
     expect(result.jobs.find((job) => job.skuId === "ma-flyer-v2")?.spineStatus).toBe("ready_for_queue");
     expect(result.jobs.find((job) => job.skuId === "sm-001")?.spineStatus).toBe("ready_for_review");
@@ -235,7 +254,7 @@ describe("job communication outbox", () => {
       started.envelope,
       record,
       job.jobId,
-      { action: "issue_refund", reason: "14-day no response" },
+      { action: "issue_refund", reason: "Client asked to cancel" },
       { id: "owner", email: "owner@example.com", displayName: "Owner", roles: ["owner"] },
       [],
       lanes,
@@ -244,25 +263,62 @@ describe("job communication outbox", () => {
     expect(refund.ok).toBe(false);
   });
 
-  it("marks untouched waiting jobs refund eligible after 14 days", () => {
+  it("never marks refund eligibility or refunds automatically from elapsed waiting time", () => {
     const record = campaign();
     const [job] = syncJobRecordsFromCampaign(record, [], [], []);
     const waitingJob: PurchasedJobRecord = {
       ...job,
       spineStatus: "waiting_on_client",
-      waitingOnClientSince: "2026-06-18T12:00:00.000Z",
-      updatedAt: "2026-06-18T12:00:00.000Z",
+      waitingOnClientSince: "2026-05-01T12:00:00.000Z",
+      updatedAt: "2026-05-01T12:00:00.000Z",
     };
 
     const result = syncFor(
       record,
       envelope([waitingJob]),
-      [material("ma-flyer-v2", "2026-06-18T12:00:00.000Z")],
+      [material("ma-flyer-v2", "2026-05-01T12:00:00.000Z")],
       new Date("2026-07-03T12:00:00.000Z").getTime(),
     );
 
-    expect(result.jobs[0].refundEligibleAt).toBeTruthy();
-    expect(result.envelope.jobCommunicationRecords?.some((entry) => entry.eventType === "refund_eligibility_14_day")).toBe(true);
+    expect(result.jobs[0].refundEligibleAt ?? null).toBeNull();
+    expect(result.jobs[0].spineStatus).toBe("waiting_on_client");
+    expect(result.envelope.jobCommunicationRecords?.some((entry) => entry.eventType === "refund_issued")).toBe(false);
+  });
+
+  it("routes legacy issue_refund through the canonical guards: an old multi-service payment is not auto-refunded", () => {
+    const record = campaign({
+      paymentTruth: {
+        processor: "stripe",
+        status: "confirmed",
+        currency: "usd",
+        expectedAmountCents: 20000,
+        confirmedAmountCents: 20000,
+        paymentIntentId: "pi_test_multi",
+        selectedServiceIds: ["ma-flyer-v2", "sm-001"],
+        decisionId: "pa",
+        factFingerprint: "fp",
+        draftRevision: 1,
+      },
+    });
+    const jobs = syncJobRecordsFromCampaign(record, [], [], []);
+    const [job] = jobs;
+    const lanes = resolveProductionLaneViews([{ campaignName: "Acme Co", job, tasks: [] }]);
+
+    const refund = applyProductionWorkspacePatch(
+      envelope(jobs),
+      record,
+      job.jobId,
+      { action: "issue_refund", reason: "Client asked to cancel before production" },
+      { id: "owner", email: "owner@example.com", displayName: "Owner", roles: ["owner"] },
+      [],
+      lanes,
+      CLIENT_ID,
+    );
+
+    expect(refund.ok).toBe(false);
+    if (refund.ok) return;
+    expect(refund.status).toBe(422);
+    expect(refund.error).toMatch(/covers multiple services/i);
   });
 
   it("resolves Owner Desk needs communication queue and safe test-send state", () => {

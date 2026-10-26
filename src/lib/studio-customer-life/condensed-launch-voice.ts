@@ -5,6 +5,8 @@
  */
 
 import { CONDENSED_SUPPORT_OPTIONS } from "@/config/studio-customer-journey-condense-v1";
+import { studioVoiceCustomerGuidance } from "@/lib/studio-voice-conversation/customer-guidance";
+import { studioExtraEligibilitySentence, studioExtrasExplainer } from "@/config/studio-extras-v1";
 import {
   STUDIO_THREE_PACKAGE_REVISION_TRUTH_V1,
   threePackageRevisionCustomerAnswer,
@@ -13,7 +15,7 @@ import {
 const truth = STUDIO_THREE_PACKAGE_REVISION_TRUTH_V1;
 
 const OFFERS =
-  "The Studio currently offers three packages. Clip Repurposing is $399. Short-Form Video Editing is $249. Social & Promo Graphics is $199. Each includes three revision rounds. You choose.";
+  "The Studio currently offers four packages. Clip Repurposing is $373.75. With the 20% Studio Thank-You, you pay $299. Short-Form Video Editing is $186.25. With the 20% Studio Thank-You, you pay $149. Social & Promo Graphics is $199. With the 20% Studio Thank-You, you pay $159.20. Campaign Launch Kit is $349. With the 20% Studio Thank-You, you pay $279.20. Each includes three revision rounds. You choose.";
 
 const REVISION = threePackageRevisionCustomerAnswer;
 
@@ -24,16 +26,16 @@ const FILES =
   "You add the actual files in My Studio after checkout. You do not upload them before you pay. The Studio does not take project files by email, and you do not use the staff File Room.";
 
 const STRIPE =
-  "You enter your card on Stripe. The Studio page does not collect your card and does not store it. Payment is confirmed only after Stripe confirms it. If checkout is cancelled, payment is not confirmed, and your project is still saved.";
+  "When checkout is open, the card is entered on the payment processor's page. This Studio page does not collect or store a card. Live checkout is not open, so there is no card page to open today. Payment counts only after the payment processor confirms it.";
 
 const NO_PASSWORDS =
-  "No. The Studio does not take passwords and does not log into your social, ads, email, review, or Google Business accounts. The Studio creates the work and delivers the files. You decide where and when to publish them. The Studio does not post for you, run your ads, send your emails, or manage your accounts.";
+  "No. The Studio does not take passwords and does not log into your social, ads, email, review, or Google Business accounts. The Studio creates the work and delivers the files. You decide where and when to publish them. The Studio does not post for you, and it does not run your ads, send your emails, or manage your accounts.";
 
 const NO_RESULTS =
   "No. The Studio does not guarantee sales, views, followers, rankings, or leads.";
 
 const CHOOSE =
-  "Tell me what you have, and you still choose. A long vertical recording for The Studio to search is Clip Repurposing at $399. English clips or marked moments you already chose are Short-Form Video Editing at $249. Graphics for a promotion are Social & Promo Graphics at $199. I will not choose the package for you.";
+  "Tell me what you have, and you still choose. A long vertical recording for The Studio to search is Clip Repurposing at $373.75. With the 20% Studio Thank-You, you pay $299. English clips or marked moments you already chose are Short-Form Video Editing at $186.25. With the 20% Studio Thank-You, you pay $149. Graphics for a promotion are Social & Promo Graphics at $199. With the 20% Studio Thank-You, you pay $159.20. One fixed four-channel campaign is Campaign Launch Kit at $349. With the 20% Studio Thank-You, you pay $279.20. I will not choose the package for you.";
 
 const PRODUCTION =
   "Production begins on a service only when payment has been received, Project Intake is complete, the required materials have been reviewed and accepted, and the service has been moved into production. Paying, finishing intake, or storing a file does not by itself start production. The Studio does not promise a delivery date.";
@@ -67,6 +69,8 @@ function testedCountryCheckout(country: string): string {
 export function answerCondensedLaunchVoice(question: string): string | null {
   const text = norm(question);
   if (!text) return null;
+  const guided = studioVoiceCustomerGuidance(question, "shared");
+  if (guided) return guided.say;
 
   if (has(text, "from canada") || has(text, "buy from canada")) {
     return testedCountryCheckout("Canada");
@@ -86,30 +90,50 @@ export function answerCondensedLaunchVoice(question: string): string | null {
     has(text, "outside the us") ||
     (has(text, "serve") && has(text, "outside"))
   ) {
-    return "Test checkout accepted billing countries and test cards for Canada, the United Kingdom, Australia, and Germany, and the package price stayed in US dollars. The three packages are delivered digitally. Live charges are not on, tax is not set up, and a local-currency price was not shown. Clip Repurposing requires an English recording. Short-Form Video Editing requires English source clips. I will not say The Studio is worldwide.";
+    return "Test checkout accepted billing countries and test cards for Canada, the United Kingdom, Australia, and Germany, and the package price stayed in US dollars. These packages are delivered digitally. Live charges are not on, tax is not set up, and a local-currency price was not shown. Clip Repurposing requires an English recording. Short-Form Video Editing requires English source clips. I will not say The Studio is worldwide.";
   }
   if (has(text, "what currency") || has(text, "currency do you")) {
-    return "The Studio sends the package price in US dollars. Clip Repurposing is $399, Short-Form Video Editing is $249, and Social & Promo Graphics is $199. Test checkout kept that US-dollar price. A local-currency price was not shown. I will not add a currency promise beyond that.";
+    return "The Studio sends the package price in US dollars. Clip Repurposing is $373.75. With the 20% Studio Thank-You, you pay $299. Short-Form Video Editing is $186.25. With the 20% Studio Thank-You, you pay $149. Social & Promo Graphics is $199. With the 20% Studio Thank-You, you pay $159.20. Campaign Launch Kit is $349. With the 20% Studio Thank-You, you pay $279.20. Test checkout kept that US-dollar price. A local-currency price was not shown. I will not add a currency promise beyond that.";
   }
   if (has(text, "other language") || has(text, "another language")) {
     return "These answers and the Studio site are in English. Clip Repurposing requires an English recording. Short-Form Video Editing requires English source clips. Social & Promo Graphics uses the facts you supply. I do not offer the video packages in another language.";
   }
 
+  if (
+    has(text, "password") ||
+    has(text, "post it") ||
+    has(text, "post to") ||
+    has(text, "post this") ||
+    has(text, "buy ads") ||
+    has(text, "buy ad")
+  ) {
+    return NO_PASSWORDS;
+  }
+
   if (has(text, "social post") || (has(text, "instagram") && !has(text, "password"))) {
-    return "Social posts are part of Social & Promo Graphics. That package is $199 and includes three revision rounds: 4 coordinated square posts, matching captions, a suggested posting order, and 2 campaign graphics. You post them.";
+    return "Social posts are part of Social & Promo Graphics. That package is $199. With the 20% Studio Thank-You, you pay $159.20. It includes three revision rounds: 4 coordinated square posts, matching captions, a suggested posting order, and 2 campaign graphics. You post them.";
   }
   if (has(text, "did my payment") || has(text, "payment go through")) return null;
   if (has(text, "receive my revision") || has(text, "got my revision")) return null;
   if (has(text, "i want a refund")) return null;
 
-  if (has(text, "549") || (has(text, "clip") && has(text, "549"))) {
-    return "No. Clip Repurposing is $399, not $549. It includes three revision rounds.";
+  if (has(text, "549") || (has(text, "clip") && (has(text, "549") || has(text, "399")))) {
+    return "No. Clip Repurposing is $373.75. With the 20% Studio Thank-You, you pay $299. It is not $399 and it is not $549. It includes three finished vertical shorts and three revision rounds.";
   }
-  if (has(text, "349") || (has(text, "short form") && has(text, "349"))) {
-    return "No. Short-Form Video Editing is $249, not $349. It includes three revision rounds.";
+  if (has(text, "campaign launch") || has(text, "launch kit")) {
+    return "Campaign Launch Kit is $349. With the 20% Studio Thank-You, you pay $279.20. It is one campaign and one offer, delivered as a flyer with a print-yourself PDF, one paste-ready email, two paste-ready text messages, and one square plus one portrait graphic. You send and post them. A short usage guide is included and is not a fifth piece. It does not include video, ad buying, ongoing marketing, or a performance guarantee. This is not a commercial 300-DPI print certification. Three revision rounds are included. You add files in My Studio after checkout.";
+  }
+  if (has(text, "creative qa") || has(text, "qa and finish") || has(text, "qa finish")) {
+    return "Creative QA & Finish is not a current package. The Studio currently offers four packages: Clip Repurposing, Short-Form Video Editing, Social & Promo Graphics, and Campaign Launch Kit. You choose.";
+  }
+  if ((has(text, "short form") || has(text, "short-form")) && has(text, "349")) {
+    return "No. Short-Form Video Editing is $186.25. With the 20% Studio Thank-You, you pay $149. It is not $249 and it is not $349. Campaign Launch Kit is $349. With the 20% Studio Thank-You, you pay $279.20. It includes three revision rounds.";
+  }
+  if (has(text, "349") && !has(text, "campaign")) {
+    return "No. Short-Form Video Editing is $186.25. With the 20% Studio Thank-You, you pay $149. It is not $249 and it is not $349. Campaign Launch Kit is $349. With the 20% Studio Thank-You, you pay $279.20. It includes three revision rounds.";
   }
   if (has(text, "social") && has(text, "99")) {
-    return "No. Social & Promo Graphics is $199, not $99. It includes three revision rounds.";
+    return "No. Social & Promo Graphics is $199, not $99. With the 20% Studio Thank-You, you pay $159.20. It includes three revision rounds.";
   }
 
   if (has(text, "what packages") || has(text, "packages do you offer") || has(text, "what do you offer")) {
@@ -117,11 +141,11 @@ export function answerCondensedLaunchVoice(question: string): string | null {
   }
 
   if (has(text, "difference") && has(text, "clip") && has(text, "short")) {
-    return "Clip Repurposing is $399. You provide one 15 to 60 minute English recording, filmed vertically, with one primary speaker, and The Studio finds the moments. Short-Form Video Editing is $249. You provide the English clips or marked moments, up to 3, each up to 45 seconds, and The Studio does not search a long recording. Both include three revision rounds. You post the finished videos.";
+    return "Clip Repurposing is $373.75. With the 20% Studio Thank-You, you pay $299. You provide one 15 to 60 minute English recording, filmed vertically, with one primary speaker, and The Studio finds the moments. Short-Form Video Editing is $186.25. With the 20% Studio Thank-You, you pay $149. You provide the English clips or marked moments, up to 3, each up to 45 seconds, and The Studio does not search a long recording. Both include three revision rounds. You post the finished videos.";
   }
 
   if (has(text, "30 minute") || has(text, "30-minute") || has(text, "long podcast") || has(text, "long recording")) {
-    return "A long recording for The Studio to search fits Clip Repurposing when it is one 15 to 60 minute English recording, filmed vertically, with one primary speaker. That package is $399. If the recording does not fit that, tell me more. I will not put it on Short-Form, because Short-Form does not search a long recording.";
+    return "A long recording for The Studio to search fits Clip Repurposing when it is one 15 to 60 minute English recording, filmed vertically, with one primary speaker. That package is $373.75. With the 20% Studio Thank-You, you pay $299. If the recording does not fit that, tell me more. I will not put it on Short-Form, because Short-Form does not search a long recording.";
   }
 
   if (
@@ -131,15 +155,15 @@ export function answerCondensedLaunchVoice(question: string): string | null {
     has(text, "20 second") ||
     has(text, "20-second")
   ) {
-    return "English clips or marked moments you already chose fit Short-Form Video Editing. It is $249 and includes up to 3 polished videos. Each clip or marked moment can be up to 45 seconds. The Studio does not search a long recording on that package.";
+    return "English clips or marked moments you already chose fit Short-Form Video Editing. It is $186.25. With the 20% Studio Thank-You, you pay $149. It includes up to 3 polished videos. Each clip or marked moment can be up to 45 seconds. The Studio does not search a long recording on that package.";
   }
 
   if (has(text, "graphics for a promotion") || has(text, "need graphics") || has(text, "promotion graphics")) {
-    return "Graphics for a promotion fit Social & Promo Graphics. It is $199 and includes one theme, 4 coordinated square posts, matching captions, a suggested posting order, and 2 campaign graphics. You post them.";
+    return "Graphics for a promotion fit Social & Promo Graphics. It is $199. With the 20% Studio Thank-You, you pay $159.20. It includes one theme, 4 coordinated square posts, matching captions, a suggested posting order, and 2 campaign graphics. You post them.";
   }
 
   if (has(text, "short form") && (has(text, "search") || has(text, "long video"))) {
-    return "No. Short-Form Video Editing does not search a long recording. You choose the clips or marked moments. If you want The Studio to search one long vertical recording, that is Clip Repurposing at $399.";
+    return "No. Short-Form Video Editing does not search a long recording. You choose the clips or marked moments. If you want The Studio to search one long vertical recording, that is Clip Repurposing at $373.75. With the 20% Studio Thank-You, you pay $299.";
   }
 
   if (has(text, "cover") && has(text, "clip")) {
@@ -147,11 +171,11 @@ export function answerCondensedLaunchVoice(question: string): string | null {
   }
 
   if (has(text, "how many posts") || (has(text, "posts") && has(text, "social and promo"))) {
-    return "Social & Promo Graphics includes 4 coordinated square posts, matching captions, a suggested posting order, and 2 campaign graphics, a 1024 by 1024 PNG and a 1024 by 1536 PNG. It is $199.";
+    return "Social & Promo Graphics includes 4 coordinated square posts, matching captions, a suggested posting order, and 2 campaign graphics, a 1024 by 1024 PNG and a 1024 by 1536 PNG. It is $199. With the 20% Studio Thank-You, you pay $159.20.";
   }
 
   if (has(text, "how many clips") || (has(text, "how many") && has(text, "clip repurposing"))) {
-    return "Clip Repurposing includes up to 5 polished vertical shorts, depending on the strength and number of distinct moments. Five is the maximum, not a guarantee. It is $399.";
+    return "Clip Repurposing includes three finished vertical shorts, with accurate captions, a customer-specific end card, and a posting companion. It is $373.75. With the 20% Studio Thank-You, you pay $299.";
   }
 
   if (has(text, "how long can") || (has(text, "45") && has(text, "short"))) {
@@ -160,16 +184,16 @@ export function answerCondensedLaunchVoice(question: string): string | null {
 
   if (has(text, "clip repurposing") && (has(text, "how much") || has(text, "included") || has(text, "what is clip"))) {
     if (has(text, "included") || has(text, "what is clip")) {
-      return "Clip Repurposing is $399. You provide one 15 to 60 minute English recording, filmed vertically, with one primary speaker. The Studio finds the strongest moments and finishes up to 5 polished vertical shorts, with captions and a posting companion. It does not include designed covers, posting, passwords, or a performance guarantee. Three revision rounds are included. You add the recording in My Studio after checkout.";
+      return "Clip Repurposing is $373.75. With the 20% Studio Thank-You, you pay $299. You provide one 15 to 60 minute English recording, filmed vertically, with one primary speaker. The Studio finds the strongest moments and finishes three finished vertical shorts, with accurate captions, a customer-specific end card, and a posting companion. It does not include designed covers, posting, passwords, or a performance guarantee. Three revision rounds are included. You add the recording in My Studio after checkout.";
     }
-    return "Clip Repurposing is $399. It includes three revision rounds.";
+    return "Clip Repurposing is $373.75. With the 20% Studio Thank-You, you pay $299. It includes three revision rounds.";
   }
 
   if (has(text, "short form") && (has(text, "how much") || has(text, "included") || has(text, "what is short"))) {
     if (has(text, "included") || has(text, "what is short")) {
-      return "Short-Form Video Editing is $249. You provide up to 3 English clips or marked moments you already chose, each up to 45 seconds. The Studio polishes them and includes captions, cover and title graphics, and a simple posting guide. It does not search a long recording. Three revision rounds are included. You add the files in My Studio after checkout.";
+      return "Short-Form Video Editing is $186.25. With the 20% Studio Thank-You, you pay $149. You provide up to 3 English clips or marked moments you already chose, each up to 45 seconds. The Studio polishes them and includes captions, cover and title graphics, and a simple posting guide. It does not search a long recording. Three revision rounds are included. You add the files in My Studio after checkout.";
     }
-    return "Short-Form Video Editing is $249. It includes three revision rounds.";
+    return "Short-Form Video Editing is $186.25. With the 20% Studio Thank-You, you pay $149. It includes three revision rounds.";
   }
 
   if (
@@ -177,9 +201,13 @@ export function answerCondensedLaunchVoice(question: string): string | null {
     (has(text, "how much") || has(text, "included") || has(text, "what is social"))
   ) {
     if (has(text, "included") || has(text, "what is social")) {
-      return "Social & Promo Graphics is $199. It includes one visual theme, 4 coordinated square posts, matching captions, a suggested posting order, and 2 campaign graphics. It does not include video, posting, passwords, or a performance guarantee. It is designed for digital use, not professional print production. Three revision rounds are included. You add logos and photos in My Studio after checkout.";
+      return "Social & Promo Graphics is $199. With the 20% Studio Thank-You, you pay $159.20. It includes one visual theme, 4 coordinated square posts, matching captions, a suggested posting order, and 2 campaign graphics. It does not include video, posting, passwords, or a performance guarantee. It is designed for digital use, not professional print production. Three revision rounds are included. You add logos and photos in My Studio after checkout.";
     }
-    return "Social & Promo Graphics is $199. It includes three revision rounds.";
+    return "Social & Promo Graphics is $199. With the 20% Studio Thank-You, you pay $159.20. It includes three revision rounds.";
+  }
+
+  if ((has(text, "studio extra") || has(text, "extras")) && (has(text, "revision") || has(text, "change"))) {
+    return studioExtrasExplainer().revisions;
   }
 
   if (
@@ -222,11 +250,12 @@ export function answerCondensedLaunchVoice(question: string): string | null {
     has(text, "payment confirmed") ||
     has(text, "cancel checkout") ||
     has(text, "pay on this page") ||
-    has(text, "optional support") && has(text, "price") ||
+    (has(text, "optional support") || has(text, "studio extra") || has(text, "extras")) &&
+      (has(text, "price") || has(text, "charge") || has(text, "cost")) ||
     has(text, "cost more")
   ) {
-    if (has(text, "optional") || has(text, "cost more")) {
-      return "Optional support does not change the package price. Clip Repurposing stays $399, Short-Form Video Editing stays $249, and Social & Promo Graphics stays $199.";
+    if (has(text, "optional") || has(text, "studio extra") || has(text, "extras") || has(text, "cost more")) {
+      return "Studio Extras are included at no additional charge. Clip Repurposing stays $373.75 before the Thank-You and $299 due, Short-Form Video Editing stays $186.25 before the Thank-You and $149 due, Social & Promo Graphics stays $199 before the Thank-You and $159.20 due, and Campaign Launch Kit stays $349 before the Thank-You and $279.20 due.";
     }
     return STRIPE;
   }
@@ -274,20 +303,44 @@ export function answerCondensedLaunchVoice(question: string): string | null {
     return NO_RESULTS;
   }
 
-  if (has(text, "reputation")) return support("reputation_customer_proof");
-  if (has(text, "ad creative")) return support("ad_creative");
-  if (has(text, "email and text") || has(text, "email text")) return support("email_and_text");
-  if (has(text, "price list") || has(text, "menu or price")) {
-    return `${support("menu_price_list")} This is optional support on Social & Promo Graphics. It does not change the $199 package price.`;
-  }
+  const extras = studioExtrasExplainer();
   if (has(text, "local visibility") || has(text, "ai and local")) {
-    return `${support("ai_local_visibility")} This is optional support on Social & Promo Graphics. It does not change the $199 package price.`;
+    return `${extras.removed} ${extras.whatYouCanAdd}`;
   }
   if (has(text, "google listing") || has(text, "update my listing")) {
-    return "No. The Studio does not update your listings. AI + Local Visibility is a written summary from details you supply, with no ranking promise.";
+    return `No. The Studio does not update your listings. ${extras.removed}`;
   }
-  if (has(text, "optional support") || has(text, "what can i add")) {
-    return "You can add Reputation & Customer Proof, Ad Creative, and Email & Text, or skip them. On Social & Promo Graphics you can also add Menu / Price List and AI + Local Visibility. Optional support does not change the package price. The Studio still does not post, send, or run the ads for you.";
+  if (has(text, "courtesy") || has(text, "can t be completed") || has(text, "cannot be completed") || has(text, "not good enough")) {
+    return extras.promise;
+  }
+  // Per-Extra answers are for questions about the offer, not the customer's own project status.
+  const offerQuestion =
+    !has(` ${text} `, " my ") &&
+    ["studio extra", "extras", "add ", "what is", "what s", "include", "offer", "can i get"].some((cue) =>
+      has(text, cue),
+    );
+  if (offerQuestion || has(text, "studio extra")) {
+    if (has(text, "review request") || has(text, "reputation") || has(text, "review card")) {
+      return `${support("review_request_kit")} ${studioExtraEligibilitySentence("review_request_kit")}`;
+    }
+    if (has(text, "ad creative")) {
+      return `${support("ad_creative")} It is a Studio Extra on Clip Repurposing and Short-Form Video Editing. It is not offered on Social & Promo Graphics.`;
+    }
+    if (has(text, "email and text") || has(text, "email text")) {
+      return `${support("email_and_text")} ${studioExtraEligibilitySentence("email_and_text")}`;
+    }
+    if (has(text, "flyer")) return `${support("flyer")} ${studioExtraEligibilitySentence("flyer")}`;
+    if (has(text, "price list") || has(text, "menu")) {
+      return `${support("menu_price_list")} ${studioExtraEligibilitySentence("menu_price_list")}`;
+    }
+  }
+  if (
+    has(text, "optional support") ||
+    has(text, "what can i add") ||
+    has(text, "studio extra") ||
+    has(text, "extras")
+  ) {
+    return `${extras.whatYouCanAdd} ${extras.promise} ${extras.notIncludedService}`;
   }
 
   if (has(text, "14 day") || has(text, "refund automatically")) {
@@ -295,7 +348,7 @@ export function answerCondensedLaunchVoice(question: string): string | null {
   }
 
   if (has(text, "buy all three") || has(text, "more than one package") || has(text, "all three")) {
-    return "You choose one package. On Build Your Project you can add optional support when it fits, or skip it. Optional support does not replace the package, and it does not change the package price.";
+    return "You choose one package. On Build Your Project you can add up to two Studio Extras, or skip them. Studio Extras do not replace the package, and they do not change the package price.";
   }
 
   if (has(text, "which one should i buy") || has(text, "what do i need") || has(text, "which package")) {
@@ -306,8 +359,8 @@ export function answerCondensedLaunchVoice(question: string): string | null {
     return `${CHOOSE} I will not invent a direction or a customer fact.`;
   }
 
-  if (has(text, "what happens next") || text === "hello") {
-    return "You choose one package, review it, and pay on Stripe. Then you complete Project Intake and add the files in My Studio. The Studio creates the work. You publish it. The Studio does not promise a delivery date.";
+  if (text === "hello") {
+    return "You choose one package and review the price. After the payment processor confirms a payment, you complete Project Intake and add the files in My Studio. The Studio creates the work. You publish it. The Studio does not promise a delivery date.";
   }
 
   if (has(text, "when does production start") || has(text, "when does production begin")) {
@@ -320,6 +373,14 @@ export function answerCondensedLaunchVoice(question: string): string | null {
 
   if (has(text, "photo i found") || has(text, "photo from google")) {
     return "You need permission to use the materials you supply. A photo found on Google is not automatically yours to use. I will not decide that the photo is allowed.";
+  }
+
+  if (has(text, "business card")) {
+    return `The Studio does not currently offer a business card. ${OFFERS}`;
+  }
+
+  if (has(text, "flyer")) {
+    return `${support("flyer")} ${studioExtraEligibilitySentence("flyer")} It does not change the package price.`;
   }
 
   if (has(text, "can i get a refund")) {

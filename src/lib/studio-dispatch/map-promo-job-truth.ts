@@ -19,7 +19,8 @@ import {
   stripCustomerFacingCta,
 } from "@/lib/studio-design-renderer/customer-facing-creative-copy";
 
-import { resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
+import { requirePresentLogoMaterial, resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
+import { flattenSkuIntakeAnswers } from "./sku-intake-answers";
 import type { JobDispatchRecord } from "./types";
 
 export type PromoTruthMapResult =
@@ -53,13 +54,9 @@ function firstMatch(re: RegExp, text: string): string {
 
 function stringAnswers(
   answers: Record<string, unknown>,
+  skuId: string,
 ): Record<string, string | undefined> {
-  const out: Record<string, string | undefined> = {};
-  for (const [k, v] of Object.entries(answers)) {
-    if (v == null) out[k] = undefined;
-    else out[k] = String(v);
-  }
-  return out;
+  return flattenSkuIntakeAnswers(answers, skuId);
 }
 
 function extractContactAndPrice(input: {
@@ -103,7 +100,7 @@ export function mapPromoProjectTruthFromJob(input: {
   }
 
   const rawAnswers = input.campaign.routeMapIntake?.answers ?? {};
-  const answers = stringAnswers(rawAnswers);
+  const answers = stringAnswers(rawAnswers, DESIGN_RENDERER_PROMO_SKU);
 
   const campaignFocus = String(answers.campaignFocus ?? "").trim();
   const mustInclude = String(answers.mustInclude ?? "").trim();
@@ -170,12 +167,12 @@ export function mapPromoProjectTruthFromJob(input: {
     };
   }
 
-  const logo = resolveApprovedLogoMaterial({
+  const logo = requirePresentLogoMaterial(resolveApprovedLogoMaterial({
     repoRoot: input.repoRoot,
     items: input.materials,
     skuId: DESIGN_RENDERER_PROMO_SKU,
     stagedLogoRelativePath: input.stagedLogoRelativePath,
-  });
+  }));
   if (!logo.ok) {
     return { ok: false, code: logo.code, message: logo.message };
   }

@@ -38,7 +38,7 @@ export const studioKitchenComms = {
  * Kitchen Comms must derive `awaiting_authorized_transport` from existing Studio
  * authorities only:
  * - `JOB_COMMUNICATION_TEMPLATES` + `syncJobCommunicationRecords` (`src/lib/job-control/communication.ts`)
- * - `JOB_CONTROL_POLICY` reminder / waiting / refund windows (`src/config/job-control.ts`)
+ * - `AUTHORIZED_LIFECYCLE_EMAIL_EVENT_TYPES` (no reminder, waiting, or refund clocks)
  * - Decision Core outgoing communication evaluator (`humanReviewRequired: false`; effect ≠ decision)
  * - Owner Console responsibility map: template + rule outcomes are not Owner Desk decisions
  *

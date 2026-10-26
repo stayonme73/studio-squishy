@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { studioCanonicalLaunchTruthV1 as truth } from "@/config/studio-canonical-launch-truth-v1";
-
+import { listCanonicalLaunchPackages } from "./enforcement";
 import {
   CLIP_DELIVERY_PATHWAY_CLOSING,
   canonicalClipDeliveryPathwayServices,
@@ -10,7 +9,7 @@ import {
 describe("Final Delivery Room Studio Pathway (Clip delivery)", () => {
   it("lists only the other canonical launch packages, in canonical order, without prices", () => {
     const services = canonicalClipDeliveryPathwayServices();
-    const expected = truth.packages.filter((pkg) => pkg.packageId !== "clip_repurposing");
+    const expected = listCanonicalLaunchPackages().filter((pkg) => pkg.packageId !== "clip_repurposing");
     expect(services.map((service) => service.skuId)).toEqual(expected.map((pkg) => pkg.packageId));
     expect(services.map((service) => service.name)).toEqual(expected.map((pkg) => pkg.customerFacingName));
     for (const service of services) {

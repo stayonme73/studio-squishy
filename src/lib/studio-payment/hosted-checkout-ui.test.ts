@@ -27,10 +27,17 @@ describe("hosted Checkout single-entry UI contract", () => {
     expect(source).toContain("useEffect");
     expect(source).toContain("lobby-entry-film__cta co-submit");
     expect(source).toContain('href="#checkout-continue"');
+    expect(source).toContain("useSamsungTapActivate");
+    expect(source).toContain("isAuthorizedCertSandbox");
+    expect(source).toContain("isDeveloperCheckoutSandboxVisible");
     expect(source).not.toContain("utility-btn--primary");
     expect(source).toContain("if (!termsAccepted)");
     expect(source).toContain('data-checkout-pay="continue"');
+    expect(source).toContain('id="checkout-pay-continue"');
+    expect(source).toContain("processorSessionFailed");
     expect(source).toContain("setShowSandboxFixture");
+    expect(source).toContain("rememberStudioPaymentSandbox");
+    expect(source).toContain("compactPaymentHonesty ? sandboxPanel");
     expect(source).not.toContain(
       'typeof window !== "undefined" ? window.location.search',
     );
@@ -100,9 +107,28 @@ describe("hosted Checkout single-entry UI contract", () => {
       runtime.indexOf("/** Return from Stripe Checkout"),
     );
     expect(continueFn).toContain("startHostedCheckout(");
+    const checkoutPanel = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationCheckoutPanel.tsx",
+      ),
+      "utf8",
+    );
+    expect(checkoutPanel).toContain("bridgeConversationPlanToCampaign");
     expect(continueFn).not.toContain("preferSandbox");
     expect(continueFn).toContain('started.mode !== "stripe"');
     expect(sandboxFn).toContain("preferSandbox: true");
+    const grid = readFileSync(
+      join(process.cwd(), "src/components/payment/SecureCheckoutGrid.tsx"),
+      "utf8",
+    );
+    const certGate = grid.slice(
+      grid.indexOf("function isAuthorizedCertSandbox"),
+      grid.indexOf("async function completeCheckout"),
+    );
+    expect(certGate).toContain("isDeveloperCheckoutSandboxVisible");
+    expect(grid).toContain("if (isAuthorizedCertSandbox())");
+    expect(grid).toContain("await handleSandboxPayment()");
     expect(sandboxFn).toContain("confirmSandboxCheckoutClient");
   });
 

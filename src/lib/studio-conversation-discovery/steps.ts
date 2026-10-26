@@ -33,6 +33,10 @@ export const DISCOVERY_TABLET_STEP_ORDER: readonly DiscoveryTabletStepId[] = [
   "anything-else",
 ] as const;
 
+export function isDiscoveryTabletStepId(stepId: string): stepId is DiscoveryTabletStepId {
+  return (DISCOVERY_TABLET_STEP_ORDER as readonly string[]).includes(stepId);
+}
+
 /** Deadline options — purposeful for feasibility / route; not plate-tile inventory. */
 export const DISCOVERY_DEADLINE_OPTIONS = [
   "As soon as possible",

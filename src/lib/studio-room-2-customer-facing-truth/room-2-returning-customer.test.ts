@@ -111,9 +111,9 @@ describe("STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH
     const text = emailFaq?.blocks.map((block) => ("text" in block ? block.text : "")).join(" ");
     expect(text).not.toMatch(THIS_VERSION);
     expect(text).not.toMatch(/test or external tool/i);
-    expect(text).toMatch(/studio board is the source of truth/i);
+    expect(text).toMatch(/my studio is the source of truth/i);
     expect(text).toMatch(/courtesy/i);
-    expect(helpCenter.backLabels.studioBoard).toBe("Back to Studio Board");
+    expect(helpCenter.backLabels.studioBoard).toBe("Back to My Studio");
     expect(JSON.stringify(helpCenter)).not.toMatch(SQUISHY);
   });
 

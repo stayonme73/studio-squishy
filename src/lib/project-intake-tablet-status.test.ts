@@ -33,6 +33,8 @@ function baseAnswers(): RouteMapIntakeAnswers {
     "shared:phone": "5551234567",
     "shared:email": "cedric@example.com",
     "v2-rtu-business-card:cardNameTitle": "Cedric, Owner",
+    "v2-rtu-business-card:cardSize":
+      "Digital CERT 1536×1024 — I print it myself",
     "v2-rtu-flyer:flyerPurpose": "Grand opening",
     "v2-rtu-flyer:mustInclude": "Phone and offer",
     "v2-rtu-flyer:intendedUse": "Print",
@@ -53,6 +55,8 @@ describe("buildProjectIntakeTabletStatus", () => {
       "Payment received",
       "Services confirmed",
     ]);
+    expect(empty.paymentReceived).toBe(true);
+    expect(empty.servicesConfirmed).toBe(true);
     expect(empty.stillNeeded).toContain("Business name");
     expect(empty.stillNeeded).toContain(
       "Flyer: What is this flyer for?",
@@ -132,6 +136,21 @@ describe("buildProjectIntakeTabletStatus", () => {
     expect(later.hasMaterialsDeferred).toBe(true);
     expect(later.nextLine).toBe(copy.nextReadyMaterialsLater);
     expect(later.stillNeeded).not.toContain("Logo and brand color references");
+  });
+
+  it("keeps Payment received and Services confirmed off Completed until they are true", () => {
+    const plan = buildProjectIntakePlan([...SERVICE_IDS]);
+    const unpaid = buildProjectIntakeTabletStatus({
+      plan,
+      answers: {},
+      paymentReceived: false,
+      servicesConfirmed: false,
+      copy,
+    });
+    expect(unpaid.paymentReceived).toBe(false);
+    expect(unpaid.servicesConfirmed).toBe(false);
+    expect(unpaid.completed).not.toContain("Payment received");
+    expect(unpaid.completed).not.toContain("Services confirmed");
   });
 
   it("uses ready Next line when all required are satisfied without deferred materials description", () => {

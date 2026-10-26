@@ -14,6 +14,7 @@ vi.mock("@/lib/auth/session", () => ({ readSessionFromRequest: vi.fn(async () =>
 import type { CampaignRecord } from "@/config/studio-board";
 import { studioCanonicalLaunchTruthV1 as truth } from "@/config/studio-canonical-launch-truth-v1";
 import {
+  campaignLaunchKitPackageDetail,
   clipRepurposingPackageDetail,
   shortFormVideoEditingPackageDetail,
   socialAndPromoGraphicsPackageDetail,
@@ -26,7 +27,7 @@ import {
   answerServiceFitFromShelf,
 } from "@/lib/studio-customer-life/voice-shelf-truth";
 
-const OLD_PRICES = /\$549|\$349|\$599|\$69\b|\$79\b|\$89\b|\$99\b|\$129\b|\$149\b/;
+const OLD_PRICES = /\$549|\$599|\$69\b|\$79\b|\$89\b|\$99\b/;
 
 type PackageId = NonNullable<CampaignRecord["condensedOffer"]>["packageId"];
 
@@ -114,29 +115,28 @@ describe("Studio Voice acceptance (committed state)", () => {
 
   it("quotes canonical prices with the Studio Thank-You", () => {
     expect(answerServiceFitFromShelf("Which service fits footage of me talking?")).toMatch(
-      /Short-Form Video Editing at \$249/,
+      /Short-Form Video Editing at \$186\.25/,
     );
-    expect(price("How much is the talking head reel edit?")).toMatch(/\$249.*\$199\.20/);
-    expect(price("How much does the 15 minute clip set cost?")).toMatch(/Clip Repurposing is \$399.*\$319\.20/);
+    expect(price("How much is the talking head reel edit?")).toMatch(/\$186\.25.*\$149/);
+    expect(price("How much does the 15 minute clip set cost?")).toMatch(/Clip Repurposing is \$373\.75.*\$299/);
     expect(price("How much is Social & Promo Graphics?")).toMatch(/Social & Promo Graphics is \$199\./);
-    expect(price("How much is a flyer?")).toMatch(
-      /Clip Repurposing at \$399, Short-Form Video Editing at \$249, and Social & Promo Graphics at \$199/,
-    );
+    expect(price("How much is a flyer?")).toMatch(/not a separate Extra on that package/);
+    expect(price("How much is a flyer?")).toMatch(/does not change the package price/);
   });
 
   it("corrects $549 Clip and $349 Short-Form instead of quoting them as current", () => {
-    expect(answerCondensedLaunchVoice("Is Clip Repurposing $549?")).toMatch(/\$399, not \$549/);
-    expect(answerCondensedLaunchVoice("Is Short-Form Video Editing $349?")).toMatch(/\$249, not \$349/);
+    expect(answerCondensedLaunchVoice("Is Clip Repurposing $549?")).toMatch(/\$373\.75.*not \$549/);
+    expect(answerCondensedLaunchVoice("Is Short-Form Video Editing $349?")).toMatch(/\$186\.25.*not \$349/);
   });
 
   it("quotes a three-package customer's own record", () => {
     const clip = answerPricingFromShelf("How much is this going to cost me?", condensedCampaign("clip_repurposing"));
-    expect(clip).toMatch(/Clip Repurposing.*\$399.*\$319\.20/);
+    expect(clip).toMatch(/Clip Repurposing.*\$373\.75.*\$299/);
     const shortForm = answerPricingFromShelf(
       "How much is this going to cost me?",
       condensedCampaign("short_form_video_editing"),
     );
-    expect(shortForm).toMatch(/Short-Form Video Editing.*\$249.*\$199\.20/);
+    expect(shortForm).toMatch(/Short-Form Video Editing.*\$186\.25.*\$149/);
     const social = answerPricingFromShelf(
       "How much is this going to cost me?",
       condensedCampaign("social_and_promo_graphics"),
@@ -151,7 +151,7 @@ describe("Studio Voice acceptance (committed state)", () => {
   it("does not quote an unpaid old-shelf plan, and labels a paid historical record as not current", () => {
     const unpaid = answerPricingFromShelf("How much is this going to cost me?", legacyCampaign("initiated", 6900));
     expect(unpaid).not.toMatch(OLD_PRICES);
-    expect(unpaid).toMatch(/Clip Repurposing at \$399/);
+    expect(unpaid).toMatch(/Clip Repurposing at \$373\.75/);
     const paid = answerPricingFromShelf("How much is this going to cost me?", legacyCampaign("confirmed", 54900));
     expect(paid).toMatch(/earlier Studio purchase/);
     expect(paid).toMatch(/It is not a current price\./);
@@ -189,8 +189,13 @@ describe("checkout acceptance (committed state)", () => {
     expect(args.condensedOffer.packageId).toBe("clip_repurposing");
   });
 
-  it("the three-package door shows exactly the canonical three at canonical prices", () => {
-    const door = [clipRepurposingPackageDetail, shortFormVideoEditingPackageDetail, socialAndPromoGraphicsPackageDetail];
+  it("the four-package door shows exactly the canonical four at canonical prices", () => {
+    const door = [
+      clipRepurposingPackageDetail,
+      shortFormVideoEditingPackageDetail,
+      socialAndPromoGraphicsPackageDetail,
+      campaignLaunchKitPackageDetail,
+    ];
     expect(door.map((pkg) => pkg.priceCents)).toEqual(truth.packages.map((pkg) => pkg.listPriceCents));
   });
 });

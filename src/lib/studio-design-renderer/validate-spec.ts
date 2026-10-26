@@ -13,12 +13,12 @@ import {
   evaluateTextLayerCollisions,
   textLayersForCollisionCheck,
 } from "./text-layer-collision";
-import type { FlyerDesignSpec, FlyerProjectTruth } from "./types";
+import type { FlyerDesignSpec, FlyerProjectTruth, FlyerTextRole } from "./types";
 import {
   DESIGN_RENDERER_PROOF_SKU,
-  FLYER_CANVAS,
   FLYER_DESIGN_SPEC_VERSION,
 } from "./types";
+import { isCertifiedFlyerCanvas } from "./flyer-content-proportional-composition";
 
 export type SpecValidationResult =
   | { ok: true }
@@ -56,14 +56,11 @@ export function validateFlyerDesignSpec(
       message: `SKU ${spec.skuId} is outside design-renderer proof scope`,
     };
   }
-  if (
-    spec.canvas.widthPx !== FLYER_CANVAS.widthPx ||
-    spec.canvas.heightPx !== FLYER_CANVAS.heightPx
-  ) {
+  if (!isCertifiedFlyerCanvas(spec.canvas)) {
     return {
       ok: false,
       code: "INVALID_DESIGN_SPEC",
-      message: `Canvas must be ${FLYER_CANVAS.widthPx}x${FLYER_CANVAS.heightPx}`,
+      message: `Canvas ${spec.canvas.widthPx}x${spec.canvas.heightPx} is not a Studio-certified flyer format`,
     };
   }
   if (!isHexColor(spec.background.color)) {
@@ -86,14 +83,18 @@ export function validateFlyerDesignSpec(
     return {
       ok: false,
       code: "INVALID_DESIGN_SPEC",
-      message: "layers must include at least wordmark, offer, price, and contact",
+      message: "layers must include at least wordmark and offer",
     };
   }
 
   const roles = new Set(
     spec.layers.filter((l) => l.type === "text").map((l) => l.role),
   );
-  for (const required of ["wordmark", "offer", "price", "contact_phone", "contact_web"] as const) {
+  const requiredRoles: FlyerTextRole[] = ["wordmark", "offer"];
+  if (!truth || truth.priceDisplay.trim()) requiredRoles.push("price");
+  if (!truth || truth.phone.trim()) requiredRoles.push("contact_phone");
+  if (!truth || truth.webDisplay.trim()) requiredRoles.push("contact_web");
+  for (const required of requiredRoles) {
     if (!roles.has(required)) {
       return {
         ok: false,
@@ -189,7 +190,8 @@ export function validateFlyerDesignSpec(
       .map((l) => l.content)
       .join(" ");
     for (const token of truth.requiredTextTokens) {
-      if (!joined.includes(token)) {
+      if (!token.trim()) continue;
+      if (!joined.toLowerCase().includes(token.toLowerCase())) {
         return {
           ok: false,
           code: "INVALID_DESIGN_SPEC",
@@ -207,8 +209,9 @@ export function validateFlyerDesignSpec(
       }
     }
     if (truth.outputMode === "customer") {
-      const leak =
-        /CERTIFICATION FIXTURE|INTERNAL TEST — not a live customer|harborandoak\.example/i;
+      const leak = truth.approvedCustomerExampleDomain
+        ? /CERTIFICATION FIXTURE|INTERNAL TEST — not a live customer/i
+        : /CERTIFICATION FIXTURE|INTERNAL TEST — not a live customer|harborandoak\.example/i;
       if (leak.test(joined)) {
         return {
           ok: false,

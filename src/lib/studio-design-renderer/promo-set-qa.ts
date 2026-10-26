@@ -11,6 +11,8 @@ import {
   evaluateTextLayerCollisions,
   textLayersForCollisionCheck,
 } from "./text-layer-collision";
+import { evaluateThemeLedPromoSet, isThemeLedPromoTruth } from "./promo-theme-led";
+import { evaluateSquareCampaignComposition } from "./social-promo-customer-package-qa";
 import type { PromoAssetSpec, PromoCampaignSetSpec, PromoProjectTruth } from "./promo-types";
 
 export type PromoSetQaResult =
@@ -42,6 +44,15 @@ export function evaluatePromoSetConsistency(input: {
 }): PromoSetQaResult {
   const { truth, spec, declaredTextByAsset } = input;
   const customerMode = truth.outputMode === "customer";
+  const themeLed = isThemeLedPromoTruth(truth);
+  if (themeLed) {
+    const themeSet = evaluateThemeLedPromoSet({
+      truth,
+      assets: spec.assets,
+      declaredTextByAsset,
+    });
+    if (!themeSet.ok) return themeSet;
+  }
 
   if (spec.assets.length !== 2) {
     return {
@@ -60,14 +71,14 @@ export function evaluatePromoSetConsistency(input: {
         message: `Missing purpose for ${asset.assetId}`,
       };
     }
-    if (!text.includes(truth.offerName) && !text.includes("Tune-Up")) {
+    if (!themeLed && !text.includes(truth.offerName)) {
       return {
         ok: false,
         code: "SET_CONSISTENCY_FAILURE",
         message: `Asset ${asset.assetId} missing shared offer truth`,
       };
     }
-    if (!text.includes(truth.priceDisplay)) {
+    if (!themeLed && truth.priceDisplay.trim() && !text.includes(truth.priceDisplay)) {
       return {
         ok: false,
         code: "SET_CONSISTENCY_FAILURE",
@@ -133,6 +144,20 @@ export function evaluatePromoSetConsistency(input: {
         code: "SET_CONSISTENCY_FAILURE",
         message: `Asset ${asset.assetId} does not surface its authorized purpose`,
       };
+    }
+  }
+
+  if (!themeLed) {
+    for (const asset of spec.assets) {
+      if (asset.layoutVariant !== "compact_square") continue;
+      const composition = evaluateSquareCampaignComposition(asset.layers);
+      if (!composition.ok) {
+        return {
+          ok: false,
+          code: "SET_CONSISTENCY_FAILURE",
+          message: composition.message,
+        };
+      }
     }
   }
 

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import type { CustomerTimelineItem } from "@/lib/project-activity/types";
 import type { CustomerPendingProjectChangeConsent } from "@/lib/project-activity/customer-view";
+import { isLeakedMaterialsBoardError } from "@/lib/studio-board-client-copy";
 
 type ActivityResponse = {
   events: CustomerTimelineItem[];
@@ -31,10 +32,15 @@ export function useProjectActivity(campaignId: string | undefined, paymentReceiv
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/campaigns/${campaignId}/project-activity`);
+      const request = () => fetch(`/api/campaigns/${campaignId}/project-activity`);
+      let res = await request();
+      if (res.status === 401 || res.status === 403) {
+        res = await request();
+      }
       const body = (await res.json()) as ActivityResponse;
       if (!res.ok) {
-        setError(body.error ?? "Could not load project activity.");
+        const raw = body.error ?? "Could not load project activity.";
+        setError(isLeakedMaterialsBoardError(raw) ? null : raw);
         return;
       }
       setEvents(body.events ?? []);

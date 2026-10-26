@@ -16,8 +16,10 @@ import type {
   MenuSectionTruth,
 } from "@/lib/studio-design-renderer/menu-types";
 import { countMenuItems } from "@/lib/studio-design-renderer/menu-contracts";
+import { evaluateMenuExactFacts } from "@/lib/studio-design-renderer/menu-exact-facts";
 
-import { resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
+import { requirePresentLogoMaterial, resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
+import { flattenSkuIntakeAnswers } from "./sku-intake-answers";
 import type { JobDispatchRecord } from "./types";
 
 export type MenuTruthMapResult =
@@ -29,6 +31,7 @@ export type MenuTruthMapResult =
         | "BROKEN_ASSET_REFERENCE"
         | "INVALID_DESIGN_SPEC"
         | "MISSING_REQUIRED_TRUTH"
+        | "AMBIGUOUS_CUSTOMER_FACT"
         | "SKU_NOT_SUPPORTED";
       message: string;
     };
@@ -217,7 +220,10 @@ export function mapMenuProjectTruthFromJob(input: {
     };
   }
 
-  const answers = input.campaign.routeMapIntake?.answers ?? {};
+  const answers = flattenSkuIntakeAnswers(
+    input.campaign.routeMapIntake?.answers,
+    DESIGN_RENDERER_MENU_SKU,
+  );
   const businessName = String(
     answers.businessName ?? input.campaign.campaignName ?? "",
   ).trim();
@@ -243,12 +249,25 @@ export function mapMenuProjectTruthFromJob(input: {
     return { ok: false, code: "MISSING_REQUIRED_TRUTH", message: parsed.message };
   }
 
-  const logo = resolveApprovedLogoMaterial({
+  const exactFacts = evaluateMenuExactFacts({
+    dietaryLabels,
+    legalDisclaimer,
+    items: parsed.sections.flatMap((section) => section.items),
+  });
+  if (!exactFacts.ok) {
+    return {
+      ok: false,
+      code: exactFacts.code,
+      message: exactFacts.message,
+    };
+  }
+
+  const logo = requirePresentLogoMaterial(resolveApprovedLogoMaterial({
     repoRoot: input.repoRoot,
     items: input.materials,
     skuId: DESIGN_RENDERER_MENU_SKU,
     stagedLogoRelativePath: input.stagedLogoRelativePath,
-  });
+  }));
   if (!logo.ok) {
     return { ok: false, code: logo.code, message: logo.message };
   }

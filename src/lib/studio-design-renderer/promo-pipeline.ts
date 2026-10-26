@@ -31,13 +31,19 @@ import {
   declaredTextFromPromoAsset,
   renderPromoAssetHtml,
 } from "./promo-render-html";
+import { evaluatePromoCampaignSetReadability } from "./promo-output-readability";
 import { evaluatePromoSetConsistency } from "./promo-set-qa";
+import { isThemeLedPromoTruth } from "./promo-theme-led";
+import { THEME_LED_IMAGERY_THEME } from "./theme-led-campaign";
 import type {
+  PromoCampaignSetIdentity,
   PromoCampaignSetSpec,
   PromoOutputMode,
   PromoProjectTruth,
   PromoRendererPipelineResult,
 } from "./promo-types";
+import { applySharedLiveLaneEntryGate, sourcePxFromPlate } from "@/lib/studio-static-creative-lane/shared-live-gates";
+
 import { PROMO_PORTRAIT_PLATE, PROMO_SQUARE_PLATE } from "./promo-types";
 import { validatePromoCampaignSetSpec } from "./promo-validate";
 
@@ -86,6 +92,49 @@ function buildPromoBrief(
 ): DesignQualityBrief {
   const base = briefForSku("v2-rtu-promotion-graphics", "a");
   const host = webHostToken(truth.webDisplay);
+  if (isThemeLedPromoTruth(truth)) {
+    // Call to action is optional on theme-led packages: required only when the customer supplied one.
+    return {
+      ...base,
+      skuId: truth.skuId,
+      fixtureId: truth.fixtureId,
+      requiredTextTokens: [...truth.requiredTextTokens],
+      prohibitedClaimPatterns: [...truth.prohibitedClaimPatterns],
+      ctaTokens: [truth.cta, truth.phone, host].filter((token) => Boolean(token?.trim())),
+      requireCta: Boolean(truth.cta.trim()),
+      minAssets: 2,
+      maxAssets: 2,
+      allowedExtensions: ["png", "jpg", "jpeg", "pdf"],
+      expectedWidthPx: undefined,
+      expectedHeightPx: undefined,
+      dimensionTolerancePx: 40,
+      brandIdentity: {
+        businessName: truth.businessName,
+        requiredWordmark: truth.wordmark,
+        approvedDescriptors: [truth.descriptor],
+        prohibitedDescriptors: [],
+        approvedLogoVariantIds: [truth.approvedLogoVariantId],
+      },
+      campaignTruth: {
+        offerName: truth.themeLed!.coreMessage,
+        offerNameRequiredTokens: [],
+        priceToken: truth.priceDisplay,
+        dateTokens: [],
+        phone: truth.phone,
+        urlTokens: [host].filter(Boolean),
+        prohibitedOfferAliases: [],
+      },
+      contactSemantics: [
+        ...(truth.phone.trim() ? [{ value: truth.phone, expectedKind: "phone" as const }] : []),
+        ...(host ? [{ value: host, expectedKind: "web" as const }] : []),
+      ],
+      prohibitedImageryThemes: [],
+      requireLogoVariant: truth.approvedLogoVariantId !== "wordmark-only",
+      requireMultiAssetConsistency: true,
+      requireArtifactBinding: true,
+      artifactRepoRoot: repoRoot,
+    };
+  }
   const dateTokens =
     truth.outputMode === "certification_fixture"
       ? ["March 10", "April 15", "2026"]
@@ -155,6 +204,14 @@ export async function runPromoRendererPipeline(input: {
       "SKU_NOT_SUPPORTED",
       `SKU ${input.truth.skuId} not in promotion-graphics renderer scope`,
     );
+  }
+
+  const laneGate = applySharedLiveLaneEntryGate({
+    repoRoot: input.repoRoot,
+    sourcePx: sourcePxFromPlate(PROMO_SQUARE_PLATE),
+  });
+  if (!laneGate.ok) {
+    return fail(mode, laneGate.code, laneGate.message);
   }
 
   try {
@@ -329,6 +386,7 @@ export async function runPromoRendererPipeline(input: {
 
   const logoId = input.truth.approvedLogoVariantId;
   const host = webHostToken(input.truth.webDisplay);
+  const themeLed = isThemeLedPromoTruth(input.truth);
   const brief = buildPromoBrief(input.truth, input.repoRoot);
   const submission: DesignQualitySubmission = {
     artifacts: identityDraft.assets.map((a) => ({
@@ -344,22 +402,26 @@ export async function runPromoRendererPipeline(input: {
       declaredLogoVariantId: logoId,
       isCampaignOfferAsset: true,
       declaredContactPresentations: [
-        { value: input.truth.phone, presentedAs: "phone" as const },
+        ...(input.truth.phone.trim() || !themeLed
+          ? [{ value: input.truth.phone, presentedAs: "phone" as const }]
+          : []),
         ...(host ? [{ value: host, presentedAs: "web" as const }] : []),
       ],
-      declaredImageryTheme: "hvac_home_services",
+      declaredImageryTheme: themeLed ? THEME_LED_IMAGERY_THEME : "hvac_home_services",
     })),
   };
 
+  const readability = evaluatePromoCampaignSetReadability(spec);
   let attestations: DesignQualityJudgmentAttestations = {
     ...passAttestations("a"),
+    readabilityReviewed: readability.readabilityReviewed,
     multiAssetConsistencyReviewed: true,
     notes: `Promotion-graphics set QA for ${input.truth.businessName}: ${identityDraft.assets
       .map(
         (a) =>
           `${a.assetId} ${a.widthPx}x${a.heightPx} purpose="${a.authorizedPurpose}" sha256 ${a.pngContentSha256} at ${a.pngRelativePath}`,
       )
-      .join("; ")}; setFingerprint=${identityDraft.sharedSpecFingerprint}. Coordinated set with layout variation; Live intake gap documented.`,
+      .join("; ")}; setFingerprint=${identityDraft.sharedSpecFingerprint}. Coordinated set with layout variation; Live intake gap documented. ${readability.evidence}`,
   };
 
   if (input.forceQaFail) {
@@ -385,17 +447,24 @@ export async function runPromoRendererPipeline(input: {
     ),
   );
 
-  const bothIndividualOk = gated.ok;
-  const setQaOk = gated.ok && setEval.ok;
+  const bothIndividualOk = gated.ok && readability.ok;
+  const setQaOk = bothIndividualOk && setEval.ok;
 
   // Rewrite identity with final QA flags (same version directory).
+  const flaggedAssets: PromoCampaignSetIdentity["assets"] = [
+    {
+      ...identityDraft.assets[0],
+      individualQaOk: bothIndividualOk,
+    },
+    {
+      ...identityDraft.assets[1],
+      individualQaOk: bothIndividualOk,
+    },
+  ];
   const identity = {
     ...identityDraft,
     setQaOk,
-    assets: identityDraft.assets.map((a) => ({
-      ...a,
-      individualQaOk: bothIndividualOk,
-    })) as typeof identityDraft.assets,
+    assets: flaggedAssets,
   };
   writeFileSync(
     path.join(
@@ -421,7 +490,12 @@ export async function runPromoRendererPipeline(input: {
         ok: setQaOk,
         individualQaOk: bothIndividualOk,
         setConsistency: setEval,
-        error: gated.ok ? undefined : gated.error,
+        readability,
+        error: setQaOk
+          ? undefined
+          : [gated.ok ? undefined : gated.error, readability.ok ? undefined : readability.evidence]
+              .filter(Boolean)
+              .join(" "),
         evaluation: gated.evaluation,
         identity,
         outputMode: mode,
@@ -443,11 +517,18 @@ export async function runPromoRendererPipeline(input: {
     "utf8",
   );
 
-  if (!gated.ok) {
-    return fail(mode, "QA_FAILURE", gated.error, {
-      designSpec: spec,
-      identity,
-    });
+  if (!setQaOk) {
+    return fail(
+      mode,
+      "QA_FAILURE",
+      [gated.ok ? undefined : gated.error, readability.ok ? undefined : readability.evidence]
+        .filter(Boolean)
+        .join(" "),
+      {
+        designSpec: spec,
+        identity,
+      },
+    );
   }
 
   return {

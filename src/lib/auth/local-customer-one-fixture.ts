@@ -15,7 +15,10 @@ import type {
 import { listCampaignEnvelopes } from "@/lib/campaign-store/store";
 import { hashPassword } from "@/lib/auth/password-hash";
 import { isLocalAuthFixtureAvailable } from "@/lib/auth/local-auth-fixture-gate";
-import { localCustomerOneAuthFixtureCopy } from "@/lib/auth/local-customer-one-fixture-copy";
+import {
+  LOCAL_CUSTOMER_ONE_FIXTURE_ID,
+  localCustomerOneAuthFixtureCopy,
+} from "@/lib/auth/local-customer-one-fixture-copy";
 import {
   insertStudioUserRecordIfMissing,
   linkClientCampaign,
@@ -26,9 +29,10 @@ import {
 import {
   isLocalCustomerOnePaidFlyerCampaign,
   pickLocalCustomerOnePaidFlyerCampaign,
+  pickOwnedPaidNonMayaCampaign,
 } from "@/lib/auth/local-customer-one-campaign";
 
-export const LOCAL_CUSTOMER_ONE_FIXTURE_ID = "local-customer-one";
+export { LOCAL_CUSTOMER_ONE_FIXTURE_ID };
 export const LOCAL_CUSTOMER_ONE_FIXTURE_EMAIL = "customer-one@local.dev";
 
 export {
@@ -36,6 +40,7 @@ export {
   localCustomerOneAuthFixtureCopy,
   isLocalCustomerOnePaidFlyerCampaign,
   pickLocalCustomerOnePaidFlyerCampaign,
+  pickOwnedPaidNonMayaCampaign,
 };
 
 function isMayaClientCandidate(user: StudioUserRecord): boolean {
@@ -59,7 +64,7 @@ async function attachExistingLocalCustomerOneProject(
   user: StudioUser,
 ): Promise<StudioUser> {
   const envelopes = await listCampaignEnvelopes();
-  const selected = pickLocalCustomerOnePaidFlyerCampaign(envelopes, user.id);
+  const selected = pickOwnedPaidNonMayaCampaign(envelopes, user.id);
   if (!selected) return user;
 
   let next = user;

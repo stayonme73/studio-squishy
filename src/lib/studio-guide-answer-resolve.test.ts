@@ -109,6 +109,13 @@ describe("studio-guide-answer-resolve — Send / Continue parity", () => {
     expect(
       resolveGuideAnswerFromUi({
         step: "ask_materials",
+        typed: "Nothing yet",
+        selectedBubbles: ["Nothing yet"],
+      }),
+    ).toEqual({ answer: "Nothing yet", skipped: false });
+    expect(
+      resolveGuideAnswerFromUi({
+        step: "ask_materials",
         typed: "",
         selectedBubbles: ["Reference examples"],
       }),

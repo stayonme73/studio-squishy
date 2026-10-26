@@ -6,7 +6,11 @@ import {
   resolveCampaignPlanLabel,
   resolveCampaignRevisionRounds,
 } from "@/lib/approved-plan-display";
-import { resolveProjectSnapshotDeliverables } from "@/lib/studio-board-project-snapshot";
+import {
+  projectSnapshotShowsDeliverablesLink,
+  resolveProjectSnapshotDeliverables,
+  resolveProjectSnapshotProgressCopy,
+} from "@/lib/studio-board-project-snapshot";
 import type { AccountPackageView, StudioBoardView } from "@/lib/studio-board-view";
 
 type Props = {
@@ -20,7 +24,7 @@ function resolvePlanSnapshot(campaign: CampaignRecord) {
 
   return {
     planLabel: resolveCampaignPlanLabel(campaign),
-    serviceName: resolveCampaignPlanIncludes(campaign)[0] ?? "Make My Social Media Posts",
+    serviceName: resolveCampaignPlanIncludes(campaign)[0] ?? "",
     revisionLine: `${revisions} revision round${revisions === 1 ? "" : "s"} included`,
   };
 }
@@ -100,7 +104,7 @@ export default function ProjectSnapshotPanel({ campaign, view, account }: Props)
             <>
               <p className="sb-project-snapshot__primary">{deliverables.label}</p>
               <p className="sb-project-snapshot__meta">
-                {deliverables.delivered} of {deliverables.total} complete
+                {resolveProjectSnapshotProgressCopy(deliverables, view.statusLabel)}
               </p>
               <div
                 className="sb-project-snapshot__progress"
@@ -119,7 +123,7 @@ export default function ProjectSnapshotPanel({ campaign, view, account }: Props)
                   }}
                 />
               </div>
-              {deliverables.showViewDeliverables ? (
+              {projectSnapshotShowsDeliverablesLink(deliverables, view.statusLabel) ? (
                 <Link href={routes.deliverables} className="sb-project-snapshot__link">
                   View deliverables →
                 </Link>
@@ -134,10 +138,12 @@ export default function ProjectSnapshotPanel({ campaign, view, account }: Props)
           </h2>
           <p className="sb-project-snapshot__primary">{plan.planLabel}</p>
           <ul className="sb-project-snapshot__checks">
-            <li>
-              <span aria-hidden>✓</span>
-              {plan.serviceName}
-            </li>
+            {plan.serviceName ? (
+              <li>
+                <span aria-hidden>✓</span>
+                {plan.serviceName}
+              </li>
+            ) : null}
             <li>
               <span aria-hidden>✓</span>
               {plan.revisionLine}

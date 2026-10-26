@@ -2,27 +2,32 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback, type ReactNode } from "react";
+import { useEffect, useMemo, useState, useCallback, type ReactNode } from "react";
 
 import CampaignBriefActions from "@/components/campaign-details/CampaignBriefActions";
 import CampaignNextAction from "@/components/studio-board/CampaignNextAction";
 import CampaignProgressPanel from "@/components/studio-board/CampaignProgressPanel";
 import CampaignRecordDrawer from "@/components/studio-board/CampaignRecordDrawer";
 import CustomerVisibilityContinuityPanel from "@/components/studio-board/CustomerVisibilityContinuityPanel";
+import { clipRepurposingRecordingIsNext } from "@/lib/studio-dispatch/clip-door-facts";
 import RouteMapProductionBriefDrawer from "@/components/route-map/RouteMapProductionBriefDrawer";
 import MaterialsIntakePanel from "@/components/materials/MaterialsIntakePanel";
+import StudioExtrasPanel from "@/components/studio-extras/StudioExtrasPanel";
 import StudioBoardMaterialsWorkflow from "@/components/studio-board/StudioBoardMaterialsWorkflow";
 import StudioBoardProjectCommunicationSection from "@/components/studio-board/StudioBoardProjectCommunicationSection";
 import StudioBoardRefundRequestSection from "@/components/studio-board/StudioBoardRefundRequestSection";
+import BoardProjectRecordFacts from "@/components/studio-board/BoardProjectRecordFacts";
 import ProjectSnapshotPanel from "@/components/studio-board/ProjectSnapshotPanel";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
 import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
 import HelpCenterLink from "@/components/shared/HelpCenterLink";
+import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import CustomerSignOutButton from "@/components/auth/CustomerSignOutButton";
 import { helpCenter } from "@/config/help-center";
 import { studioBoard, studioBoardDraftRoomHref, studioBoardStudioGuideHref } from "@/config/studio-board";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
 import { resolveCustomerVisibilityContinuityView } from "@/lib/customer-visibility-continuity";
+import { isIntakeComplete } from "@/lib/studio-board-campaign";
 import { isDuplicateStatusAndStage } from "@/lib/studio-board/board-status-mobile-presentation";
 import {
   greetingPeriodFromDate,
@@ -32,28 +37,25 @@ import {
   type StudioBoardDisplayFacts,
 } from "@/lib/studio-board-view";
 import { speakConversationLine } from "@/lib/studio-conversation-speech";
-import { consumeStudioVoiceBoardWelcome } from "@/lib/studio-voice-board-handoff";
-import { resolveBoardHeaderGreeting } from "@/lib/studio-board-customer-greeting";
+import {
+  consumeStudioVoiceBoardWelcome,
+  consumeStudioVoiceReturningWelcome,
+} from "@/lib/studio-voice-board-handoff";
+import { answerCustomerLifeQuestion } from "@/lib/studio-customer-life/answer-question";
+import {
+  resolveBoardBoundCustomerDisplayName,
+  resolveBoardHeaderGreeting,
+} from "@/lib/studio-board-customer-greeting";
 import LocalTestFixtureBoardControl from "@/components/studio-board/LocalTestFixtureBoardControl";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 import { useProjectJobStatus } from "@/lib/use-project-job-status";
 
 const {
-  brand,
-  sidebar,
   empty: emptyCopy,
   currentCampaign: currentCampaignCopy,
   membership: membershipDefaults,
   routes,
 } = studioBoard;
-
-type SidebarIconName =
-  | "board"
-  | "new"
-  | "help"
-  | "record"
-  | "review"
-  | "delivery";
 
 /** Client-only period — never gates the greeting to an empty shell. */
 function useLiveGreetingPeriod() {
@@ -68,105 +70,28 @@ function useLiveGreetingPeriod() {
   return period;
 }
 
-function SidebarIcon({ name }: { name: SidebarIconName }) {
-  switch (name) {
-    case "board":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-          <rect x="3" y="3" width="8" height="8" rx="1.5" />
-          <rect x="13" y="3" width="8" height="8" rx="1.5" />
-          <rect x="3" y="13" width="8" height="8" rx="1.5" />
-          <rect x="13" y="13" width="8" height="8" rx="1.5" />
-        </svg>
-      );
-    case "new":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M12 8v8M8 12h8" strokeLinecap="round" />
-        </svg>
-      );
-    case "help":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M9.5 9.25a2.75 2.75 0 0 1 4.75 1.75c0 1.75-2.25 2-2.25 3.75" strokeLinecap="round" />
-          <circle cx="12" cy="17" r="0.75" fill="currentColor" stroke="none" />
-        </svg>
-      );
-    case "record":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-          <path d="M6 4h9l3 3v13H6V4Z" strokeLinejoin="round" />
-          <path d="M15 4v4h4" strokeLinejoin="round" />
-          <path d="M9 12h6M9 16h6" strokeLinecap="round" />
-        </svg>
-      );
-    case "review":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-          <path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6z" />
-          <circle cx="12" cy="12" r="2.5" />
-        </svg>
-      );
-    case "delivery":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-          <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" />
-          <path d="M12 12l8-4.5M12 12v9M12 12L4 7.5" />
-        </svg>
-      );
-  }
-}
-
-type SidebarNavAccent = "board" | "record" | "review" | "delivery" | "help";
-
-function NavItem({
-  href,
-  active,
-  accent,
-  icon,
+function BoardMore({
+  title,
   children,
-  actionHint,
-  onClick,
+  id,
+  accessory,
 }: {
-  href?: string;
-  active?: boolean;
-  accent?: SidebarNavAccent;
-  icon: SidebarIconName;
+  title: string;
   children: ReactNode;
-  actionHint?: string;
-  onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
+  id?: string;
+  accessory?: ReactNode;
 }) {
-  const className = [
-    "sb-nav__item",
-    active ? "sb-nav__item--active" : "sb-nav__item--link",
-    accent ? `sb-nav__item--accent-${accent}` : "",
-    actionHint ? "sb-nav__item--action" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-  const content = (
-    <>
-      <span className="sb-nav__icon" aria-hidden>
-        <SidebarIcon name={icon} />
-      </span>
-      <span className="sb-nav__label-wrap">
-        <span className="sb-nav__label">{children}</span>
-        {actionHint ? <span className="sb-nav__action-hint">{actionHint}</span> : null}
-      </span>
-    </>
+  return (
+    <details id={id} className="sb-card sb-more bf-material bf-material-paper">
+      <summary className="sb-more__summary">
+        <span className="sb-more__title">
+          {accessory}
+          <span>{title}</span>
+        </span>
+      </summary>
+      <div className="sb-more__body">{children}</div>
+    </details>
   );
-
-  if (href) {
-    return (
-      <Link href={href} className={className} onClick={onClick}>
-        {content}
-      </Link>
-    );
-  }
-
-  return <span className={className}>{content}</span>;
 }
 
 function CampaignMetric({
@@ -204,7 +129,10 @@ export default function StudioBoardScene({
 
   /** Campaign lookup unfinished — never claim no project or empty-state conclusions. */
   const campaignLookupPending = !ready;
-  const boardCampaign = accessState === "no-active-project" ? null : campaign;
+  const boardCampaign =
+    accessState === "no-active-project" || accessState === "local-unavailable"
+      ? null
+      : campaign;
   const showNoActiveProject =
     ready && (accessState === "no-active-project" || !boardCampaign);
   const loadingCopy = emptyCopy.loading;
@@ -212,7 +140,7 @@ export default function StudioBoardScene({
     boardCampaign?.paymentReceivedAt ? boardCampaign.campaignId : undefined,
   );
   const movedToProduction = customerJobs.some((job) => job.hasProductionStarted);
-  /** Session greeting — independent of campaign claim/load. */
+  /** Session greeting, then bound to the Board campaign so Maya cannot leak onto a fresh project. */
   const [customerDisplayName, setCustomerDisplayName] = useState<string | null>(null);
   const [sessionGreetingResolved, setSessionGreetingResolved] = useState(false);
   const [materialsFacts, setMaterialsFacts] = useState<{
@@ -248,6 +176,15 @@ export default function StudioBoardScene({
     };
   }, []);
 
+  const boundCustomerDisplayName = useMemo(
+    () =>
+      resolveBoardBoundCustomerDisplayName({
+        sessionDisplayName: customerDisplayName,
+        campaign: boardCampaign,
+      }),
+    [boardCampaign, customerDisplayName],
+  );
+
   const displayFacts = useMemo<StudioBoardDisplayFacts>(() => {
     const blockingRequiredCount =
       materialsFacts?.blockingRequiredCount ??
@@ -257,12 +194,12 @@ export default function StudioBoardScene({
       blockingRequiredCount,
       movedToProduction,
       stillNeededLabel: materialsFacts?.stillNeededLabels[0] ?? null,
-      customerDisplayName,
+      customerDisplayName: boundCustomerDisplayName,
       jobs: customerJobs,
     };
   }, [
     boardCampaign?.materialsSummary?.blockingRequiredCount,
-    customerDisplayName,
+    boundCustomerDisplayName,
     customerJobs,
     materialsFacts,
     movedToProduction,
@@ -311,6 +248,14 @@ export default function StudioBoardScene({
     [boardCampaign, customerJobs, displayFacts, materialsFacts, view.headerSnapshot],
   );
   const account = useMemo(() => resolveAccountPackageView(boardCampaign), [boardCampaign]);
+  const boardCondensed = view.hasCampaign && !campaignLookupPending;
+
+  useEffect(() => {
+    if (window.location.hash !== "#sb-project-details") return;
+    const node = document.getElementById("sb-project-details");
+    if (node instanceof HTMLDetailsElement) node.open = true;
+    node?.scrollIntoView({ block: "start" });
+  }, [boardCondensed]);
 
   const newCampaignHref = studioBoardDraftRoomHref();
 
@@ -329,42 +274,36 @@ export default function StudioBoardScene({
   const headerGreeting = useMemo(
     () =>
       resolveBoardHeaderGreeting({
-        displayName: customerDisplayName,
+        displayName: boundCustomerDisplayName,
         greetingPeriod,
-        sessionResolved: sessionGreetingResolved,
+        sessionResolved: sessionGreetingResolved && ready,
       }),
-    [customerDisplayName, greetingPeriod, sessionGreetingResolved],
+    [boundCustomerDisplayName, greetingPeriod, ready, sessionGreetingResolved],
   );
 
   /* Voice Board handoff — welcome once after Intake → sign-in → Board. */
   useEffect(() => {
     if (!ready) return;
-    if (accessState === "auth-required") return;
-    if (!consumeStudioVoiceBoardWelcome()) return;
-    speakConversationLine(conversationRoomGuideV1.boardArrivalWelcomeVoice);
-  }, [ready, accessState]);
-
-  const navRef = useRef<HTMLElement>(null);
-
-  useLayoutEffect(() => {
-    if (!ready) return;
-    if (accessState === "auth-required" || accessState === "denied" || accessState === "error") {
+    if (accessState === "auth-required" || accessState === "local-unavailable") return;
+    if (consumeStudioVoiceBoardWelcome()) {
+      speakConversationLine(conversationRoomGuideV1.boardArrivalWelcomeVoice);
       return;
     }
-    const nav = navRef.current;
-    if (!nav) return;
-    const help = nav.querySelector<HTMLElement>(".sb-nav__item--accent-help");
-    if (!help) return;
-    const apply = () => {
-      const width = Math.ceil(help.getBoundingClientRect().width);
-      if (width < 1) return;
-      nav.style.setProperty("--sb-help-nav-width", `${width}px`);
-    };
-    apply();
-    const observer = new ResizeObserver(apply);
-    observer.observe(help);
-    return () => observer.disconnect();
-  }, [ready, accessState]);
+    if (!consumeStudioVoiceReturningWelcome()) return;
+    const returning = answerCustomerLifeQuestion("I am a returning customer.", {
+      campaign: boardCampaign,
+      account: {
+        signedIn: true,
+        preferredName: boundCustomerDisplayName,
+      },
+    });
+    speakConversationLine(returning.text);
+  }, [accessState, boardCampaign, boundCustomerDisplayName, ready]);
+
+  const greetingLead =
+    headerGreeting.kind === "named"
+      ? `Good ${headerGreeting.period}, ${headerGreeting.name}`
+      : headerGreeting.text;
 
   if (ready && accessState === "auth-required") {
     return <ClientAccessStatePanel state={accessState} />;
@@ -374,103 +313,196 @@ export default function StudioBoardScene({
     return <ClientAccessStatePanel state={accessState} />;
   }
 
+  if (ready && accessState === "local-unavailable") {
+    return <ClientAccessStatePanel state={accessState} />;
+  }
+
   if (ready && accessState === "error") {
     return <ClientAccessStatePanel state={accessState} onRetry={() => void refresh()} />;
   }
 
   return (
     <div className="sb sb--v4" aria-label="Studio Board" aria-busy={!ready}>
-      <aside className="sb-sidebar">
-        <div className="sb-brand">
-          <p className="sb-brand__the">{brand.theLabel}</p>
-          <div className="sb-brand__lockup">
-            <span className="sb-brand__icon" aria-hidden>
-              <svg viewBox="0 0 32 32" fill="none">
-                <path
-                  d="M16 4v2M16 26v2M4 16h2M26 16h2M7.05 7.05l1.42 1.42M23.53 23.53l1.42 1.42M7.05 24.95l1.42-1.42M23.53 8.47l1.42-1.42"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M16 9c-3.2 0-5.5 2.2-5.5 5.2 0 2.1 1.2 3.4 2.4 4.3V20a3.6 3.6 0 0 0 6.2 0v-1.5c1.2-.9 2.4-2.2 2.4-4.3C21.5 11.2 19.2 9 16 9Z"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinejoin="round"
-                />
-                <path d="M16 17.5v2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                <circle cx="16" cy="13.5" r="1.15" fill="currentColor" />
-              </svg>
-            </span>
-            <div className="sb-brand__stack">
-              <p className="sb-brand__name">{brand.nameLabel}</p>
-            </div>
-          </div>
-        </div>
-
-        <nav ref={navRef} className="sb-nav" aria-label="Studio navigation">
-          <NavItem active accent="board" icon="board">
-            {sidebar.studioBoard}
-          </NavItem>
-          <NavItem
-            href={routes.feedbackStudio}
-            icon="review"
-            accent="review"
-            active={view.hasCampaign && view.status === "READY_FOR_REVIEW"}
-          >
-            {sidebar.reviewRoom}
-          </NavItem>
-          <NavItem
-            href={routes.deliverables}
-            icon="delivery"
-            accent="delivery"
-            active={view.hasCampaign && view.status === "DELIVERED"}
-          >
-            {sidebar.finalDelivery}
-          </NavItem>
-          <NavItem href={routes.helpCenter} icon="help" accent="help">
-            {sidebar.helpCenter}
-          </NavItem>
-          <NavItem href={newCampaignHref} icon="new">
-            {sidebar.newCampaign}
-          </NavItem>
-          {/* Phone: fills the open slot under Help Center; desktop: last sidebar action. */}
-          <CustomerSignOutButton className="sb-nav__item sb-nav__item--active sb-sign-out" />
-        </nav>
-
-        <div className="sb-sidebar-lower">
-          <StudioBoardDevStatus placement="sidebar" />
-        </div>
-      </aside>
-
       <div className="sb-main">
+        <UtilityPageHeader
+          backHref={routes.studioLobby}
+          backLabel="← Back to Studio Lobby"
+          activeNav="studio-board"
+          title={greetingLead}
+          helpCenterFrom="studio-board"
+        />
+
         <header className="sb-header-v3">
           {showLocalTestFixture ? <LocalTestFixtureBoardControl /> : null}
-          <div className="sb-header-v3__row">
-            <div className="sb-header-v3__copy">
-              <h1 className="sb-header-v3__title">Studio Board</h1>
-              {headerGreeting.kind === "named" ? (
-                <p className="sb-header-v3__greeting">
-                  Good {headerGreeting.period},{" "}
-                  <span className="sb-header-v3__name">{headerGreeting.name}</span>
-                </p>
-              ) : (
-                <p
-                  className="sb-header-v3__greeting"
-                  aria-busy={headerGreeting.busy || undefined}
-                >
-                  {headerGreeting.text}
-                </p>
-              )}
-            </div>
-          </div>
         </header>
+
+        <div className="sb-page-actions">
+          <CustomerSignOutButton className="sb-sign-out" />
+        </div>
 
         <div
           className={`sb-board-layout${
             campaignLookupPending || view.hasCampaign ? "" : " sb-board-layout--no-campaign"
-          }`}
+          }${boardCondensed ? " sb-board-layout--condensed" : ""}`}
         >
+          {boardCondensed ? (
+            <>
+              <article
+                className="sb-card sb-card--current sb-overview bf-material bf-material-paper"
+                aria-labelledby="sb-current-campaign-title"
+              >
+                <div className="sb-overview__body">
+                  <h2 id="sb-current-campaign-title" className="sb-current-campaign__name">
+                    {view.campaignTitle}
+                    {view.packageLabel ? (
+                      <span className="sb-overview__service"> · {view.packageLabel}</span>
+                    ) : null}
+                  </h2>
+                  <p className="sb-overview__status">{view.statusLabel}</p>
+                  <div className="sb-overview__next">
+                    <p className="sb-overview__kicker">Your next step</p>
+                    <CampaignNextAction
+                      campaign={boardCampaign}
+                      hasCampaign={view.hasCampaign}
+                      status={view.status}
+                      nextUpdateLabel={view.headerSnapshot?.nextUpdate ?? null}
+                      studioGuideHref={studioGuideHref}
+                      displayFacts={displayFacts}
+                      sourceSearch={`?${searchParams.toString()}`}
+                      showStatus={false}
+                    />
+                  </div>
+                  <dl className="sb-overview__facts">
+                    <div>
+                      <dt>Project Intake</dt>
+                      <dd>
+                        {clipRepurposingRecordingIsNext(boardCampaign)
+                          ? "Saved"
+                          : isIntakeComplete(boardCampaign)
+                            ? "Finished"
+                            : "Not finished"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Payment</dt>
+                      <dd>{account.paymentStatus}</dd>
+                    </div>
+                    <div>
+                      <dt>{currentCampaignCopy.revisionsRemaining}</dt>
+                      <dd>{account.revisionsRemaining}</dd>
+                    </div>
+                  </dl>
+                  <p className="sb-overview__note">
+                    Project details, materials, policies, and delivery information available when needed.
+                  </p>
+                </div>
+              </article>
+
+              <BoardMore
+                id="sb-project-details"
+                title="Project details"
+                accessory={
+                  <Link
+                    href={newCampaignHref}
+                    className="sb-more__new"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    New
+                  </Link>
+                }
+              >
+                {boardCampaign ? <BoardProjectRecordFacts campaign={boardCampaign} /> : null}
+                {boardCampaign ? (
+                  <CampaignBriefActions
+                    campaign={boardCampaign}
+                    showView={false}
+                    className="sb-current-campaign__brief-actions"
+                    layout="stack"
+                    currentStatusLabel={view.statusLabel}
+                  />
+                ) : null}
+                <div className="sb-current-campaign__metrics">
+                  {view.packageLabel ? (
+                    <CampaignMetric label={currentCampaignCopy.package} value={view.packageLabel} />
+                  ) : null}
+                  {view.campaignProgressLabel ? (
+                    <CampaignMetric
+                      label={currentCampaignCopy.campaignStage}
+                      value={view.campaignProgressLabel}
+                      repeat={isDuplicateStatusAndStage(view.statusLabel, view.campaignProgressLabel)}
+                    />
+                  ) : null}
+                  {!boardCampaign?.approvedStudioPlan ? (
+                    <>
+                      <CampaignMetric
+                        label={currentCampaignCopy.campaignsRemaining}
+                        value={account.campaignsRemaining}
+                      />
+                      <CampaignMetric
+                        label={currentCampaignCopy.emailsRemaining}
+                        value={account.emailsRemaining}
+                      />
+                      <CampaignMetric
+                        label={currentCampaignCopy.smsRemaining}
+                        value={account.smsRemaining}
+                      />
+                    </>
+                  ) : null}
+                </div>
+                <ProjectSnapshotPanel campaign={boardCampaign} view={view} account={account} />
+              </BoardMore>
+
+              <BoardMore title="Materials" id="sb-materials">
+                <StudioBoardMaterialsWorkflow
+                  campaign={boardCampaign}
+                  hasCampaign={Boolean(boardCampaign)}
+                  campaignLookupPending={campaignLookupPending}
+                  movedToProduction={movedToProduction}
+                  onMaterialsFactsChange={handleMaterialsFactsChange}
+                  hideGlance={Boolean(boardCampaign?.paymentReceivedAt)}
+                />
+                {boardCampaign?.paymentReceivedAt ? <MaterialsIntakePanel campaign={boardCampaign} /> : null}
+                {boardCampaign?.paymentReceivedAt ? (
+                  <StudioExtrasPanel campaignId={boardCampaign.campaignId} placement="board" />
+                ) : null}
+              </BoardMore>
+
+              <BoardMore title="Progress">
+                <CampaignProgressPanel
+                  campaign={boardCampaign}
+                  steps={view.progressSteps}
+                  timeline={view.activityFeed}
+                  displayFacts={displayFacts}
+                />
+              </BoardMore>
+
+              <BoardMore title="Messages">
+                <StudioBoardProjectCommunicationSection
+                  campaign={boardCampaign}
+                  hasCampaign={Boolean(boardCampaign)}
+                  campaignLookupPending={campaignLookupPending}
+                />
+              </BoardMore>
+
+              <BoardMore title="Payment history and policies">
+                <StudioBoardRefundRequestSection
+                  campaign={boardCampaign}
+                  hasCampaign={Boolean(boardCampaign)}
+                  campaignLookupPending={campaignLookupPending}
+                />
+                {view.status === "DRAFT_RECEIVED" || view.status === "PAYMENT_RECEIVED" ? (
+                  <HelpCenterLink
+                    label={helpCenter.boardLinks.awaitingPayment.label}
+                    anchor={helpCenter.boardLinks.awaitingPayment.anchor}
+                    from="studio-board"
+                    className="sb-help-link"
+                  />
+                ) : null}
+              </BoardMore>
+            </>
+          ) : (
+          <>
+          <div className="sb-board-stack sb-board-stack--main">
           <article
             className="sb-card sb-card--current bf-material bf-material-paper"
             aria-labelledby="sb-current-campaign-title"
@@ -510,6 +542,7 @@ export default function StudioBoardScene({
                       nextUpdateLabel={view.headerSnapshot?.nextUpdate ?? null}
                       studioGuideHref={studioGuideHref}
                       displayFacts={displayFacts}
+                      sourceSearch={`?${searchParams.toString()}`}
                     />
                   ) : null}
 
@@ -519,6 +552,7 @@ export default function StudioBoardScene({
                       onViewBrief={() => router.push(studioBoard.routes.campaignDetails)}
                       className="sb-current-campaign__brief-actions"
                       layout="stack"
+                      currentStatusLabel={view.statusLabel}
                     />
                   ) : null}
 
@@ -601,6 +635,37 @@ export default function StudioBoardScene({
             </div>
           </article>
 
+          <article className="sb-card sb-card--project-snapshot bf-material bf-material-paper">
+            {campaignLookupPending ? (
+              <>
+                <p className="sb-card__tab">PROJECT SNAPSHOT</p>
+                <p className="sb-project-snapshot__empty">{loadingCopy.snapshotHint}</p>
+              </>
+            ) : (
+              <ProjectSnapshotPanel
+                campaign={boardCampaign}
+                view={view}
+                account={account}
+              />
+            )}
+          </article>
+
+          <StudioBoardRefundRequestSection
+            campaign={boardCampaign}
+            hasCampaign={Boolean(boardCampaign)}
+            campaignLookupPending={campaignLookupPending}
+          />
+
+          {boardCampaign?.paymentReceivedAt ? (
+            <MaterialsIntakePanel campaign={boardCampaign} />
+          ) : null}
+
+          {boardCampaign?.paymentReceivedAt ? (
+            <StudioExtrasPanel campaignId={boardCampaign.campaignId} placement="board" />
+          ) : null}
+          </div>
+
+          <div className="sb-board-stack sb-board-stack--side">
           <article className="sb-card sb-card--progress bf-material bf-material-paper">
             {campaignLookupPending ? (
               <>
@@ -617,21 +682,6 @@ export default function StudioBoardScene({
             )}
           </article>
 
-          <article className="sb-card sb-card--project-snapshot bf-material bf-material-paper">
-            {campaignLookupPending ? (
-              <>
-                <p className="sb-card__tab">PROJECT SNAPSHOT</p>
-                <p className="sb-project-snapshot__empty">{loadingCopy.snapshotHint}</p>
-              </>
-            ) : (
-              <ProjectSnapshotPanel
-                campaign={boardCampaign}
-                view={view}
-                account={account}
-              />
-            )}
-          </article>
-
           <StudioBoardMaterialsWorkflow
             campaign={boardCampaign}
             hasCampaign={Boolean(boardCampaign)}
@@ -639,22 +689,18 @@ export default function StudioBoardScene({
             movedToProduction={movedToProduction}
             onMaterialsFactsChange={handleMaterialsFactsChange}
           />
-          {boardCampaign?.paymentReceivedAt ? (
-            <MaterialsIntakePanel campaign={boardCampaign} />
-          ) : null}
+
+          <StudioBoardProjectCommunicationSection
+            campaign={boardCampaign}
+            hasCampaign={Boolean(boardCampaign)}
+            campaignLookupPending={campaignLookupPending}
+          />
+          </div>
+          </>
+          )}
         </div>
 
-        <StudioBoardProjectCommunicationSection
-          campaign={boardCampaign}
-          hasCampaign={Boolean(boardCampaign)}
-          campaignLookupPending={campaignLookupPending}
-        />
-
-        <StudioBoardRefundRequestSection
-          campaign={boardCampaign}
-          hasCampaign={Boolean(boardCampaign)}
-          campaignLookupPending={campaignLookupPending}
-        />
+        <StudioBoardDevStatus placement="sidebar" />
       </div>
 
       <CampaignRecordDrawer open={recordOpen} onClose={() => setRecordOpen(false)} />

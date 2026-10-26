@@ -27,7 +27,7 @@ export const CONTENT_ROUTING_LABELS: Record<ContentRoutingState, string> = {
   TECHNICAL_REVIEW_REQUIRED: "Technical review required",
   CLEARED_FOR_PRODUCTION: "Cleared for production",
   CLEARED_WITH_LIMITS: "Cleared with limits",
-  QUARANTINED: "Quarantined — Studio review required",
+  QUARANTINED: "The Studio needs to review this file before using it.",
   REJECTED: "Rejected",
   SUPERSEDED: "Superseded by a newer file",
   WITHDRAWN_BY_CUSTOMER: "Withdrawn",

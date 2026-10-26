@@ -77,10 +77,15 @@ export function resolveProjectStatusPanelState(params: {
   loading: boolean;
   error: string | null;
   jobs: readonly CustomerJobStatusSummary[];
+  /** Board-aligned purchased-service rows when the live status call is empty or leaked. */
+  fallbackJobs?: readonly CustomerJobStatusSummary[];
 }): ProjectStatusPanelState {
   if (!params.paymentReceivedAt) return { kind: "pending-payment" };
   if (params.loading) return { kind: "loading" };
+  if (params.jobs.length > 0) return { kind: "loaded", jobs: params.jobs };
+  if (params.fallbackJobs && params.fallbackJobs.length > 0) {
+    return { kind: "loaded", jobs: params.fallbackJobs };
+  }
   if (params.error) return { kind: "error" };
-  if (params.jobs.length === 0) return { kind: "empty" };
-  return { kind: "loaded", jobs: params.jobs };
+  return { kind: "empty" };
 }

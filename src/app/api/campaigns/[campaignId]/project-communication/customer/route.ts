@@ -153,6 +153,7 @@ export async function POST(request: Request, context: RouteContext) {
           campaignId,
           question: result.message.body,
           commMessageId: result.message.id,
+          user,
         });
   } catch {
     loop = {

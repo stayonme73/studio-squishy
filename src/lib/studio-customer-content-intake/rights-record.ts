@@ -48,12 +48,18 @@ export function detectRightsFilenameContradiction(input: {
   fileName: string;
   recognizablePeoplePresent: boolean | null;
   thirdPartyMaterialPresent: boolean | null;
+  /** Logo-brand uploads often include "logo" in the file name — not third-party evidence. */
+  category?: MaterialCategory;
 }): boolean {
   const likenessHint = filenameLikenessHint(input.fileName);
   const thirdPartyHint = filenameThirdPartyHint(input.fileName);
+  const thirdPartyFilenameContradiction =
+    input.category !== "logo-brand" &&
+    thirdPartyHint &&
+    input.thirdPartyMaterialPresent === false;
   return (
     (likenessHint && input.recognizablePeoplePresent === false) ||
-    (thirdPartyHint && input.thirdPartyMaterialPresent === false)
+    thirdPartyFilenameContradiction
   );
 }
 
@@ -90,6 +96,7 @@ export function buildCustomerContentRightsRecord(input: {
     fileName,
     recognizablePeoplePresent,
     thirdPartyMaterialPresent,
+    category: input.category,
   });
 
   const statementComplete = rightsRequired
@@ -115,7 +122,9 @@ export function buildCustomerContentRightsRecord(input: {
       (recognizablePeoplePresent === null && likenessFilenameHint),
     thirdPartyMaterialReviewRequired:
       thirdPartyMaterialPresent === true ||
-      (thirdPartyMaterialPresent === null && thirdPartyFilenameHint),
+      (thirdPartyMaterialPresent === null &&
+        thirdPartyFilenameHint &&
+        input.category !== "logo-brand"),
     likenessConsentConfirmed,
     thirdPartyRightsConfirmed,
     recognizablePeoplePresent,

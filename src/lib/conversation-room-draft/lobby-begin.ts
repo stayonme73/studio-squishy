@@ -3,11 +3,25 @@
  * after a finished purchase + Intake handoff.
  *
  * Incomplete journey: preserve and resume (working-draft contract).
- * Completed journey: do not resurrect an empty “complete” tablet.
+ * Completed journey / protected Maya pointer: do not let a new customer
+ * inherit another customer’s campaign, Intake, or Review state.
+ * Detaches the browser current-campaign pointer only — never deletes the
+ * server campaign record.
  */
 
+import { MAYA_PROTECTED_CAMPAIGN_ID } from "@/config/studio-production-team-workforce-v1";
+import { studioPreAcceptanceV1 } from "@/config/studio-pre-acceptance-v1";
+import { STUDIO_PAYMENT_SANDBOX_SESSION_KEY } from "@/lib/studio-payment/sandbox-query";
+import { clearConversationSession } from "@/lib/studio-conversation-framework/lobby-session";
 import { clearGuideCaptureDraft } from "@/lib/studio-guide-capture";
-import { readCurrentCampaign } from "@/lib/studio-board-campaign";
+import {
+  clearCampaignState,
+  isIntakeComplete,
+  readCurrentCampaign,
+} from "@/lib/studio-board-campaign";
+import { clearProjectDetailsDraft } from "@/lib/project-details-session";
+import { clearStoredProjectClaimReceipt, readStoredProjectClaimReceipt } from "@/lib/studio-project-claim/client-receipt";
+import { clearStudioVoiceBoardHandoff } from "@/lib/studio-voice-board-handoff";
 import {
   clearGuideMemoryDraft,
   clearGuideUiStep,
@@ -22,6 +36,65 @@ import { readConversationStage } from "./slices";
 
 export type LobbyConversationBeginInvite = "start" | "resume";
 
+function removeStorageKeysContaining(
+  storage: Storage,
+  needle: string,
+): void {
+  const keys: string[] = [];
+  for (let index = 0; index < storage.length; index += 1) {
+    const key = storage.key(index);
+    if (key && key.includes(needle)) keys.push(key);
+  }
+  for (const key of keys) {
+    if (key === STUDIO_PAYMENT_SANDBOX_SESSION_KEY) continue;
+    storage.removeItem(key);
+  }
+}
+
+/**
+ * Detach this browser from the current customer/campaign pointer.
+ * Does not delete the campaign record on disk. Preserves the sandbox
+ * payment opt-in so Customer-One can still Test pay.
+ */
+export function detachCurrentCustomerBrowserSession(): void {
+  if (typeof window === "undefined") return;
+
+  const campaign = readCurrentCampaign();
+  const campaignId = campaign?.campaignId;
+  const claim = readStoredProjectClaimReceipt();
+
+  clearConversationGuideLocals();
+  clearWorkingDraft();
+  clearConversationSession();
+  clearStudioVoiceBoardHandoff();
+
+  try {
+    window.sessionStorage.removeItem(studioPreAcceptanceV1.storageKey);
+  } catch {
+    /* private mode */
+  }
+
+  if (campaignId) {
+    clearProjectDetailsDraft(campaignId);
+    try {
+      removeStorageKeysContaining(window.localStorage, campaignId);
+      removeStorageKeysContaining(window.sessionStorage, campaignId);
+    } catch {
+      /* private mode */
+    }
+  }
+
+  if (
+    claim &&
+    (claim.campaignId === campaignId ||
+      claim.campaignId === MAYA_PROTECTED_CAMPAIGN_ID)
+  ) {
+    clearStoredProjectClaimReceipt();
+  }
+
+  clearCampaignState();
+}
+
 /** True when this browser’s conversation project already finished Intake. */
 export function isConversationJourneyComplete(): boolean {
   const draft = readWorkingDraft();
@@ -29,9 +102,11 @@ export function isConversationJourneyComplete(): boolean {
     return true;
   }
   const campaign = readCurrentCampaign();
-  return Boolean(
-    campaign?.paymentReceivedAt && campaign?.routeMapIntakeSubmittedAt,
-  );
+  if (!campaign) return false;
+  if (campaign.campaignId === MAYA_PROTECTED_CAMPAIGN_ID) {
+    return true;
+  }
+  return Boolean(campaign.paymentReceivedAt && isIntakeComplete(campaign));
 }
 
 /**
@@ -46,12 +121,10 @@ export function clearConversationGuideLocals(): void {
 
 /**
  * Clear local Conversation Room capture for a deliberate fresh start.
- * Does not delete the campaign record. Prefer clearConversationGuideLocals
- * on Intake → Board handoff so attribution is not erased.
+ * Detaches the current-campaign pointer. Does not delete the campaign record.
  */
 export function clearCompletedConversationLocalState(): void {
-  clearConversationGuideLocals();
-  clearWorkingDraft();
+  detachCurrentCustomerBrowserSession();
 }
 
 function hasUnfinishedConversationProgress(): boolean {
@@ -67,7 +140,7 @@ function hasUnfinishedConversationProgress(): boolean {
 /**
  * Lobby / mobile Let’s Get Started.
  * Completes → clear leftover local state and invite a fresh start.
- * Mid-journey → resume invite (CR restores stage + tablet).
+ * Mid-journey unpaid work → resume invite (CR restores stage + tablet).
  */
 export function resolveLobbyConversationBeginInvite(): LobbyConversationBeginInvite {
   if (isConversationJourneyComplete()) {

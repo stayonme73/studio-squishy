@@ -10,6 +10,7 @@ import {
 import {
   ownerEscalationForException,
   ownerEscalationForOwnerInteraction,
+  ownerEscalationForQualityCategory,
   ownerEscalationForRoutineOperationalEvent,
 } from "./owner-escalation";
 import type {
@@ -74,10 +75,7 @@ function fromQa(envelope: ServerTasksEnvelope): KitchenOperationalEvent[] {
     const routedRole = qa.routedTaskId
       ? envelope.tasks.find((task) => task.id === qa.routedTaskId)?.responsibleRole
       : envelope.tasks.find((task) => task.id === qa.taskId)?.responsibleRole;
-    const ownerEscalation =
-      qa.category === "direction_disagreement" || qa.category === "compliance_concern"
-        ? ("owner_required" as const)
-        : ownerEscalationForRoutineOperationalEvent();
+    const ownerEscalation = ownerEscalationForQualityCategory(qa.category);
 
     return {
       eventId: `qa:${qa.id}`,
@@ -385,7 +383,7 @@ function fromMaterials(
   materials: readonly CampaignMaterialItem[],
   syncedAt: string,
 ): KitchenOperationalEvent[] {
-  return materials.filter(isBlockingMaterialItem).map((item) => ({
+  return materials.filter((item) => isBlockingMaterialItem(item, campaignId)).map((item) => ({
     eventId: `material-block:${item.id}`,
     occurredAt: item.reviewedAt ?? item.submittedAt ?? syncedAt,
     campaignId,

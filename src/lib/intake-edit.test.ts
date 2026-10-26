@@ -4,6 +4,8 @@ import type { CampaignRecord } from "@/config/studio-board";
 import { createCampaignFromRouteMapJob } from "@/lib/route-map-campaign";
 import {
   ROUTE_MAP_INTAKE_HREF,
+  isIntakeEditable,
+  isIntakeEditableForCustomer,
   isRouteMapCampaign,
   projectDetailsEditHref,
   resolveIntakeEditHref,
@@ -16,9 +18,15 @@ describe("intake edit routing", () => {
     const campaign = createCampaignFromRouteMapJob("v2-rtu-social-posts", "random-exit")!;
     expect(isRouteMapCampaign(campaign)).toBe(true);
     expect(routeMapIntakeHref()).toBe(ROUTE_MAP_INTAKE_HREF);
-    expect(resolveIntakeEditHref(campaign)).toBe("/route-map?step=intake");
-    expect(resolvePostPaymentIntakeHref(campaign)).toBe("/route-map?step=intake");
-    expect(projectDetailsEditHref(undefined, campaign)).toBe("/route-map?step=intake");
+    expect(resolveIntakeEditHref(campaign)).toBe(
+      `/studio-conversation-room?stage=intake&campaignId=${campaign.campaignId}`,
+    );
+    expect(resolvePostPaymentIntakeHref(campaign)).toBe(
+      `/studio-conversation-room?stage=intake&campaignId=${campaign.campaignId}`,
+    );
+    expect(projectDetailsEditHref(undefined, campaign)).toBe(
+      `/studio-conversation-room?stage=intake&campaignId=${campaign.campaignId}`,
+    );
   });
 
   it("keeps non–Route Map campaigns on quarantined Route Map intake", () => {
@@ -29,7 +37,24 @@ describe("intake edit routing", () => {
     } as CampaignRecord;
 
     expect(isRouteMapCampaign(campaign)).toBe(false);
-    expect(resolveIntakeEditHref(campaign, "spark")).toBe("/route-map?step=intake");
-    expect(resolvePostPaymentIntakeHref(campaign, "spark")).toBe("/route-map?step=intake");
+    expect(resolveIntakeEditHref(campaign, "spark")).toBe(
+      "/studio-conversation-room?stage=intake&campaignId=discovery-test",
+    );
+    expect(resolvePostPaymentIntakeHref(campaign, "spark")).toBe(
+      "/studio-conversation-room?stage=intake&campaignId=discovery-test",
+    );
+  });
+
+  it("locks pre-production intake copy once the live status is Final Delivery ready", () => {
+    expect(isIntakeEditable("PAYMENT_RECEIVED")).toBe(true);
+    expect(
+      isIntakeEditableForCustomer("PAYMENT_RECEIVED", "Final Delivery ready"),
+    ).toBe(false);
+    expect(isIntakeEditableForCustomer("PAYMENT_RECEIVED", "Ready for Review")).toBe(
+      false,
+    );
+    expect(isIntakeEditableForCustomer("PAYMENT_RECEIVED", "Payment received")).toBe(
+      true,
+    );
   });
 });

@@ -36,9 +36,18 @@ import {
 import {
   formatRecordFieldValue,
 } from "@/lib/project-record-client-copy";
-import { resolveStudioBoardView } from "@/lib/studio-board-view";
+import {
+  resolveCampaignProgressSteps,
+  resolveStudioBoardView,
+  type CampaignProgressStep,
+} from "@/lib/studio-board-view";
 import type { CustomerJobStatusSummary } from "@/lib/project-record-status";
-import { resolveCustomerCurrentStatusOverlay } from "@/lib/studio-customer-current-status";
+import {
+  alignCustomerFacingJobStatusLabel,
+  resolveCustomerCurrentStatusOverlay,
+  type CustomerCurrentStatusOverlay,
+} from "@/lib/studio-customer-current-status";
+import type { ServiceId } from "@/catalog/types";
 
 const { campaignDetails: copy } = studioBoard;
 
@@ -72,6 +81,8 @@ export type CampaignDetailsView = {
   studioUpdates: readonly StudioUpdate[];
   deliverables: DeliverablesPreview;
   timeline: CampaignTimelineEntry[];
+  progressSteps: readonly CampaignProgressStep[];
+  statusJobs: readonly CustomerJobStatusSummary[];
 };
 
 function formatCreatedDate(iso: string) {
@@ -186,7 +197,68 @@ const emptyView: CampaignDetailsView = {
     hint: copy.deliverables.preparingHint,
   },
   timeline: [],
+  progressSteps: [],
+  statusJobs: [],
 };
+
+const ETA_PROGRESS_MASQUERADE = /^(in progress|soon|tbd|—|-)$/i;
+
+/** Estimated completion is a date or a truthful wait state — never a progress label. */
+export function resolveRecordEstimatedCompletion(
+  campaign: CampaignRecord,
+  overlay: CustomerCurrentStatusOverlay | null,
+): string {
+  if (campaign.targetCompletionDate) {
+    const formatted = formatCreatedDate(campaign.targetCompletionDate);
+    if (formatted !== copy.notProvided) return formatted;
+  }
+
+  const raw = campaign.estimatedCompletion?.trim() ?? "";
+  if (raw && !ETA_PROGRESS_MASQUERADE.test(raw)) return raw;
+
+  if (overlay?.kind === "delivery_ready" || campaign.campaignStatus === "DELIVERED") {
+    return studioBoard.statusContent.DELIVERED.estimatedCompletion;
+  }
+
+  if (
+    overlay?.kind === "intake_received" ||
+    overlay?.kind === "intake_needed" ||
+    overlay?.kind === "identity_verifying"
+  ) {
+    return studioBoard.statusContent.PAYMENT_RECEIVED.estimatedCompletion;
+  }
+
+  return "Not scheduled yet";
+}
+
+export function fallbackRecordStatusJobs(
+  campaign: CampaignRecord,
+  statusLabel: string,
+): CustomerJobStatusSummary[] {
+  const items = campaign.approvedStudioPlan?.lineItems ?? [];
+  return items.map((item, index) => ({
+    jobId: `record-plan-${campaign.campaignId}-${item.skuId}-${index}`,
+    campaignId: campaign.campaignId,
+    skuId: item.skuId as ServiceId,
+    serviceName: item.serviceName,
+    statusLabel,
+    isWaitingOnClient: false,
+    hasProductionStarted: false,
+    deliveredAt: null,
+    clientDeadline: null,
+  }));
+}
+
+export function alignRecordJobStatusWithOverlay(
+  jobs: readonly CustomerJobStatusSummary[],
+  overlay: CustomerCurrentStatusOverlay | null,
+): CustomerJobStatusSummary[] {
+  if (!overlay) return [...jobs];
+  return jobs.map((job) => ({
+    ...job,
+    statusLabel: alignCustomerFacingJobStatusLabel(job.statusLabel, overlay.statusLabel),
+  }));
+}
 
 function normalizeVisionSummaryForRecord(
   sections: readonly DraftIntakeSummarySection[],
@@ -254,7 +326,6 @@ export function resolveCampaignDetailsView(
     campaignName: resolveCampaignDisplayName(campaign),
     statusLabel: boardView.statusLabel,
     status: campaign.campaignStatus,
-    estimatedCompletion: campaign.estimatedCompletion,
     createdDate: formatCreatedDate(campaign.createdAt),
     campaignType: resolveCampaignPlanLabel(campaign),
     visionSummary,
@@ -268,6 +339,20 @@ export function resolveCampaignDetailsView(
     packageIncludes: resolveCampaignPlanIncludes(campaign),
     studioUpdates: resolveCampaignStudioNotes(campaign),
     deliverables: resolveDeliverables(campaign.campaignStatus, options?.finalDelivery, overlay),
-    timeline: resolveCampaignTimeline(campaign),
+    timeline: resolveCampaignTimeline(campaign).map((entry) =>
+      entry.label === "Current status" ? { ...entry, date: boardView.statusLabel } : entry,
+    ),
+    progressSteps: resolveCampaignProgressSteps(campaign, {
+      jobs: options?.jobs,
+      movedToProduction,
+      blockingRequiredCount: campaign.materialsSummary?.blockingRequiredCount ?? 0,
+    }),
+    statusJobs: alignRecordJobStatusWithOverlay(
+      options?.jobs?.length
+        ? options.jobs
+        : fallbackRecordStatusJobs(campaign, boardView.statusLabel),
+      overlay,
+    ),
+    estimatedCompletion: resolveRecordEstimatedCompletion(campaign, overlay),
   };
 }

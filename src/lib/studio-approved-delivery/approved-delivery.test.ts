@@ -272,6 +272,31 @@ describe("PRODUCTION-ASSURANCE-APPROVED-DELIVERED-BINDING-1", () => {
     expect(decision.blockCodes).toContain("artifact_mismatch");
   });
 
+  it("raw pin hex matches sha256-prefixed CDF hashes", () => {
+    const HEX = "375ff88238f300b4ad63f6934a8ac9d3636a12fb11d3fd5e4a11298630c02d90";
+    const job = baseJob({
+      spineStatus: "approved",
+      ownerApprovalPending: null,
+      internalQaReviewAuthorization: qaAuth({
+        contentSha256s: [HEX],
+      }),
+      customerApprovedArtifactAuthorization: approvalPin(baseJob(), {
+        contentSha256s: [HEX],
+      }),
+      clientDeliveryFiles: [
+        cdf({
+          contentSha256: `sha256:${HEX}`,
+          releaseStatus: "pending_release",
+        }),
+      ],
+    });
+    const decision = evaluateApprovalMatchForRelease({ job });
+    expect(isEligibleForDelivery(decision)).toBe(true);
+    expect(
+      canSystemAuthorizeFinalDelivery(job, ["Post concepts"], NO_MATERIAL_HOLDS).allowed,
+    ).toBe(true);
+  });
+
   it("wrong hash → blocked", () => {
     const job = baseJob({
       spineStatus: "ready_for_delivery",

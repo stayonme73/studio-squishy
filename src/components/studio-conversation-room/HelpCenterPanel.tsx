@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import styles from "@/components/studio-conversation-room/help-center-panel.module.css";
+import { helpCenterHref } from "@/config/help-center";
 
 export type HelpCenterPanelProps = {
   open?: boolean;
@@ -36,7 +37,7 @@ export default function HelpCenterPanel({
           Policies, FAQ, and the Quick Policy Guide are in the full Help Center.
         </p>
         <div className={styles.actions}>
-          <Link href="/help-center" className={styles.primary}>
+          <Link href={helpCenterHref(undefined, "conversation-room")} className={styles.primary}>
             Open Help Center
           </Link>
           {onClose ? (

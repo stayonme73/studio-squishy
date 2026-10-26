@@ -15,6 +15,7 @@ import type { CampaignMaterialItem } from "@/lib/materials/types";
 import {
   DESIGN_RENDERER_SOCIAL_POSTS_SKU,
   SOCIAL_POSTS_RENDERER_VERSION,
+  reasonSocialPostCaptionsDeterministic,
   reasonSocialPostsSetDeterministic,
   runSocialPostsJobPipeline,
 } from "@/lib/studio-design-renderer";
@@ -23,9 +24,16 @@ import type {
   SocialPostsSetIdentity,
   SocialPostsSetSpec,
 } from "@/lib/studio-design-renderer";
+import { refineLaunchDesignSpecCreative } from "@/lib/studio-production-team-workforce";
 
 import { customerArtifactRootRel } from "./map-flyer-job-truth";
 import { mapSocialPostsProjectTruthFromJob } from "./map-social-job-truth";
+import { mapSocialPromoOfferLedSocialTruth } from "./map-social-promo-offer-led-truth";
+import { mapSocialPromoThemeLedSocialTruth } from "./map-social-promo-theme-led-truth";
+import {
+  isSocialPromoCompositeBranchJob,
+  themeLedSetFingerprint,
+} from "./social-promo-composite-dispatch";
 import {
   SOCIAL_POSTS_DISPATCH_HOOK_PACKAGE_ID,
   acquireSocialPostsRenderLockWithBriefWait,
@@ -37,6 +45,7 @@ import {
   type SocialPostsDispatchHookReceipt,
 } from "./social-posts-hook-idempotency";
 import type { JobDispatchRecord } from "./types";
+import { disposableSocialPromoCertBlocksBillableProviders } from "@/lib/studio-payment/disposable-social-promo-cert-isolation";
 
 export { SOCIAL_POSTS_DISPATCH_HOOK_PACKAGE_ID };
 
@@ -144,6 +153,17 @@ function alreadyRenderedResult(input: {
  * Invoke the proven social-posts renderer for one ready dispatch record.
  * Same fingerprint → ALREADY_RENDERED (no new vN).
  */
+
+function mapSocialBranch(
+  jobId: string,
+  mapInput: Parameters<typeof mapSocialPostsProjectTruthFromJob>[0],
+) {
+  if (!isSocialPromoCompositeBranchJob(jobId)) return mapSocialPostsProjectTruthFromJob(mapInput);
+  const offer = mapSocialPromoOfferLedSocialTruth(mapInput);
+  if (offer.ok || offer.code !== "THEME_LED_PATH") return offer;
+  return mapSocialPromoThemeLedSocialTruth(mapInput);
+}
+
 export async function invokeSocialPostsDispatchHook(input: {
   repoRoot: string;
   campaign: CampaignRecord;
@@ -193,13 +213,14 @@ export async function invokeSocialPostsDispatchHook(input: {
     };
   }
 
-  const mapped = mapSocialPostsProjectTruthFromJob({
+  const mapInput = {
     repoRoot: input.repoRoot,
     campaign: input.campaign,
     dispatchRecord: record,
     materials: input.materials,
     stagedLogoRelativePath: input.stagedLogoRelativePath,
-  });
+  };
+  const mapped = mapSocialBranch(record.jobId, mapInput);
   if (!mapped.ok) {
     return {
       ok: false,
@@ -218,7 +239,15 @@ export async function invokeSocialPostsDispatchHook(input: {
 
   let designSpec: SocialPostsSetSpec;
   try {
-    designSpec = reasonSocialPostsSetDeterministic(mapped.truth);
+    const seed = reasonSocialPostsSetDeterministic(mapped.truth);
+    designSpec = await refineLaunchDesignSpecCreative({
+      skuId: record.skuId,
+      seed,
+      authorizedFacts: mapped.truth,
+      forbidBillableProviders: disposableSocialPromoCertBlocksBillableProviders(
+        input.campaign,
+      ),
+    });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return {
@@ -235,12 +264,22 @@ export async function invokeSocialPostsDispatchHook(input: {
     };
   }
 
-  const tuple = buildSocialPostsIdempotencyTuple({
+  const builtTuple = buildSocialPostsIdempotencyTuple({
     dispatchId: record.dispatchId,
     jobId: record.jobId,
     skuId: record.skuId,
     spec: designSpec,
   });
+  const tuple =
+    mapped.truth.contentMode === "theme_led"
+      ? {
+          ...builtTuple,
+          sharedSpecFingerprint: themeLedSetFingerprint(builtTuple.sharedSpecFingerprint, [
+            ...designSpec.assets,
+            ...reasonSocialPostCaptionsDeterministic(mapped.truth, designSpec.assets),
+          ]),
+        }
+      : builtTuple;
   const idempotencyKey = buildSocialPostsIdempotencyKey(tuple);
 
   const lookup = () =>

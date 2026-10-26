@@ -4,6 +4,9 @@ import { customerVisibleFileFormatLabel } from "@/config/deliverables";
 import { feedbackStudio } from "@/config/feedback-studio";
 import type { VersionCompareProof } from "@/lib/job-control/version-compare";
 import { resolveVersionCompareSelection } from "@/lib/job-control/version-compare";
+import { isCopyReviewProofFile } from "@/lib/studio-copy-review-bind/customer-facing";
+
+import ReviewCopyReading from "./ReviewCopyReading";
 
 type Props = {
   proofFiles: readonly VersionCompareProof[];
@@ -59,11 +62,23 @@ function ProofPane({
       </header>
       <div className="fs-version-compare__body">
             {proof.accessHref ? (
-              <img
-                src={proof.accessHref}
-                alt={proof.versionLabel}
-                className="fs-review-proof__image"
-              />
+              isCopyReviewProofFile(proof.fileType, proof.filename) ? (
+                <ReviewCopyReading url={proof.accessHref} title={proof.versionLabel} />
+              ) : proof.fileType.startsWith("video/") || /\.mp4$/i.test(proof.filename) ? (
+                <video
+                  controls
+                  playsInline
+                  preload="metadata"
+                  src={proof.accessHref}
+                  className="fs-review-proof__video"
+                />
+              ) : (
+                <img
+                  src={proof.accessHref}
+                  alt={proof.versionLabel}
+                  className="fs-review-proof__image"
+                />
+              )
             ) : null}
             <p className="fs-version-compare__filename">
           {proof.accessHref ? (
@@ -107,7 +122,8 @@ export default function JobReviewVersionCompare({
   return (
     <div className="fs-version-compare" aria-label={copy.title}>
       <p className="fs-version-compare__title">{copy.title}</p>
-      <p className="fs-version-compare__lead">{copy.lead}</p>
+      <p className="fs-version-compare__lead fs-version-compare__lead--desktop">{copy.lead}</p>
+      <p className="fs-version-compare__lead fs-version-compare__lead--phone">{copy.phoneLead}</p>
       <div className="fs-version-compare__panes">
         <ProofPane
           roleLabel={copy.priorLabel}

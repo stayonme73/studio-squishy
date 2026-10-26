@@ -9,6 +9,8 @@ import {
 } from "@/catalog/compat";
 import type { RouteMapIntakeTemplateId } from "@/catalog/intake/types";
 import type { BillingType, StudioServiceEntry } from "@/catalog/types";
+import { isInternalSellNowSku } from "@/config/studio-internal-sell-now-register-v1";
+import { LAUNCH_MENU_HONEST_TIMING_LABEL } from "@/config/studio-menu-readiness-and-demand-freeze-v1";
 
 function formatUsd(cents: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -43,6 +45,9 @@ export function getCheckoutPriceDisplay(service: StudioServiceEntry): string {
  * Prefers routeMapTurnaroundLabel when seeded; preserves monthly cycle precedence for Discovery SKUs.
  */
 export function getCheckoutTimingLabel(service: StudioServiceEntry): string {
+  if (isInternalSellNowSku(service.id)) {
+    return LAUNCH_MENU_HONEST_TIMING_LABEL;
+  }
   if (service.routeMapTurnaroundLabel) {
     return service.routeMapTurnaroundLabel;
   }
@@ -72,6 +77,9 @@ export function getRouteMapPriceDisplay(service: StudioServiceEntry): string {
 
 /** Customer-facing Route Map turnaround / timing copy. */
 export function getRouteMapTurnaroundLabel(service: StudioServiceEntry): string {
+  if (isInternalSellNowSku(service.id)) {
+    return LAUNCH_MENU_HONEST_TIMING_LABEL;
+  }
   if (service.routeMapTurnaroundLabel) {
     return service.routeMapTurnaroundLabel;
   }

@@ -30,6 +30,14 @@
  * Relies on hook idempotency (ALREADY_RENDERED). Observer does not mint versions itself.
  */
 
+import {
+  LIVE_LANE_CAPACITY_SKIP_REASON,
+  admitQuickLaneProduction,
+  createLiveLaneCapacityTracker,
+  liveLaneForDispatchRecord,
+  releaseQuickLaneReservation,
+  type ProductionLaneView,
+} from "@/lib/job-control";
 import { existsSync } from "fs";
 import path from "path";
 
@@ -49,6 +57,10 @@ import {
   DESIGN_RENDERER_SM_001_SKU,
   DESIGN_RENDERER_SOCIAL_POSTS_SKU,
 } from "@/lib/studio-design-renderer";
+import {
+  isFlyerProductionIntakeReady,
+  missingFlyerConversionRoute,
+} from "@/lib/project-intake-flyer-production";
 import { readMaterialsEnvelope } from "@/lib/materials/store";
 
 import { invokeBf001DispatchHook } from "./bf-001-dispatch-hook";
@@ -64,7 +76,16 @@ import { invokeServiceSheetDispatchHook } from "./service-sheet-dispatch-hook";
 import { invokeSm001DispatchHook } from "./sm-001-dispatch-hook";
 import { invokeSm001MonthlyDispatchHook } from "./sm-001-monthly-dispatch-hook";
 import { invokeSocialPostsDispatchHook } from "./social-posts-dispatch-hook";
+import {
+  isSocialPromoCompositeBranchJob,
+  SOCIAL_PROMO_COMPOSITE_RENDER_HOLD,
+} from "./social-promo-composite-dispatch";
 import type { DispatchExecutionRecord, JobDispatchRecord } from "./types";
+import { isProductionFrozen } from "@/lib/studio-production-team-workforce/freeze-maya";
+import {
+  disposableSpCertDesignRendererSkuGate,
+  resolveDesignRendererPreferAnthropic,
+} from "@/lib/studio-payment/disposable-test-isolation-guards";
 
 export const DESIGN_DISPATCH_OBSERVER_PACKAGE_ID =
   "STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1" as const;
@@ -104,6 +125,11 @@ export type DesignRendererObserverResult = {
   pdfRelativePath?: string;
   backPngContentSha256?: string;
   receiptRelativePath?: string;
+  internalLoop?: import("@/lib/studio-production-correction").InternalProductionLoopRecord;
+  generalDesignLoop?: import("@/config/studio-general-design-runtime-v1").GeneralDesignInternalLoopRecord;
+  /** Machine-selected production method (flyer lane). */
+  productionMethodId?: string;
+  productionMethodWhy?: string;
   ownerRoutineProduction: "NONE";
   canvaRequired: false;
   makeRequired: false;
@@ -139,8 +165,10 @@ function resolveStagedLogoRelativePath(
   repoRoot: string,
   campaignId: string,
 ): string | undefined {
-  const candidate = `data/campaign-design-artifacts/${campaignId}/materials/logo.svg`;
-  if (existsSync(path.join(repoRoot, candidate))) return candidate;
+  for (const name of ["logo.png", "logo.jpg", "logo.jpeg", "logo.svg"] as const) {
+    const candidate = `data/campaign-design-artifacts/${campaignId}/materials/${name}`;
+    if (existsSync(path.join(repoRoot, candidate))) return candidate;
+  }
   return undefined;
 }
 
@@ -151,7 +179,11 @@ function resolveStagedLogoRelativePath(
  */
 export function shouldObserveDesignRenderer(
   record: JobDispatchRecord,
+  campaign?: Pick<CampaignRecord, "socialPromoRenderRelease">,
 ): { invoke: true } | { invoke: false; reason: string } {
+  if (isSocialPromoCompositeBranchJob(record.jobId) && !campaign?.socialPromoRenderRelease) {
+    return { invoke: false, reason: SOCIAL_PROMO_COMPOSITE_RENDER_HOLD };
+  }
   if (!OBSERVED_RENDERER_SKUS.has(record.skuId)) {
     return { invoke: false, reason: "sku_not_design_renderer_lane" };
   }
@@ -175,6 +207,9 @@ export async function runDesignRendererDispatchObserver(input: {
   campaign: CampaignRecord;
   dispatch: DispatchExecutionRecord;
   repoRoot?: string;
+  laneViews?: readonly ProductionLaneView[];
+  /** Tests opt in. Machine (non-test) always reserves Quick slots here. */
+  enforceQuickAdmission?: boolean;
 }): Promise<DesignRendererObserverPass> {
   const repoRoot = input.repoRoot ?? process.cwd();
   const observedAt = new Date().toISOString();
@@ -184,26 +219,77 @@ export async function runDesignRendererDispatchObserver(input: {
     repoRoot,
     input.campaign.campaignId,
   );
+  const tracker = input.laneViews
+    ? createLiveLaneCapacityTracker(input.laneViews)
+    : null;
+  const enforceQuickAdmission =
+    input.enforceQuickAdmission ?? process.env.NODE_ENV !== "test";
+  const quickEvidenceJobIds =
+    input.laneViews?.find((view) => view.lane === "quick")?.activeJobs.map((job) => job.jobId) ??
+    [];
 
   const results: DesignRendererObserverResult[] = [];
 
   for (const record of input.dispatch.records) {
-    const gate = shouldObserveDesignRenderer(record);
+    const gate = shouldObserveDesignRenderer(record, input.campaign);
     if (!gate.invoke) {
       if (OBSERVED_RENDERER_SKUS.has(record.skuId)) {
         results.push(skip(record, gate.reason));
       }
       continue;
     }
+    const certSkuGate = disposableSpCertDesignRendererSkuGate(input.campaign, record.skuId);
+    if (!certSkuGate.allowed) {
+      results.push(skip(record, certSkuGate.skipReason));
+      continue;
+    }
+    const laneJob = liveLaneForDispatchRecord(record);
+    let quickHeldJobId: string | null = null;
+    if (tracker && !tracker.allows(laneJob)) {
+      results.push(skip(record, LIVE_LANE_CAPACITY_SKIP_REASON));
+      continue;
+    }
+    const lane = laneJob.returnLane ?? laneJob.productionLane;
+    if (enforceQuickAdmission && lane === "quick") {
+      const admitted = admitQuickLaneProduction({
+        repoRoot,
+        jobId: laneJob.jobId,
+        campaignId: input.campaign.campaignId,
+        evidenceJobIds: quickEvidenceJobIds,
+        capacity: input.laneViews?.find((view) => view.lane === "quick")?.capacity,
+      });
+      if (!admitted.ok) {
+        results.push(skip(record, LIVE_LANE_CAPACITY_SKIP_REASON));
+        continue;
+      }
+      quickHeldJobId = laneJob.jobId;
+    }
+    if (tracker) tracker.occupy(laneJob);
 
     if (record.skuId === DESIGN_RENDERER_PROOF_SKU) {
+      if (!isFlyerProductionIntakeReady(input.campaign)) {
+        if (quickHeldJobId) releaseQuickLaneReservation({ repoRoot, jobId: quickHeldJobId });
+        results.push(skip(record, "flyer_intake_production_fields_missing"));
+        continue;
+      }
+      // Promotional work with no way to respond is not produced. The Studio asks
+      // for the missing action route instead of inventing one or shipping a dead end.
+      if (missingFlyerConversionRoute(input.campaign)) {
+        if (quickHeldJobId) releaseQuickLaneReservation({ repoRoot, jobId: quickHeldJobId });
+        results.push(skip(record, "flyer_conversion_route_missing"));
+        continue;
+      }
       const hooked = await invokeDesignRendererDispatchHook({
         repoRoot,
         campaign: input.campaign,
         dispatchRecord: record,
         materials,
         stagedLogoRelativePath,
-        preferAnthropic: false,
+        preferAnthropic: resolveDesignRendererPreferAnthropic(
+          input.campaign,
+          !isProductionFrozen(input.campaign, record.skuId) &&
+            Boolean(process.env.ANTHROPIC_API_KEY),
+        ),
       });
 
       if (hooked.ok) {
@@ -219,6 +305,9 @@ export async function runDesignRendererDispatchObserver(input: {
           pdfContentSha256: hooked.identity.pdfContentSha256,
           pdfRelativePath: hooked.identity.pdfRelativePath,
           receiptRelativePath: hooked.receiptRelativePath,
+          internalLoop: hooked.internalLoop,
+          productionMethodId: hooked.productionMethodId,
+          productionMethodWhy: hooked.productionMethodWhy,
           ownerRoutineProduction: "NONE",
           canvaRequired: false,
           makeRequired: false,
@@ -231,6 +320,14 @@ export async function runDesignRendererDispatchObserver(input: {
           ok: false,
           failureCode: hooked.failureCode,
           message: hooked.message,
+          renderVersion: hooked.identity?.renderVersion,
+          pngContentSha256: hooked.identity?.pngContentSha256,
+          pngRelativePath: hooked.identity?.pngRelativePath,
+          pdfContentSha256: hooked.identity?.pdfContentSha256,
+          pdfRelativePath: hooked.identity?.pdfRelativePath,
+          internalLoop: hooked.internalLoop,
+          productionMethodId: hooked.productionMethodId,
+          productionMethodWhy: hooked.productionMethodWhy,
           ownerRoutineProduction: "NONE",
           canvaRequired: false,
           makeRequired: false,
@@ -380,6 +477,7 @@ export async function runDesignRendererDispatchObserver(input: {
           pngContentSha256: assetA?.pngContentSha256,
           backPngContentSha256: assetB?.pngContentSha256,
           receiptRelativePath: hooked.receiptRelativePath,
+          generalDesignLoop: hooked.generalDesignLoop,
           ownerRoutineProduction: "NONE",
           canvaRequired: false,
           makeRequired: false,
@@ -392,6 +490,7 @@ export async function runDesignRendererDispatchObserver(input: {
           ok: false,
           failureCode: hooked.failureCode,
           message: hooked.message,
+          generalDesignLoop: hooked.generalDesignLoop,
           ownerRoutineProduction: "NONE",
           canvaRequired: false,
           makeRequired: false,

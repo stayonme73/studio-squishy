@@ -4,19 +4,26 @@ import { studioPaymentV1 } from "@/config/studio-payment-v1";
 import { buildPreAcceptancePaymentAuthorization } from "@/lib/studio-pre-acceptance/authorization-binding";
 import { evaluatePreAcceptance } from "@/lib/studio-pre-acceptance/evaluate";
 import type { PreAcceptanceProjectFacts } from "@/lib/studio-pre-acceptance/types";
-import { readCampaignEnvelope } from "@/lib/campaign-store/store";
+import { readCampaignEnvelope, upsertCampaignRecord } from "@/lib/campaign-store/store";
 
 import { confirmPaymentFromProcessor } from "./confirm";
+import { sealDisposableKitStripeTestProof } from "./disposable-kit-test-isolation";
 import {
   assertStripeSafeForTests,
   readStripeSecretKey,
   readStripeWebhookSecret,
 } from "./env";
 import { readCheckoutSessionBinding } from "./events-store";
+import { reconcileStripeRefundEvent, type RefundReconcileResult } from "./refund-execution-run";
 import type { PaymentConfirmationResult } from "./types";
 
 export type WebhookHandleResult =
-  | { ok: true; ignored?: boolean; result?: PaymentConfirmationResult }
+  | {
+      ok: true;
+      ignored?: boolean;
+      result?: PaymentConfirmationResult;
+      refund?: RefundReconcileResult;
+    }
   | { ok: false; status: number; error: string; message: string };
 
 function metadataString(
@@ -69,6 +76,7 @@ export async function handleStripeWebhook(
   options?: {
     stripe?: Stripe;
     env?: NodeJS.ProcessEnv;
+    reconcileRefund?: (refund: Stripe.Refund) => Promise<RefundReconcileResult>;
   },
 ): Promise<WebhookHandleResult> {
   const env = options?.env ?? process.env;
@@ -105,6 +113,17 @@ export async function handleStripeWebhook(
       error: "invalid_signature",
       message: "Stripe webhook signature verification failed.",
     };
+  }
+
+  if (
+    event.type === "refund.created" ||
+    event.type === "refund.updated" ||
+    event.type === "refund.failed"
+  ) {
+    const refund = await (options?.reconcileRefund ?? reconcileStripeRefundEvent)(
+      event.data.object as Stripe.Refund,
+    );
+    return { ok: true, ignored: !refund.applied, refund };
   }
 
   if (event.type !== "checkout.session.completed") {
@@ -166,6 +185,22 @@ export async function handleStripeWebhook(
     draftRevision,
     selectedServiceIds,
   );
+
+  if (session.livemode === false) {
+    const proofEnvelope = await readCampaignEnvelope(campaignId);
+    if (proofEnvelope) {
+      const sealed = sealDisposableKitStripeTestProof({
+        campaign: proofEnvelope.record,
+        checkoutSessionId: session.id,
+        source: "stripe_webhook",
+        livemode: false,
+        paymentStatus: "paid",
+      });
+      if (sealed) {
+        await upsertCampaignRecord(sealed, proofEnvelope.clientUserId);
+      }
+    }
+  }
 
   const result = await confirmPaymentFromProcessor({
     campaignId,

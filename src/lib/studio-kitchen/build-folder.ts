@@ -17,8 +17,8 @@ import { isOpenExceptionStatus } from "@/lib/campaign-tasks/exceptions";
 import {
   resolveLatestHandoffForTask,
   resolveQaSummaryForTask,
-} from "@/lib/campaign-tasks/file-room-controls";
-import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
+} from "@/lib/campaign-tasks/task-record-summary";
+import type { ServerTasksEnvelope, TaskEffectiveStatus } from "@/lib/campaign-tasks/types";
 import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import { isBlockingMaterialItem } from "@/lib/materials/materials-view";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
@@ -34,6 +34,19 @@ import type {
 } from "./types";
 
 const unavailable = studioKitchenFoundation.page.unavailableLabel;
+
+function isRecordedEffectiveStatus(value: unknown): value is TaskEffectiveStatus {
+  return (
+    typeof value === "string" &&
+    Object.prototype.hasOwnProperty.call(campaignTasksConfig.effectiveStatusLabels, value)
+  );
+}
+
+/** Read a recorded effective status. Absent or unknown stays the unavailable fallback. */
+function recordedEffectiveStatus(task: object): TaskEffectiveStatus | null {
+  if (!("effectiveStatus" in task)) return null;
+  return isRecordedEffectiveStatus(task.effectiveStatus) ? task.effectiveStatus : null;
+}
 
 function fileRoomHref(campaignId: string): string {
   return `/file-room/${encodeURIComponent(campaignId)}`;
@@ -146,12 +159,13 @@ export function buildKitchenProductionFolderFromLive(input: {
           task.id,
         );
         const role = task.assignedRole ?? task.responsibleRole ?? null;
+        const effectiveStatus = recordedEffectiveStatus(task);
         return {
           id: task.id,
           title: task.title,
-          effectiveStatus: task.effectiveStatus ?? null,
-          effectiveStatusLabel: task.effectiveStatus
-            ? effectiveStatusLabel(task.effectiveStatus)
+          effectiveStatus,
+          effectiveStatusLabel: effectiveStatus
+            ? effectiveStatusLabel(effectiveStatus)
             : unavailable,
           workflowState: task.workflowState ?? null,
           responsibleRole: role,
@@ -169,7 +183,9 @@ export function buildKitchenProductionFolderFromLive(input: {
   const openExceptionCount = exceptions.filter((record) =>
     isOpenExceptionStatus(record.status),
   ).length;
-  const blockingMaterialCount = input.materials.filter(isBlockingMaterialItem).length;
+  const blockingMaterialCount = input.materials.filter((item) =>
+    isBlockingMaterialItem(item, campaign.campaignId),
+  ).length;
   const pendingOutboxCount = communications.filter(
     (record) => record.deliveryStatus === "pending_owner_send",
   ).length;

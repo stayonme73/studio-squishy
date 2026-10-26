@@ -4,6 +4,8 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import MaterialsUpdateBranch from "@/components/campaign-details/MaterialsUpdateBranch";
 import SquishyStatusPanel from "@/components/squishy/SquishyStatusPanel";
+import HelpCenterLink from "@/components/shared/HelpCenterLink";
+import { helpCenter } from "@/config/help-center";
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
 import {
   isDirectApplyTargetKey,
@@ -488,7 +490,7 @@ export default function ProjectRecordSquishy({
             rows={2}
             placeholder={studioBoard.campaignDetails.squishy.placeholder}
           />
-          <button type="submit" className="utility-btn utility-btn--secondary" disabled={!input.trim()}>
+          <button type="submit" className="utility-btn utility-btn--primary cd-squishy__ask" disabled={!input.trim()}>
             {studioBoard.campaignDetails.squishy.askLabel}
           </button>
         </form>
@@ -606,6 +608,9 @@ export default function ProjectRecordSquishy({
           {error}
         </p>
       ) : null}
+
+      <p className="cd-updates__help">{studioBoard.campaignDetails.footerHint}</p>
+      <HelpCenterLink label={helpCenter.campaignLinks.pageFooter[0].label} from="campaign-details" />
     </section>
   );
 }

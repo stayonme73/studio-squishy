@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import ClientAccessGlass from "@/components/auth/ClientAccessGlass";
 import {
   resolveAccessDeniedCopy,
   type AccessControlDeniedRoomId,
@@ -50,8 +51,13 @@ export default function AccessControlDeniedPanel({
     return card;
   }
 
+  const customer = room === "customer";
+
   return (
-    <div className="utility-page utility-page--access">
+    <div
+      className={`utility-page utility-page--access${customer ? " utility-page--client-access" : ""}`}
+    >
+      {customer ? <ClientAccessGlass /> : null}
       <div className="utility-access-card-shell">{card}</div>
     </div>
   );

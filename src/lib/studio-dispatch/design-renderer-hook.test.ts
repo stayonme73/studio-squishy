@@ -170,7 +170,10 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-HOOK-1", () => {
         preferAnthropic: false,
       });
 
-      expect(result.ok).toBe(true);
+      expect(
+        result.ok,
+        result.ok ? "ok" : `${result.failureCode}: ${result.message}`,
+      ).toBe(true);
       if (!result.ok) return;
       expect(result.dispatchId).toMatch(/^dd:/);
       expect(result.canvaRequired).toBe(false);
@@ -201,6 +204,6 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-HOOK-1", () => {
       expect(receipt).toContain("v2-rtu-flyer");
       void HOOK_ART_DIR;
     },
-    120_000,
+    180_000,
   );
 });

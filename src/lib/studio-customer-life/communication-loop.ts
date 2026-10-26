@@ -5,18 +5,39 @@ import {
   studioVoiceMachineCustomerCommunicationV1 as comm,
   type CustomerCommunicationAskState,
 } from "@/config/studio-voice-machine-customer-communication-v1";
+import type { StudioUser } from "@/lib/campaign-store/types";
 import { readCampaignEnvelope } from "@/lib/campaign-store/store";
-import { readTasksEnvelope } from "@/lib/campaign-tasks/store";
+import { getOrGenerateTasks, readTasksEnvelope } from "@/lib/campaign-tasks/store";
 import { readMaterialsEnvelope } from "@/lib/materials/store";
+import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
+import {
+  pgReadCustomerLifeEnvelope,
+  pgWriteCustomerLifeEnvelope,
+} from "@/lib/studio-durable-persistence/postgres-comms";
+import { pgAtomicPersistCustomerLifeAskAndOwnerJudgmentTask } from "@/lib/studio-durable-persistence/postgres-comms-life-atomic";
+import {
+  buildOwnerJudgmentTaskIdempotencyKey,
+  findAskByCommMessageId,
+  ownerJudgmentTaskMessage,
+  reconcilePendingOwnerJudgmentTaskSyncs,
+  syncOwnerJudgmentTaskForAsk,
+  withOwnerJudgmentTaskSyncFields,
+} from "@/lib/studio-customer-life/owner-judgment-task-sync";
 import type { ProjectCommunicationMessage } from "@/lib/project-communication/types";
 
 import { answerCustomerLifeQuestion, classifyCustomerLifeQuestion } from "./answer-question";
 import { assembleCustomerLifeTruth } from "./assemble-truth";
 import type {
+  CustomerLifeAccountContext,
   CustomerLifeAnswer,
   CustomerLifeAskResult,
+  CustomerLifeQuestionIntent,
   CustomerLifeTruth,
 } from "./types";
+
+function isOwnerJudgmentIntent(intent: CustomerLifeQuestionIntent): boolean {
+  return intent === "complaint" || intent === "refund" || intent === "dissatisfaction";
+}
 
 const LIFE_DIR = path.join(process.cwd(), "data", "campaign-customer-life");
 
@@ -29,6 +50,9 @@ export type CustomerLifeReceipt = {
   commMessageId?: string;
   askState: CustomerCommunicationAskState;
   source: "machine_record" | "none";
+  /** Stable idempotency for owner-judgment complaint task sync (Postgres recovery). */
+  ownerJudgmentTaskIdempotencyKey?: string;
+  ownerJudgmentTaskSyncState?: "pending" | "synced" | "not_required";
 };
 
 export type CustomerLifeMayaResponse = {
@@ -111,40 +135,55 @@ export function resolveStudioCustomerRequests(
     }));
 }
 
+function normalizeCustomerLifeEnvelope(
+  campaignId: string,
+  parsed: Partial<CustomerLifeEnvelope> & {
+    asks?: Array<Partial<CustomerLifeReceipt>>;
+  },
+): CustomerLifeEnvelope {
+  return {
+    campaignId: parsed.campaignId ?? campaignId,
+    updatedAt: parsed.updatedAt ?? new Date().toISOString(),
+    asks: (parsed.asks ?? []).map((ask) => ({
+      askedAt: ask.askedAt ?? new Date().toISOString(),
+      question: ask.question ?? "",
+      intent: ask.intent ?? "unknown",
+      answer: ask.answer ?? "",
+      known: Boolean(ask.known),
+      commMessageId: ask.commMessageId,
+      askState: ask.askState ?? (ask.known ? "answered" : "waiting_for_studio"),
+      source: ask.source ?? "machine_record",
+      ownerJudgmentTaskIdempotencyKey: ask.ownerJudgmentTaskIdempotencyKey,
+      ownerJudgmentTaskSyncState: ask.ownerJudgmentTaskSyncState,
+    })),
+    mayaResponses: parsed.mayaResponses ?? [],
+  };
+}
+
 export async function readCustomerLifeEnvelope(
   campaignId: string,
 ): Promise<CustomerLifeEnvelope> {
+  if (isPostgresPersistenceEnabled()) {
+    const stored = await pgReadCustomerLifeEnvelope(campaignId);
+    if (stored) return normalizeCustomerLifeEnvelope(campaignId, stored);
+    return normalizeCustomerLifeEnvelope(campaignId, { campaignId, asks: [], mayaResponses: [] });
+  }
   try {
     const raw = await fs.readFile(path.join(LIFE_DIR, `${campaignId}.json`), "utf8");
     const parsed = JSON.parse(raw) as Partial<CustomerLifeEnvelope> & {
       asks?: Array<Partial<CustomerLifeReceipt>>;
     };
-    return {
-      campaignId: parsed.campaignId ?? campaignId,
-      updatedAt: parsed.updatedAt ?? new Date().toISOString(),
-      asks: (parsed.asks ?? []).map((ask) => ({
-        askedAt: ask.askedAt ?? new Date().toISOString(),
-        question: ask.question ?? "",
-        intent: ask.intent ?? "unknown",
-        answer: ask.answer ?? "",
-        known: Boolean(ask.known),
-        commMessageId: ask.commMessageId,
-        askState: ask.askState ?? (ask.known ? "answered" : "waiting_for_studio"),
-        source: ask.source ?? "machine_record",
-      })),
-      mayaResponses: parsed.mayaResponses ?? [],
-    };
+    return normalizeCustomerLifeEnvelope(campaignId, parsed);
   } catch {
-    return {
-      campaignId,
-      updatedAt: new Date().toISOString(),
-      asks: [],
-      mayaResponses: [],
-    };
+    return normalizeCustomerLifeEnvelope(campaignId, { campaignId, asks: [], mayaResponses: [] });
   }
 }
 
 async function writeCustomerLifeEnvelope(envelope: CustomerLifeEnvelope): Promise<void> {
+  if (isPostgresPersistenceEnabled()) {
+    await pgWriteCustomerLifeEnvelope(envelope);
+    return;
+  }
   await fs.mkdir(LIFE_DIR, { recursive: true });
   await fs.writeFile(
     path.join(LIFE_DIR, `${envelope.campaignId}.json`),
@@ -176,9 +215,14 @@ export async function askCustomerLifeFromStore(input: {
   question: string;
   campaignOverride?: import("@/config/studio-board").CampaignRecord | null;
   commMessageId?: string;
+  user?: StudioUser | null;
+  account?: CustomerLifeAccountContext;
 }): Promise<CustomerLifeAskResult> {
   const facts = await loadFacts(input);
-  const answer = answerCustomerLifeQuestion(input.question, facts);
+  const answer = answerCustomerLifeQuestion(input.question, {
+    ...facts,
+    account: input.account ?? { signedIn: Boolean(input.user) },
+  });
   const truth = assembleCustomerLifeTruth(facts);
   const askedAt = new Date().toISOString();
   const askState = resolveCustomerAskState({
@@ -187,19 +231,121 @@ export async function askCustomerLifeFromStore(input: {
   });
 
   if (facts.campaignId) {
-    const envelope = await readCustomerLifeEnvelope(facts.campaignId);
-    envelope.asks.push({
-      askedAt,
-      question: input.question,
-      intent: answer.intent,
-      answer: answer.text,
-      known: answer.known,
-      commMessageId: input.commMessageId,
-      askState,
-      source: answer.source,
+    await reconcilePendingOwnerJudgmentTaskSyncs({
+      campaignId: facts.campaignId,
+      campaign: facts.campaign,
+      user: input.user,
+      readLife: () => readCustomerLifeEnvelope(facts.campaignId!),
+      writeLife: writeCustomerLifeEnvelope,
     });
-    envelope.updatedAt = askedAt;
-    await writeCustomerLifeEnvelope(envelope);
+
+    const existingAsk =
+      input.commMessageId != null
+        ? findAskByCommMessageId(
+            await readCustomerLifeEnvelope(facts.campaignId),
+            input.commMessageId,
+          )
+        : undefined;
+    if (existingAsk) {
+      return { answer, truth };
+    }
+
+    const ownerJudgment =
+      input.user && facts.campaign && isOwnerJudgmentIntent(answer.intent);
+    const taskIdempotencyKey = ownerJudgment
+      ? buildOwnerJudgmentTaskIdempotencyKey({
+          campaignId: facts.campaignId,
+          intent: answer.intent,
+          commMessageId: input.commMessageId,
+          askedAt,
+        })
+      : undefined;
+
+    const newAsk: CustomerLifeReceipt = withOwnerJudgmentTaskSyncFields(
+      {
+        askedAt,
+        question: input.question,
+        intent: answer.intent,
+        answer: answer.text,
+        known: answer.known,
+        commMessageId: input.commMessageId,
+        askState,
+        source: answer.source,
+      },
+      {
+        idempotencyKey: taskIdempotencyKey ?? "",
+        syncState: ownerJudgment ? "pending" : "not_required",
+      },
+    );
+    if (!ownerJudgment) {
+      delete newAsk.ownerJudgmentTaskIdempotencyKey;
+      delete newAsk.ownerJudgmentTaskSyncState;
+    }
+
+    if (isPostgresPersistenceEnabled() && ownerJudgment && input.user && facts.campaign) {
+      await getOrGenerateTasks(facts.campaignId, facts.campaign);
+      const atomic = await pgAtomicPersistCustomerLifeAskAndOwnerJudgmentTask({
+        campaignId: facts.campaignId,
+        mutateLife: (current) => ({
+          ...current,
+          asks: [...current.asks, newAsk],
+          updatedAt: askedAt,
+        }),
+        ownerJudgment: {
+          user: input.user,
+          idempotencyKey: taskIdempotencyKey!,
+          message: ownerJudgmentTaskMessage(answer.intent, input.question),
+        },
+      });
+      const lifeAfterAtomic = await readCustomerLifeEnvelope(facts.campaignId);
+      lifeAfterAtomic.asks = lifeAfterAtomic.asks.map((ask) =>
+        ask.ownerJudgmentTaskIdempotencyKey === taskIdempotencyKey
+          ? withOwnerJudgmentTaskSyncFields(ask, {
+              idempotencyKey: taskIdempotencyKey!,
+              syncState: atomic.taskSynced ? "synced" : "pending",
+            })
+          : ask,
+      );
+      lifeAfterAtomic.updatedAt = new Date().toISOString();
+      await writeCustomerLifeEnvelope(lifeAfterAtomic);
+      if (!atomic.taskSynced) {
+        await reconcilePendingOwnerJudgmentTaskSyncs({
+          campaignId: facts.campaignId,
+          campaign: facts.campaign,
+          user: input.user,
+          readLife: () => readCustomerLifeEnvelope(facts.campaignId),
+          writeLife: writeCustomerLifeEnvelope,
+        });
+      }
+    } else {
+      const envelope = await readCustomerLifeEnvelope(facts.campaignId);
+      envelope.asks.push(newAsk);
+      envelope.updatedAt = askedAt;
+      await writeCustomerLifeEnvelope(envelope);
+
+      if (ownerJudgment && input.user && facts.campaign && taskIdempotencyKey) {
+        const sync = await syncOwnerJudgmentTaskForAsk({
+          campaignId: facts.campaignId,
+          campaign: facts.campaign,
+          user: input.user,
+          idempotencyKey: taskIdempotencyKey,
+          message: ownerJudgmentTaskMessage(answer.intent, input.question),
+        }).catch(() => ({ ok: false as const }));
+        if (sync.ok) {
+          const lifeAfter = await readCustomerLifeEnvelope(facts.campaignId);
+          lifeAfter.asks = lifeAfter.asks.map((ask) =>
+            ask.askedAt === askedAt && ask.question === input.question
+              ? withOwnerJudgmentTaskSyncFields(ask, {
+                  idempotencyKey: taskIdempotencyKey,
+                  syncState: "synced",
+                })
+              : ask,
+          );
+          lifeAfter.updatedAt = new Date().toISOString();
+          await writeCustomerLifeEnvelope(lifeAfter);
+        }
+      }
+    }
   }
 
   return { answer, truth };
@@ -213,6 +359,7 @@ export async function handleCustomerBoardQuestion(input: {
   campaignId: string;
   question: string;
   commMessageId: string;
+  user?: StudioUser | null;
 }): Promise<CustomerCommunicationLoopResult> {
   let lookupFailed = false;
   let result: CustomerLifeAskResult;
@@ -221,6 +368,10 @@ export async function handleCustomerBoardQuestion(input: {
       campaignId: input.campaignId,
       question: input.question,
       commMessageId: input.commMessageId,
+      user: input.user,
+      account: input.user
+        ? { signedIn: true, preferredName: input.user.displayName ?? null }
+        : undefined,
     });
   } catch {
     lookupFailed = true;
@@ -279,11 +430,7 @@ export async function handleCustomerBoardQuestion(input: {
         askState: mayaResponse.stallCleared ? "answered" : "waiting_for_customer",
       };
       envelope.updatedAt = new Date().toISOString();
-      await fs.writeFile(
-        path.join(LIFE_DIR, `${envelope.campaignId}.json`),
-        `${JSON.stringify(envelope, null, 2)}\n`,
-        "utf8",
-      );
+      await writeCustomerLifeEnvelope(envelope);
     }
   }
 

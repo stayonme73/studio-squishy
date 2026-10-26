@@ -183,6 +183,73 @@ describe("KITCHEN-FOUNDATION-1 projection", () => {
     expect(folder.assignedToLabel).toBe("Not yet recorded");
   });
 
+  it("does not treat stored status as the folder effective status", () => {
+    const tasksEnvelope = {
+      campaignId: "live-camp-1",
+      planFingerprint: "fp-status",
+      syncedAt: "2026-08-07T12:00:00.000Z",
+      tasks: [
+        {
+          id: "task-status",
+          title: "Creative production",
+          phase: "creative_production",
+          status: "in_progress",
+          relatedServiceIds: ["v2-rtu-flyer"],
+          familyId: "marketing_assets",
+          serviceName: "Flyer",
+          dependsOn: [],
+          workflowState: "in_progress",
+        },
+      ],
+      jobRecords: [],
+      handoffs: [],
+      qaRecords: [],
+      exceptionRecords: [],
+      jobCommunicationRecords: [],
+    } as unknown as ServerTasksEnvelope;
+    const folder = buildKitchenProductionFolderFromLive({
+      envelope: envelope(campaignRecord()),
+      tasksEnvelope,
+      materials: [],
+    });
+    expect(folder.tasks[0]?.effectiveStatus).toBeNull();
+    expect(folder.tasks[0]?.effectiveStatusLabel).toBe("Not yet recorded");
+  });
+
+  it("shows a recorded effective status when that field is present", () => {
+    const tasksEnvelope = {
+      campaignId: "live-camp-1",
+      planFingerprint: "fp-recorded",
+      syncedAt: "2026-08-07T12:00:00.000Z",
+      tasks: [
+        {
+          id: "task-recorded",
+          title: "Creative production",
+          phase: "creative_production",
+          status: "blocked",
+          effectiveStatus: "ready_for_qa",
+          relatedServiceIds: ["v2-rtu-flyer"],
+          familyId: "marketing_assets",
+          serviceName: "Flyer",
+          dependsOn: [],
+          workflowState: "in_progress",
+        },
+      ],
+      jobRecords: [],
+      handoffs: [],
+      qaRecords: [],
+      exceptionRecords: [],
+      jobCommunicationRecords: [],
+    } as unknown as ServerTasksEnvelope;
+    const folder = buildKitchenProductionFolderFromLive({
+      envelope: envelope(campaignRecord()),
+      tasksEnvelope,
+      materials: [],
+    });
+    expect(folder.tasks[0]?.effectiveStatus).toBe("ready_for_qa");
+    expect(folder.tasks[0]?.effectiveStatusLabel).toBe("Ready for QA");
+  });
+
   it("does not invent due dates or assignees when missing", () => {
     const tasksEnvelope = {
       campaignId: "live-camp-1",

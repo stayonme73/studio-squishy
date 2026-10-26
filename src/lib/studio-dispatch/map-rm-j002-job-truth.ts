@@ -261,13 +261,16 @@ export function mapRmJ002KitProjectTruthFromJob(input: {
   if (!logo.ok) {
     return { ok: false, code: logo.code, message: logo.message };
   }
-  const logoAbs = path.join(input.repoRoot, logo.material.relativePath);
-  if (!existsSync(logoAbs)) {
-    return {
-      ok: false,
-      code: "BROKEN_ASSET_REFERENCE",
-      message: `BROKEN_ASSET_REFERENCE: logo missing at ${logo.material.relativePath}`,
-    };
+  const suppliedLogo = logo.material;
+  if (suppliedLogo) {
+    const logoAbs = path.join(input.repoRoot, suppliedLogo.relativePath);
+    if (!existsSync(logoAbs)) {
+      return {
+        ok: false,
+        code: "BROKEN_ASSET_REFERENCE",
+        message: `BROKEN_ASSET_REFERENCE: logo missing at ${suppliedLogo.relativePath}`,
+      };
+    }
   }
 
   const truth: RmJ002KitProjectTruth = {
@@ -288,11 +291,15 @@ export function mapRmJ002KitProjectTruthFromJob(input: {
     label: `${structure.businessName} — rm-j002 ${structure.platform} kit`,
     credentialsPresent: false,
     mutationRequested: false,
-    logoMaterial: {
-      materialId: logo.material.materialId,
-      relativePath: logo.material.relativePath,
-      contentSha256: logo.material.contentSha256,
-    },
+    ...(suppliedLogo
+      ? {
+          logoMaterial: {
+            materialId: suppliedLogo.materialId,
+            relativePath: suppliedLogo.relativePath,
+            contentSha256: suppliedLogo.contentSha256,
+          },
+        }
+      : {}),
   };
 
   return { ok: true, truth, structure };

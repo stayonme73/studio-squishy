@@ -73,7 +73,10 @@ export async function requireClaimableCampaignSync(
       campaignId,
       reason: "campaign_owned_by_another_client",
     });
-    return accessDeniedResponse();
+    return NextResponse.json(
+      { error: "Access denied", code: "wrong_owner" },
+      { status: 403 },
+    );
   }
   return existing;
 }

@@ -27,6 +27,9 @@ import type {
 import { CATALOG_SCHEMA_VERSION } from "@/catalog/types";
 import { ROUTE_MAP_LAUNCH_SERVICES } from "@/catalog/route-map-launch";
 import { ROUTE_MAP_V2_ALL_SERVICES } from "@/catalog/route-map-v2-launch";
+import { STAGING_CLIP_REPURPOSING_SERVICES } from "@/catalog/staging-clip-repurposing";
+import { STAGING_INTERNAL_SERVICES } from "@/catalog/staging-short-form-video-edit";
+import { STAGING_CREATIVE_QA_FINISH_SERVICES } from "@/catalog/staging-creative-qa-finish";
 
 function withDiscoverySync(
   mapping: readonly DiscoveryMappingRule[],
@@ -131,6 +134,9 @@ const LAUNCH_STATUS_BY_ID: Readonly<Record<ServiceId, LaunchStatus>> = {
   "v2-rtu-short-video": "limited",
   "v2-rtu-business-card": "limited",
   "v2-addon-post-publish": "retired",
+  "v2-rtu-short-form-video-edit": "limited",
+  "v2-rtu-clip-repurposing": "limited",
+  "v2-creative-qa-finish": "limited",
 };
 
 function resolveLaunchStatus(id: ServiceId): LaunchStatus {
@@ -2526,5 +2532,8 @@ const LEGACY_RETIRED_SERVICES: readonly StudioServiceEntry[] = [
 /** Temporary raw assembly — normalized at export via `@/catalog/seeds`. */
 export const RAW_SERVICE_CATALOG: readonly StudioServiceEntry[] = [
   ...V2_LAUNCH_SERVICES,
+  ...STAGING_INTERNAL_SERVICES,
+  ...STAGING_CLIP_REPURPOSING_SERVICES,
+  ...STAGING_CREATIVE_QA_FINISH_SERVICES,
   ...LEGACY_RETIRED_SERVICES,
 ] as const;

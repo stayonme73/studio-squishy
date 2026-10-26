@@ -10,12 +10,25 @@ import { createFsFileRoomStorageAdapter } from "@/lib/file-storage/fs-adapter";
 import { buildJobId } from "@/lib/job-control/lane-map";
 import { assembleCustomerLifeTruth } from "@/lib/studio-customer-life";
 
+import { Readable } from "node:stream";
+
+import type { FileRoomStorageAdapter, FileRoomStorageDownloadResult } from "@/lib/file-storage/types";
+
+import type { CustomerContentRightsInput } from "@/lib/studio-customer-content-intake/types";
+
 import {
+  bytesFromStoredDownloadBody,
   downloadStoredCustomerMaterialBytes,
   isPrivateStoredMaterial,
   storeAndAttachCustomerMaterialFile,
   validateCustomerMaterialFile,
 } from "./client-file-store";
+import { minimalSyntheticPngBytes } from "./image-file-bytes";
+import {
+  buildMaterialContentFingerprint,
+  priorApprovalMatchesCurrentContent,
+} from "@/lib/studio-material-use/evaluate";
+
 import { reconcileFlyerWordmarkMaterialTruth } from "./store";
 import type { CampaignMaterialItem, ServerMaterialsEnvelope } from "./types";
 
@@ -30,6 +43,19 @@ const maya: StudioUser = {
   roles: ["client"],
   currentCampaignId: CAMPAIGN_ID,
 };
+
+function logoClearanceRights(
+  overrides: Partial<CustomerContentRightsInput> = {},
+): CustomerContentRightsInput {
+  return {
+    useAuthorizationBasis: "customer_has_permission",
+    commercialUsePermitted: true,
+    cropAdaptPermitted: true,
+    recognizablePeoplePresent: false,
+    thirdPartyMaterialPresent: false,
+    ...overrides,
+  };
+}
 
 function flyerLineItem(): NonNullable<CampaignRecord["approvedStudioPlan"]>["lineItems"][number] {
   return {
@@ -124,7 +150,7 @@ function tasks(): ServerTasksEnvelope {
   };
 }
 
-function pngFile(bytes = "CEDAR-AND-BLOOM-WORDMARK-PNG", name = "maya-optional-mark.png"): File {
+function pngFile(bytes: Buffer | string = minimalSyntheticPngBytes(), name = "maya-optional-mark.png"): File {
   return new File([bytes], name, { type: "image/png" });
 }
 
@@ -137,19 +163,37 @@ describe("STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1", () => {
       validateCustomerMaterialFile(new File(["x"], "virus.exe", { type: "application/x-msdownload" }))
         .ok,
     ).toBe(false);
-    expect(
-      validateCustomerMaterialFile(
-        new File([new Uint8Array(studioMaterialsUploadV1.maxFileBytes + 1)], "huge.png", {
-          type: "image/png",
-        }),
-      ).error,
-    ).toBe(studioMaterialsUploadV1.customerCopy.tooLarge);
+    const oversized = validateCustomerMaterialFile(
+      new File([new Uint8Array(studioMaterialsUploadV1.maxFileBytes + 1)], "huge.png", {
+        type: "image/png",
+      }),
+    );
+    expect(oversized.ok).toBe(false);
+    if (oversized.ok) return;
+    expect(oversized.error).toBe(studioMaterialsUploadV1.customerCopy.tooLarge);
+  });
+
+  it("rejects logo-brand uploads without complete file-rights attestation", async () => {
+    const adapter = createMockFileRoomStorageAdapter();
+    const stored = await storeAndAttachCustomerMaterialFile({
+      adapter,
+      campaign: campaign(),
+      campaignClientUserId: maya.id,
+      tasks: tasks(),
+      materials: materials([logoItem()]),
+      user: maya,
+      file: pngFile(),
+      itemId: logoItem().id,
+    });
+    expect(stored.ok).toBe(false);
+    if (stored.ok) return;
+    expect(stored.status).toBe(400);
   });
 
   it("stores real bytes, receipts from stored truth, and makes them retrievable", async () => {
     const adapter = createMockFileRoomStorageAdapter();
     const file = pngFile();
-    const expectedHash = createHash("sha256").update(Buffer.from("CEDAR-AND-BLOOM-WORDMARK-PNG")).digest("hex");
+    const expectedHash = createHash("sha256").update(minimalSyntheticPngBytes()).digest("hex");
 
     const stored = await storeAndAttachCustomerMaterialFile({
       adapter,
@@ -160,6 +204,7 @@ describe("STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1", () => {
       user: maya,
       file,
       itemId: logoItem().id,
+      rightsInput: logoClearanceRights(),
     });
 
     expect(stored.ok).toBe(true);
@@ -170,13 +215,22 @@ describe("STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1", () => {
 
     const item = stored.materials.items[0]!;
     expect(isPrivateStoredMaterial(item)).toBe(true);
+    if (!isPrivateStoredMaterial(item)) return;
+    expect(priorApprovalMatchesCurrentContent(item)).toBe(true);
+    expect(item.useDecision?.contentFingerprint).toBe(buildMaterialContentFingerprint(item));
     expect(item.reviewStatus).toBe("submitted");
     expect(item.reviewStatus).not.toBe("approved_for_use");
     expect(item.uploadStatus).toBe("stored");
-    expect(item.storageRef?.checksumSha256).toBe(expectedHash);
+    expect(item.storageRef.checksumSha256).toBe(expectedHash);
 
     const job = stored.tasks.jobRecords?.[0];
-    expect(job?.fileRegistry?.some((ref) => ref.storageRef.checksumSha256 === expectedHash)).toBe(
+    expect(
+      job?.fileRegistry?.some(
+        (ref) =>
+          ref.storageRef.provider === "supabase_storage" &&
+          ref.storageRef.checksumSha256 === expectedHash,
+      ),
+    ).toBe(
       true,
     );
     expect(job?.lastClientResponseAt).toBeTruthy();
@@ -187,7 +241,7 @@ describe("STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1", () => {
     const downloaded = await downloadStoredCustomerMaterialBytes({ adapter, item });
     expect(downloaded.ok).toBe(true);
     if (!downloaded.ok) return;
-    expect(Buffer.from(downloaded.body).toString("utf8")).toBe("CEDAR-AND-BLOOM-WORDMARK-PNG");
+    expect(Buffer.from(downloaded.body).equals(minimalSyntheticPngBytes())).toBe(true);
     expect(downloaded.checksumSha256).toBe(expectedHash);
 
     const truth = assembleCustomerLifeTruth({
@@ -210,6 +264,7 @@ describe("STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1", () => {
       file: pngFile(),
       itemId: logoItem().id,
       useAuthorizationBasis: "customer_has_permission",
+      rightsInput: logoClearanceRights(),
     });
 
     expect(stored.ok).toBe(true);
@@ -219,6 +274,41 @@ describe("STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1", () => {
     expect(item.reviewStatus).toBe("submitted");
     expect(item.reviewStatus).not.toBe("approved_for_use");
     expect(item.useAuthorization?.basis).toBe("customer_has_permission");
+  });
+
+  it("does not backfill rights when duplicate bytes are re-posted without attestation", async () => {
+    const adapter = createMockFileRoomStorageAdapter();
+    const file = pngFile();
+    const first = await storeAndAttachCustomerMaterialFile({
+      adapter,
+      campaign: campaign(),
+      campaignClientUserId: maya.id,
+      tasks: tasks(),
+      materials: materials([logoItem()]),
+      user: maya,
+      file,
+      itemId: logoItem().id,
+      rightsInput: logoClearanceRights(),
+    });
+    expect(first.ok).toBe(true);
+    if (!first.ok) return;
+    const certBefore = first.materials.items[0]?.contentCertification;
+
+    const duplicate = await storeAndAttachCustomerMaterialFile({
+      adapter,
+      campaign: campaign(),
+      campaignClientUserId: maya.id,
+      tasks: first.tasks,
+      materials: first.materials,
+      user: maya,
+      file,
+      itemId: logoItem().id,
+    });
+    expect(duplicate.ok).toBe(true);
+    if (!duplicate.ok) return;
+    expect(duplicate.duplicate).toBe(true);
+    expect(duplicate.materials.items[0]?.contentCertification).toEqual(certBefore);
+    expect(duplicate.materials.items[0]?.contentCertification?.rights.statementComplete).toBe(true);
   });
 
   it("keeps the first stored file on duplicate bytes and does not treat filename-only as received", async () => {
@@ -233,6 +323,7 @@ describe("STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1", () => {
       user: maya,
       file,
       itemId: logoItem().id,
+      rightsInput: logoClearanceRights(),
     });
     expect(first.ok).toBe(true);
     if (!first.ok) return;
@@ -284,6 +375,7 @@ describe("STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1", () => {
       user: maya,
       file: pngFile(),
       itemId: logoItem().id,
+      rightsInput: logoClearanceRights(),
     });
     expect(stored.ok).toBe(true);
     if (!stored.ok) return;
@@ -368,6 +460,23 @@ describe("STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1", () => {
     expect(result.envelope.items[0]?.requirementLevel).toBe("required");
   });
 
+  it("leaves a requested flyer slot requested when it is not an exception", () => {
+    const seeded = materials([
+      logoItem({
+        id: "factual-confirmation-requested",
+        category: "factual-confirmation",
+        requirementLevel: "required",
+        reviewStatus: "requested",
+        contentKind: "confirmation",
+        uploadStatus: "none",
+      }),
+    ]);
+    const result = reconcileFlyerWordmarkMaterialTruth(seeded, campaign());
+    expect(result.changed).toBe(false);
+    expect(result.envelope.items[0]?.reviewStatus).toBe("requested");
+    expect(result.envelope.items[0]?.requirementLevel).toBe("required");
+  });
+
   it("keeps bytes after a fresh storage adapter — not localStorage-only", async () => {
     const adapter = createFsFileRoomStorageAdapter("studio-files-maya-return");
     const stored = await storeAndAttachCustomerMaterialFile({
@@ -379,6 +488,7 @@ describe("STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1", () => {
       user: maya,
       file: pngFile(),
       itemId: logoItem().id,
+      rightsInput: logoClearanceRights(),
     });
     expect(stored.ok).toBe(true);
     if (!stored.ok) return;
@@ -394,6 +504,56 @@ describe("STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1", () => {
     });
     expect(downloaded.ok).toBe(true);
     if (!downloaded.ok) return;
-    expect(Buffer.from(downloaded.body).toString("utf8")).toBe("CEDAR-AND-BLOOM-WORDMARK-PNG");
+    expect(Buffer.from(downloaded.body).equals(minimalSyntheticPngBytes())).toBe(true);
+  });
+
+  it("copies each supported stored body without changing the bytes", async () => {
+    const payload = new TextEncoder().encode("EXACT-BYTES");
+    const cases: FileRoomStorageDownloadResult["body"][] = [
+      Buffer.from(payload),
+      payload,
+      payload.buffer.slice(payload.byteOffset, payload.byteOffset + payload.byteLength),
+      new Blob([payload]),
+      new ReadableStream({
+        start(controller) {
+          controller.enqueue(payload.slice(0, 5));
+          controller.enqueue(payload.slice(5));
+          controller.close();
+        },
+      }),
+      Readable.from([payload.slice(0, 4), payload.slice(4)]),
+    ];
+    for (const body of cases) {
+      const bytes = await bytesFromStoredDownloadBody(body);
+      expect(Array.from(bytes)).toEqual(Array.from(payload));
+    }
+  });
+
+  it("fails closed on a text-encoded stored stream and a missing file", async () => {
+    await expect(
+      bytesFromStoredDownloadBody(Readable.from(["EXACT-BYTES"])),
+    ).rejects.toThrow("text-encoded");
+    const missing = await downloadStoredCustomerMaterialBytes({
+      adapter: bodyAdapter(new Uint8Array([1])),
+      item: logoItem(),
+    });
+    expect(missing.ok).toBe(false);
+    if (missing.ok) return;
+    expect(missing.status).toBe(404);
   });
 });
+
+function bodyAdapter(body: FileRoomStorageDownloadResult["body"]): FileRoomStorageAdapter {
+  return {
+    provider: "mock_storage",
+    bucket: "studio-files-test",
+    buildObjectPath: () => "unused",
+    createStorageRef: () => {
+      throw new Error("unused");
+    },
+    uploadObject: async () => {
+      throw new Error("unused");
+    },
+    downloadObject: async () => ({ body, contentType: "text/plain" }),
+  };
+}

@@ -36,6 +36,7 @@ export async function GET(request: Request, context: RouteContext) {
       job: match.job,
       file: match.file,
       clientDeliveryFile: match.clientDeliveryFile,
+      campaignClientUserId: match.campaignEnvelope?.clientUserId,
     });
     if (!decision.allowed) {
       return NextResponse.json({ error: "File not available." }, { status: 403 });
@@ -58,6 +59,7 @@ export async function GET(request: Request, context: RouteContext) {
           job: match.job,
           file: match.file,
           clientDeliveryFile: match.clientDeliveryFile,
+          campaignClientUserId: match.campaignEnvelope?.clientUserId,
         });
 
     if (!result.ok) {

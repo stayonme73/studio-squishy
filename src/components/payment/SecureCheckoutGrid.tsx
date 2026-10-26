@@ -2,6 +2,8 @@
 
 import { type FormEvent, type ReactNode, useEffect, useMemo, useState } from "react";
 
+import { useSamsungTapActivate } from "@/lib/studio-samsung-activate";
+
 import type { ServiceId } from "@/catalog/types";
 import type { ApprovalAcknowledgment } from "@/config/studio-board";
 import { payment } from "@/config/payment";
@@ -17,6 +19,10 @@ import {
   type PaymentPlanSummary,
 } from "@/lib/payment-plan-summary";
 import { isDeveloperCheckoutSandboxVisible } from "@/lib/studio-payment/hosted-checkout-ui";
+import {
+  rememberStudioPaymentSandbox,
+  restoreStudioPaymentSandboxQuery,
+} from "@/lib/studio-payment/sandbox-query";
 import { readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
 
 type Props = {
@@ -49,6 +55,24 @@ type Props = {
   onViewPlanDetails?: () => void;
   /** Override submit button label (Conversation Room panel may use “Complete Checkout”). */
   submitLabel?: string;
+  /** Review & Pay may replace Conversation Room intake steps without rewriting payment.ts. */
+  whatsNextSteps?: readonly { label: string; marker: "number" }[];
+  whatsNextReassurance?: string;
+  termsLabel?: string;
+  /** Review & Pay heading. Defaults to the shared checkout title. */
+  confirmSectionTitle?: string;
+  /** Review & Pay can name the payment block without changing other checkouts. */
+  summaryTitle?: string;
+  servicesHeading?: string;
+  investmentLabel?: string;
+  investmentNote?: string;
+  /** Review & Pay already states the price above this grid. */
+  hideOrderSummary?: boolean;
+  /**
+   * Review & Pay already has one price. Keep the line under the button
+   * and leave out the Stripe sentence above it.
+   */
+  paymentLine?: "both" | "reassurance";
   /**
    * Phone Conversation Room: say Stripe/payment honesty once.
    * Desktop /payment keeps the security note plus the under-button reassurance.
@@ -153,6 +177,16 @@ export default function SecureCheckoutGrid({
   onViewPlanDetails,
   submitLabel,
   compactPaymentHonesty = false,
+  whatsNextSteps,
+  whatsNextReassurance,
+  termsLabel,
+  confirmSectionTitle,
+  summaryTitle,
+  servicesHeading,
+  investmentLabel,
+  investmentNote,
+  hideOrderSummary = false,
+  paymentLine = "both",
 }: Props) {
   const checkoutPackageId = resolveCheckoutPackageId(packageIdProp);
   const storedPlanSummary = useMemo(() => buildPaymentPlanSummary(), []);
@@ -163,10 +197,24 @@ export default function SecureCheckoutGrid({
   const [showSandboxFixture, setShowSandboxFixture] = useState(false);
   const isEmbedded = layout === "embedded";
   const confirmLabel = submitLabel ?? payment.form.submitLabel;
+  const confirmTerms = termsLabel ?? payment.form.termsLabel;
+  const confirmTitle = confirmSectionTitle ?? payment.sections.confirm;
+  const nextSteps = whatsNextSteps ?? payment.whatsNext.steps;
+  const nextReassurance = whatsNextReassurance ?? payment.whatsNext.emailReassurance;
+  const payActivate = useSamsungTapActivate<HTMLAnchorElement>(() => {
+    if (completing) return;
+    if (!termsAccepted) {
+      setCheckoutError(confirmTerms);
+      return;
+    }
+    void completeCheckout();
+  });
 
   /* Query flag is only knowable after mount. SSR `window` is undefined, so a
      useMemo on first paint hid the fixture even with ?studioPaymentSandbox=1. */
   useEffect(() => {
+    rememberStudioPaymentSandbox(window.location.search);
+    restoreStudioPaymentSandboxQuery();
     if (!onSandboxConfirm) {
       setShowSandboxFixture(false);
       return;
@@ -176,6 +224,16 @@ export default function SecureCheckoutGrid({
     );
   }, [onSandboxConfirm]);
 
+  useEffect(() => {
+    if (!showSandboxFixture || !checkoutError) return;
+    if (!/card payment is not ready/i.test(checkoutError)) return;
+    const fixture = document.querySelector(
+      '[data-developer-fixture="sandbox-confirm"]',
+    );
+    if (!(fixture instanceof HTMLElement)) return;
+    fixture.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [checkoutError, showSandboxFixture]);
+
   function buildAcknowledgment(): ApprovalAcknowledgment {
     return {
       acknowledgmentVersion: ACKNOWLEDGMENT_VERSION,
@@ -184,10 +242,29 @@ export default function SecureCheckoutGrid({
     };
   }
 
+  function isAuthorizedCertSandbox(): boolean {
+    if (!onSandboxConfirm || typeof window === "undefined") return false;
+    return isDeveloperCheckoutSandboxVisible({
+      search: window.location.search,
+    });
+  }
+
   async function completeCheckout() {
     if (completing) return;
+    /*
+     * Cert path only: ?studioPaymentSandbox=1 (or NEXT_PUBLIC_DEV_TOOLS=1)
+     * uses the existing sandbox-confirm flow. Production Continue never
+     * prefers sandbox.
+     */
+    if (isAuthorizedCertSandbox()) {
+      await handleSandboxPayment();
+      return;
+    }
     const acknowledgment = buildAcknowledgment();
-    if (onBeforePayment && !onBeforePayment(acknowledgment)) return;
+    if (onBeforePayment && !onBeforePayment(acknowledgment)) {
+      setCheckoutError(studioPaymentV1.customerCopy.processorSessionFailed);
+      return;
+    }
     setCheckoutError(null);
     setCompleting(true);
     if (onPaymentComplete) {
@@ -213,7 +290,7 @@ export default function SecureCheckoutGrid({
     event.preventDefault();
     if (completing) return;
     if (!termsAccepted) {
-      setCheckoutError(payment.form.termsLabel);
+      setCheckoutError(confirmTerms);
       return;
     }
     void completeCheckout();
@@ -222,11 +299,14 @@ export default function SecureCheckoutGrid({
   async function handleSandboxPayment() {
     if (!onSandboxConfirm || completing) return;
     if (!termsAccepted) {
-      setCheckoutError(payment.form.termsLabel);
+      setCheckoutError(confirmTerms);
       return;
     }
     const acknowledgment = buildAcknowledgment();
-    if (onBeforePayment && !onBeforePayment(acknowledgment)) return;
+    if (onBeforePayment && !onBeforePayment(acknowledgment)) {
+      setCheckoutError(studioPaymentV1.customerCopy.processorSessionFailed);
+      return;
+    }
     setCheckoutError(null);
     setCompleting(true);
     try {
@@ -270,7 +350,7 @@ export default function SecureCheckoutGrid({
           checked={termsAccepted}
           onChange={(event) => setTermsAccepted(event.target.checked)}
         />
-        <span>{payment.form.termsLabel}</span>
+        <span>{confirmTerms}</span>
       </label>
     </section>
   );
@@ -361,7 +441,7 @@ export default function SecureCheckoutGrid({
             {planSummaryBody}
           </PaperCard>
 
-          <PaperCard title={payment.sections.confirm} className="pay-paper-card--form">
+          <PaperCard title={confirmTitle} className="pay-paper-card--form">
             <form className="pay-form" onSubmit={handleSubmit}>
               {recommendationNotice ? (
                 <div className="pay-disclaimer" role="note">
@@ -412,8 +492,10 @@ export default function SecureCheckoutGrid({
       data-collects-card="false"
     >
       <div className="pay-checkout-stack">
-        <CheckoutSection title={payment.sections.summary}>
-          <h3 className="co-card__subheading">{payment.sections.deliverables}</h3>
+        {hideOrderSummary ? null : <CheckoutSection title={summaryTitle ?? payment.sections.summary}>
+          <h3 className="co-card__subheading">
+            {servicesHeading ?? payment.sections.deliverables}
+          </h3>
           <ul className="co-deliverables">
             {planSummary.lineItems.map((item) => (
               <li key={item.serviceId} className="co-deliverable">
@@ -450,15 +532,19 @@ export default function SecureCheckoutGrid({
                 </div>
               </>
             ) : null}
-            <p className="co-investment__label">{payment.summary.investmentLabel}</p>
+            <p className="co-investment__label">
+              {investmentLabel ?? payment.summary.investmentLabel}
+            </p>
             <p className="co-investment__total">{planSummary.amountDueTodayDisplay}</p>
-            <p className="co-investment__note">{payment.summary.cardProcessingDisclosureNote}</p>
+            <p className="co-investment__note">
+              {investmentNote ?? payment.summary.cardProcessingDisclosureNote}
+            </p>
           </div>
-        </CheckoutSection>
+        </CheckoutSection>}
 
         <form className="pay-checkout-form" onSubmit={handleSubmit}>
           <CheckoutSection
-            title={payment.sections.confirm}
+            title={confirmTitle}
             className="co-card--confirm"
             sectionId="checkout-pay-continue"
           >
@@ -483,26 +569,38 @@ export default function SecureCheckoutGrid({
                 checked={termsAccepted}
                 onChange={(event) => setTermsAccepted(event.target.checked)}
               />
-              <span>{payment.form.termsLabel}</span>
+              <span>{confirmTerms}</span>
             </label>
-            <p className="co-payment-security" role="note">
-              {payment.form.paymentSecurityNote}
-            </p>
+            {paymentLine === "reassurance" ? null : (
+              <p className="co-payment-security" role="note">
+                {payment.form.paymentSecurityNote}
+              </p>
+            )}
+            {compactPaymentHonesty ? sandboxPanel : null}
             <a
+              ref={payActivate.ref}
+              id="checkout-pay-continue"
               href="#checkout-continue"
               className="lobby-entry-film__cta co-submit"
               data-checkout-pay="continue"
+              data-completing={completing ? "true" : undefined}
+              role="button"
+              aria-busy={completing ? "true" : undefined}
               aria-disabled={completing ? "true" : undefined}
               onClick={(event) => {
                 event.preventDefault();
                 if (completing) return;
-                event.currentTarget.closest("form")?.requestSubmit();
+                payActivate.onClick();
               }}
               onKeyDown={(event) => {
                 if (event.key !== "Enter" && event.key !== " ") return;
                 event.preventDefault();
                 if (completing) return;
-                event.currentTarget.closest("form")?.requestSubmit();
+                if (!termsAccepted) {
+                  setCheckoutError(confirmTerms);
+                  return;
+                }
+                void completeCheckout();
               }}
             >
               <span>{confirmLabel}</span>
@@ -514,12 +612,12 @@ export default function SecureCheckoutGrid({
             ) : compactPaymentHonesty ? null : (
               <p className="co-payment-reassurance">{payment.form.paymentReassurance}</p>
             )}
-            {sandboxPanel}
+            {compactPaymentHonesty ? null : sandboxPanel}
           </CheckoutSection>
 
           <CheckoutSection title={payment.sections.next}>
             <ol className="co-next-steps" aria-label={payment.sections.next}>
-              {payment.whatsNext.steps.map((step, index) => (
+              {nextSteps.map((step, index) => (
                 <li key={step.label} className="co-next-steps__item">
                   <span className="co-next-steps__num" aria-hidden="true">
                     {index + 1}
@@ -528,7 +626,7 @@ export default function SecureCheckoutGrid({
                 </li>
               ))}
             </ol>
-            <p className="co-next-steps__reassurance">{payment.whatsNext.emailReassurance}</p>
+            <p className="co-next-steps__reassurance">{nextReassurance}</p>
           </CheckoutSection>
         </form>
       </div>

@@ -9,7 +9,7 @@ import { loadKitchenProjectionDetail } from "@/lib/studio-kitchen/load-projectio
 import { loadKitchenCommsLedger } from "@/lib/studio-kitchen-comms";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
-import "../../mobile-route-fixes.css";
+import "../../studio-customer-last-paint.css";
 
 export const dynamic = "force-dynamic";
 

@@ -1,3 +1,8 @@
+import {
+  recordAnthropicCall,
+  type AnthropicUsagePayload,
+} from "@/lib/studio-project-alpha/cost-telemetry";
+
 import type { AiPredictionResponse } from "./types";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
@@ -52,13 +57,25 @@ export async function predictDecision(input: {
   });
 
   if (!response.ok) {
+    recordAnthropicCall({
+      model,
+      purpose: "studio_manager_guidance",
+      httpStatus: response.status,
+    });
     const detail = await response.text();
     throw new Error(`Anthropic API error (${response.status}): ${detail}`);
   }
 
   const payload = (await response.json()) as {
     content?: Array<{ type: string; text?: string }>;
+    usage?: AnthropicUsagePayload;
   };
+  recordAnthropicCall({
+    model,
+    purpose: "studio_manager_guidance",
+    httpStatus: response.status,
+    usage: payload.usage,
+  });
 
   const text = payload.content
     ?.filter((block) => block.type === "text")
