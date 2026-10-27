@@ -14,6 +14,7 @@ import {
   writeFileSync,
   writeSync,
 } from "fs";
+import os from "os";
 import path from "path";
 
 import { studioCapacity100OrderHardeningV1 as pack } from "@/config/studio-capacity-100-order-hardening-v1";
@@ -37,6 +38,9 @@ export type AcquireHeavyOccupancyResult =
     };
 
 function lockAbs(repoRoot: string): string {
+  if (process.env.VERCEL) {
+    return path.join(os.tmpdir(), "studio-lane-occupancy", "heavy.lock.json");
+  }
   return path.join(repoRoot, HEAVY_OCCUPANCY_LOCK_REL);
 }
 

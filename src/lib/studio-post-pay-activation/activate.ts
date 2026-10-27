@@ -39,7 +39,8 @@ function activationMatchesJobs(
   return arraysEqual(existing.jobIds, jobIds);
 }
 
-async function writePendingRetry(
+/** Durable retry marker when activation/dispatch throws after payment truth is saved. */
+export async function persistPostPayActivationPendingRetry(
   campaign: CampaignRecord,
   message: string,
 ): Promise<CampaignRecord> {
@@ -100,7 +101,7 @@ export async function ensurePostPayActivation(
     working = restoreProductionScopeFromPaymentAuthority(campaign);
   } catch (error) {
     if (error instanceof ProductionScopeRestoreError) {
-      const failed = await writePendingRetry(campaign, error.message);
+      const failed = await persistPostPayActivationPendingRetry(campaign, error.message);
       return {
         ok: false,
         campaign: failed,
@@ -211,7 +212,7 @@ export async function ensurePostPayActivation(
     const message =
       error instanceof Error ? error.message : "Post-pay activation failed.";
     try {
-      const failed = await writePendingRetry(working, message);
+      const failed = await persistPostPayActivationPendingRetry(working, message);
       return {
         ok: false,
         campaign: failed,

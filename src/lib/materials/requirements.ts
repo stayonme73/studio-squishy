@@ -6,7 +6,7 @@ import { isSocialPostsStandardHardenSku } from "@/config/studio-social-posts-sta
 import {
   FLYER_PROOF_CONTRACT,
   isDesignRendererProofSku,
-} from "@/lib/studio-design-renderer";
+} from "@/lib/studio-design-renderer/contracts";
 
 import type { MaterialCategory, MaterialRequirementLevel, MaterialSlotDefinition } from "./types";
 

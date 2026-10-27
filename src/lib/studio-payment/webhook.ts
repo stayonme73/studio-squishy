@@ -6,7 +6,6 @@ import { evaluatePreAcceptance } from "@/lib/studio-pre-acceptance/evaluate";
 import type { PreAcceptanceProjectFacts } from "@/lib/studio-pre-acceptance/types";
 import { readCampaignEnvelope, upsertCampaignRecord } from "@/lib/campaign-store/store";
 
-import { confirmPaymentFromProcessor } from "./confirm";
 import { sealDisposableKitStripeTestProof } from "./disposable-kit-test-isolation";
 import {
   assertStripeSafeForTests,
@@ -202,6 +201,7 @@ export async function handleStripeWebhook(
     }
   }
 
+  const { confirmPaymentFromProcessor } = await import("./confirm");
   const result = await confirmPaymentFromProcessor({
     campaignId,
     checkoutSessionId: session.id,

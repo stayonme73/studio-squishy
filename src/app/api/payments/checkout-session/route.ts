@@ -9,6 +9,8 @@ import {
 import { createCheckoutSession } from "@/lib/studio-payment/create-session";
 import type { CheckoutSessionCreateRequest } from "@/lib/studio-payment/types";
 
+export const runtime = "nodejs";
+
 export async function POST(request: Request) {
   let body: Partial<CheckoutSessionCreateRequest>;
   try {

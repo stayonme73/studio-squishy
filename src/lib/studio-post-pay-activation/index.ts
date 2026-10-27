@@ -1,5 +1,6 @@
 export {
   ensurePostPayActivation,
+  persistPostPayActivationPendingRetry,
 } from "./activate";
 export {
   isPaymentConfirmedForActivation,

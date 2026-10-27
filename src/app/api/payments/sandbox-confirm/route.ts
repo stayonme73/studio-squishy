@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 import { confirmSandboxCheckoutSession } from "@/lib/studio-payment/sandbox-confirm";
 
+export const runtime = "nodejs";
+
 export async function POST(request: Request) {
   let body: { checkoutSessionId?: string };
   try {

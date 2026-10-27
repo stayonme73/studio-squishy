@@ -1,8 +1,6 @@
 import type { CampaignRecord } from "@/config/studio-board";
-import {
-  DESIGN_RENDERER_PROMO_SKU,
-  DESIGN_RENDERER_SOCIAL_POSTS_SKU,
-} from "@/lib/studio-design-renderer";
+import { DESIGN_RENDERER_PROMO_SKU } from "@/lib/studio-design-renderer/promo-types";
+import { DESIGN_RENDERER_SOCIAL_POSTS_SKU } from "@/lib/studio-design-renderer/social-posts-types";
 import {
   disposableKitTestMustStayIsolated,
   skipsProductionForDisposableKitTest,

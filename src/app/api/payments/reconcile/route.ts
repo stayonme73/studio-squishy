@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 import { reconcileCheckoutSession } from "@/lib/studio-payment/reconcile";
 
+export const runtime = "nodejs";
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const sessionId = url.searchParams.get("session_id");

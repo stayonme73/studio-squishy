@@ -1,15 +1,13 @@
 import Stripe from "stripe";
 
 import { studioPaymentV1 } from "@/config/studio-payment-v1";
+import type { CampaignRecord } from "@/config/studio-board";
 import { readCampaignEnvelope, upsertCampaignRecord } from "@/lib/campaign-store/store";
-import { recoverPaidOperatingChain } from "@/lib/studio-paid-activation-recovery";
 
 import {
   markProjectClaimReceiptDeliveredToBrowser,
   releaseUnclaimedBrowserClaimToken,
 } from "@/lib/studio-project-claim/claim-receipts";
-
-import { confirmPaymentFromProcessor } from "./confirm";
 import { sealDisposableKitStripeTestProof } from "./disposable-kit-test-isolation";
 import {
   assertStripeSafeForTests,
@@ -18,6 +16,14 @@ import {
 } from "./env";
 import { readCheckoutSessionBinding } from "./events-store";
 import type { ReconcileCheckoutResult } from "./types";
+
+/** Defer dispatch/design-renderer graph until post-payment wake is actually needed. */
+async function wakePaidOperatingChain(record: CampaignRecord) {
+  const { recoverPaidOperatingChain } = await import(
+    "@/lib/studio-paid-activation-recovery"
+  );
+  return recoverPaidOperatingChain(record);
+}
 
 /**
  * Guest pay: the checkout session id is the payment identity Stripe already
@@ -88,7 +94,7 @@ export async function reconcileCheckoutSession(
     );
     if (row?.status === "confirmed") {
       const woken = envelope?.record
-        ? await recoverPaidOperatingChain(envelope.record)
+        ? await wakePaidOperatingChain(envelope.record)
         : null;
       const campaign = woken?.campaign ?? envelope?.record ?? null;
       const claimRawToken = await claimTokenForPayingBrowser({
@@ -109,7 +115,7 @@ export async function reconcileCheckoutSession(
       };
     }
   } else if (envelope?.record.paymentReceivedAt) {
-    const woken = await recoverPaidOperatingChain(envelope.record);
+    const woken = await wakePaidOperatingChain(envelope.record);
     const claimRawToken = await claimTokenForPayingBrowser({
       campaignId: binding.campaignId,
       checkoutSessionId,
@@ -203,6 +209,7 @@ export async function reconcileCheckoutSession(
     }
   }
 
+  const { confirmPaymentFromProcessor } = await import("./confirm");
   const result = await confirmPaymentFromProcessor({
     campaignId: binding.campaignId,
     checkoutSessionId,

@@ -3,6 +3,13 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Local FS campaign/task stores use path.join(process.cwd(), "data/..."). NFT tracing
   // otherwise pulls multi-GB trees into every Serverless Function on Vercel.
+  // Next externalizes `sharp` by default; include native @img binaries in traced lambdas.
+  outputFileTracingIncludes: {
+    "/api/**": [
+      "./node_modules/@img/**",
+      "./node_modules/sharp/**",
+    ],
+  },
   outputFileTracingExcludes: {
     "/*": [
       "./data/**/*",
@@ -28,10 +35,10 @@ const nextConfig: NextConfig = {
       "./tsconfig.tsbuildinfo",
       "./node_modules/playwright-core/**/*",
       "./node_modules/@playwright/**/*",
-      "./node_modules/@img/sharp-wasm32/**/*",
     ],
   },
-  serverExternalPackages: ["sharp", "@napi-rs/canvas", "canvas"],
+  // Bundle sharp native libs into traced functions — externalizing breaks libvips on Vercel nodejs24.
+  serverExternalPackages: ["@napi-rs/canvas", "canvas", "stripe", "pg"],
   devIndicators: false,
   // Phone LAN cert. Next.js 16 blocks /_next from unlisted hosts while HTML still paints.
   // Keep only recorded private-network IPs. If DHCP changes, add the new IP and restart.

@@ -7,11 +7,6 @@ import {
 } from "@/lib/campaign-store/store";
 import { applyPostPaymentOwnership } from "@/lib/studio-project-claim/post-payment-ownership";
 import { sendProjectClaimRecoveryEmail } from "@/lib/studio-project-claim/send-claim-email";
-import {
-  recoverPaidOperatingChain,
-  sweepPaidActivationRecovery,
-} from "@/lib/studio-paid-activation-recovery";
-
 import { deliverQueuedCustomerEmails } from "@/lib/studio-lifecycle-email/campaign";
 
 import { applyPaidTruthToCampaignRecord } from "./apply-paid-record";
@@ -53,13 +48,28 @@ export async function activateAfterPayment(
   ) {
     return campaign;
   }
-  const recovered = await recoverPaidOperatingChain(campaign);
-  if (env.NODE_ENV !== "test") {
-    void sweepPaidActivationRecovery({
-      excludeCampaignId: campaign.campaignId,
-    }).catch(() => undefined);
+  try {
+    const { recoverPaidOperatingChain, sweepPaidActivationRecovery } = await import(
+      "@/lib/studio-paid-activation-recovery"
+    );
+    const recovered = await recoverPaidOperatingChain(campaign);
+    if (env.NODE_ENV !== "test") {
+      void sweepPaidActivationRecovery({
+        excludeCampaignId: campaign.campaignId,
+      }).catch(() => undefined);
+    }
+    return recovered.campaign;
+  } catch (caught) {
+    const message = caught instanceof Error ? caught.message : "activation_failed";
+    console.error("[activateAfterPayment]", message);
+    if (campaign.paymentReceivedAt || campaign.paymentTruth?.status === "confirmed") {
+      const { persistPostPayActivationPendingRetry } = await import(
+        "@/lib/studio-post-pay-activation/activate"
+      );
+      return persistPostPayActivationPendingRetry(campaign, message);
+    }
+    return campaign;
   }
-  return recovered.campaign;
 }
 
 async function finalizeConfirmSuccess(input: {

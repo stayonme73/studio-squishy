@@ -11,7 +11,7 @@ import {
 import {
   FLYER_PROOF_CONTRACT,
   isDesignRendererProofSku,
-} from "@/lib/studio-design-renderer";
+} from "@/lib/studio-design-renderer/contracts";
 
 import { syncMaterialsSummaryOnCampaign } from "./campaign-summary";
 import { ensureCondensedPackageMaterialSlots } from "./condensed-package-slots";

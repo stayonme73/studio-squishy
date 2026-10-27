@@ -36,6 +36,9 @@
     "sharp": "^0.35.1",
     "stripe": "^17.7.0"
   },
+  "optionalDependencies": {
+    "@img/sharp-linux-x64": "^0.35.1"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",

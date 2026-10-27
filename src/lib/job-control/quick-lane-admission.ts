@@ -5,6 +5,7 @@
  */
 
 import { closeSync, existsSync, mkdirSync, openSync, readdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "fs";
+import os from "os";
 import path from "path";
 
 import { OWNER_CONTROL_ROOM_SECTION } from "@/config/job-control";
@@ -31,8 +32,25 @@ function reservationFileName(jobId: string): string {
   return `${encodeURIComponent(jobId)}.json`;
 }
 
+/**
+ * Writable on Vercel serverless (/tmp). **Per-instance only** — not cross-instance
+ * exclusivity on Preview/serverless. Production desk + local dev use durable
+ * `data/studio-lane-occupancy` file locks; checkout still enforces lane caps via
+ * `evaluateHeavyStopSale` against Postgres-backed campaign truth.
+ */
+function laneOccupancyRoot(repoRoot: string): string {
+  if (process.env.VERCEL) {
+    return path.join(os.tmpdir(), "studio-lane-occupancy");
+  }
+  return path.join(repoRoot, "data/studio-lane-occupancy");
+}
+
+function quickLaneDir(repoRoot: string): string {
+  return path.join(laneOccupancyRoot(repoRoot), "quick");
+}
+
 function reservationPath(repoRoot: string, jobId: string): string {
-  return path.join(repoRoot, QUICK_LANE_RESERVATION_DIR, reservationFileName(jobId));
+  return path.join(quickLaneDir(repoRoot), reservationFileName(jobId));
 }
 
 function sleepMs(ms: number): void {
@@ -56,7 +74,7 @@ function readReservation(abs: string): QuickLaneReservation | null {
 }
 
 function withAdmissionLock<T>(repoRoot: string, nowMs: number, work: () => T): T | "admission_lock_unavailable" {
-  const lockAbs = path.join(repoRoot, QUICK_LANE_ADMISSION_LOCK);
+  const lockAbs = path.join(laneOccupancyRoot(repoRoot), "quick.admission.lock");
   mkdirSync(path.dirname(lockAbs), { recursive: true });
   const deadline = Date.now() + LOCK_WAIT_MS;
   while (Date.now() < deadline) {
@@ -88,7 +106,7 @@ function withAdmissionLock<T>(repoRoot: string, nowMs: number, work: () => T): T
 }
 
 function listReservationFiles(repoRoot: string): string[] {
-  const dir = path.join(repoRoot, QUICK_LANE_RESERVATION_DIR);
+  const dir = quickLaneDir(repoRoot);
   if (!existsSync(dir)) return [];
   return readdirSync(dir)
     .filter((name) => name.endsWith(".json"))
@@ -150,7 +168,7 @@ export function admitQuickLaneProduction(input: {
   const evidence = new Set(input.evidenceJobIds);
 
   const locked = withAdmissionLock(repoRoot, nowMs, () => {
-    mkdirSync(path.join(repoRoot, QUICK_LANE_RESERVATION_DIR), { recursive: true });
+    mkdirSync(quickLaneDir(repoRoot), { recursive: true });
     const holders = new Set(evidence);
     for (const abs of listReservationFiles(repoRoot)) {
       const reservation = readReservation(abs);

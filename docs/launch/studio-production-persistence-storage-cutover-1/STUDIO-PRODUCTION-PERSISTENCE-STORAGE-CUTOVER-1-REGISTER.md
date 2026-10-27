@@ -16,7 +16,8 @@
 | Preview build fixes | **`18574344`** (+ **`d92faf83`**, deploy docs **`7df67f59`**, signup recovery **`5dae8ee0`**) — on GitHub via **thin release sync** (below) |
 | GitHub thin release sync | **PASS** 2026-10-26 PM — branch **`operating/mobile-customer-journey-certification-1-thin-release`** @ **`0fc9ad05`** (from **`ee8afb0d`**). **Included:** `18574344`→`bcf012ca`, `d92faf83`→`fddb6bd0`, `7df67f59`→`69be22af`, `5dae8ee0`→`0fc9ad05`. **Excluded:** **`20a5e00e`** (bulk launch media), **`e9edfb42`**, merge **`481bc268`** (empty on remote base). **Original remote branch unchanged** @ **`ee8afb0d`**. Local thick history preserved (**`thin-release-sync-backup`** → **`5dae8ee0`**). Diagnosis: `STUDIO-GITHUB-PUSH-DIAGNOSIS-2026-10-26.md` |
 | Vercel Pro | **ACTIVE** — team **`stayonme73s-projects`** · project **`the-studio-company`** |
-| NEW Preview deploy | **PASS WITH LIMITS** — signup recovery **`STUDIO-NEW-SITE-PREVIEW-SIGNUP-RECOVERY-1`** · T1 PASS · **T2 PASS** · T4 identity PASS (limits) · T3/T5 not complete · report `STUDIO-NEW-SITE-PREVIEW-SIGNUP-RECOVERY-1-REPORT.md` |
+| NEW Preview deploy | **PASS WITH LIMITS** — **`dpl_6U6ocV5dd1yxDeY79LGxPyreNjHo`** · `https://the-studio-company-b381ngezk-stayonme73s-projects.vercel.app` · sharp/bootstrap **fixed** · **T3/T4 PASS** (Test webhook + Postgres) · **T5 partial** (Test DB seed + local download 200/403/bytes; hosted auth GET blocked — session parity) · `STUDIO-HOSTED-PREVIEW-SHARP-BOOTSTRAP-FIX-1-REPORT.md` · **uncommitted** local fixes |
+| Sharp fix closeout | **PASS WITH LIMITS** — 2026-10-26 PM · `STUDIO-HOSTED-PREVIEW-SHARP-FIX-CLOSEOUT-1-REPORT.md` · activation **`pending_retry`** on throw · lane **`/tmp` per-instance limit** documented · focused vitest **PASS** (boundary + kit isolation + T5 fixture) · **no commit/push** |
 | Production | **`fc56426`** / Welcome Hall **unchanged** on **`studio-squishy.vercel.app`** |
 | Production migration / deploy | **NOT RUN** |
 
