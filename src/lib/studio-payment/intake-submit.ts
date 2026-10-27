@@ -13,6 +13,8 @@ import {
   upsertCampaignRecord,
 } from "@/lib/campaign-store/store";
 import { ensureDispatchExecution } from "@/lib/studio-dispatch/ensure";
+import { ensureSocialPromoCompositeRenderRelease } from "@/lib/studio-dispatch/social-promo-composite-render-release";
+import type { CustomerIdentityDispatchSession } from "@/lib/studio-customer-identity-safety-gate";
 import { recoverPaidOperatingChain } from "@/lib/studio-paid-activation-recovery";
 import { ensurePostPayActivation } from "@/lib/studio-post-pay-activation";
 import { ensureRoutingHandoff } from "@/lib/studio-routing-handoff";
@@ -23,6 +25,11 @@ export type PaidIntakeSubmitInput = {
   checkoutSessionId: string;
   answers: RouteMapIntakeAnswers;
   submittedAt?: string;
+  /**
+   * When true, activation + routing run synchronously; dispatch observers run via
+   * {@link continuePaidIntakeOperatingChain} (e.g. Next.js `after()` on hosted).
+   */
+  deferDispatch?: boolean;
 };
 
 export type PaidIntakeSubmitResult =
@@ -79,10 +86,16 @@ export async function submitPaidIntakeByCheckoutSession(
     const advanced = await advancePaidOperatingAfterSubmittedIntake(
       envelope.record,
       envelope.clientUserId ?? null,
+      { deferDispatch: input.deferDispatch },
+    );
+    const campaign = await persistSocialPromoRenderReleaseIfNeeded(
+      envelope.record,
+      advanced,
+      envelope.clientUserId,
     );
     return {
       ok: true,
-      campaign: advanced,
+      campaign,
       alreadySubmitted: true,
     };
   }
@@ -116,26 +129,82 @@ export async function submitPaidIntakeByCheckoutSession(
   const advanced = await advancePaidOperatingAfterSubmittedIntake(
     saved.record,
     saved.clientUserId ?? envelope.clientUserId ?? null,
+    { deferDispatch: input.deferDispatch },
   );
-  return { ok: true, campaign: advanced, alreadySubmitted: false };
+  const campaign = await persistSocialPromoRenderReleaseIfNeeded(
+    saved.record,
+    advanced,
+    saved.clientUserId ?? envelope.clientUserId,
+  );
+  return { ok: true, campaign, alreadySubmitted: false };
+}
+
+async function persistSocialPromoRenderReleaseIfNeeded(
+  before: CampaignRecord,
+  after: CampaignRecord,
+  clientUserId: string | null | undefined,
+): Promise<CampaignRecord> {
+  if (before.socialPromoRenderRelease || !after.socialPromoRenderRelease) {
+    return after;
+  }
+  const saved = await upsertCampaignRecord(after, clientUserId ?? undefined);
+  return saved.record;
+}
+
+function identitySessionForCampaign(
+  campaign: CampaignRecord,
+  clientUserId: string | null,
+): CustomerIdentityDispatchSession | undefined {
+  if (!clientUserId) return undefined;
+  return {
+    sessionCurrentCampaignId: campaign.campaignId,
+    sessionClientUserId: clientUserId,
+    intakeCampaignId: campaign.campaignId,
+  };
+}
+
+/** Dispatch + observers after intake HTTP returns (hosted serverless duration). */
+export async function continuePaidIntakeOperatingChain(
+  campaignId: string,
+): Promise<CampaignRecord | null> {
+  const envelope = await readCampaignEnvelope(campaignId);
+  if (!envelope?.record.routeMapIntakeSubmittedAt) return null;
+  if (disposableTestOperatingChainBlocked(envelope.record)) return envelope.record;
+
+  const identitySession = identitySessionForCampaign(
+    envelope.record,
+    envelope.clientUserId ?? null,
+  );
+  const recovered = await recoverPaidOperatingChain(envelope.record, {
+    identitySession,
+  });
+  let working = ensureSocialPromoCompositeRenderRelease(recovered.campaign);
+  if (
+    !recovered.campaign.socialPromoRenderRelease &&
+    working.socialPromoRenderRelease
+  ) {
+    const envelope = await readCampaignEnvelope(campaignId);
+    const saved = await upsertCampaignRecord(working, envelope?.clientUserId ?? undefined);
+    working = saved.record;
+  }
+  const dispatched = await ensureDispatchExecution(working, identitySession);
+  return dispatched.campaign;
 }
 
 async function advancePaidOperatingAfterSubmittedIntake(
   campaign: CampaignRecord,
   clientUserId: string | null,
+  options?: { deferDispatch?: boolean },
 ): Promise<CampaignRecord> {
   if (disposableTestOperatingChainBlocked(campaign)) {
     return campaign;
   }
 
   let working = campaign;
-  if (clientUserId) {
+  const identitySession = identitySessionForCampaign(working, clientUserId);
+  if (clientUserId && !options?.deferDispatch) {
     const recovered = await recoverPaidOperatingChain(working, {
-      identitySession: {
-        sessionCurrentCampaignId: working.campaignId,
-        sessionClientUserId: clientUserId,
-        intakeCampaignId: working.campaignId,
-      },
+      identitySession,
     });
     working = recovered.campaign;
   }
@@ -149,15 +218,11 @@ async function advancePaidOperatingAfterSubmittedIntake(
   working = activated.campaign;
 
   const routed = await ensureRoutingHandoff(working);
-  working = routed.campaign;
+  working = ensureSocialPromoCompositeRenderRelease(routed.campaign);
 
-  const identitySession = clientUserId
-    ? {
-        sessionCurrentCampaignId: working.campaignId,
-        sessionClientUserId: clientUserId,
-        intakeCampaignId: working.campaignId,
-      }
-    : undefined;
+  if (options?.deferDispatch) {
+    return working;
+  }
 
   if (working.condensedOffer?.packageId === SOCIAL_PROMO_CURRENT_DOOR_PACKAGE_ID) {
     const dispatched = await ensureDispatchExecution(working, identitySession);

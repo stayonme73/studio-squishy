@@ -41,6 +41,7 @@ import {
 } from "@/lib/studio-customer-identity-safety-gate";
 import { studioCustomerIdentitySafetyGateV1 } from "@/config/studio-customer-identity-safety-gate-v1";
 import { resolveDispatchExecutionIsolationBlock } from "@/lib/studio-payment/disposable-test-isolation-guards";
+import { withCampaignArtifactProductionWorkspace } from "@/lib/campaign-design-artifacts";
 
 function recordsEqual(
   a: readonly JobDispatchRecord[],
@@ -98,6 +99,7 @@ async function attachDesignRendererObserver(input: {
   campaign: CampaignRecord;
   dispatch: DispatchExecutionRecord;
   alreadyEvaluated: boolean;
+  repoRoot: string;
 }): Promise<Extract<DispatchExecutionResult, { ok: true }>> {
   const laneViews =
     process.env.NODE_ENV === "test"
@@ -107,6 +109,7 @@ async function attachDesignRendererObserver(input: {
     campaign: input.campaign,
     dispatch: input.dispatch,
     laneViews,
+    repoRoot: input.repoRoot,
   });
   let launchMenu: Awaited<ReturnType<typeof runLaunchMenuProductionObserver>>;
   try {
@@ -114,6 +117,7 @@ async function attachDesignRendererObserver(input: {
       campaign: input.campaign,
       dispatch: input.dispatch,
       laneViews,
+      repoRoot: input.repoRoot,
     });
   } catch (error) {
     launchMenu = {
@@ -141,6 +145,7 @@ async function attachDesignRendererObserver(input: {
     creativeQa = await runCreativeQaFinishObserver({
       campaign: input.campaign,
       dispatch: input.dispatch,
+      repoRoot: input.repoRoot,
     });
   } catch (error) {
     creativeQa = {
@@ -161,7 +166,7 @@ async function attachDesignRendererObserver(input: {
   }
 
   recordMachineProductionPass({
-    repoRoot: process.cwd(),
+    repoRoot: input.repoRoot,
     campaign: input.campaign,
     records: input.dispatch.records,
     designResults: observer.results,
@@ -200,7 +205,9 @@ async function attachDesignRendererObserver(input: {
 
   const boundFlyer = await ensureFlyerMachineReviewBind(saved.record);
   const boundGeneralDesign = await ensureGeneralDesignMachineReviewBind(boundFlyer);
-  const boundDesign = await ensureSocialPromoCompositeReviewBind(boundGeneralDesign);
+  const boundDesign = await ensureSocialPromoCompositeReviewBind(boundGeneralDesign, {
+    repoRoot: input.repoRoot,
+  });
   const boundCampaignKit = await ensureCampaignLaunchKitReviewBind(boundDesign);
   const boundCopy = await ensureCopyMachineReviewBind(boundCampaignKit);
   const boundStills = await ensureShortVideoMachineReviewBindFromCampaign(
@@ -343,11 +350,14 @@ export async function ensureDispatchExecution(
       prior.activationCheckoutSessionId === envelope.activationCheckoutSessionId &&
       recordsEqual(prior.records, envelope.records)
     ) {
-      return attachDesignRendererObserver({
-        campaign: working,
-        dispatch: prior,
-        alreadyEvaluated: true,
-      });
+      return withCampaignArtifactProductionWorkspace(working.campaignId, (repoRoot) =>
+        attachDesignRendererObserver({
+          campaign: working,
+          dispatch: prior,
+          alreadyEvaluated: true,
+          repoRoot,
+        }),
+      );
     }
 
     const campaignEnvelope = await readCampaignEnvelope(working.campaignId);
@@ -360,11 +370,14 @@ export async function ensureDispatchExecution(
       campaignEnvelope?.clientUserId,
     );
 
-    return attachDesignRendererObserver({
-      campaign: saved.record,
-      dispatch: envelope,
-      alreadyEvaluated: false,
-    });
+    return withCampaignArtifactProductionWorkspace(saved.record.campaignId, (repoRoot) =>
+      attachDesignRendererObserver({
+        campaign: saved.record,
+        dispatch: envelope,
+        alreadyEvaluated: false,
+        repoRoot,
+      }),
+    );
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Dispatch execution failed.";

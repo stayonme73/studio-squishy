@@ -5,11 +5,22 @@
  */
 
 import { closeSync, existsSync, mkdirSync, openSync, readdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "fs";
-import os from "os";
 import path from "path";
 
 import { OWNER_CONTROL_ROOM_SECTION } from "@/config/job-control";
 import { studioCapacity100OrderHardeningV1 } from "@/config/studio-capacity-100-order-hardening-v1";
+
+import {
+  admitQuickLaneProductionPostgres,
+  reconcileQuickLaneClaimsPostgres,
+  releaseQuickLaneClaimPostgres,
+  shouldUsePostgresLaneClaims,
+} from "./postgres-lane-claims";
+import {
+  syncAdmitQuickLaneProduction,
+  syncReconcileQuickLaneClaims,
+  syncReleaseQuickLaneClaim,
+} from "./postgres-lane-sync-bridge";
 
 export const QUICK_LANE_RESERVATION_DIR = "data/studio-lane-occupancy/quick";
 export const QUICK_LANE_ADMISSION_LOCK = "data/studio-lane-occupancy/quick.admission.lock";
@@ -32,16 +43,8 @@ function reservationFileName(jobId: string): string {
   return `${encodeURIComponent(jobId)}.json`;
 }
 
-/**
- * Writable on Vercel serverless (/tmp). **Per-instance only** — not cross-instance
- * exclusivity on Preview/serverless. Production desk + local dev use durable
- * `data/studio-lane-occupancy` file locks; checkout still enforces lane caps via
- * `evaluateHeavyStopSale` against Postgres-backed campaign truth.
- */
+/** Desk/local filesystem locks. Vercel uses Postgres claims when persistence is enabled. */
 function laneOccupancyRoot(repoRoot: string): string {
-  if (process.env.VERCEL) {
-    return path.join(os.tmpdir(), "studio-lane-occupancy");
-  }
   return path.join(repoRoot, "data/studio-lane-occupancy");
 }
 
@@ -118,12 +121,35 @@ function listReservationFiles(repoRoot: string): string[] {
  * whose heartbeat is older than the Studio occupancy window.
  * Does not delete campaign, task, or audit records.
  */
+export async function reconcileQuickLaneReservationsAsync(input: {
+  repoRoot?: string;
+  evidenceJobIds: readonly string[];
+  nowMs?: number;
+  staleMs?: number;
+}): Promise<{ released: string[] }> {
+  if (shouldUsePostgresLaneClaims()) {
+    return reconcileQuickLaneClaimsPostgres({
+      evidenceJobIds: input.evidenceJobIds,
+      nowMs: input.nowMs,
+      staleMs: input.staleMs,
+    });
+  }
+  return reconcileQuickLaneReservations(input);
+}
+
 export function reconcileQuickLaneReservations(input: {
   repoRoot?: string;
   evidenceJobIds: readonly string[];
   nowMs?: number;
   staleMs?: number;
 }): { released: string[] } {
+  if (shouldUsePostgresLaneClaims()) {
+    return syncReconcileQuickLaneClaims({
+      evidenceJobIds: input.evidenceJobIds,
+      nowMs: input.nowMs,
+      staleMs: input.staleMs,
+    });
+  }
   const repoRoot = input.repoRoot ?? process.cwd();
   const nowMs = input.nowMs ?? Date.now();
   const staleMs = input.staleMs ?? studioCapacity100OrderHardeningV1.occupancyMs.heartbeatStaleMs;
@@ -150,6 +176,30 @@ export function reconcileQuickLaneReservations(input: {
   return { released: locked };
 }
 
+export async function admitQuickLaneProductionAsync(input: {
+  repoRoot?: string;
+  jobId: string;
+  campaignId: string;
+  evidenceJobIds: readonly string[];
+  capacity?: number;
+  now?: string;
+  nowMs?: number;
+  staleMs?: number;
+}): Promise<QuickLaneAdmission> {
+  if (shouldUsePostgresLaneClaims()) {
+    return admitQuickLaneProductionPostgres({
+      jobId: input.jobId,
+      campaignId: input.campaignId,
+      evidenceJobIds: input.evidenceJobIds,
+      capacity: input.capacity,
+      now: input.now,
+      nowMs: input.nowMs,
+      staleMs: input.staleMs,
+    });
+  }
+  return admitQuickLaneProduction(input);
+}
+
 export function admitQuickLaneProduction(input: {
   repoRoot?: string;
   jobId: string;
@@ -160,6 +210,17 @@ export function admitQuickLaneProduction(input: {
   nowMs?: number;
   staleMs?: number;
 }): QuickLaneAdmission {
+  if (shouldUsePostgresLaneClaims()) {
+    return syncAdmitQuickLaneProduction({
+      jobId: input.jobId,
+      campaignId: input.campaignId,
+      evidenceJobIds: input.evidenceJobIds,
+      capacity: input.capacity,
+      now: input.now,
+      nowMs: input.nowMs,
+      staleMs: input.staleMs,
+    });
+  }
   const repoRoot = input.repoRoot ?? process.cwd();
   const capacity = input.capacity ?? OWNER_CONTROL_ROOM_SECTION.laneCapacity.quick;
   const nowMs = input.nowMs ?? Date.now();
@@ -223,10 +284,23 @@ export function admitQuickLaneProduction(input: {
   return locked;
 }
 
+export async function releaseQuickLaneReservationAsync(input: {
+  repoRoot?: string;
+  jobId: string;
+}): Promise<boolean> {
+  if (shouldUsePostgresLaneClaims()) {
+    return releaseQuickLaneClaimPostgres({ jobId: input.jobId });
+  }
+  return releaseQuickLaneReservation(input);
+}
+
 export function releaseQuickLaneReservation(input: {
   repoRoot?: string;
   jobId: string;
 }): boolean {
+  if (shouldUsePostgresLaneClaims()) {
+    return syncReleaseQuickLaneClaim({ jobId: input.jobId });
+  }
   const repoRoot = input.repoRoot ?? process.cwd();
   const abs = reservationPath(repoRoot, input.jobId);
   if (!existsSync(abs)) return false;

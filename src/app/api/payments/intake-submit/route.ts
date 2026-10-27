@@ -1,7 +1,10 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 
 import type { RouteMapIntakeAnswers } from "@/config/route-map-intake-v1";
-import { submitPaidIntakeByCheckoutSession } from "@/lib/studio-payment/intake-submit";
+import {
+  continuePaidIntakeOperatingChain,
+  submitPaidIntakeByCheckoutSession,
+} from "@/lib/studio-payment/intake-submit";
 
 export async function POST(request: Request) {
   let body: {
@@ -33,6 +36,7 @@ export async function POST(request: Request) {
     checkoutSessionId: body.checkoutSessionId,
     answers: body.answers,
     submittedAt: body.submittedAt,
+    deferDispatch: true,
   });
   if (!result.ok) {
     const status =
@@ -45,9 +49,13 @@ export async function POST(request: Request) {
             : 400;
     return NextResponse.json(result, { status });
   }
+  const campaignId = result.campaign.campaignId;
+  after(async () => {
+    await continuePaidIntakeOperatingChain(campaignId);
+  });
   return NextResponse.json({
     ok: true,
     alreadySubmitted: result.alreadySubmitted,
-    campaign: result.campaign,
+    campaignId,
   });
 }

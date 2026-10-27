@@ -14,10 +14,24 @@ import {
   writeFileSync,
   writeSync,
 } from "fs";
-import os from "os";
 import path from "path";
 
 import { studioCapacity100OrderHardeningV1 as pack } from "@/config/studio-capacity-100-order-hardening-v1";
+
+import {
+  acquireHeavyOccupancyClaimPostgres,
+  heavyOccupancyClaimNeedsOwnerPostgres,
+  readHeavyOccupancyClaimPostgres,
+  recoverStaleHeavyOccupancyClaimPostgres,
+  releaseHeavyOccupancyClaimPostgres,
+  shouldUsePostgresLaneClaims,
+} from "./postgres-lane-claims";
+import {
+  syncAcquireHeavyOccupancyClaim,
+  syncReadHeavyOccupancyClaim,
+  syncRecoverStaleHeavyOccupancyClaim,
+  syncReleaseHeavyOccupancyClaim,
+} from "./postgres-lane-sync-bridge";
 
 export const HEAVY_OCCUPANCY_LOCK_REL =
   "data/studio-lane-occupancy/heavy.lock.json" as const;
@@ -38,15 +52,24 @@ export type AcquireHeavyOccupancyResult =
     };
 
 function lockAbs(repoRoot: string): string {
-  if (process.env.VERCEL) {
-    return path.join(os.tmpdir(), "studio-lane-occupancy", "heavy.lock.json");
-  }
   return path.join(repoRoot, HEAVY_OCCUPANCY_LOCK_REL);
+}
+
+export async function readHeavyOccupancyLockAsync(
+  repoRoot: string,
+): Promise<HeavyOccupancyLockRecord | null> {
+  if (shouldUsePostgresLaneClaims()) {
+    return readHeavyOccupancyClaimPostgres();
+  }
+  return readHeavyOccupancyLock(repoRoot);
 }
 
 export function readHeavyOccupancyLock(
   repoRoot: string,
 ): HeavyOccupancyLockRecord | null {
+  if (shouldUsePostgresLaneClaims()) {
+    return syncReadHeavyOccupancyClaim();
+  }
   const abs = lockAbs(repoRoot);
   if (!existsSync(abs)) return null;
   try {
@@ -89,12 +112,35 @@ function isHeartbeatStale(record: HeavyOccupancyLockRecord, nowMs: number): bool
   return nowMs - beat > pack.occupancyMs.heartbeatStaleMs;
 }
 
+export async function recoverStaleHeavyOccupancyLockAsync(input: {
+  repoRoot: string;
+  occupyingJobIds?: readonly string[];
+  viewsAuthoritative?: boolean;
+  nowMs?: number;
+}): Promise<{ recovered: boolean; needsOwner: boolean }> {
+  if (shouldUsePostgresLaneClaims()) {
+    return recoverStaleHeavyOccupancyClaimPostgres({
+      occupyingJobIds: input.occupyingJobIds,
+      viewsAuthoritative: input.viewsAuthoritative,
+      nowMs: input.nowMs,
+    });
+  }
+  return recoverStaleHeavyOccupancyLock(input);
+}
+
 export function recoverStaleHeavyOccupancyLock(input: {
   repoRoot: string;
   occupyingJobIds?: readonly string[];
   viewsAuthoritative?: boolean;
   nowMs?: number;
 }): { recovered: boolean; needsOwner: boolean } {
+  if (shouldUsePostgresLaneClaims()) {
+    return syncRecoverStaleHeavyOccupancyClaim({
+      occupyingJobIds: input.occupyingJobIds,
+      viewsAuthoritative: input.viewsAuthoritative,
+      nowMs: input.nowMs,
+    });
+  }
   const abs = lockAbs(input.repoRoot);
   const existing = readHeavyOccupancyLock(input.repoRoot);
   if (!existing) {
@@ -118,6 +164,26 @@ export function recoverStaleHeavyOccupancyLock(input: {
   return { recovered: false, needsOwner: true };
 }
 
+export async function acquireHeavyOccupancyLockAsync(input: {
+  repoRoot: string;
+  jobId: string;
+  campaignId: string;
+  occupyingJobIds?: readonly string[];
+  viewsAuthoritative?: boolean;
+  now?: string;
+}): Promise<AcquireHeavyOccupancyResult> {
+  if (shouldUsePostgresLaneClaims()) {
+    return acquireHeavyOccupancyClaimPostgres({
+      jobId: input.jobId,
+      campaignId: input.campaignId,
+      occupyingJobIds: input.occupyingJobIds,
+      viewsAuthoritative: input.viewsAuthoritative,
+      now: input.now,
+    });
+  }
+  return acquireHeavyOccupancyLock(input);
+}
+
 export function acquireHeavyOccupancyLock(input: {
   repoRoot: string;
   jobId: string;
@@ -126,6 +192,15 @@ export function acquireHeavyOccupancyLock(input: {
   viewsAuthoritative?: boolean;
   now?: string;
 }): AcquireHeavyOccupancyResult {
+  if (shouldUsePostgresLaneClaims()) {
+    return syncAcquireHeavyOccupancyClaim({
+      jobId: input.jobId,
+      campaignId: input.campaignId,
+      occupyingJobIds: input.occupyingJobIds,
+      viewsAuthoritative: input.viewsAuthoritative,
+      now: input.now,
+    });
+  }
   const now = input.now ?? new Date().toISOString();
   const nowMs = Date.parse(now);
   const recovered = recoverStaleHeavyOccupancyLock({
@@ -168,17 +243,41 @@ export function acquireHeavyOccupancyLock(input: {
   return { ok: false, reason: "deadlock_needs_owner" };
 }
 
+export async function releaseHeavyOccupancyLockAsync(input: {
+  repoRoot: string;
+  jobId: string;
+}): Promise<boolean> {
+  if (shouldUsePostgresLaneClaims()) {
+    return releaseHeavyOccupancyClaimPostgres({ jobId: input.jobId });
+  }
+  return releaseHeavyOccupancyLock(input);
+}
+
 export function releaseHeavyOccupancyLock(input: {
   repoRoot: string;
   jobId: string;
 }): boolean {
+  if (shouldUsePostgresLaneClaims()) {
+    return syncReleaseHeavyOccupancyClaim({ jobId: input.jobId });
+  }
   const existing = readHeavyOccupancyLock(input.repoRoot);
   if (!existing) return true;
   if (existing.jobId !== input.jobId) return false;
   return unlinkLock(lockAbs(input.repoRoot));
 }
 
+export async function heavyOccupancyLockNeedsOwnerAsync(repoRoot: string): Promise<boolean> {
+  if (shouldUsePostgresLaneClaims()) {
+    return heavyOccupancyClaimNeedsOwnerPostgres();
+  }
+  return heavyOccupancyLockNeedsOwner(repoRoot);
+}
+
 export function heavyOccupancyLockNeedsOwner(repoRoot: string): boolean {
+  if (shouldUsePostgresLaneClaims()) {
+    void repoRoot;
+    return false;
+  }
   const abs = lockAbs(repoRoot);
   if (!existsSync(abs)) return false;
   return readHeavyOccupancyLock(repoRoot) === null;

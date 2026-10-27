@@ -17,12 +17,12 @@ import type { LongSourceSentences } from "@/lib/studio-clip-repurposing/types";
 
 import {
   LIVE_LANE_CAPACITY_SKIP_REASON,
-  acquireHeavyOccupancyLock,
-  admitQuickLaneProduction,
+  acquireHeavyOccupancyLockAsync,
+  admitQuickLaneProductionAsync,
   createLiveLaneCapacityTracker,
   liveLaneForDispatchRecord,
-  releaseHeavyOccupancyLock,
-  releaseQuickLaneReservation,
+  releaseHeavyOccupancyLockAsync,
+  releaseQuickLaneReservationAsync,
   type ProductionLaneView,
 } from "@/lib/job-control";
 import { invokeClipRepurposingDispatchHook } from "./clip-repurposing-dispatch-hook";
@@ -136,7 +136,7 @@ export async function runLaunchMenuProductionObserver(input: {
 
     let heavyLockHeld = false;
     if (laneJob.productionLane === "heavy") {
-      const claimed = acquireHeavyOccupancyLock({
+      const claimed = await acquireHeavyOccupancyLockAsync({
         repoRoot,
         jobId: record.jobId,
         campaignId: input.campaign.campaignId,
@@ -153,7 +153,7 @@ export async function runLaunchMenuProductionObserver(input: {
     let quickHeldJobId: string | null = null;
     const lane = laneJob.returnLane ?? laneJob.productionLane;
     if (enforceQuickAdmission && lane === "quick") {
-      const admitted = admitQuickLaneProduction({
+      const admitted = await admitQuickLaneProductionAsync({
         repoRoot,
         jobId: laneJob.jobId,
         campaignId: input.campaign.campaignId,
@@ -161,7 +161,7 @@ export async function runLaunchMenuProductionObserver(input: {
         capacity: input.laneViews?.find((view) => view.lane === "quick")?.capacity,
       });
       if (!admitted.ok) {
-        if (heavyLockHeld) releaseHeavyOccupancyLock({ repoRoot, jobId: record.jobId });
+        if (heavyLockHeld) await releaseHeavyOccupancyLockAsync({ repoRoot, jobId: record.jobId });
         results.push(skip(record, LIVE_LANE_CAPACITY_SKIP_REASON));
         continue;
       }
@@ -316,10 +316,10 @@ export async function runLaunchMenuProductionObserver(input: {
       }
     } finally {
       if (heavyLockHeld && (process.env.NODE_ENV === "test" || !invokedOk)) {
-        releaseHeavyOccupancyLock({ repoRoot, jobId: record.jobId });
+        await releaseHeavyOccupancyLockAsync({ repoRoot, jobId: record.jobId });
       }
       if (quickHeldJobId && !invokedOk) {
-        releaseQuickLaneReservation({ repoRoot, jobId: quickHeldJobId });
+        await releaseQuickLaneReservationAsync({ repoRoot, jobId: quickHeldJobId });
       }
     }
   }

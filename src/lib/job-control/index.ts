@@ -59,8 +59,11 @@ export {
   QUICK_LANE_ADMISSION_LOCK,
   QUICK_LANE_RESERVATION_DIR,
   admitQuickLaneProduction,
+  admitQuickLaneProductionAsync,
   reconcileQuickLaneReservations,
+  reconcileQuickLaneReservationsAsync,
   releaseQuickLaneReservation,
+  releaseQuickLaneReservationAsync,
   readQuickLaneReservationJobIds,
   type QuickLaneAdmission,
 } from "./quick-lane-admission";
@@ -68,12 +71,18 @@ export {
 export {
   HEAVY_OCCUPANCY_LOCK_REL,
   acquireHeavyOccupancyLock,
+  acquireHeavyOccupancyLockAsync,
   releaseHeavyOccupancyLock,
+  releaseHeavyOccupancyLockAsync,
   recoverStaleHeavyOccupancyLock,
+  recoverStaleHeavyOccupancyLockAsync,
   readHeavyOccupancyLock,
+  readHeavyOccupancyLockAsync,
   type AcquireHeavyOccupancyResult,
   type HeavyOccupancyLockRecord,
 } from "./heavy-occupancy-lock";
+
+export { shouldUsePostgresLaneClaims } from "./postgres-lane-claims";
 
 export {
   shouldMoveJobToWaitingOnClient,

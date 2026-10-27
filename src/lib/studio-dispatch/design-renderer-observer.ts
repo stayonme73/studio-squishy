@@ -32,10 +32,10 @@
 
 import {
   LIVE_LANE_CAPACITY_SKIP_REASON,
-  admitQuickLaneProduction,
+  admitQuickLaneProductionAsync,
   createLiveLaneCapacityTracker,
   liveLaneForDispatchRecord,
-  releaseQuickLaneReservation,
+  releaseQuickLaneReservationAsync,
   type ProductionLaneView,
 } from "@/lib/job-control";
 import { existsSync } from "fs";
@@ -251,7 +251,7 @@ export async function runDesignRendererDispatchObserver(input: {
     }
     const lane = laneJob.returnLane ?? laneJob.productionLane;
     if (enforceQuickAdmission && lane === "quick") {
-      const admitted = admitQuickLaneProduction({
+      const admitted = await admitQuickLaneProductionAsync({
         repoRoot,
         jobId: laneJob.jobId,
         campaignId: input.campaign.campaignId,
@@ -268,14 +268,14 @@ export async function runDesignRendererDispatchObserver(input: {
 
     if (record.skuId === DESIGN_RENDERER_PROOF_SKU) {
       if (!isFlyerProductionIntakeReady(input.campaign)) {
-        if (quickHeldJobId) releaseQuickLaneReservation({ repoRoot, jobId: quickHeldJobId });
+        if (quickHeldJobId) await releaseQuickLaneReservationAsync({ repoRoot, jobId: quickHeldJobId });
         results.push(skip(record, "flyer_intake_production_fields_missing"));
         continue;
       }
       // Promotional work with no way to respond is not produced. The Studio asks
       // for the missing action route instead of inventing one or shipping a dead end.
       if (missingFlyerConversionRoute(input.campaign)) {
-        if (quickHeldJobId) releaseQuickLaneReservation({ repoRoot, jobId: quickHeldJobId });
+        if (quickHeldJobId) await releaseQuickLaneReservationAsync({ repoRoot, jobId: quickHeldJobId });
         results.push(skip(record, "flyer_conversion_route_missing"));
         continue;
       }
