@@ -1,6 +1,6 @@
 /**
  * STUDIO-HOSTED-PREVIEW-SHARP-FIX-FINAL-CLOSEOUT — hosted Preview T5 (Test only).
- * Legitimate Preview signup + login session (server-issued studio_session).
+ * Legitimate Preview signup + login; session via curl cookie jar (-c/-b), not forged tokens.
  * Usage: node scripts/hosted-preview-t5-file-room.mjs <dpl_...> <preview-origin>
  */
 import { createHash } from "crypto";
@@ -40,90 +40,52 @@ for (const line of readFileSync(path.join(repoRoot, ".env.local"), "utf8").split
 const tmp = path.join(tmpdir(), "studio-hosted-preview-t5");
 mkdirSync(tmp, { recursive: true });
 
-function parseHttpResponse(outBuf) {
-  const out = Buffer.isBuffer(outBuf) ? outBuf : Buffer.from(String(outBuf ?? ""), "latin1");
-  let httpIdx = -1;
-  const marker = Buffer.from("HTTP/");
-  for (let i = out.length - marker.length; i >= 0; i -= 1) {
-    if (out.subarray(i, i + marker.length).equals(marker)) {
-      httpIdx = i;
-      break;
-    }
-  }
-  const responseBuf = httpIdx >= 0 ? out.subarray(httpIdx) : out;
-  const headerEnd = responseBuf.indexOf("\r\n\r\n");
-  const headerBuf = headerEnd >= 0 ? responseBuf.subarray(0, headerEnd) : responseBuf;
-  const bodyBuf = headerEnd >= 0 ? responseBuf.subarray(headerEnd + 4) : Buffer.alloc(0);
-  const headers = headerBuf.toString("utf8");
-  const statusMatches = [...headers.matchAll(/^HTTP\/[\d.]+ (\d+)/gm)];
-  const status = statusMatches.length
-    ? Number(statusMatches[statusMatches.length - 1][1])
-    : 0;
-  const setCookies = [...headers.matchAll(/^set-cookie:\s*([^\r\n]+)/gim)].map((m) =>
-    m[1].split(";")[0].trim(),
-  );
-  return { status, headers, bodyBuf, bodyText: bodyBuf.toString("utf8"), setCookies };
+function parseHttpResponse(out) {
+  const text = String(out ?? "");
+  const httpIdx = text.indexOf("HTTP/");
+  const slice = httpIdx >= 0 ? text.slice(httpIdx) : text;
+  const headerEnd = slice.indexOf("\r\n\r\n");
+  const headers = headerEnd >= 0 ? slice.slice(0, headerEnd) : slice;
+  const bodyText = headerEnd >= 0 ? slice.slice(headerEnd + 4) : "";
+  const bodyBuf = Buffer.from(bodyText, "latin1");
+  const statusMatch = headers.match(/^HTTP\/[\d.]+ (\d+)/m);
+  const status = statusMatch ? Number(statusMatch[1]) : 0;
+  return { status, headers, bodyBuf, bodyText };
 }
 
-function mergeSessionCookies(setCookies, prior) {
-  const jar = new Map();
-  if (prior) {
-    for (const part of prior.split(";")) {
-      const trimmed = part.trim();
-      const eq = trimmed.indexOf("=");
-      if (eq > 0) jar.set(trimmed.slice(0, eq), trimmed.slice(eq + 1));
-    }
-  }
-  for (const pair of setCookies) {
-    const eq = pair.indexOf("=");
-    if (eq > 0) jar.set(pair.slice(0, eq), pair.slice(eq + 1));
-  }
-  if (!jar.has("studio_session")) return prior ?? null;
-  return `studio_session=${jar.get("studio_session")}`;
-}
-
-function vercelCurl(route, { method = "GET", body, cookie } = {}) {
-  const args = [
-    "vercel",
-    "curl",
-    route,
-    "--deployment",
-    deploymentId,
-    "-i",
-  ];
+function vercelCurl(route, { method = "GET", body, jar } = {}) {
+  const args = ["vercel", "curl", route, "--deployment", deploymentId, "-i"];
   if (method !== "GET") {
     args.push("-X", method);
   }
   if (body) {
     const bodyPath = path.join(tmp, `body-${randomBytes(4).toString("hex")}.json`);
     writeFileSync(bodyPath, JSON.stringify(body), "utf8");
-    args.push("-H", "Content-Type: application/json", "--data-binary", `@${bodyPath}`);
+    const bodyArg = bodyPath.replace(/\\/g, "/");
+    args.push("-H", "Content-Type: application/json", "--data-binary", `@${bodyArg}`);
   }
-  if (cookie) {
-    const cookiePath = path.join(tmp, `cookie-${randomBytes(4).toString("hex")}.txt`);
-    writeFileSync(cookiePath, cookie.replace(/^Cookie:\s*/i, ""), "utf8");
-    args.push("-H", `Cookie: ${readFileSync(cookiePath, "utf8").trim()}`);
+  if (jar) {
+    args.push("-b", jar.replace(/\\/g, "/"), "-c", jar.replace(/\\/g, "/"));
   }
   const r = spawnSync("npx", args, {
     cwd: repoRoot,
-    shell: false,
+    shell: true,
     maxBuffer: 24 * 1024 * 1024,
   });
-  const parsed = parseHttpResponse(r.stdout);
-  const sessionCookie = mergeSessionCookies(parsed.setCookies, cookie);
-  return { ...parsed, cookie: sessionCookie };
+  return parseHttpResponse(`${r.stdout ?? ""}`);
 }
 
 function parseJsonUser(bodyText) {
   const jsonStart = bodyText.indexOf("{");
-  const parsed = JSON.parse(bodyText.slice(jsonStart >= 0 ? jsonStart : 0));
-  return parsed.user;
+  return JSON.parse(bodyText.slice(jsonStart >= 0 ? jsonStart : 0)).user;
 }
 
 function registerClient(label) {
   const email = `scout-hosted-t5-${label}-${randomBytes(4).toString("hex")}@example.com`;
+  const jar = path.join(tmp, `${label}-${randomBytes(4).toString("hex")}.cookies.txt`);
   const signup = vercelCurl("/api/auth/signup", {
     method: "POST",
+    jar,
     body: {
       email,
       password: TEST_PASSWORD,
@@ -136,6 +98,7 @@ function registerClient(label) {
   }
   const login = vercelCurl("/api/auth/login", {
     method: "POST",
+    jar,
     body: { email, password: TEST_PASSWORD },
   });
   if (login.status !== 200) {
@@ -149,11 +112,16 @@ function registerClient(label) {
     console.error("login_user_parse_failed", login.bodyText.slice(0, 400));
     process.exit(1);
   }
-  if (!user?.id || !login.cookie?.startsWith("studio_session=")) {
-    console.error("login_missing_session", label);
+  if (!user?.id) {
+    console.error("login_missing_user", label);
     process.exit(1);
   }
-  return { user, email, cookie: login.cookie };
+  const probe = vercelCurl("/api/campaigns/current", { jar });
+  if (probe.status === 401) {
+    console.error("session_jar_not_accepted", label);
+    process.exit(1);
+  }
+  return { user, email, jar };
 }
 
 const ownerClient = registerClient("owner");
@@ -171,7 +139,7 @@ const seedEnv = {
 const seedRun = spawnSync(
   "npx",
   ["vitest", "run", "src/lib/studio-durable-persistence/hosted-preview-t5-fixture.test.ts"],
-  { cwd: repoRoot, encoding: "utf8", shell: false, env: seedEnv },
+  { cwd: repoRoot, encoding: "utf8", shell: true, env: seedEnv },
 );
 if (seedRun.status !== 0) {
   console.error("seed_failed", seedRun.stdout, seedRun.stderr);
@@ -180,14 +148,7 @@ if (seedRun.status !== 0) {
 const fixture = JSON.parse(readFileSync(fixtureOut, "utf8"));
 const downloadPath = `/api/file-room/files/${encodeURIComponent(fixture.fileId)}/download`;
 
-const sessionProbe = vercelCurl("/api/campaigns/current", { cookie: ownerClient.cookie });
-console.log("session_probe_status", sessionProbe.status);
-if (sessionProbe.status === 401) {
-  console.error("owner_session_not_accepted_on_preview", sessionProbe.bodyText.slice(0, 200));
-  process.exit(1);
-}
-
-const authorized = vercelCurl(downloadPath, { cookie: ownerClient.cookie });
+const authorized = vercelCurl(downloadPath, { jar: ownerClient.jar });
 console.log("authorized_status", authorized.status);
 if (authorized.status !== 200) {
   console.error("authorized_body", authorized.bodyText.slice(0, 300));
@@ -199,7 +160,7 @@ if (authorizedSha !== fixture.expectedSha256) {
   process.exit(1);
 }
 
-const denied = vercelCurl(downloadPath, { cookie: strangerClient.cookie });
+const denied = vercelCurl(downloadPath, { jar: strangerClient.jar });
 console.log("stranger_status", denied.status);
 if (denied.status !== 403) {
   console.error("stranger_body", denied.bodyText.slice(0, 300));
@@ -210,11 +171,12 @@ console.log(
   JSON.stringify({
     ok: true,
     deploymentId,
+    previewOrigin,
     campaignId,
     fileId: fixture.fileId,
     authorizedStatus: authorized.status,
     strangerStatus: denied.status,
     sha256: authorizedSha,
-    sessionPath: "signup_then_login",
+    sessionPath: "signup_login_cookie_jar",
   }),
 );
