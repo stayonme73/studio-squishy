@@ -3,12 +3,13 @@
  * Usage: node scripts/hosted-preview-t3-complete.mjs <dpl_...> <preview-origin> [checkoutSessionId]
  */
 import { spawnSync } from "child_process";
-import { createHash, randomBytes } from "crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { randomBytes } from "crypto";
+import { existsSync, readFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import Stripe from "stripe";
 import pg from "pg";
+import { createHostedVercelCurl } from "./lib/hosted-preview-vercel-curl.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
@@ -48,26 +49,12 @@ if (!whsec?.startsWith("whsec_")) throw new Error("STRIPE_WEBHOOK_SECRET missing
 if (!databaseUrl?.includes("tzyglhypseyokhbeozjw")) throw new Error("Test DATABASE_URL required");
 
 const stripe = new Stripe(stripeSecret);
-
-function vercelCurl(route, { method = "GET", body, rawBody, headers = [] } = {}) {
-  const args = ["vercel", "curl", route, "--deployment", deploymentId, "-X", method, "-i"];
-  for (const h of headers) args.push("-H", h);
-  if (rawBody != null) {
-    const bodyPath = path.join(repoRoot, "tmp-hosted-webhook-payload.json");
-    mkdirSync(path.dirname(bodyPath), { recursive: true });
-    writeFileSync(bodyPath, rawBody, "utf8");
-    args.push("-H", "Content-Type: application/json", "--data-binary", `@${bodyPath}`);
-  } else if (body != null) {
-    args.push("-H", "Content-Type: application/json", "-d", JSON.stringify(body));
-  }
-  const npxCmd = process.platform === "win32" ? "npx.cmd" : "npx";
-  const r = spawnSync(npxCmd, args, { cwd: repoRoot, encoding: "utf8", shell: false });
-  const out = `${r.stdout ?? ""}${r.stderr ?? ""}`;
-  const headerEnd = out.indexOf("\r\n\r\n");
-  const bodyText = headerEnd >= 0 ? out.slice(headerEnd + 4).trim() : out.trim();
-  const statusMatch = out.match(/^HTTP\/[\d.]+ (\d+)/m);
-  return { status: statusMatch ? Number(statusMatch[1]) : 0, bodyText };
-}
+const tmpDir = path.join(repoRoot, "tmp-hosted-vercel-curl");
+const { vercelCurl, vercelStripeWebhook } = createHostedVercelCurl({
+  repoRoot,
+  deploymentId,
+  tmpDir,
+});
 
 if (!checkoutSessionId) {
   console.log("Creating checkout via hosted smoke helper…");
@@ -117,11 +104,7 @@ const signature = stripe.webhooks.generateTestHeaderString({
   secret: whsec,
 });
 
-const webhook = vercelCurl("/api/payments/webhook", {
-  method: "POST",
-  rawBody: payload,
-  headers: [`Stripe-Signature: ${signature}`],
-});
+const webhook = vercelStripeWebhook(payload, signature);
 console.log("webhook_status", webhook.status);
 console.log("webhook_body", webhook.bodyText.slice(0, 400));
 
