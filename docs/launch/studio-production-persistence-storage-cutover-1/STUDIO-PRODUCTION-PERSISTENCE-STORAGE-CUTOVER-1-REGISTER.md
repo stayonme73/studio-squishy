@@ -13,7 +13,8 @@
 | Test Storage preflight | **PASS** 2026-10-26 AM (`studio-files-test`, ref `tzyglhypseyokhbeozjw`) — **not rerun** |
 | Production Supabase (Owner 2026-10-26) | **VERIFIED** — `txgzguzlojlhndkbncc` HEALTHY; **`studio-files`** private; **8** scheduled DB backups; latest **2026-10-26 12:59:38 UTC**; **PITR off**; **migrations none** |
 | Vercel (Owner 2026-10-26) | Project **`the-studio-company`**; Prod **`fc56426`** OLD; Git **disconnected**; reconciliation + **Preview §7** |
-| Preview build fixes | **`18574344`** (+ **`d92faf83`** register, merge **`481bc268`** local) — TS + NFT trace; **GitHub push failed HTTP 500** (remote **`ee8afb0d`**) |
+| Preview build fixes | **`18574344`** (+ **`d92faf83`**, deploy docs **`7df67f59`**, signup recovery **`5dae8ee0`**) — on GitHub via **thin release sync** (below) |
+| GitHub thin release sync | **PASS** 2026-10-26 PM — branch **`operating/mobile-customer-journey-certification-1-thin-release`** @ **`0fc9ad05`** (from **`ee8afb0d`**). **Included:** `18574344`→`bcf012ca`, `d92faf83`→`fddb6bd0`, `7df67f59`→`69be22af`, `5dae8ee0`→`0fc9ad05`. **Excluded:** **`20a5e00e`** (bulk launch media), **`e9edfb42`**, merge **`481bc268`** (empty on remote base). **Original remote branch unchanged** @ **`ee8afb0d`**. Local thick history preserved (**`thin-release-sync-backup`** → **`5dae8ee0`**). Diagnosis: `STUDIO-GITHUB-PUSH-DIAGNOSIS-2026-10-26.md` |
 | Vercel Pro | **ACTIVE** — team **`stayonme73s-projects`** · project **`the-studio-company`** |
 | NEW Preview deploy | **PASS WITH LIMITS** — signup recovery **`STUDIO-NEW-SITE-PREVIEW-SIGNUP-RECOVERY-1`** · T1 PASS · **T2 PASS** · T4 identity PASS (limits) · T3/T5 not complete · report `STUDIO-NEW-SITE-PREVIEW-SIGNUP-RECOVERY-1-REPORT.md` |
 | Production | **`fc56426`** / Welcome Hall **unchanged** on **`studio-squishy.vercel.app`** |
