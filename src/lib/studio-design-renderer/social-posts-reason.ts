@@ -189,10 +189,22 @@ function socialLogoLayers(input: {
   ];
 }
 
+function offerLeadOfferTypography(truth: SocialPostsProjectTruth): {
+  fontSizePx: number;
+  fontWeight: 600 | 700;
+} {
+  const note = truth.revisionInstruction?.trim() ?? "";
+  if (/headline|tone|softer|less salesy|warmer|offer/i.test(note)) {
+    return { fontSizePx: 40, fontWeight: 600 };
+  }
+  return { fontSizePx: 44, fontWeight: 700 };
+}
+
 /** Post 1 — offer/price hero. Top colour band, left-aligned price stack. */
 function layoutOfferLead(ctx: LayoutContext): SocialPostDesignLayer[] {
   const { truth, member, logoMaterialId: logo, width: W } = ctx;
   const c = truth.brandColors;
+  const offerType = offerLeadOfferTypography(truth);
   const priceLine = truth.priceDisplay.trim()
     ? truth.wasPriceDisplay
       ? `${truth.priceDisplay} · ${truth.wasPriceDisplay}`
@@ -266,8 +278,8 @@ function layoutOfferLead(ctx: LayoutContext): SocialPostDesignLayer[] {
       content: truth.offerName,
       x: 56,
       width: W - 112,
-      fontSizePx: 44,
-      fontWeight: 700,
+      fontSizePx: offerType.fontSizePx,
+      fontWeight: offerType.fontWeight,
       lineHeight: 1.2,
       color: c.primary,
       align: "left",

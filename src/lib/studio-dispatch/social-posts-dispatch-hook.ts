@@ -270,6 +270,7 @@ export async function invokeSocialPostsDispatchHook(input: {
     skuId: record.skuId,
     spec: designSpec,
   });
+  const revisionSalt = mapped.truth.revisionInstruction?.trim() ?? "";
   const tuple =
     mapped.truth.contentMode === "theme_led"
       ? {
@@ -277,9 +278,18 @@ export async function invokeSocialPostsDispatchHook(input: {
           sharedSpecFingerprint: themeLedSetFingerprint(builtTuple.sharedSpecFingerprint, [
             ...designSpec.assets,
             ...reasonSocialPostCaptionsDeterministic(mapped.truth, designSpec.assets),
+            revisionSalt,
           ]),
         }
-      : builtTuple;
+      : revisionSalt
+        ? {
+            ...builtTuple,
+            sharedSpecFingerprint: themeLedSetFingerprint(builtTuple.sharedSpecFingerprint, [
+              revisionSalt,
+              ...designSpec.assets,
+            ]),
+          }
+        : builtTuple;
   const idempotencyKey = buildSocialPostsIdempotencyKey(tuple);
 
   const lookup = () =>

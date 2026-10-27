@@ -198,6 +198,8 @@ export type SocialPostsProjectTruth = {
   assets: SocialPostsQuad<SocialPostMemberTruth>;
   /** Audit note: dispatch/observer wiring intentionally not part of this proof. */
   dispatchWiringScopeNote: string;
+  /** Customer revision round — must change render fingerprint and on-artifact treatment. */
+  revisionInstruction?: string;
 };
 
 export type SocialPostAssetSpec = {

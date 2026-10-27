@@ -269,6 +269,8 @@ export function mapSocialPromoOfferLedSocialTruth(input: {
       ],
       dispatchWiringScopeNote:
         "Social & Promo Graphics composite branch social_posts — offer facts from the parent intake, customer output, no certification labels.",
+      revisionInstruction:
+        input.campaign.machineFlyerRevisionEmphasis?.instruction?.trim() || undefined,
     },
   };
 }

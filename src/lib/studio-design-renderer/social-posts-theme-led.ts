@@ -9,6 +9,7 @@ import {
   themeLedCopyPlan,
   themeLedInventedCtaFinding,
   themeLedRepetitionFinding,
+  themeLedStatement,
   themeLedUnsuppliedFactLeak,
 } from "./theme-led-campaign";
 import {
@@ -70,6 +71,19 @@ function copyOf(truth: SocialPostsProjectTruth) {
   return { ...plan, theme: plan.statement };
 }
 
+/** Customer-supplied optional facts from intake — must appear on-artifact when present (design-quality tokens). */
+export function themeLedCustomerSuppliedFactsLine(truth: SocialPostsProjectTruth): string | null {
+  if (!truth.themeLed) return null;
+  const statement = themeLedStatement(truth.themeLed.theme).trim();
+  const body = truth.body.trim();
+  if (!body || body === statement) return null;
+  if (body.startsWith(statement)) {
+    const facts = body.slice(statement.length).trim();
+    return facts || null;
+  }
+  return body;
+}
+
 function supportLayer(
   id: string,
   content: string | null,
@@ -103,18 +117,40 @@ function ctaLayer(
   ];
 }
 
+function themeLedHeroHeadlineTypography(truth: SocialPostsProjectTruth): {
+  fontSizePx: number;
+  fontWeight: 600 | 700;
+} {
+  const note = truth.revisionInstruction?.trim() ?? "";
+  if (/headline|tone|softer|less salesy|warmer/i.test(note)) {
+    return { fontSizePx: 50, fontWeight: 600 };
+  }
+  return { fontSizePx: 56, fontWeight: 700 };
+}
+
 /** Post 1 — the whole idea: wordmark band, core message, theme. */
 function layoutThemeHero(ctx: ThemeLayoutContext): SocialPostDesignLayer[] {
   const { truth, member, width: W } = ctx;
   const c = truth.brandColors;
   const id = member.assetId;
   const copy = copyOf(truth);
+  const headlineType = themeLedHeroHeadlineTypography(truth);
   return [
     { type: "shape", id: `${id}-band`, role: "offer_band", x: 0, y: 0, width: W, height: 200, fill: c.primary },
     text({ id: `${id}-wordmark`, role: "wordmark", content: truth.wordmark, x: 72, y: 72, width: W - 144, fontSizePx: 46, fontWeight: 700, lineHeight: 1.15, letterSpacingPx: 1, color: c.background, align: "left" }),
-    text({ id: `${id}-headline`, role: "headline", content: copy.core, x: 72, y: 268, width: W - 144, fontSizePx: 56, fontWeight: 700, lineHeight: 1.15, color: c.primary, align: "left" }),
+    text({ id: `${id}-headline`, role: "headline", content: copy.core, x: 72, y: 268, width: W - 144, fontSizePx: headlineType.fontSizePx, fontWeight: headlineType.fontWeight, lineHeight: 1.15, color: c.primary, align: "left" }),
     { type: "shape", id: `${id}-rule`, role: "footer_rule", x: 72, y: 584, width: 180, height: 6, fill: c.secondary },
     text({ id: `${id}-body`, role: "body", content: copy.theme, x: 72, y: 632, width: W - 144, fontSizePx: 28, fontWeight: 400, lineHeight: 1.4, color: c.text, align: "left" }),
+    ...supportLayer(id, themeLedCustomerSuppliedFactsLine(truth), {
+      x: 72,
+      y: 720,
+      width: W - 144,
+      fontSizePx: 24,
+      fontWeight: 400,
+      lineHeight: 1.35,
+      color: c.muted,
+      align: "left",
+    }),
     ...ctaLayer(truth, id, 880, "left"),
   ];
 }

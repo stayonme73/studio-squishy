@@ -55,6 +55,11 @@ import { deliverLifecycleNoticesForCampaign } from "@/lib/studio-lifecycle-email
 
 import { evaluateSocialPromoCustomerPackage } from "@/lib/studio-design-renderer/social-promo-customer-package-qa";
 
+import {
+  isHostedDurableCampaignArtifactsEnabled,
+  withCampaignArtifactProductionWorkspace,
+} from "@/lib/campaign-design-artifacts/hosted-durable";
+
 import { assembleCustomerLifeTruth } from "./assemble-truth";
 
 const MACHINE_USER = {
@@ -76,15 +81,22 @@ type SetFile = {
   hex: string;
 };
 
-function absPath(rel: string | undefined): string | null {
+function absPath(rel: string | undefined, repoRoot: string): string | null {
   if (!rel?.trim()) return null;
-  const abs = path.join(process.cwd(), rel.replace(/\\/g, "/"));
-  return existsSync(abs) ? abs : null;
+  const normalized = rel.replace(/\\/g, "/");
+  const primary = path.join(repoRoot, normalized);
+  if (existsSync(primary)) return primary;
+  const desk = path.join(process.cwd(), normalized);
+  if (repoRoot !== process.cwd() && existsSync(desk)) return desk;
+  return null;
 }
 
-function branchSetGatePassed(result: DesignRendererObserverResult): boolean {
+function branchSetGatePassed(
+  result: DesignRendererObserverResult,
+  repoRoot: string,
+): boolean {
   if (result.ok !== true || result.action !== "invoked") return false;
-  const receiptAbs = absPath(result.receiptRelativePath);
+  const receiptAbs = absPath(result.receiptRelativePath, repoRoot);
   if (!receiptAbs) return false;
   try {
     const receipt = JSON.parse(readFileSync(receiptAbs, "utf8")) as {
@@ -105,25 +117,28 @@ function collectSetFiles(input: {
   parentJobId: string;
   social: DesignRendererObserverResult;
   graphics: DesignRendererObserverResult;
+  repoRoot: string;
 }): { files: SetFile[]; socialVersion: number; graphicsVersion: number } | null {
   const social = collectGeneralDesignReviewContract({
     campaignId: input.campaignId,
     jobId: `${input.parentJobId}:branch:social_posts`,
     skuId: SOCIAL_BRANCH_SKU,
     result: input.social,
+    repoRoot: input.repoRoot,
   });
   const graphics = collectGeneralDesignReviewContract({
     campaignId: input.campaignId,
     jobId: `${input.parentJobId}:branch:campaign_graphics`,
     skuId: GRAPHICS_BRANCH_SKU,
     result: input.graphics,
+    repoRoot: input.repoRoot,
   });
   if (social.setStatus !== "complete_reviewable_set") return null;
   if (graphics.setStatus !== "complete_reviewable_set") return null;
 
   const files: SetFile[] = [];
   for (const member of [...social.members, ...graphics.members]) {
-    const abs = absPath(member.pngRelativePath);
+    const abs = absPath(member.pngRelativePath, input.repoRoot);
     if (!abs) return null;
     files.push({
       member: member.memberId as SocialPromoDeliveryMember,
@@ -131,8 +146,8 @@ function collectSetFiles(input: {
       hex: member.pngContentSha256,
     });
   }
-  const captions = absPath(social.captionTextRelativePath);
-  const order = absPath(social.postingOrderTextRelativePath);
+  const captions = absPath(social.captionTextRelativePath, input.repoRoot);
+  const order = absPath(social.postingOrderTextRelativePath, input.repoRoot);
   if (!captions || !social.captionTextSha256 || !order || !social.postingOrderTextSha256) {
     return null;
   }
@@ -252,12 +267,14 @@ async function bindParentJob(input: {
   graphics: DesignRendererObserverResult;
   clientUserId?: string | null;
   materials?: readonly CampaignMaterialItem[];
+  repoRoot: string;
 }): Promise<{ envelope: ServerTasksEnvelope; bound: boolean; rejected: boolean }> {
   const set = collectSetFiles({
     campaignId: input.campaign.campaignId,
     parentJobId: input.job.jobId,
     social: input.social,
     graphics: input.graphics,
+    repoRoot: input.repoRoot,
   });
   if (!set) return { envelope: input.envelope, bound: false, rejected: false };
   if (
@@ -513,7 +530,19 @@ async function bindParentJob(input: {
 
 export async function ensureSocialPromoCompositeReviewBind(
   campaign: CampaignRecord,
+  options?: { repoRoot?: string },
 ): Promise<CampaignRecord> {
+  const repoRoot = options?.repoRoot ?? process.cwd();
+  if (
+    !options?.repoRoot &&
+    isHostedDurableCampaignArtifactsEnabled() &&
+    Boolean(process.env.VERCEL)
+  ) {
+    return withCampaignArtifactProductionWorkspace(campaign.campaignId, (hydratedRoot) =>
+      ensureSocialPromoCompositeReviewBind(campaign, { repoRoot: hydratedRoot }),
+    );
+  }
+
   const results = campaign.dispatchExecution?.designRendererObserver?.results ?? [];
   if (results.length === 0) return campaign;
   const envelope = await readTasksEnvelope(campaign.campaignId);
@@ -527,7 +556,9 @@ export async function ensureSocialPromoCompositeReviewBind(
     (result) => result.dispatchId === `dd:${job.jobId}:branch:campaign_graphics`,
   );
   if (!social || !graphics) return campaign;
-  if (!branchSetGatePassed(social) || !branchSetGatePassed(graphics)) return campaign;
+  if (!branchSetGatePassed(social, repoRoot) || !branchSetGatePassed(graphics, repoRoot)) {
+    return campaign;
+  }
 
   const campaignEnvelope = await readCampaignEnvelope(campaign.campaignId);
   const materialsEnvelope = await getOrInitializeMaterials(
@@ -542,6 +573,7 @@ export async function ensureSocialPromoCompositeReviewBind(
     graphics,
     clientUserId: campaignEnvelope?.clientUserId,
     materials: materialsEnvelope.items,
+    repoRoot,
   });
   if (bound.rejected) {
     await writeTasksEnvelope(bound.envelope);

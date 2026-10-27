@@ -27,10 +27,29 @@ function normalizeRel(rel: string): string {
   return rel.replace(/\\/g, "/").replace(/^\.?\//, "");
 }
 
-function readJson(rel: string | undefined): Record<string, unknown> | null {
+function artifactRoot(repoRoot?: string): string {
+  return repoRoot?.trim() ? repoRoot : process.cwd();
+}
+
+function readJson(
+  rel: string | undefined,
+  repoRoot?: string,
+): Record<string, unknown> | null {
   if (!rel?.trim()) return null;
-  const abs = path.join(process.cwd(), normalizeRel(rel));
-  if (!existsSync(abs)) return null;
+  const root = artifactRoot(repoRoot);
+  const normalized = normalizeRel(rel);
+  const abs = path.join(root, normalized);
+  if (!existsSync(abs)) {
+    const desk = path.join(process.cwd(), normalized);
+    if (root !== process.cwd() && existsSync(desk)) {
+      try {
+        return JSON.parse(readFileSync(desk, "utf8")) as Record<string, unknown>;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
   try {
     return JSON.parse(readFileSync(abs, "utf8")) as Record<string, unknown>;
   } catch {
@@ -42,8 +61,14 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : null;
 }
 
-function sha256Rel(rel: string): string {
-  const abs = path.join(process.cwd(), normalizeRel(rel));
+function sha256Rel(rel: string, repoRoot?: string): string {
+  const root = artifactRoot(repoRoot);
+  const normalized = normalizeRel(rel);
+  let abs = path.join(root, normalized);
+  if (!existsSync(abs)) {
+    const desk = path.join(process.cwd(), normalized);
+    if (root !== process.cwd() && existsSync(desk)) abs = desk;
+  }
   if (!existsSync(abs) || !rel.trim()) return "";
   return createHash("sha256").update(readFileSync(abs)).digest("hex");
 }
@@ -190,8 +215,9 @@ export function collectGeneralDesignReviewContract(input: {
   jobId: string;
   skuId: string;
   result: DesignRendererObserverResult;
+  repoRoot?: string;
 }): GeneralDesignReviewArtifactContract {
-  const receipt = readJson(input.result.receiptRelativePath);
+  const receipt = readJson(input.result.receiptRelativePath, input.repoRoot);
   const identity = asRecord(receipt?.identity) ?? receipt;
   let members: GeneralDesignReviewProofMember[] = [];
   if (input.skuId === "v2-rtu-promotion-graphics" && identity) {
@@ -222,10 +248,10 @@ export function collectGeneralDesignReviewContract(input: {
     ? postingOrderJsonRel.replace(/posting-order\.json$/i, "posting-order.txt")
     : undefined;
   const captionTextSha256 = captionTextRelativePath
-    ? sha256Rel(captionTextRelativePath)
+    ? sha256Rel(captionTextRelativePath, input.repoRoot)
     : "";
   const postingOrderTextSha256 = postingOrderTextRelativePath
-    ? sha256Rel(postingOrderTextRelativePath)
+    ? sha256Rel(postingOrderTextRelativePath, input.repoRoot)
     : "";
 
   return {

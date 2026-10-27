@@ -296,8 +296,24 @@ export async function invokePromoDispatchHook(input: {
       skuId: record.skuId,
       spec,
     });
-    return themeLed
-      ? { ...built, sharedSpecFingerprint: themeLedSetFingerprint(built.sharedSpecFingerprint, spec.assets) }
+    const revisionSalt = mapped.truth.revisionInstruction?.trim() ?? "";
+    if (themeLed) {
+      return {
+        ...built,
+        sharedSpecFingerprint: themeLedSetFingerprint(built.sharedSpecFingerprint, [
+          ...spec.assets,
+          revisionSalt,
+        ]),
+      };
+    }
+    return revisionSalt
+      ? {
+          ...built,
+          sharedSpecFingerprint: themeLedSetFingerprint(built.sharedSpecFingerprint, [
+            revisionSalt,
+            ...spec.assets,
+          ]),
+        }
       : built;
   };
   const tuple = tupleFor(designSpec);

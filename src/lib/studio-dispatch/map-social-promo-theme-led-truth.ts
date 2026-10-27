@@ -188,6 +188,8 @@ export function mapSocialPromoThemeLedSocialTruth(input: {
       assets: themeLedSocialPostMembers(),
       dispatchWiringScopeNote:
         "Social & Promo Graphics composite branch social_posts — theme-led layouts from the parent intake; wordmark-only; captions Studio-written from the customer's theme and core message.",
+      revisionInstruction:
+        input.campaign.machineFlyerRevisionEmphasis?.instruction?.trim() || undefined,
     },
   };
 }
