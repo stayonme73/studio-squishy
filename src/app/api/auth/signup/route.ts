@@ -74,7 +74,10 @@ export async function POST(request: Request) {
     });
     response.cookies.set(SESSION_COOKIE_NAME, token, sessionCookieOptions());
     return response;
-  } catch {
+  } catch (caught) {
+    const signupFailure =
+      caught instanceof Error ? caught.message : "unknown_error";
+    console.error("[api/auth/signup]", signupFailure);
     return NextResponse.json(
       { error: ACCOUNT_CREATE_UNAVAILABLE },
       { status: 500 },

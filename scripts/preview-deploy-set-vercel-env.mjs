@@ -14,6 +14,42 @@ const envPath = path.join(repoRoot, ".env.local");
 const TEST_REF = "tzyglhypseyokhbeozjw";
 const PROD_REF = "txgzguzlojlhndkbncc";
 
+/** Re-encode password segment so special chars survive CLI / dashboard paste. */
+function normalizePostgresUrl(url) {
+  const trimmed = url.trim();
+  const prefix = "postgresql://";
+  if (!trimmed.startsWith(prefix)) return trimmed;
+  const rest = trimmed.slice(prefix.length);
+  const at = rest.lastIndexOf("@");
+  if (at <= 0) return trimmed;
+  const userPass = rest.slice(0, at);
+  const hostPart = rest.slice(at + 1);
+  const colon = userPass.indexOf(":");
+  if (colon <= 0) return trimmed;
+  const user = userPass.slice(0, colon);
+  const passRaw = userPass.slice(colon + 1);
+  let decoded = passRaw;
+  try {
+    decoded = decodeURIComponent(passRaw);
+  } catch {
+    decoded = passRaw;
+  }
+  const pass = encodeURIComponent(decoded);
+  return `${prefix}${user}:${pass}@${hostPart}`;
+}
+
+/** Vercel serverless → Supabase transaction pooler (6543) + pgbouncer flag. */
+function vercelServerlessDatabaseUrl(url) {
+  let u = normalizePostgresUrl(url);
+  if (u.includes(".pooler.supabase.com:5432/")) {
+    u = u.replace(".pooler.supabase.com:5432/", ".pooler.supabase.com:6543/");
+  }
+  if (!u.includes("pgbouncer=")) {
+    u += `${u.includes("?") ? "&" : "?"}pgbouncer=true`;
+  }
+  return u;
+}
+
 function parseEnvFile(filePath) {
   const out = {};
   if (!existsSync(filePath)) return out;
@@ -53,6 +89,7 @@ function assertTestOnly(key, value) {
 
 function vercelEnvAdd(name, value, previewOnly = true) {
   const args = ["vercel", "env", "add", name, previewOnly ? "preview" : "development", "--force"];
+  // shell:false — Windows cmd expands `$` in DB URLs and corrupts passwords.
   const r = spawnSync("npx", args, {
     cwd: repoRoot,
     input: value,
@@ -61,7 +98,8 @@ function vercelEnvAdd(name, value, previewOnly = true) {
     stdio: ["pipe", "pipe", "pipe"],
   });
   if (r.status !== 0) {
-    console.error(`Failed to set ${name}: ${r.stderr?.slice(0, 200) || r.stdout?.slice(0, 200)}`);
+    const detail = [r.stderr, r.stdout, r.error?.message].filter(Boolean).join(" ").slice(0, 400);
+    console.error(`Failed to set ${name}: ${detail || "unknown"}`);
     process.exit(1);
   }
   console.log(`Set Preview env: ${name}`);
@@ -85,7 +123,7 @@ assertTestOnly("STRIPE_SECRET_KEY", stripeSecret);
 const pairs = [
   ["SESSION_SECRET", sessionSecret],
   ["STUDIO_PERSISTENCE_BACKEND", "postgres"],
-  ["DATABASE_URL", databaseUrl],
+  ["DATABASE_URL", vercelServerlessDatabaseUrl(databaseUrl)],
   ["NEXT_PUBLIC_SUPABASE_URL", supabaseUrl],
   ["SUPABASE_SERVICE_ROLE_KEY", serviceRole],
   ["SUPABASE_STORAGE_BUCKET", bucket],
@@ -106,4 +144,17 @@ for (const [k, v] of pairs) {
   vercelEnvAdd(k, v.trim());
 }
 
-console.log("Preview env configured (SESSION_SECRET is new; NEXT_PUBLIC_SITE_URL set after first deploy URL).");
+const previewSiteUrl = process.argv[2]?.trim();
+if (previewSiteUrl) {
+  if (!previewSiteUrl.startsWith("https://") || previewSiteUrl.includes(" ")) {
+    console.error("Usage: node scripts/preview-deploy-set-vercel-env.mjs [https://preview-host.vercel.app]");
+    process.exit(2);
+  }
+  vercelEnvAdd("NEXT_PUBLIC_SITE_URL", previewSiteUrl.replace(/\/+$/, ""));
+}
+
+console.log(
+  previewSiteUrl
+    ? "Preview env configured (incl. NEXT_PUBLIC_SITE_URL)."
+    : "Preview env configured (SESSION_SECRET is new; pass Preview URL arg to set NEXT_PUBLIC_SITE_URL).",
+);

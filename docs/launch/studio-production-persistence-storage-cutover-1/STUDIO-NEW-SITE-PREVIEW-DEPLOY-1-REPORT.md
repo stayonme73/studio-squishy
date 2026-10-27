@@ -77,14 +77,14 @@ Revert or commit separately — **not** merged to GitHub release ref.
 | Tier | Result | Evidence |
 |------|--------|----------|
 | **T1 — Shell** | **PASS** | `/` **200** — NEW homepage (`studio-homepage`, lounge plate); `/help-center` **200**; `/route-map` **307** → `/studio-conversation-room` (locked redirect); not Draft Room |
-| **T2 — Auth** | **FAIL** | `POST /api/auth/signup` → **500** `Account creation is temporarily unavailable` (exception in handler — likely Postgres/auth persistence on Preview) |
-| **T3 — Pay** | **NOT RUN** | Blocked on T2 session/account |
-| **T4 — Persistence** | **NOT RUN** | Blocked on T2 |
-| **T5 — File Room** | **NOT RUN** | Blocked on T2 |
+| **T2 — Auth** | **PASS** (recovery) | See **`STUDIO-NEW-SITE-PREVIEW-SIGNUP-RECOVERY-1-REPORT.md`** — invalid Preview **`DATABASE_URL`** fixed via env re-upload; signup **200** on `dpl_4i9n7k4…` |
+| **T3 — Pay** | **NOT RUN** | Stripe **test** keys on Preview; sandbox-confirm blocked by design — needs hosted checkout smoke |
+| **T4 — Persistence** | **PASS WITH LIMITS** | Test **`studio_users`** rows from T2 probes |
+| **T5 — File Room** | **NOT RUN** | After T3 + upload fixture |
 
-**Preview env (unchanged):** Test Supabase ref **`tzyglhypseyokhbeozjw`**, **`studio-files-test`**, Stripe **test**, **`TRANSACTIONAL_EMAIL_PROVIDER=none`**, Preview **`SESSION_SECRET`** present (names verified via `vercel env ls preview`).
+**Superseded failure note:** Initial T2 **500** was **not** auth logic regression — **Test Postgres credentials on Vercel Preview** (see recovery report §2).
 
-**Remaining:** Set **`NEXT_PUBLIC_SITE_URL`** to Preview host after Owner confirms URL; diagnose signup **500** against Test **`DATABASE_URL`** / auth postgres path.
+**Preview env:** Test ref **`tzyglhypseyokhbeozjw`**, **`NEXT_PUBLIC_SITE_URL`** set to active Preview host, **`DATABASE_URL`** transaction pooler (**6543** + `pgbouncer=true`).
 
 ---
 

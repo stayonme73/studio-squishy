@@ -15,7 +15,7 @@
 | Vercel (Owner 2026-10-26) | Project **`the-studio-company`**; Prod **`fc56426`** OLD; Git **disconnected**; reconciliation + **Preview §7** |
 | Preview build fixes | **`18574344`** (+ **`d92faf83`** register, merge **`481bc268`** local) — TS + NFT trace; **GitHub push failed HTTP 500** (remote **`ee8afb0d`**) |
 | Vercel Pro | **ACTIVE** — team **`stayonme73s-projects`** · project **`the-studio-company`** |
-| NEW Preview deploy | **PASS WITH LIMITS** — **`dpl_4i9n7k4PJ8fj6Hca9Nf9UKAHKnqz`** · **`https://the-studio-company-ooxt99n28-stayonme73s-projects.vercel.app`** · T1 PASS · T2–T5 not complete |
+| NEW Preview deploy | **PASS WITH LIMITS** — signup recovery **`STUDIO-NEW-SITE-PREVIEW-SIGNUP-RECOVERY-1`** · T1 PASS · **T2 PASS** · T4 identity PASS (limits) · T3/T5 not complete · report `STUDIO-NEW-SITE-PREVIEW-SIGNUP-RECOVERY-1-REPORT.md` |
 | Production | **`fc56426`** / Welcome Hall **unchanged** on **`studio-squishy.vercel.app`** |
 | Production migration / deploy | **NOT RUN** |
 

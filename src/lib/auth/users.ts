@@ -9,6 +9,7 @@ import type {
 } from "@/lib/campaign-store/types";
 import { isPlausibleEmail, normalizeEmail } from "@/lib/auth/email-normalize";
 import { isPostgresPersistenceEnabled } from "@/config/studio-durable-persistence-v1";
+import { requirePostgresPersistenceOnHostedRuntime } from "@/lib/studio-durable-persistence/hosted-persistence-guard";
 import {
   pgFindUserByEmail,
   pgFindUserById,
@@ -265,6 +266,7 @@ export type CreateClientAccountResult =
 export async function createClientAccount(
   input: CreateClientAccountInput,
 ): Promise<CreateClientAccountResult> {
+  requirePostgresPersistenceOnHostedRuntime("createClientAccount");
   const email = normalizeEmail(input.email);
   const displayName = input.displayName.trim();
   const password = input.password;
