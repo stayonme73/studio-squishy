@@ -4,6 +4,7 @@ docs
 test-artifacts
 tmp
 .playwright-browsers
-assets
+# House serif bytes for design renderer — must ship on Preview (see studio-static-design-composition-v1)
+!assets/fonts/**
 *.md
 .git

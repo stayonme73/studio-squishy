@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
     "/api/**": [
       "./node_modules/@img/**",
       "./node_modules/sharp/**",
+      "./assets/fonts/**/*",
+      "./node_modules/@sparticuz/chromium/bin/**",
+      "./node_modules/@sparticuz/chromium/build/**",
+      "./node_modules/playwright-core/**",
     ],
   },
   outputFileTracingExcludes: {
@@ -17,7 +21,6 @@ const nextConfig: NextConfig = {
       "./test-artifacts/**/*",
       "./tmp/**/*",
       "./tmp-*/**/*",
-      "./assets/**/*",
       "./.playwright-browsers/**/*",
       "./src/archive/**/*",
     ],
@@ -33,12 +36,18 @@ const nextConfig: NextConfig = {
       "./public/**/*.webm",
       "./public/**/*@2x.png",
       "./tsconfig.tsbuildinfo",
-      "./node_modules/playwright-core/**/*",
-      "./node_modules/@playwright/**/*",
     ],
   },
   // Bundle sharp native libs into traced functions — externalizing breaks libvips on Vercel nodejs24.
-  serverExternalPackages: ["@napi-rs/canvas", "canvas", "stripe", "pg"],
+  serverExternalPackages: [
+    "@napi-rs/canvas",
+    "@sparticuz/chromium",
+    "canvas",
+    "pg",
+    "playwright",
+    "playwright-core",
+    "stripe",
+  ],
   devIndicators: false,
   // Phone LAN cert. Next.js 16 blocks /_next from unlisted hosts while HTML still paints.
   // Keep only recorded private-network IPs. If DHCP changes, add the new IP and restart.

@@ -30,8 +30,8 @@ async function captureSidePng(input: {
   heightPx: number;
 }): Promise<CardSideCapture> {
   mkdirSync(path.dirname(input.pngAbsolutePath), { recursive: true });
-  const { chromium } = await import("playwright");
-  const browser = await chromium.launch({ headless: true });
+  const { launchDesignRendererChromium } = await import("./launch-chromium");
+  const browser = await launchDesignRendererChromium();
   try {
     const page = await browser.newPage({
       viewport: { width: input.widthPx, height: input.heightPx },
@@ -105,8 +105,8 @@ export async function captureBusinessCardExports(input: {
     heightPx,
   });
 
-  const { chromium } = await import("playwright");
-  const browser = await chromium.launch({ headless: true });
+  const { launchDesignRendererChromium } = await import("./launch-chromium");
+  const browser = await launchDesignRendererChromium();
   try {
     const page = await browser.newPage({
       viewport: { width: widthPx, height: heightPx },

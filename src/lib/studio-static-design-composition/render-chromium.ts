@@ -374,8 +374,10 @@ export const chromiumStaticDesignRenderer: StaticDesignRenderer = {
       );
     writeFileSync(htmlPath, html, "utf8");
 
-    const { chromium } = await import("playwright");
-    const browser = await chromium.launch({ headless: true });
+    const { launchDesignRendererChromium } = await import(
+      "@/lib/studio-design-renderer/launch-chromium"
+    );
+    const browser = await launchDesignRendererChromium();
     const renderedFacts: RenderedFactCheck[] = [];
     try {
       const page = await browser.newPage({
