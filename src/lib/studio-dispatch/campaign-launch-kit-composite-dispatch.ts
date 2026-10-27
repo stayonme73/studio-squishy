@@ -14,11 +14,19 @@ import type { CampaignMaterialItem } from "@/lib/materials/types";
 import { evaluateJobRoutingDecision } from "@/lib/studio-routing-handoff/evaluate";
 import type { JobRoutingDecision } from "@/lib/studio-routing-handoff/types";
 
+import { condensedServiceSku } from "@/config/studio-customer-journey-condense-v1";
+
 import { readCampaignLaunchKitBrief } from "./campaign-launch-kit-brief";
 
 const CONTRACT = studioCampaignLaunchKitCurrentDoorContractV1;
 const PARENT = CAMPAIGN_LAUNCH_KIT_PACKAGE_ID;
 const PARENT_SERVICE = PARENT as ServiceId;
+/** Condensed checkout stores factory SKU on the parent job; composite routing keys off package id. */
+const PARENT_FACTORY_SKU = condensedServiceSku(PARENT) as ServiceId;
+
+function isCampaignLaunchKitParentJob(skuId: ServiceId): boolean {
+  return skuId === PARENT_SERVICE || skuId === PARENT_FACTORY_SKU;
+}
 
 const BRANCHES = [
   CONTRACT.branches.flyer,
@@ -63,7 +71,7 @@ export function campaignLaunchKitCompositeRoutingDecisions(input: {
   materials: readonly CampaignMaterialItem[];
   evaluatedAt?: string;
 }): JobRoutingDecision[] | null {
-  if (input.job.skuId !== PARENT_SERVICE) return null;
+  if (!isCampaignLaunchKitParentJob(input.job.skuId)) return null;
   const brief = readCampaignLaunchKitBrief(input.campaign);
   const intakeComplete = Boolean(input.job.intakeComplete && brief.ok);
   return BRANCHES.map((branch) =>
