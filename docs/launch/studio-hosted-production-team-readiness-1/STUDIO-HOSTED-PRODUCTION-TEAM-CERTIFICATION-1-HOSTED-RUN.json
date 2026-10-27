@@ -1,0 +1,326 @@
+{
+  "startedAt": "2026-10-27T03:26:09.056Z",
+  "finishedAt": "2026-10-27T03:30:55.406Z",
+  "deploymentId": "dpl_2tboEKNUEY7PLbCT6XQnxumUxhRo",
+  "previewOrigin": "https://the-studio-company-la2h2kcar-stayonme73s-projects.vercel.app",
+  "ledger": [
+    {
+      "at": "2026-10-27T03:26:24.565Z",
+      "packageId": "clip_repurposing",
+      "stage": "auth-signup-login",
+      "status": "PASS",
+      "detail": "hpt-cert-clip_repurposing-2d52e67f@example.com",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:26:35.105Z",
+      "packageId": "clip_repurposing",
+      "stage": "checkout-session",
+      "status": "PASS",
+      "detail": "cs_test_a1BekwxMUe2GBPeP5DsSJaKg0CTnAfnWN9p9JA36YS5JA8AUiLvzVn4ouy",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:26:48.733Z",
+      "packageId": "clip_repurposing",
+      "stage": "stripe-webhook",
+      "status": "PASS",
+      "detail": "",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:26:53.920Z",
+      "packageId": "clip_repurposing",
+      "stage": "hosted-concurrent-reconcile-wake",
+      "status": "PASS",
+      "detail": "statuses=200,200",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:26:54.855Z",
+      "packageId": "clip_repurposing",
+      "stage": "postgres-paid-truth",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "at": "2026-10-27T03:27:11.997Z",
+      "packageId": "clip_repurposing",
+      "stage": "intake-submit",
+      "status": "PASS",
+      "detail": "fresh",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:27:16.560Z",
+      "packageId": "clip_repurposing",
+      "stage": "machine-dispatch",
+      "status": "PASS",
+      "detail": "deferred"
+    },
+    {
+      "at": "2026-10-27T03:27:16.560Z",
+      "packageId": "clip_repurposing",
+      "stage": "genuine-production",
+      "status": "NOT REACHED",
+      "detail": "no invoked observer evidence in envelope"
+    },
+    {
+      "at": "2026-10-27T03:27:16.560Z",
+      "packageId": "clip_repurposing",
+      "stage": "independent-quality",
+      "status": "NOT REACHED",
+      "detail": "no QA block in campaign envelope"
+    },
+    {
+      "at": "2026-10-27T03:27:16.560Z",
+      "packageId": "clip_repurposing",
+      "stage": "customer-review",
+      "status": "NOT REACHED",
+      "detail": "not eligible yet on hosted path"
+    },
+    {
+      "at": "2026-10-27T03:27:16.561Z",
+      "packageId": "clip_repurposing",
+      "stage": "final-delivery",
+      "status": "NOT REACHED",
+      "detail": "not released in this runner window"
+    },
+    {
+      "at": "2026-10-27T03:27:36.718Z",
+      "packageId": "short_form_video_editing",
+      "stage": "auth-signup-login",
+      "status": "PASS",
+      "detail": "hpt-cert-short_form_video_editing-e264fe3d@example.com",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:27:47.767Z",
+      "packageId": "short_form_video_editing",
+      "stage": "checkout-session",
+      "status": "PASS",
+      "detail": "cs_test_a1SvIkhy3oIWUAdKJJeGJRopjQlgsdNIPeKBrxC4A7oyJFEIdGh3RCZ2nF",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:28:01.843Z",
+      "packageId": "short_form_video_editing",
+      "stage": "stripe-webhook",
+      "status": "PASS",
+      "detail": "",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:28:07.158Z",
+      "packageId": "short_form_video_editing",
+      "stage": "hosted-concurrent-reconcile-wake",
+      "status": "PASS",
+      "detail": "statuses=200,200",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:28:08.172Z",
+      "packageId": "short_form_video_editing",
+      "stage": "postgres-paid-truth",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "at": "2026-10-27T03:28:26.031Z",
+      "packageId": "short_form_video_editing",
+      "stage": "intake-submit",
+      "status": "PASS",
+      "detail": "fresh",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:28:30.983Z",
+      "packageId": "short_form_video_editing",
+      "stage": "machine-dispatch",
+      "status": "PASS",
+      "detail": "deferred"
+    },
+    {
+      "at": "2026-10-27T03:28:30.983Z",
+      "packageId": "short_form_video_editing",
+      "stage": "genuine-production",
+      "status": "NOT REACHED",
+      "detail": "no invoked observer evidence in envelope"
+    },
+    {
+      "at": "2026-10-27T03:28:30.983Z",
+      "packageId": "short_form_video_editing",
+      "stage": "independent-quality",
+      "status": "NOT REACHED",
+      "detail": "no QA block in campaign envelope"
+    },
+    {
+      "at": "2026-10-27T03:28:30.983Z",
+      "packageId": "short_form_video_editing",
+      "stage": "customer-review",
+      "status": "NOT REACHED",
+      "detail": "not eligible yet on hosted path"
+    },
+    {
+      "at": "2026-10-27T03:28:30.983Z",
+      "packageId": "short_form_video_editing",
+      "stage": "final-delivery",
+      "status": "NOT REACHED",
+      "detail": "not released in this runner window"
+    },
+    {
+      "at": "2026-10-27T03:28:50.266Z",
+      "packageId": "social_and_promo_graphics",
+      "stage": "auth-signup-login",
+      "status": "PASS",
+      "detail": "hpt-cert-social_and_promo_graphics-c7dcde27@example.com",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:29:00.767Z",
+      "packageId": "social_and_promo_graphics",
+      "stage": "checkout-session",
+      "status": "PASS",
+      "detail": "cs_test_a1saTg9YfiVekpcUqccwVQTP5aLgwjEoSvB1EdAsR6A5pWjEptR483yycV",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:29:14.961Z",
+      "packageId": "social_and_promo_graphics",
+      "stage": "stripe-webhook",
+      "status": "PASS",
+      "detail": "",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:29:20.995Z",
+      "packageId": "social_and_promo_graphics",
+      "stage": "hosted-concurrent-reconcile-wake",
+      "status": "PASS",
+      "detail": "statuses=200,200",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:29:21.903Z",
+      "packageId": "social_and_promo_graphics",
+      "stage": "postgres-paid-truth",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "at": "2026-10-27T03:29:35.817Z",
+      "packageId": "social_and_promo_graphics",
+      "stage": "intake-submit",
+      "status": "FAIL",
+      "detail": "npm warn Unknown env config \"devdir\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nVercel CLI 65.4.0 (Node.js 24.15.0)\n  % Total    % Received % Xferd  Average Speed  Time    Ti",
+      "httpStatus": 500
+    },
+    {
+      "at": "2026-10-27T03:29:55.598Z",
+      "packageId": "campaign_launch_kit",
+      "stage": "auth-signup-login",
+      "status": "PASS",
+      "detail": "hpt-cert-campaign_launch_kit-db92aa71@example.com",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:30:06.293Z",
+      "packageId": "campaign_launch_kit",
+      "stage": "checkout-session",
+      "status": "PASS",
+      "detail": "cs_test_a1gwLpZYvY4WkHJo0n0Lb6mJhdEJmaVZgGEBNPdVllDfdQ7GDKM92lLtBF",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:30:21.006Z",
+      "packageId": "campaign_launch_kit",
+      "stage": "stripe-webhook",
+      "status": "PASS",
+      "detail": "",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:30:26.629Z",
+      "packageId": "campaign_launch_kit",
+      "stage": "hosted-concurrent-reconcile-wake",
+      "status": "PASS",
+      "detail": "statuses=200,200",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:30:27.623Z",
+      "packageId": "campaign_launch_kit",
+      "stage": "postgres-paid-truth",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "at": "2026-10-27T03:30:46.455Z",
+      "packageId": "campaign_launch_kit",
+      "stage": "intake-submit",
+      "status": "PASS",
+      "detail": "fresh",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-10-27T03:30:51.404Z",
+      "packageId": "campaign_launch_kit",
+      "stage": "machine-dispatch",
+      "status": "PASS",
+      "detail": "deferred"
+    },
+    {
+      "at": "2026-10-27T03:30:51.404Z",
+      "packageId": "campaign_launch_kit",
+      "stage": "genuine-production",
+      "status": "NOT REACHED",
+      "detail": "no invoked observer evidence in envelope"
+    },
+    {
+      "at": "2026-10-27T03:30:51.404Z",
+      "packageId": "campaign_launch_kit",
+      "stage": "independent-quality",
+      "status": "NOT REACHED",
+      "detail": "no QA block in campaign envelope"
+    },
+    {
+      "at": "2026-10-27T03:30:51.404Z",
+      "packageId": "campaign_launch_kit",
+      "stage": "customer-review",
+      "status": "NOT REACHED",
+      "detail": "not eligible yet on hosted path"
+    },
+    {
+      "at": "2026-10-27T03:30:51.404Z",
+      "packageId": "campaign_launch_kit",
+      "stage": "final-delivery",
+      "status": "NOT REACHED",
+      "detail": "not released in this runner window"
+    }
+  ],
+  "summaries": [
+    {
+      "packageId": "clip_repurposing",
+      "verdict": "NOT REACHED",
+      "campaignId": "disposable-hpt-cert-clip_repurposing-6a31a13c",
+      "checkoutSessionId": "cs_test_a1BekwxMUe2GBPeP5DsSJaKg0CTnAfnWN9p9JA36YS5JA8AUiLvzVn4ouy"
+    },
+    {
+      "packageId": "short_form_video_editing",
+      "verdict": "NOT REACHED",
+      "campaignId": "disposable-hpt-cert-short_form_video_editing-cd113eac",
+      "checkoutSessionId": "cs_test_a1SvIkhy3oIWUAdKJJeGJRopjQlgsdNIPeKBrxC4A7oyJFEIdGh3RCZ2nF"
+    },
+    {
+      "packageId": "social_and_promo_graphics",
+      "verdict": "NOT REACHED",
+      "reason": "intake failed"
+    },
+    {
+      "packageId": "campaign_launch_kit",
+      "verdict": "NOT REACHED",
+      "campaignId": "disposable-hpt-cert-campaign_launch_kit-fe2d85f6",
+      "checkoutSessionId": "cs_test_a1gwLpZYvY4WkHJo0n0Lb6mJhdEJmaVZgGEBNPdVllDfdQ7GDKM92lLtBF"
+    }
+  ]
+}

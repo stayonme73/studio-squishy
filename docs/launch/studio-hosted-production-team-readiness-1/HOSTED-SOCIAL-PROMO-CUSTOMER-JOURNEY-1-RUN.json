@@ -1,0 +1,102 @@
+{
+  "startedAt": "2026-10-27T13:01:06.030Z",
+  "finishedAt": "2026-10-27T13:03:20.405Z",
+  "deploymentId": "dpl_FMEpEfaF5hq9C2R1ijDsEd998JJ2",
+  "previewOrigin": "https://the-studio-company-qh02t0ysa-stayonme73s-projects.vercel.app",
+  "campaignId": "disposable-hosted-sp-journey-454f1def",
+  "socialPromoRenderRelease": {
+    "authorizedBy": "owner-tagia",
+    "authorizedAt": "2026-10-27T13:01:43.778Z",
+    "reason": "STUDIO-HOSTED-SOCIAL-PROMO-CUSTOMER-JOURNEY-1 — owner-authorized render release for disposable Preview cert.",
+    "packageId": "social_and_promo_graphics",
+    "campaignId": "disposable-hosted-sp-journey-454f1def",
+    "sandboxOnly": true
+  },
+  "ledger": [
+    {
+      "status": "PASS",
+      "detail": "hosted-sp-journey-owner-979740@example.com"
+    },
+    {
+      "status": "PASS",
+      "detail": "cs_test_a1hHqliqbewYTGHKYZMQkcUxcYuJkSjApMyWu37kd6lWCnD8J7QiUFrayw"
+    },
+    {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "detail": "owner-tagia"
+    },
+    {
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "detail": "social=true promo=true waitMs=16915"
+    },
+    {
+      "status": "NOT_REACHED",
+      "detail": "HTTP 403"
+    },
+    {
+      "status": "PASS",
+      "detail": "HTTP 403"
+    }
+  ],
+  "designResults": [
+    {
+      "ok": true,
+      "skuId": "v2-rtu-social-posts",
+      "action": "invoked",
+      "dispatchId": "dd:disposable-hosted-sp-journey-454f1def:social_and_promo_graphics:branch:social_posts",
+      "makeRequired": false,
+      "canvaRequired": false,
+      "renderVersion": 1,
+      "pngContentSha256": "84f2531d997c352bfbbca71b9c6d93773fffa977cd693797fffafd65411a5a5f",
+      "invocationOutcome": "RENDERED",
+      "receiptRelativePath": "data/campaign-design-artifacts/disposable-hosted-sp-journey-454f1def/dd_disposable-hosted-sp-journey-454f1def_social_and_promo_graphics_branch_social_posts/renders/v1/dispatch-hook-receipt.json",
+      "backPngContentSha256": "b1171d3a831c72e8e74a6662f02f23e54dc3354bed223bfebd9c08fd03a3843f",
+      "ownerRoutineProduction": "NONE"
+    },
+    {
+      "ok": true,
+      "skuId": "v2-rtu-promotion-graphics",
+      "action": "invoked",
+      "dispatchId": "dd:disposable-hosted-sp-journey-454f1def:social_and_promo_graphics:branch:campaign_graphics",
+      "makeRequired": false,
+      "canvaRequired": false,
+      "renderVersion": 1,
+      "pngContentSha256": "0a6e94cd53ce17ee8a88a5305d131b47af40f55af2053c4deb293411fc54e01b",
+      "generalDesignLoop": {
+        "jobId": "disposable-hosted-sp-journey-454f1def:social_and_promo_graphics:branch:campaign_graphics",
+        "skuId": "v2-rtu-promotion-graphics",
+        "status": "passed",
+        "attempts": [
+          {
+            "message": null,
+            "qaResult": "pass",
+            "startedAt": "2026-10-27T13:02:08.775Z",
+            "completedAt": "2026-10-27T13:02:08.775Z",
+            "failureCode": null,
+            "triggeredBy": "initial_dispatch",
+            "attemptNumber": 1,
+            "pngContentSha256": "0a6e94cd53ce17ee8a88a5305d131b47af40f55af2053c4deb293411fc54e01b"
+          }
+        ],
+        "packageId": "STUDIO-OPERATING-GENERAL-DESIGN-RUNTIME-1",
+        "updatedAt": "2026-10-27T13:02:08.775Z",
+        "campaignId": "disposable-hosted-sp-journey-454f1def",
+        "dispatchId": "dd:disposable-hosted-sp-journey-454f1def:social_and_promo_graphics:branch:campaign_graphics",
+        "maxAttempts": 3,
+        "ownerEscalation": null
+      },
+      "invocationOutcome": "RENDERED",
+      "receiptRelativePath": "data/campaign-design-artifacts/disposable-hosted-sp-journey-454f1def/dd_disposable-hosted-sp-journey-454f1def_social_and_promo_graphics_branch_campaign_graphics/renders/v1/dispatch-hook-receipt.json",
+      "backPngContentSha256": "0cec2d7f568adc8ad855472cb04576da08d18273576a902bfcdef37e44e9ea4d",
+      "ownerRoutineProduction": "NONE"
+    }
+  ]
+}

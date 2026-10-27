@@ -1,0 +1,103 @@
+{
+  "startedAt": "2026-10-27T15:36:19.049Z",
+  "finishedAt": "2026-10-27T15:42:00.471Z",
+  "deploymentId": "dpl_7K8zNWYYku22nyQhgrxiWi4sETVy",
+  "previewOrigin": "https://the-studio-company-b0qpk1oab-stayonme73s-projects.vercel.app",
+  "campaignId": "disposable-hosted-sp-final-cert-d03a76a8",
+  "ledger": [
+    {
+      "stage": "auth",
+      "status": "PASS",
+      "detail": "hosted-sp-final-owner-c0951c@example.com"
+    },
+    {
+      "stage": "checkout",
+      "status": "PASS",
+      "detail": "cs_test_a1ceDiWotag9huvz4LyE320M7DHYFzM0AKNfTJklYVedyURhsQUAa3eRBr"
+    },
+    {
+      "stage": "webhook",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "stage": "intake-submit",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "stage": "socialPromoRenderRelease-product-path",
+      "status": "PASS",
+      "detail": "Confirmed payment and submitted Project Intake — automatic Social & Promo compos"
+    },
+    {
+      "stage": "continue-paid-intake-chain",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "stage": "hosted-design-production-v1",
+      "status": "PASS",
+      "detail": "social=true promo=true waitMs=16041"
+    },
+    {
+      "stage": "parent-ready_for_review",
+      "status": "PASS",
+      "detail": "ready_for_review"
+    },
+    {
+      "stage": "customer-review-get",
+      "status": "PASS",
+      "detail": "8 deliverables HTTP 200"
+    },
+    {
+      "stage": "one-revision-request",
+      "status": "PASS",
+      "detail": "revision_requested"
+    },
+    {
+      "stage": "revision-corrected-artifacts",
+      "status": "PASS",
+      "detail": "renderVersion=2 v1=84f2531d997c v2=faee04ba17dd"
+    },
+    {
+      "stage": "correction-ledger",
+      "status": "PASS",
+      "detail": "1 jobCorrectionUses"
+    },
+    {
+      "stage": "approve-for-delivery",
+      "status": "PASS",
+      "detail": "ready_for_delivery"
+    },
+    {
+      "stage": "released-files",
+      "status": "PASS",
+      "detail": "8/8"
+    },
+    {
+      "stage": "cross-customer-denial",
+      "status": "PASS",
+      "detail": "HTTP 403"
+    },
+    {
+      "stage": "exact-byte-download",
+      "status": "FAIL",
+      "detail": "HTTP 0"
+    },
+    {
+      "stage": "durable-state-second-request",
+      "status": "PASS",
+      "detail": "wake HTTP 200"
+    }
+  ],
+  "socialPromoRenderRelease": {
+    "reason": "Confirmed payment and submitted Project Intake — automatic Social & Promo composite render authorization (current door).",
+    "releasedAt": "2026-10-27T15:37:03.469Z",
+    "authorizedBy": "owner"
+  },
+  "renderVersion": 2,
+  "v1SocialSha": "84f2531d997c352bfbbca71b9c6d93773fffa977cd693797fffafd65411a5a5f",
+  "v2SocialSha": "faee04ba17ddd5ad74fc0eec69dd23c7eae433ae1a34aec0035f208a22fa4549",
+  "jobCorrectionUses": 1
+}

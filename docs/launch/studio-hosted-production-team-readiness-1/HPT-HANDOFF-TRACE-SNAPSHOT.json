@@ -1,0 +1,513 @@
+{
+  "disposable-hpt-cert-clip_repurposing-6a31a13c": {
+    "client_user_id": "75aea0f3-db06-445c-8f45-e9995139233d",
+    "pkg": "clip_repurposing",
+    "intake_at": "2026-10-27T03:26:54.855Z",
+    "dispatch_status": "deferred",
+    "postpay": "activated",
+    "routing_status": "deferred",
+    "routing_decisions": [
+      {
+        "jobId": "disposable-hpt-cert-clip_repurposing-6a31a13c:v2-rtu-clip-repurposing",
+        "skuId": "v2-rtu-clip-repurposing",
+        "reason": "Campaign is not in ready_for_routing activation phase.",
+        "status": "WAITING_FOR_PREREQUISITE",
+        "blocker": "activation_phase:awaiting_materials",
+        "campaignId": "disposable-hpt-cert-clip_repurposing-6a31a13c",
+        "decisionId": "rd:disposable-hpt-cert-clip_repurposing-6a31a13c:v2-rtu-clip-repurposing",
+        "controlLane": "heavy",
+        "evaluatedAt": "2026-10-27T03:26:59.553Z",
+        "factFingerprint": "rh1:disposable-hpt-cert-clip_repurposing-6a31a13c:v2-rtu-clip-repurposing:v2-rtu-clip-repurposing:cs_test_a1BekwxMUe2GBPeP5DsSJaKg0CTnAfnWN9p9JA36YS5JA8AUiLvzVn4ouy:clip_repurposing:1:1:In progress:29900:2026-10-27T03:26:30.698Z:contract_ready:0",
+        "readyForDispatch": false,
+        "productionFamilyId": "video_audio",
+        "capabilityReadiness": "contract_ready",
+        "ownerActionRequired": false
+      }
+    ],
+    "dispatch_records": [
+      {
+        "jobId": "disposable-hpt-cert-clip_repurposing-6a31a13c:v2-rtu-clip-repurposing",
+        "skuId": "v2-rtu-clip-repurposing",
+        "reason": "Campaign is not in ready_for_routing activation phase.",
+        "status": "WAITING_FOR_PREREQUISITE",
+        "blocker": "activation_phase:awaiting_materials",
+        "campaignId": "disposable-hpt-cert-clip_repurposing-6a31a13c",
+        "dispatchId": "dd:disposable-hpt-cert-clip_repurposing-6a31a13c:v2-rtu-clip-repurposing",
+        "controlLane": "heavy",
+        "evaluatedAt": "2026-10-27T03:27:00.961Z",
+        "requirements": null,
+        "routingDecisionId": "rd:disposable-hpt-cert-clip_repurposing-6a31a13c:v2-rtu-clip-repurposing",
+        "productionFamilyId": "video_audio",
+        "ownerActionRequired": false,
+        "executionIdentityReady": false,
+        "routingFactFingerprint": "rh1:disposable-hpt-cert-clip_repurposing-6a31a13c:v2-rtu-clip-repurposing:v2-rtu-clip-repurposing:cs_test_a1BekwxMUe2GBPeP5DsSJaKg0CTnAfnWN9p9JA36YS5JA8AUiLvzVn4ouy:clip_repurposing:1:1:In progress:29900:2026-10-27T03:26:30.698Z:contract_ready:0"
+      }
+    ],
+    "design_observer": {
+      "results": [],
+      "packageId": "STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1",
+      "campaignId": "disposable-hpt-cert-clip_repurposing-6a31a13c",
+      "observedAt": "2026-10-27T03:27:05.017Z",
+      "makeRequired": false,
+      "canvaRequired": false,
+      "ownerRoutineProduction": "NONE"
+    },
+    "launch_observer": {
+      "results": [],
+      "packageId": "STUDIO-OPERATING-LAUNCH-MENU-PRODUCTION-RUNTIME-1",
+      "campaignId": "disposable-hpt-cert-clip_repurposing-6a31a13c",
+      "observedAt": "2026-10-27T03:27:05.135Z",
+      "ownerRoutineProduction": "NONE"
+    },
+    "isolation": null,
+    "paid_at": "2026-10-27T03:26:38.824Z"
+  },
+  "disposable-hpt-cert-short_form_video_editing-cd113eac": {
+    "client_user_id": "d769a3c6-9035-4aa2-af15-29f7418d7f5f",
+    "pkg": "short_form_video_editing",
+    "intake_at": "2026-10-27T03:28:08.173Z",
+    "dispatch_status": "deferred",
+    "postpay": "activated",
+    "routing_status": "deferred",
+    "routing_decisions": [
+      {
+        "jobId": "disposable-hpt-cert-short_form_video_editing-cd113eac:v2-rtu-short-form-video-edit",
+        "skuId": "v2-rtu-short-form-video-edit",
+        "reason": "Campaign is not in ready_for_routing activation phase.",
+        "status": "WAITING_FOR_PREREQUISITE",
+        "blocker": "activation_phase:awaiting_materials",
+        "campaignId": "disposable-hpt-cert-short_form_video_editing-cd113eac",
+        "decisionId": "rd:disposable-hpt-cert-short_form_video_editing-cd113eac:v2-rtu-short-form-video-edit",
+        "controlLane": "heavy",
+        "evaluatedAt": "2026-10-27T03:28:12.985Z",
+        "factFingerprint": "rh1:disposable-hpt-cert-short_form_video_editing-cd113eac:v2-rtu-short-form-video-edit:v2-rtu-short-form-video-edit:cs_test_a1SvIkhy3oIWUAdKJJeGJRopjQlgsdNIPeKBrxC4A7oyJFEIdGh3RCZ2nF:short_form_video_editing:1:1:In progress:14900:2026-10-27T03:27:43.923Z:contract_ready:0",
+        "readyForDispatch": false,
+        "productionFamilyId": "video_audio",
+        "capabilityReadiness": "contract_ready",
+        "ownerActionRequired": false
+      }
+    ],
+    "dispatch_records": [
+      {
+        "jobId": "disposable-hpt-cert-short_form_video_editing-cd113eac:v2-rtu-short-form-video-edit",
+        "skuId": "v2-rtu-short-form-video-edit",
+        "reason": "Campaign is not in ready_for_routing activation phase.",
+        "status": "WAITING_FOR_PREREQUISITE",
+        "blocker": "activation_phase:awaiting_materials",
+        "campaignId": "disposable-hpt-cert-short_form_video_editing-cd113eac",
+        "dispatchId": "dd:disposable-hpt-cert-short_form_video_editing-cd113eac:v2-rtu-short-form-video-edit",
+        "controlLane": "heavy",
+        "evaluatedAt": "2026-10-27T03:28:14.376Z",
+        "requirements": null,
+        "routingDecisionId": "rd:disposable-hpt-cert-short_form_video_editing-cd113eac:v2-rtu-short-form-video-edit",
+        "productionFamilyId": "video_audio",
+        "ownerActionRequired": false,
+        "executionIdentityReady": false,
+        "routingFactFingerprint": "rh1:disposable-hpt-cert-short_form_video_editing-cd113eac:v2-rtu-short-form-video-edit:v2-rtu-short-form-video-edit:cs_test_a1SvIkhy3oIWUAdKJJeGJRopjQlgsdNIPeKBrxC4A7oyJFEIdGh3RCZ2nF:short_form_video_editing:1:1:In progress:14900:2026-10-27T03:27:43.923Z:contract_ready:0"
+      }
+    ],
+    "design_observer": {
+      "results": [],
+      "packageId": "STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1",
+      "campaignId": "disposable-hpt-cert-short_form_video_editing-cd113eac",
+      "observedAt": "2026-10-27T03:28:18.714Z",
+      "makeRequired": false,
+      "canvaRequired": false,
+      "ownerRoutineProduction": "NONE"
+    },
+    "launch_observer": {
+      "results": [],
+      "packageId": "STUDIO-OPERATING-LAUNCH-MENU-PRODUCTION-RUNTIME-1",
+      "campaignId": "disposable-hpt-cert-short_form_video_editing-cd113eac",
+      "observedAt": "2026-10-27T03:28:18.841Z",
+      "ownerRoutineProduction": "NONE"
+    },
+    "isolation": null,
+    "paid_at": "2026-10-27T03:27:51.403Z"
+  },
+  "disposable-hpt-cert-social_and_promo_graphics-cfee3b4a": {
+    "client_user_id": "3a9737af-9a35-4612-b320-882f04064bc0",
+    "pkg": "social_and_promo_graphics",
+    "intake_at": "2026-10-27T03:29:21.903Z",
+    "dispatch_status": "evaluated",
+    "postpay": "activated",
+    "routing_status": "evaluated",
+    "routing_decisions": [
+      {
+        "jobId": "disposable-hpt-cert-social_and_promo_graphics-cfee3b4a:social_and_promo_graphics:branch:social_posts",
+        "skuId": "v2-rtu-social-posts",
+        "reason": "Capability family social is dispatch-eligible.",
+        "status": "READY_FOR_DISPATCH",
+        "blocker": null,
+        "campaignId": "disposable-hpt-cert-social_and_promo_graphics-cfee3b4a",
+        "decisionId": "rd:disposable-hpt-cert-social_and_promo_graphics-cfee3b4a:social_and_promo_graphics:branch:social_posts",
+        "controlLane": "standard",
+        "evaluatedAt": "2026-10-27T03:29:26.648Z",
+        "factFingerprint": "rh1:disposable-hpt-cert-social_and_promo_graphics-cfee3b4a:social_and_promo_graphics:branch:social_posts:v2-rtu-social-posts:cs_test_a1saTg9YfiVekpcUqccwVQTP5aLgwjEoSvB1EdAsR6A5pWjEptR483yycV:social_and_promo_graphics:1:0:In progress:15920:2026-10-27T03:28:56.858Z:contract_ready:0",
+        "readyForDispatch": true,
+        "productionFamilyId": "social",
+        "capabilityReadiness": "contract_ready",
+        "ownerActionRequired": false
+      },
+      {
+        "jobId": "disposable-hpt-cert-social_and_promo_graphics-cfee3b4a:social_and_promo_graphics:branch:campaign_graphics",
+        "skuId": "v2-rtu-promotion-graphics",
+        "reason": "Capability family marketing_assets is dispatch-eligible.",
+        "status": "READY_FOR_DISPATCH",
+        "blocker": null,
+        "campaignId": "disposable-hpt-cert-social_and_promo_graphics-cfee3b4a",
+        "decisionId": "rd:disposable-hpt-cert-social_and_promo_graphics-cfee3b4a:social_and_promo_graphics:branch:campaign_graphics",
+        "controlLane": "standard",
+        "evaluatedAt": "2026-10-27T03:29:26.648Z",
+        "factFingerprint": "rh1:disposable-hpt-cert-social_and_promo_graphics-cfee3b4a:social_and_promo_graphics:branch:campaign_graphics:v2-rtu-promotion-graphics:cs_test_a1saTg9YfiVekpcUqccwVQTP5aLgwjEoSvB1EdAsR6A5pWjEptR483yycV:social_and_promo_graphics:1:0:In progress:15920:2026-10-27T03:28:56.858Z:contract_ready:0",
+        "readyForDispatch": true,
+        "productionFamilyId": "marketing_assets",
+        "capabilityReadiness": "contract_ready",
+        "ownerActionRequired": false
+      }
+    ],
+    "dispatch_records": [
+      {
+        "jobId": "disposable-hpt-cert-social_and_promo_graphics-cfee3b4a:social_and_promo_graphics:branch:social_posts",
+        "skuId": "v2-rtu-social-posts",
+        "reason": "Execution identity ready for family social.",
+        "status": "EXECUTION_IDENTITY_READY",
+        "blocker": null,
+        "campaignId": "disposable-hpt-cert-social_and_promo_graphics-cfee3b4a",
+        "dispatchId": "dd:disposable-hpt-cert-social_and_promo_graphics-cfee3b4a:social_and_promo_graphics:branch:social_posts",
+        "controlLane": "standard",
+        "evaluatedAt": "2026-10-27T07:04:48.795Z",
+        "requirements": {
+          "qaItemIds": [
+            "visual_quality",
+            "brand_alignment",
+            "specs_met",
+            "client_safe_packaging",
+            "deliverable_complete",
+            "scope_match",
+            "factual_accuracy",
+            "direction_match",
+            "usability",
+            "direction_alignment",
+            "brand_fit",
+            "copy_accuracy",
+            "brand_voice",
+            "grammar",
+            "production_complete",
+            "deliverable_specs",
+            "client_requirements",
+            "package_complete",
+            "fingerprint_match",
+            "no_internal_leaks",
+            "four_posts"
+          ],
+          "limitations": [
+            "Video, Reels, motion graphics, Stories, carousels, or animation",
+            "Portrait versions or extra platform sizes",
+            "TikTok vertical, Stories, Reels, or extra platform sizes",
+            "Posting, scheduling, publishing, content management, or account access",
+            "Paid ads or ad management",
+            "Outside freelancers, voice actors, printers, or production vendors",
+            "Photography or filming",
+            "Daily content or ongoing management",
+            "Comment/DM/community management",
+            "Deep hashtag research",
+            "More than 4 posts",
+            "Four separate redesign cycles — one revision is for the whole set",
+            "More than one revision round",
+            "Owner or Scout finishing the posts after QA exhausts",
+            "Primary tool integration state: integrated (contract_ready)."
+          ],
+          "primaryTool": {
+            "label": "Studio Design Renderer (HTML/CSS + Playwright)",
+            "toolId": "studio_design_renderer",
+            "required": true,
+            "toolReadiness": "contract_ready",
+            "integrationState": "integrated"
+          },
+          "deliverables": [
+            "4× Four coordinated square static post graphics — 1024 × 1024 each; one campaign or theme; one agreed platform; one caption for each post",
+            "4× Four digital PNG files — square 1024 × 1024 (not JPG, not extra platform sizes)",
+            "Suggested posting order (not a calendar) — you post them",
+            "Caption file for all four posts (plain text)"
+          ],
+          "producerRole": "creative_production",
+          "optionalTools": [
+            {
+              "label": "Text / copy production capability",
+              "toolId": "text_model",
+              "required": true,
+              "toolReadiness": "manual_operational_path_exists",
+              "integrationState": "manual_operational"
+            }
+          ],
+          "optionalInputs": [],
+          "readinessNotes": "RTU social posts — creative_production + Studio Design Renderer (Owner-independent set). Client posts. Canva not required for this SKU. Visual PASS WITH LIMITS.",
+          "catalogFamilyId": "social_media",
+          "productionSteps": [
+            {
+              "id": "social-brief",
+              "label": "Confirm inputs & brief",
+              "taskPhase": null,
+              "responsibleRole": "producer_dispatcher"
+            },
+            {
+              "id": "social-step-1",
+              "label": "Content direction",
+              "taskPhase": "strategy_content_direction",
+              "responsibleRole": "strategy"
+            },
+            {
+              "id": "social-step-2",
+              "label": "Copy",
+              "taskPhase": "copy",
+              "responsibleRole": "copy"
+            },
+            {
+              "id": "social-step-3",
+              "label": "Creative",
+              "taskPhase": "creative",
+              "responsibleRole": "creative_production"
+            },
+            {
+              "id": "social-step-4",
+              "label": "QA review",
+              "taskPhase": "qa",
+              "responsibleRole": "qa"
+            },
+            {
+              "id": "social-step-5",
+              "label": "Delivery prep",
+              "taskPhase": "delivery_prep",
+              "responsibleRole": "producer_dispatcher"
+            },
+            {
+              "id": "social-review-ready",
+              "label": "Review-ready handoff",
+              "taskPhase": "delivery_prep",
+              "responsibleRole": "producer_dispatcher"
+            }
+          ],
+          "supportingRoles": [
+            "strategy",
+            "copy",
+            "qa",
+            "producer_dispatcher"
+          ],
+          "productionFamilyId": "social",
+          "capabilityReadiness": "contract_ready",
+          "requiredStudioInputs": [
+            "Approved plan / RTU scope",
+            "Offer facts from Campaign Record",
+            "Brand assets when required"
+          ],
+          "requiredCustomerInputs": [
+            "Final wording, prices, logo, images, and contact details for the posts",
+            "Upload, post, and schedule the finished graphics yourself",
+            "Handle replies, comments, direct messages, and other account activity",
+            "Use your own platform account"
+          ],
+          "formatExportRequirements": [
+            "Four coordinated square static post graphics — digital PNG, 1024 × 1024 each",
+            "Caption file for all four posts (plain text)",
+            "Suggested posting order (not a calendar) — customer posts them",
+            "Editable source files are not included unless separately authorized"
+          ]
+        },
+        "routingDecisionId": "rd:disposable-hpt-cert-social_and_promo_graphics-cfee3b4a:social_and_promo_graphics:branch:social_posts",
+        "productionFamilyId": "social",
+        "ownerActionRequired": false,
+        "executionIdentityReady": true,
+        "routingFactFingerprint": "rh1:disposable-hpt-cert-social_and_promo_graphics-cfee3b4a:social_and_promo_graphics:branch:social_posts:v2-rtu-social-posts:cs_test_a1saTg9YfiVekpcUqccwVQTP5aLgwjEoSvB1EdAsR6A5pWjEptR483yycV:social_and_promo_graphics:1:0:In progress:15920:2026-10-27T03:28:56.858Z:contract_ready:0"
+      },
+      {
+        "jobId": "disposable-hpt-cert-social_and_promo_graphics-cfee3b4a:social_and_promo_graphics:branch:campaign_graphics",
+        "skuId": "v2-rtu-promotion-graphics",
+        "reason": "Execution identity ready for family marketing_assets.",
+        "status": "EXECUTION_IDENTITY_READY",
+        "blocker": null,
+        "campaignId": "disposable-hpt-cert-social_and_promo_graphics-cfee3b4a",
+        "dispatchId": "dd:disposable-hpt-cert-social_and_promo_graphics-cfee3b4a:social_and_promo_graphics:branch:campaign_graphics",
+        "controlLane": "standard",
+        "evaluatedAt": "2026-10-27T07:04:48.795Z",
+        "requirements": {
+          "qaItemIds": [
+            "visual_quality",
+            "brand_alignment",
+            "specs_met",
+            "client_safe_packaging",
+            "deliverable_complete",
+            "scope_match",
+            "factual_accuracy",
+            "direction_match",
+            "usability",
+            "production_complete",
+            "deliverable_specs",
+            "client_requirements",
+            "package_complete",
+            "fingerprint_match",
+            "no_internal_leaks"
+          ],
+          "limitations": [
+            "More than 2 campaign graphics",
+            "Multiple campaigns, offers, or themes",
+            "Social post sets or captions",
+            "Flyers, menus, service sheets, or handouts",
+            "Video, motion graphics, or animation",
+            "Photography or custom illustration",
+            "Landscape graphics or extra format sets",
+            "Certified 300 DPI or commercial print files",
+            "Multiple size sets or format versions per graphic",
+            "Printing, shipping, posting, publishing, or scheduling",
+            "Outside freelancers, voice actors, printers, or production vendors",
+            "Editable source files",
+            "Owner or Scout finishing the campaign graphics after QA exhausts",
+            "More than one revision round",
+            "Primary tool integration state: integrated (contract_ready)."
+          ],
+          "primaryTool": {
+            "label": "Studio Design Renderer (HTML/CSS + Playwright)",
+            "toolId": "studio_design_renderer",
+            "required": true,
+            "toolReadiness": "contract_ready",
+            "integrationState": "integrated"
+          },
+          "deliverables": [
+            "2× Two finished coordinated static campaign graphics — one theme; one square 1024×1024 and one portrait 1024×1536; no captions",
+            "2× Two digital PNG files you can post or share yourself (not a certified 300 DPI print file)"
+          ],
+          "producerRole": "creative_production",
+          "optionalTools": [],
+          "optionalInputs": [],
+          "readinessNotes": "RTU campaign graphics — creative_production + Studio Design Renderer (Owner-independent set). Distinct from published landing page (rm-j005). Canva not required for this SKU. Visual PASS WITH LIMITS.",
+          "catalogFamilyId": "marketing_assets",
+          "productionSteps": [
+            {
+              "id": "marketing_assets-brief",
+              "label": "Confirm inputs & brief",
+              "taskPhase": null,
+              "responsibleRole": "producer_dispatcher"
+            },
+            {
+              "id": "marketing_assets-step-1",
+              "label": "Creative",
+              "taskPhase": "creative",
+              "responsibleRole": "creative_production"
+            },
+            {
+              "id": "marketing_assets-step-2",
+              "label": "QA review",
+              "taskPhase": "qa",
+              "responsibleRole": "qa"
+            },
+            {
+              "id": "marketing_assets-step-3",
+              "label": "Delivery prep",
+              "taskPhase": "delivery_prep",
+              "responsibleRole": "producer_dispatcher"
+            },
+            {
+              "id": "marketing_assets-review-ready",
+              "label": "Review-ready handoff",
+              "taskPhase": "delivery_prep",
+              "responsibleRole": "producer_dispatcher"
+            }
+          ],
+          "supportingRoles": [
+            "qa",
+            "producer_dispatcher",
+            "copy"
+          ],
+          "productionFamilyId": "marketing_assets",
+          "capabilityReadiness": "contract_ready",
+          "requiredStudioInputs": [
+            "Final copy when required",
+            "Brand assets",
+            "SKU asset count limit"
+          ],
+          "requiredCustomerInputs": [
+            "Distribute the finished graphics yourself through print, social media, email, or other channels",
+            "Use your own printer, platform, or account"
+          ],
+          "formatExportRequirements": [
+            "Final flattened digital PNG export for each graphic",
+            "Editable source files are not included unless separately authorized",
+            "Two coordinated digital campaign graphics — square 1024×1024 and portrait 1024×1536. Not a certified 300 DPI print file."
+          ]
+        },
+        "routingDecisionId": "rd:disposable-hpt-cert-social_and_promo_graphics-cfee3b4a:social_and_promo_graphics:branch:campaign_graphics",
+        "productionFamilyId": "marketing_assets",
+        "ownerActionRequired": false,
+        "executionIdentityReady": true,
+        "routingFactFingerprint": "rh1:disposable-hpt-cert-social_and_promo_graphics-cfee3b4a:social_and_promo_graphics:branch:campaign_graphics:v2-rtu-promotion-graphics:cs_test_a1saTg9YfiVekpcUqccwVQTP5aLgwjEoSvB1EdAsR6A5pWjEptR483yycV:social_and_promo_graphics:1:0:In progress:15920:2026-10-27T03:28:56.858Z:contract_ready:0"
+      }
+    ],
+    "design_observer": null,
+    "launch_observer": null,
+    "isolation": null,
+    "paid_at": "2026-10-27T03:29:04.220Z"
+  },
+  "disposable-hpt-cert-campaign_launch_kit-fe2d85f6": {
+    "client_user_id": "380f80ea-3edf-4c11-ab6a-d75bfc46fb43",
+    "pkg": "campaign_launch_kit",
+    "intake_at": "2026-10-27T03:30:27.623Z",
+    "dispatch_status": "deferred",
+    "postpay": "activated",
+    "routing_status": "evaluated",
+    "routing_decisions": [
+      {
+        "jobId": "disposable-hpt-cert-campaign_launch_kit-fe2d85f6:v2-campaign-launch-kit",
+        "skuId": "v2-campaign-launch-kit",
+        "reason": "Unknown SKU — no catalog entry. No production contract invented.",
+        "status": "ROUTING_BLOCKED",
+        "blocker": "unknown_sku",
+        "campaignId": "disposable-hpt-cert-campaign_launch_kit-fe2d85f6",
+        "decisionId": "rd:disposable-hpt-cert-campaign_launch_kit-fe2d85f6:v2-campaign-launch-kit",
+        "controlLane": "standard",
+        "evaluatedAt": "2026-10-27T03:30:32.171Z",
+        "factFingerprint": "rh1:disposable-hpt-cert-campaign_launch_kit-fe2d85f6:v2-campaign-launch-kit:v2-campaign-launch-kit:cs_test_a1gwLpZYvY4WkHJo0n0Lb6mJhdEJmaVZgGEBNPdVllDfdQ7GDKM92lLtBF:campaign_launch_kit:1:0:In progress:27920:2026-10-27T03:30:02.302Z:unknown_sku:0",
+        "readyForDispatch": false,
+        "productionFamilyId": null,
+        "capabilityReadiness": null,
+        "ownerActionRequired": false
+      }
+    ],
+    "dispatch_records": [
+      {
+        "jobId": "disposable-hpt-cert-campaign_launch_kit-fe2d85f6:v2-campaign-launch-kit",
+        "skuId": "v2-campaign-launch-kit",
+        "reason": "Unknown SKU — no catalog entry. No production contract invented.",
+        "status": "DISPATCH_BLOCKED",
+        "blocker": "unknown_sku",
+        "campaignId": "disposable-hpt-cert-campaign_launch_kit-fe2d85f6",
+        "dispatchId": "dd:disposable-hpt-cert-campaign_launch_kit-fe2d85f6:v2-campaign-launch-kit",
+        "controlLane": "standard",
+        "evaluatedAt": "2026-10-27T03:30:33.717Z",
+        "requirements": null,
+        "routingDecisionId": "rd:disposable-hpt-cert-campaign_launch_kit-fe2d85f6:v2-campaign-launch-kit",
+        "productionFamilyId": null,
+        "ownerActionRequired": false,
+        "executionIdentityReady": false,
+        "routingFactFingerprint": "rh1:disposable-hpt-cert-campaign_launch_kit-fe2d85f6:v2-campaign-launch-kit:v2-campaign-launch-kit:cs_test_a1gwLpZYvY4WkHJo0n0Lb6mJhdEJmaVZgGEBNPdVllDfdQ7GDKM92lLtBF:campaign_launch_kit:1:0:In progress:27920:2026-10-27T03:30:02.302Z:unknown_sku:0"
+      }
+    ],
+    "design_observer": {
+      "results": [],
+      "packageId": "STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1",
+      "campaignId": "disposable-hpt-cert-campaign_launch_kit-fe2d85f6",
+      "observedAt": "2026-10-27T03:30:38.651Z",
+      "makeRequired": false,
+      "canvaRequired": false,
+      "ownerRoutineProduction": "NONE"
+    },
+    "launch_observer": {
+      "results": [],
+      "packageId": "STUDIO-OPERATING-LAUNCH-MENU-PRODUCTION-RUNTIME-1",
+      "campaignId": "disposable-hpt-cert-campaign_launch_kit-fe2d85f6",
+      "observedAt": "2026-10-27T03:30:38.724Z",
+      "ownerRoutineProduction": "NONE"
+    },
+    "isolation": null,
+    "paid_at": "2026-10-27T03:30:09.938Z"
+  }
+}

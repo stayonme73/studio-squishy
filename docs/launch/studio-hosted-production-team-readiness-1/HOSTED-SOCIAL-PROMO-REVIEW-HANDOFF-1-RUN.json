@@ -1,0 +1,92 @@
+{
+  "startedAt": "2026-10-27T13:44:36.003Z",
+  "finishedAt": "2026-10-27T13:46:00.130Z",
+  "deploymentId": "dpl_3yrin37e6GNUFCJcGLTRM8kxwSKn",
+  "previewOrigin": "https://the-studio-company-aufe7z6f5-stayonme73s-projects.vercel.app",
+  "campaignId": "disposable-hosted-sp-journey-454f1def",
+  "parentJobId": "disposable-hosted-sp-journey-454f1def:social_and_promo_graphics",
+  "ledger": [
+    {
+      "stage": "owner-auth",
+      "status": "PASS",
+      "detail": "hosted-sp-journey-owner-979740@example.com"
+    },
+    {
+      "stage": "continue-paid-intake-chain",
+      "status": "PASS",
+      "detail": "HTTP 200 31384ms {\"at\":\"2026-10-27T13:44:50.295Z\",\"finished\":\"2026-10-27T13:45:16.519Z\",\"campaignId\":\"disposable-hosted-sp-journey-454f1d"
+    },
+    {
+      "stage": "campaign-wake-get",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "stage": "parent-spine-after-bind",
+      "status": "PASS",
+      "detail": "ready_for_delivery"
+    },
+    {
+      "stage": "customer-review-get",
+      "status": "PASS",
+      "detail": "post-delivery review payload"
+    },
+    {
+      "stage": "one-revision-round",
+      "status": "PASS",
+      "detail": "prior run — locked revision_requested feedback in Test DB"
+    },
+    {
+      "stage": "customer-approve-for-delivery",
+      "status": "PASS",
+      "detail": "ready_for_delivery"
+    },
+    {
+      "stage": "cross-customer-denial",
+      "status": "FAIL",
+      "detail": "HTTP 0"
+    },
+    {
+      "stage": "final-delivery-page",
+      "status": "FAIL",
+      "detail": "HTTP 307"
+    },
+    {
+      "stage": "released-file-count",
+      "status": "PASS",
+      "detail": "8/8 released"
+    },
+    {
+      "stage": "exact-byte-download",
+      "status": "FAIL",
+      "detail": "HTTP 0"
+    },
+    {
+      "stage": "socialPromoRenderRelease-pathway",
+      "status": "LIMIT",
+      "detail": "No product Owner Console/API pathway verified; journey used disposable Postgres stamp only — not Owner decision evidence."
+    }
+  ],
+  "spineStatus": "ready_for_delivery",
+  "releasedCount": 8,
+  "chainResponse": {
+    "at": "2026-10-27T13:44:50.295Z",
+    "finished": "2026-10-27T13:45:16.519Z",
+    "campaignId": "disposable-hosted-sp-journey-454f1def",
+    "dispatchStatus": "evaluated",
+    "designResults": [
+      {
+        "skuId": "v2-rtu-social-posts",
+        "action": "invoked",
+        "ok": true,
+        "message": null
+      },
+      {
+        "skuId": "v2-rtu-promotion-graphics",
+        "action": "invoked",
+        "ok": true,
+        "message": null
+      }
+    ]
+  }
+}
