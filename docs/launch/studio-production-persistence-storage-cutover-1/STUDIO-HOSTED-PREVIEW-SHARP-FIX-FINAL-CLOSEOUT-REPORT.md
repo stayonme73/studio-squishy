@@ -3,7 +3,7 @@
 **Written:** 2026-10-26 ~10:24 PM (America/New_York)  
 **GitHub branch:** `operating/mobile-customer-journey-certification-1-thin-release`  
 **Commit (product release):** **`2297df3e51bd48047979f47ab4c1959d34988f5f`**  
-**Follow-up commit (T5 runner):** pending push — cookie-jar session fix for hosted File Room  
+**Follow-up commit (T5 runner):** **`5b1c5b3d`** — cookie-jar session fix for hosted File Room  
 **Canonical Preview deployment:** **`dpl_569875Y8CPp9NTTMYycNVuwEwQzd`**  
 **Preview URL:** `https://the-studio-company-q7ekwyk0h-stayonme73s-projects.vercel.app`  
 **Production:** **`fc56426`** unchanged  
