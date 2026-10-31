@@ -4,7 +4,10 @@ import path from "node:path";
 import { NextResponse } from "next/server";
 
 import { requireReadableCampaign } from "@/lib/campaign-store/server-access";
-import { studioExtraArtifactAllowed } from "@/lib/studio-extras/customer-view";
+import {
+  studioExtraArtifactAbsolutePath,
+  studioExtraArtifactAllowed,
+} from "@/lib/studio-extras/customer-view";
 import type { StudioExtraState } from "@/lib/studio-extras/types";
 
 type RouteContext = {
@@ -34,9 +37,14 @@ export async function GET(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "File not available." }, { status: 403 });
   }
 
+  const absPath = studioExtraArtifactAbsolutePath(process.cwd(), campaignId, artifact);
+  if (!absPath) {
+    return NextResponse.json({ error: "File not available." }, { status: 403 });
+  }
+
   let body: Buffer;
   try {
-    body = await readFile(path.join(process.cwd(), artifact.path));
+    body = await readFile(absPath);
   } catch {
     return NextResponse.json({ error: "File not available." }, { status: 404 });
   }

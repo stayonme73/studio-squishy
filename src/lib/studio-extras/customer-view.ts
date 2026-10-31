@@ -53,6 +53,24 @@ export function studioExtraArtifactAllowed(
   return normalized.startsWith(root) && !normalized.split(path.sep).includes("..");
 }
 
+/**
+ * Absolute path for an allowed Extra artifact. Uses fixed `data/campaign-design-artifacts`
+ * segments only (no `path.join(cwd, dynamicRel)`) so Next/Vercel NFT does not trace the repo root.
+ */
+export function studioExtraArtifactAbsolutePath(
+  repoRoot: string,
+  campaignId: string,
+  artifact: Pick<StudioExtraArtifact, "path">,
+): string | null {
+  if (!studioExtraArtifactAllowed(campaignId, artifact)) return null;
+  const rel = artifact.path.replace(/\\/g, "/").replace(/^\/+/, "");
+  const prefix = `data/campaign-design-artifacts/${campaignId}/`;
+  if (!rel.startsWith(prefix)) return null;
+  const suffixParts = rel.slice(prefix.length).split("/").filter(Boolean);
+  if (suffixParts.some((part) => part === ".." || part === ".")) return null;
+  return path.join(repoRoot, "data", "campaign-design-artifacts", campaignId, ...suffixParts);
+}
+
 export function studioExtraFileHref(
   campaignId: string,
   extraId: string,
@@ -63,10 +81,16 @@ export function studioExtraFileHref(
   return `/api/campaigns/${encodeURIComponent(campaignId)}/studio-extras/files/${extraId}/${encodeURIComponent(unitId)}/${index}?purpose=${purpose}`;
 }
 
-async function readSmallText(repoRoot: string, artifact: StudioExtraArtifact): Promise<string | null> {
+async function readSmallText(
+  repoRoot: string,
+  campaignId: string,
+  artifact: StudioExtraArtifact,
+): Promise<string | null> {
   if (!artifact.mimeType.startsWith("text/plain")) return null;
   try {
-    const buffer = await readFile(path.join(repoRoot, artifact.path));
+    const abs = studioExtraArtifactAbsolutePath(repoRoot, campaignId, artifact);
+    if (!abs) return null;
+    const buffer = await readFile(abs);
     if (buffer.byteLength > TEXT_LIMIT_BYTES) return null;
     return buffer.toString("utf8");
   } catch {
@@ -91,7 +115,7 @@ async function filesFor(
         label: artifact.label,
         mimeType: artifact.mimeType,
         href: studioExtraFileHref(campaignId, record.id, unit.unitId, index, purpose),
-        text: await readSmallText(repoRoot, artifact),
+        text: await readSmallText(repoRoot, campaignId, artifact),
       });
     }
   }
