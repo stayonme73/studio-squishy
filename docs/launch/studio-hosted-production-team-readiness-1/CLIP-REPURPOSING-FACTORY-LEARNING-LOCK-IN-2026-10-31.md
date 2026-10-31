@@ -57,8 +57,10 @@
 ## Deployment version
 
 - **Git branch:** `preview/clip-repurposing-integration-2026-10-31` (Preview only).
-- **Prior failed CLI deployments:** `dpl_3UJMk…`, `dpl_Cu4D7…` — internal Vercel error post-build.
-- **Target:** Vercel Preview **Ready** from Git push (not CLI prebuilt on Windows).
+- **Commit:** `6191d640` — pushed to `origin` 2026-10-31 (130 files; no secrets; excludes `_tmp`/`.tmp`/run JSON evidence).
+- **Vercel deployment (single post-push attempt):** `dpl_7LX7U91qMEuT9Teefjr9r2wXRAUa` — **Error**, internal Vercel error after **27m 16s** build (same class as `dpl_3UJMk`, `dpl_Cu4D7`).
+- **GitHub → Vercel hook:** not observed (zero check runs on commit).
+- **Fresh disposable E2E:** not started — no **Ready** integrated Preview.
 
 ---
 

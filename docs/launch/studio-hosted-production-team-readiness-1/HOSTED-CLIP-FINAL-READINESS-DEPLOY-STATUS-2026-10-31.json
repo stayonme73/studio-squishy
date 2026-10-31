@@ -53,5 +53,19 @@
     "disposable-hpt-cert-clip_repurposing-36dd199b",
     "disposable-hpt-cert-clip_repurposing-6a31a13c"
   ],
-  "verdict": "BLOCKED — Owner business decision required on Preview ship path"
+  "gitPreviewDeploy": {
+    "branch": "preview/clip-repurposing-integration-2026-10-31",
+    "commit": "6191d64036b951293c04bbcbb71a7dc227b43d21",
+    "pushedAt": "2026-10-31T14:04:00Z",
+    "githubAutoDeploy": "NOT_OBSERVED — no check runs on commit",
+    "vercelDeployment": {
+      "id": "dpl_7LX7U91qMEuT9Teefjr9r2wXRAUa",
+      "url": "https://the-studio-company-c0s50qbq9-stayonme73s-projects.vercel.app",
+      "status": "Error",
+      "reason": "The deployment failed because of an internal Vercel error.",
+      "buildDuration": "27m 16s",
+      "inspectUrl": "https://vercel.com/stayonme73s-projects/the-studio-company/7LX7U91qMEuT9Teefjr9r2wXRAUa"
+    }
+  },
+  "verdict": "BLOCKED — Vercel platform internal error after successful ~27m build (git commit 6191d640). No further deploy retries per Owner GO."
 }
