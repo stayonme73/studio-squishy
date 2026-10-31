@@ -56,6 +56,7 @@
     "scripts/repair-*.ts",
     "scripts/run-*.ts",
     "scripts/verify-clip-*.ts",
+    "scripts/hosted-sfv-*.ts",
     "src/lib/studio-549-clip-repurposing-value-delivery/assemble-cert.ts",
     "src/lib/studio-549-clip-repurposing-value-delivery/index.ts",
     "src/lib/studio-549-clip-repurposing/owner-cert-correction.ts",

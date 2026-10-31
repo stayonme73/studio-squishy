@@ -103,6 +103,7 @@ export function latestShortVideoQaIsUnresolvedFail(
 }
 
 function machineVideoQualityEvidence(input: {
+  skuId: string;
   contentSha256: string;
   campaignId: string;
   durationSeconds?: number;
@@ -110,7 +111,7 @@ function machineVideoQualityEvidence(input: {
   const hex = normalizeContentSha256(input.contentSha256).replace(/^sha256:/, "");
   return {
     evaluation: {
-      skuId: SHORT_VIDEO_MACHINE_REVIEW_SKU,
+      skuId: input.skuId,
       ok: true,
       findings: [],
       checkedAt: new Date().toISOString(),
@@ -133,9 +134,10 @@ function machineVideoQualityEvidence(input: {
 }
 
 /**
- * Bind MP4 identity to Kitchen QA + Review eligibility for the short-video job.
+ * Bind MP4 identity to Kitchen QA + Review eligibility for a Machine video job.
  */
-export function bindShortVideoIdentityToQaRecords(input: {
+export function bindMachineVideoIdentityToQaRecords(input: {
+  skuId: string;
   campaign: CampaignRecord;
   envelope: ServerTasksEnvelope;
   mp4ContentSha256: string;
@@ -146,13 +148,14 @@ export function bindShortVideoIdentityToQaRecords(input: {
   durationSeconds?: number;
   videoQualityEvidence?: VideoQualityEvidence | null;
   clientUserId?: string | null;
+  qaCheckId?: string;
 }): {
   envelope: ServerTasksEnvelope;
   bound: boolean;
   alreadyBound: boolean;
   qaAction: "qa_pass" | "qa_fail" | "none";
 } {
-  const skuId = SHORT_VIDEO_MACHINE_REVIEW_SKU;
+  const skuId = input.skuId;
   const taskId = formalQaTaskIdForService(skuId);
   const hash = normalizeContentSha256(input.mp4ContentSha256);
   const matching = recordsForHash(input.envelope, hash, input.mp4ContentSha256);
@@ -168,6 +171,7 @@ export function bindShortVideoIdentityToQaRecords(input: {
   const evidence =
     input.videoQualityEvidence ??
     machineVideoQualityEvidence({
+      skuId,
       contentSha256: input.mp4ContentSha256,
       campaignId: input.campaign.campaignId,
       durationSeconds: input.durationSeconds,
@@ -191,10 +195,10 @@ export function bindShortVideoIdentityToQaRecords(input: {
     actorRole: "qa",
     action: qaAction,
     category: evidencePassed ? undefined : "production_correction",
-    checks: ["machine_short_video_identity"],
+    checks: [input.qaCheckId ?? "machine_short_video_identity"],
     notes: evidencePassed
-      ? "Sealed Machine short-video MP4 bound for Review eligibility."
-      : "Short-video output is not customer-ready. Internal video quality evidence did not pass.",
+      ? "Sealed Machine video MP4 bound for Review eligibility."
+      : "Video output is not customer-ready. Internal video quality evidence did not pass.",
     workVersionId,
     videoQualityEvidence: evidence,
     artifactBinding: {
@@ -337,6 +341,16 @@ export function bindShortVideoIdentityToQaRecords(input: {
   return { envelope, bound: true, alreadyBound: false, qaAction };
 }
 
+/** @deprecated Import bindMachineVideoIdentityToQaRecords with skuId instead. */
+export function bindShortVideoIdentityToQaRecords(
+  input: Omit<Parameters<typeof bindMachineVideoIdentityToQaRecords>[0], "skuId">,
+): ReturnType<typeof bindMachineVideoIdentityToQaRecords> {
+  return bindMachineVideoIdentityToQaRecords({
+    ...input,
+    skuId: SHORT_VIDEO_MACHINE_REVIEW_SKU,
+  });
+}
+
 /**
  * Wire an already-produced Shotstack MP4 into customer Board → QA → Review.
  * Production still uses the Shotstack pipeline; this bind opens Review with playable proof.
@@ -367,7 +381,8 @@ export async function ensureShortVideoMachineReviewBind(input: {
   const artifactId =
     input.artifactId ?? `${SHORT_VIDEO_MACHINE_REVIEW_SKU}-v${renderVersion}`;
 
-  const bound = bindShortVideoIdentityToQaRecords({
+  const bound = bindMachineVideoIdentityToQaRecords({
+    skuId: SHORT_VIDEO_MACHINE_REVIEW_SKU,
     campaign,
     envelope,
     mp4ContentSha256: input.contentSha256,

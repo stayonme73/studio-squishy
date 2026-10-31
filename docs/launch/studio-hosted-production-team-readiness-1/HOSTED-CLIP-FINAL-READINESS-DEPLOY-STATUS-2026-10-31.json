@@ -1,0 +1,57 @@
+{
+  "recordedAt": "2026-10-31T13:52:00.000Z",
+  "assignment": "final-readiness closure — Preview deploy + DO sync + fresh disposable E2E",
+  "previewDeployments": [
+    {
+      "id": "dpl_3UJMk5VKJS1v9dy7tFvNmPfnkYn3",
+      "url": "https://the-studio-company-rm33og6rf-stayonme73s-projects.vercel.app",
+      "status": "Error",
+      "reason": "The deployment failed because of an internal Vercel error.",
+      "buildDuration": "27m 44s"
+    },
+    {
+      "id": "dpl_Eo5jLxTJrFygVvsNLutUJgGrEuJM",
+      "url": "https://the-studio-company-4wb1hcghk-stayonme73s-projects.vercel.app",
+      "status": "Error",
+      "reason": "The deployment failed because of an internal Vercel error."
+    },
+    {
+      "id": "dpl_Cu4D7KM2zofY7yCRaXiEEevSwiuc",
+      "url": "https://the-studio-company-2j60i8c4r-stayonme73s-projects.vercel.app",
+      "status": "Error",
+      "reason": "The deployment failed because of an internal Vercel error.",
+      "buildDuration": "27m 14s",
+      "note": "CLI deploy from integrated local tree 2026-10-31; compile phase completes then post-build internal error (same pattern as 3UJMk)."
+    },
+    {
+      "id": "dpl_9HQC72wZVk9AW99sUHVoSwyUpiSL",
+      "url": "https://the-studio-company-evck8xks9-stayonme73s-projects.vercel.app",
+      "status": "Ready",
+      "note": "Last Ready Preview; predates integrated closure code in local tree."
+    }
+  ],
+  "localPrebuiltDeploy": {
+    "attempted": true,
+    "npmRunBuild": "PASS (exit 0, ~32m)",
+    "vercelBuild": "FAIL",
+    "failure": "EPERM: operation not permitted, symlink deliverables.func -> studio-board.func (Windows; junction works but Vercel CLI requires symlink)",
+    "mitigationAttempted": "Remote CLI deploy (Cu4D7) — same Vercel internal error after ~27m build"
+  },
+  "digitalOcean": {
+    "ssh": "PASS studioadmin@68.183.142.179 with ~/.ssh/studio-do-ed25519",
+    "workerHealthLocal": "PASS http://127.0.0.1:8787/health",
+    "tunnelHealth": "PASS HOSTED_CLIP_WORKER_URL trycloudflare /health",
+    "codeSync": "PASS tar scripts+src+public to /var/studio/studio-squishy (~424MB)",
+    "workerEnv": "PASS hosted-clip-droplet-install-remote-env-1.mjs 16 keys",
+    "previewEnvSync": "PASS HOSTED_CLIP_COMPUTE_PROVIDER, HOSTED_CLIP_WORKER_URL, HOSTED_CERT_INTERNAL_CHUNK_KEY"
+  },
+  "freshDisposableE2E": {
+    "status": "NOT_RUN",
+    "reason": "No Ready Preview deployment carries integrated closure code; cannot satisfy assignment without deploy path above."
+  },
+  "preservedCampaigns": [
+    "disposable-hpt-cert-clip_repurposing-36dd199b",
+    "disposable-hpt-cert-clip_repurposing-6a31a13c"
+  ],
+  "verdict": "BLOCKED — Owner business decision required on Preview ship path"
+}

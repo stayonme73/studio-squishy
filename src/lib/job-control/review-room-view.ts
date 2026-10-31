@@ -302,6 +302,42 @@ export function resolveClientReviewView(input: {
     });
   }
 
+  // Condensed / launch-menu jobs may have Machine review proof + prep without plan-line deliverable labels.
+  if (deliverables.length === 0) {
+    for (const prep of job.deliverablePrep ?? []) {
+      if (!prep.preparedAt || !prep.deliverableKey) continue;
+      const refs = (job.fileRegistry ?? []).filter(
+        (ref) =>
+          isApprovedReviewProofReference(ref) &&
+          ref.deliverableKey === prep.deliverableKey,
+      );
+      if (refs.length === 0) continue;
+      deliverables.push({
+        key: prep.deliverableKey,
+        label: prep.label,
+        prepared: true,
+        preparedAt: prep.preparedAt,
+        proofFiles: refs.map((ref) => ({
+          id: ref.id,
+          filename: ref.filename,
+          fileType: ref.fileType,
+          accessHref:
+            resolveClientFacingFileHref({
+              registryFileId: ref.id,
+              url:
+                ref.storageRef.provider === "google_shared_drive"
+                  ? ref.storageRef.reference
+                  : undefined,
+              storageRef: ref.storageRef,
+              purpose: "proof",
+            }) || null,
+          versionLabel: ref.versionLabel,
+          addedAt: ref.addedAt,
+        })),
+      });
+    }
+  }
+
   const deliverableKeys = deliverables.map((entry) => entry.key);
   const release = findLatestStudioReviewRelease(
     envelope.jobActivityEvents ?? [],

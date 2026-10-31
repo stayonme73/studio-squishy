@@ -9,5 +9,7 @@ export {
   commitCampaignDesignArtifacts,
   hydrateCampaignDesignArtifacts,
   isHostedDurableCampaignArtifactsEnabled,
+  probeWorkspaceRootForCampaign,
+  withCampaignArtifactProbeWorkspace,
   withCampaignArtifactProductionWorkspace,
 } from "./hosted-durable";

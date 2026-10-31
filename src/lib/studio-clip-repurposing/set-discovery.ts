@@ -318,6 +318,15 @@ function reject(
   return { ...candidate, rejectionReason: reason };
 }
 
+/** Resolve a candidate id from the full discovery scan (including early rejects). */
+export function findSetCandidateById(
+  input: LongSourceSentences,
+  id: string,
+): SetCandidate | undefined {
+  const { candidates, earlyRejected } = buildCandidates(input.sentences);
+  return [...candidates, ...earlyRejected].find((candidate) => candidate.id === id);
+}
+
 export function discoverClipSet(input: LongSourceSentences): SetDiscoveryResult {
   const { candidates: all, earlyRejected } = buildCandidates(input.sentences);
   const rejected: SetCandidate[] = [...earlyRejected];

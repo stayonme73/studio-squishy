@@ -1,4 +1,9 @@
 import { execFileSync } from "child_process";
+
+import {
+  resolveFfmpegExecutable,
+  resolveFfprobeExecutable,
+} from "@/lib/studio-media-runtime/ffmpeg-cli";
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import path from "path";
 
@@ -28,7 +33,7 @@ function probeRawVideo(
 ): { width: number; height: number; duration: number } | { error: string } {
   try {
     const json = execFileSync(
-      "ffprobe",
+      resolveFfprobeExecutable(),
       [
         "-v",
         "error",
@@ -150,7 +155,7 @@ export async function ensureLiveProofSource(input: {
     "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1";
   try {
     execFileSync(
-      "ffmpeg",
+      resolveFfmpegExecutable(),
       [
         "-y",
         "-f",

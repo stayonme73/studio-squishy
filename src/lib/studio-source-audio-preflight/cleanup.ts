@@ -1,4 +1,4 @@
-import { spawnSync } from "child_process";
+import { spawnFfmpeg } from "@/lib/studio-media-runtime/ffmpeg-cli";
 import { existsSync, mkdirSync } from "fs";
 import path from "path";
 
@@ -25,8 +25,7 @@ function remuxCleanedAudio(input: {
   filter: string;
 }): boolean {
   mkdirSync(path.dirname(input.destAbsolutePath), { recursive: true });
-  const run = spawnSync(
-    "ffmpeg",
+  const run = spawnFfmpeg(
     [
       "-y",
       "-i",

@@ -1,7 +1,12 @@
-import { execFileSync, spawnSync } from "child_process";
+import { execFileSync } from "child_process";
 import { existsSync, unlinkSync } from "fs";
 
 import { studioShortFormVideoEditingBuildV1 } from "@/config/studio-short-form-video-editing-build-v1";
+import {
+  resolveFfmpegExecutable,
+  resolveFfprobeExecutable,
+  spawnFfmpeg,
+} from "@/lib/studio-media-runtime/ffmpeg-cli";
 
 const TARGET = studioShortFormVideoEditingBuildV1.audioFinish;
 
@@ -67,7 +72,7 @@ function parseProbeStreams(absolutePath: string): {
   durationSeconds: number | null;
 } {
   const raw = execFileSync(
-    "ffprobe",
+    resolveFfprobeExecutable(),
     [
       "-v",
       "error",
@@ -111,8 +116,7 @@ function measureVolume(absolutePath: string): {
   meanVolumeDb: number | null;
   maxVolumeDb: number | null;
 } {
-  const volume = spawnSync(
-    "ffmpeg",
+  const volume = spawnFfmpeg(
     ["-i", absolutePath, "-af", "volumedetect", "-f", "null", "-"],
     { encoding: "utf8" },
   );
@@ -222,8 +226,7 @@ export function finishFootageAudio(input: {
     return { ok: false, message: "Audio-finish source missing." };
   }
 
-  const measuredRun = spawnSync(
-    "ffmpeg",
+  const measuredRun = spawnFfmpeg(
     [
       "-y",
       "-i",
@@ -253,7 +256,7 @@ export function finishFootageAudio(input: {
   const wavPath = `${input.outputAbsolutePath}.loudnorm.wav`;
   try {
     execFileSync(
-      "ffmpeg",
+      resolveFfmpegExecutable(),
       [
         "-y",
         "-i",
@@ -270,7 +273,7 @@ export function finishFootageAudio(input: {
       { stdio: "pipe" },
     );
     execFileSync(
-      "ffmpeg",
+      resolveFfmpegExecutable(),
       [
         "-y",
         "-i",

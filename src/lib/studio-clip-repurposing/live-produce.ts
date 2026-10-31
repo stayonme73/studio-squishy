@@ -10,8 +10,13 @@ import path from "path";
 
 import { applyDotenvLocal } from "@/lib/studio-short-form-video-editing/load-env-local";
 import { finishFootageAudio } from "@/lib/studio-short-form-video-editing/audio-finish";
-import { assembleBurnedShort, exactWords } from "@/lib/studio-short-form-video-editing/caption-burn";
-import { CLIP_CAPTION_PRESENTATION, finishClipDecisionList, paintClipCustomerEndCard } from "./caption-finish";
+import {
+  assembleBurnedShort,
+  exactWords,
+  isAssembleBurnedShortComplete,
+} from "@/lib/studio-short-form-video-editing/caption-burn";
+import { finishCertifiedClipCaptionEdl } from "./clip-caption-finish-edl";
+import { CLIP_CAPTION_PRESENTATION, paintClipCustomerEndCard } from "./caption-finish";
 import { buildEditDecisionList } from "@/lib/studio-short-form-video-editing/edl";
 import { buildFootageShotstackPayload } from "@/lib/studio-short-form-video-editing/footage-payload";
 import { evaluateFootageProbe } from "@/lib/studio-short-form-video-editing/gates";
@@ -334,45 +339,26 @@ async function produceOneClip(input: {
 }) {
   const clipDir = path.join(proofDir(input.repoRoot), "clips", input.candidate.id);
   mkdirSync(clipDir, { recursive: true });
-  const localWords = offsetWords(
-    input.words,
-    input.extractStart,
-    input.extractStart + 180,
-  );
-  const intake: FootageIntake = {
-    skuId: "v2-rtu-short-form-video-edit",
-    sourceRelativePath: path.relative(input.repoRoot, input.extractAbs),
+  const captionFinish = finishCertifiedClipCaptionEdl({
+    words: input.words,
+    extractAbsolutePath: input.extractAbs,
+    extractStart: input.extractStart,
+    opening: input.opening,
+    exit: input.exit,
     ctaText: CERTIFICATION_SHARED_CTA,
     mustKeepLine: input.candidate.claim,
-    rightsCleared: true,
-    language: "en",
-  };
-  const probe = probeFootageSource(input.extractAbs);
-  if ("error" in probe) {
-    return { ok: false as const, message: probe.error, spendUsd: 0, credits: null, renders: 0 };
-  }
-  const edl = buildEditDecisionList({
-    words: localWords,
-    intake,
-    sourceDurationSeconds: probe.durationSeconds,
-    lockContinuousRange: { start: input.opening, end: input.exit },
-  });
-  if (!edl.ok) {
-    return { ok: false as const, message: edl.message, spendUsd: 0, credits: null, renders: 0 };
-  }
-  const captionFinish = finishClipDecisionList(edl, localWords, {
-    start: input.opening,
-    end: input.exit,
+    sourceRelativePath: path.relative(input.repoRoot, input.extractAbs),
   });
   if (!captionFinish.ok) {
     return {
       ok: false as const,
-      message: `Clip caption finish rejected: ${captionFinish.findings.join("; ")}`,
+      message: captionFinish.message,
       spendUsd: 0,
       credits: null,
       renders: 0,
     };
   }
+  const edl = captionFinish.edl;
 
   const finishedPath = path.join(clipDir, "audio-finished.mp4");
   const finished = finishFootageAudio({
@@ -406,6 +392,15 @@ async function produceOneClip(input: {
       `${JSON.stringify({ ok: false, message: burned.message, findings: burned.findings ?? [] }, null, 2)}\n`,
     );
     return { ok: false as const, message: burned.message, spendUsd: 0, credits: null, renders: 0 };
+  }
+  if (!isAssembleBurnedShortComplete(burned)) {
+    return {
+      ok: false as const,
+      message: "Clip live produce requires a completed local burn, not a preview mux chunk.",
+      spendUsd: 0,
+      credits: null,
+      renders: 0,
+    };
   }
   writeFileSync(
     path.join(clipDir, "exact-text-qa.json"),

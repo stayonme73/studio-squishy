@@ -11,6 +11,7 @@ import {
   exactWords,
   fitSpeechCaptionsToFrame,
   paintExactTextLine,
+  resolveUniformSpeechFontSize,
   speechLineFitsFrame,
   stabilizeOpeningCaptionPresentation,
 } from "./caption-burn";
@@ -134,20 +135,81 @@ describe("Exact-text QA and local burn helpers", () => {
     expect(mixed.sharedSpriteHeight).toBe(Math.ceil(44 * 1.75));
   });
 
+  it("fits and paints prior clip cert overflow lines at the uniform ladder size", async () => {
+    const stroke = "#111111";
+    for (const text of [
+      "I would rather sell 10 things",
+      "They think a bigger menu looks",
+      "than 50 things we can barely manage.",
+    ]) {
+      const captions = [{ start: 0, end: 3, text, role: "speech" as const }];
+      const resolved = await resolveUniformSpeechFontSize(captions, stroke, {
+        bandHeight: 120,
+        background: "transparent",
+      });
+      expect(resolved.ok).toBe(true);
+      if (!resolved.ok) return;
+      const fitted = await fitSpeechCaptionsToFrame(captions, {
+        fontSize: resolved.fontSize,
+        stroke,
+      });
+      expect(Array.isArray(fitted)).toBe(true);
+      if (!Array.isArray(fitted)) return;
+      const dir = mkdtempSync(path.join(tmpdir(), "sfve-stroke-"));
+      for (const caption of fitted.filter((c) => c.role !== "cta")) {
+        expect(await speechLineFitsFrame(caption.text, undefined, resolved.fontSize, stroke)).toBe(
+          true,
+        );
+        const painted = await paintExactTextLine({
+          text: caption.text,
+          outputAbsolutePath: path.join(dir, `${caption.start}.png`),
+          width: studioShortFormVideoEditingBuildV1.offer.width,
+          height: 160,
+          fontSize: resolved.fontSize,
+          fill: "#ffffff",
+          background: "#111111",
+          radius: 10,
+          stroke,
+        });
+        expect(painted.ok, painted.ok ? "" : painted.message).toBe(true);
+      }
+    }
+    const combined = [
+      "I would rather sell 10 things",
+      "They think a bigger menu looks",
+      "than 50 things we can barely manage.",
+    ].map((text, index) => ({
+      start: index * 3,
+      end: index * 3 + 3,
+      text,
+      role: "speech" as const,
+    }));
+    const combinedResolved = await resolveUniformSpeechFontSize(combined, stroke, {
+      bandHeight: 120,
+      background: "transparent",
+    });
+    expect(combinedResolved.ok).toBe(true);
+  });
+
   it("splits a spoken line that cannot fit the frame and keeps the words", async () => {
-    const text = "Just because a computer successfully creates";
-    expect(await speechLineFitsFrame(text)).toBe(false);
-    const fitted = await fitSpeechCaptionsToFrame([
-      { start: 1, end: 4, text, role: "speech" },
-      { start: 4, end: 7, text: "Visit the business site.", role: "cta" },
-    ]);
+    const text =
+      "Just because a computer successfully creates something customers will remember tomorrow";
+    const stroke = "#111111";
+    expect(await speechLineFitsFrame(text, undefined, 44, stroke)).toBe(false);
+    const fitted = await fitSpeechCaptionsToFrame(
+      [
+        { start: 1, end: 4, text, role: "speech" },
+        { start: 4, end: 7, text: "Visit the business site.", role: "cta" },
+      ],
+      { fontSize: 44, stroke },
+    );
     expect(Array.isArray(fitted)).toBe(true);
     if (!Array.isArray(fitted)) return;
     const speech = fitted.filter((caption) => caption.role !== "cta");
     expect(speech.length).toBeGreaterThan(1);
     expect(speech.map((caption) => caption.text).join(" ")).toBe(text);
     for (const caption of speech) {
-      expect(await speechLineFitsFrame(caption.text)).toBe(true);
+      expect(await speechLineFitsFrame(caption.text, undefined, 44, stroke)).toBe(true);
     }
     expect(fitted.find((caption) => caption.role === "cta")?.text).toBe(
       "Visit the business site.",

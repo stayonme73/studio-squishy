@@ -11,6 +11,7 @@ import path from "path";
 import { studioShortFormVideoEditingBuildV1 } from "@/config/studio-short-form-video-editing-build-v1";
 import {
   assembleBurnedShort,
+  isAssembleBurnedShortComplete,
   exactWords,
   paintExactCtaCard,
 } from "@/lib/studio-short-form-video-editing/caption-burn";
@@ -180,6 +181,9 @@ export async function runFlagshipOwnerQaCorrection(input: {
     ctaHoldSeconds: ctaHold,
   });
   if (!burned.ok) return burned;
+  if (!isAssembleBurnedShortComplete(burned)) {
+    return { ok: false, message: "Owner QA correction requires a completed local burn." };
+  }
 
   punched = path.join(workDir, "punched.mp4");
   const punch = applyHookPunchIn({
@@ -516,6 +520,9 @@ export async function runFlagshipBareCaptions(input: {
     ctaBackground: FLAGSHIP_STUDIO_CTA_PILL,
   });
   if (!burned.ok) return burned;
+  if (!isAssembleBurnedShortComplete(burned)) {
+    return { ok: false, message: "Owner QA bare-caption correction requires a completed local burn." };
+  }
 
   const punched = path.join(workDir, "punched.mp4");
   const punch = applyHookPunchIn({

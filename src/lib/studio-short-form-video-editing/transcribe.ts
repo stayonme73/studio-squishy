@@ -1,4 +1,6 @@
 import { execFileSync } from "child_process";
+
+import { resolveFfmpegExecutable } from "@/lib/studio-media-runtime/ffmpeg-cli";
 import { readFileSync, unlinkSync } from "fs";
 import { tmpdir } from "os";
 import path from "path";
@@ -52,7 +54,7 @@ export async function transcribeFootageFile(input: {
   );
   try {
     execFileSync(
-      "ffmpeg",
+      resolveFfmpegExecutable(),
       [
         "-y",
         "-i",

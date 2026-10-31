@@ -122,9 +122,9 @@ describe("clip caption finish", () => {
       path.join(root, "src/lib/studio-short-form-video-editing/edl.ts"),
       "utf8",
     );
-    expect(factory).toContain("finishClipDecisionList");
+    expect(factory).toContain("finishCertifiedClipCaptionEdl");
     expect(factory).toContain("paintClipCustomerEndCard");
-    expect(produce).toContain("finishClipDecisionList");
+    expect(produce).toContain("finishCertifiedClipCaptionEdl");
     expect(produce).toContain("paintClipCustomerEndCard");
     expect(shortForm).not.toContain("finishClipDecisionList");
   });
@@ -185,8 +185,8 @@ describe("clip caption finish", () => {
       path.join(root, "src/lib/studio-dispatch/short-form-current-door-production.ts"),
       "utf8",
     );
-    expect(factory).toContain("finishClipDecisionList(edl, localWords");
-    expect(produce).toContain("finishClipDecisionList(edl, localWords");
+    expect(factory).toContain("finishCertifiedClipCaptionEdl");
+    expect(produce).toContain("finishCertifiedClipCaptionEdl");
     expect(factory).toContain("CLIP_CAPTION_PRESENTATION");
     expect(produce).toContain("CLIP_CAPTION_PRESENTATION");
     expect(burn).toContain("input.captionBottomPx ?? 72");

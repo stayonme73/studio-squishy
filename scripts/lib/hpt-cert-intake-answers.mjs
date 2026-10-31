@@ -19,12 +19,28 @@ export function intakeAnswersForPackage(packageId) {
     case "short_form_video_editing":
       return {
         "shared:businessName": "HPT SFV Cert Co",
-        "short_form_video_editing:purpose": "Polished short-form edit from our supplied footage.",
+        "short_form_video_editing:purpose":
+          "Polished short-form edit from our supplied talking-head footage.",
+        "short_form_video_editing:markedMoments":
+          "I am sending up to 3 English clips or marked moments. Each one is 45 seconds or less, and I have marked the moments to use.",
+        "short_form_video_editing:usableFootage":
+          "The footage and audio are clear enough to use.",
         "short_form_video_editing:context": "Under 5 minutes raw; vertical delivery.",
         "short_form_video_editing:cta": "Visit our site",
         "short_form_video_editing:mustKeep": "Logo end card",
         "short_form_video_editing:rights":
-          "I have permission to use the materials I am supplying for this project.",
+          "I own these clips, or I have permission from everyone who appears in them.",
+        // Legacy factory keys — required so hosted dispatch uses the footage factory lane (not current-door hold).
+        "v2-rtu-short-form-video-edit:videoPurpose":
+          "Help customers understand why a finished page feels trustworthy.",
+        "v2-rtu-short-form-video-edit:talkingHeadConfirm":
+          "Yes — one native-vertical English talking-head I own or have permission to use",
+        "v2-rtu-short-form-video-edit:rightsAcknowledgement":
+          "I own this recording, or I have permission from everyone who appears in it",
+        "v2-rtu-short-form-video-edit:ctaText": "Visit our site",
+        "v2-rtu-short-form-video-edit:mustKeepLine": "Logo end card",
+        "v2-rtu-short-form-video-edit:sourceMaterials":
+          "hosted-sfv-cert-footage.mp4 — customer-owned vertical talking-head for certification.",
       };
     case "social_and_promo_graphics":
       return {
@@ -43,7 +59,13 @@ export function intakeAnswersForPackage(packageId) {
       return {
         "shared:businessName": "HPT Kit Cert Co",
         "campaign_launch_kit:purpose": "Spring tune-up campaign for our local studio.",
-        "campaign_launch_kit:facts": "Open house, email list, and social push in one coordinated kit.",
+        "campaign_launch_kit:facts":
+          "Open house weekend, email list, and social push in one coordinated kit.",
+        "campaign_launch_kit:prices": "$189 (was $249)",
+        "campaign_launch_kit:dates": "March 10 – April 15, 2026",
+        "campaign_launch_kit:cta": "Book online or call",
+        "campaign_launch_kit:phone": "555-0100",
+        "campaign_launch_kit:website": "https://example.com/book-tuneup",
         "campaign_launch_kit:mustKeep": "Studio name and warm tone",
         "campaign_launch_kit:rights":
           "I have permission to use the materials I am supplying for this project.",

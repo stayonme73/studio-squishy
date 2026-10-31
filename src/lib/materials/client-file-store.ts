@@ -341,7 +341,8 @@ export async function storeAndAttachCustomerMaterialFile(input: {
     contentType: input.file.type || "application/octet-stream",
     sizeBytes: bytes.byteLength,
     checksumSha256: checksum,
-    versionLabel: "v1",
+    /** Unique per upload so replacements do not collide with Supabase `x-upsert: false`. */
+    versionLabel: newCertificationId,
     uploadedAt: occurredAt,
   };
 

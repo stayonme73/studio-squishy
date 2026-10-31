@@ -4,7 +4,7 @@
  */
 
 import { createHash } from "crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
 import type { CampaignRecord } from "@/config/studio-board";
@@ -78,6 +78,36 @@ function receiptFileName(lane: FootageEditingReceiptLane): string {
   return lane === "revision"
     ? "footage-editing-revision-hook-receipt.json"
     : "footage-editing-hook-receipt.json";
+}
+
+export function footageEditingDurableMp4Rel(
+  campaignId: string,
+  dispatchId: string,
+  lane: FootageEditingReceiptLane = "first-cut",
+): string {
+  const root = customerArtifactRootRel(campaignId, dispatchId);
+  const file =
+    lane === "revision" ? "footage-revision-cut.mp4" : "footage-first-cut.mp4";
+  return `${root}/${file}`.replace(/\\/g, "/");
+}
+
+function sealFootageMp4UnderArtifactRoot(input: {
+  repoRoot: string;
+  campaignId: string;
+  dispatchId: string;
+  lane: FootageEditingReceiptLane;
+  producedRelativePath: string;
+}): string {
+  const sourceAbs = path.join(input.repoRoot, input.producedRelativePath);
+  const durableRel = footageEditingDurableMp4Rel(
+    input.campaignId,
+    input.dispatchId,
+    input.lane,
+  );
+  const durableAbs = path.join(input.repoRoot, durableRel);
+  mkdirSync(path.dirname(durableAbs), { recursive: true });
+  copyFileSync(sourceAbs, durableAbs);
+  return durableRel;
 }
 
 function receiptPath(
@@ -279,14 +309,21 @@ export async function invokeFootageEditingDispatchHook(input: {
     };
   }
 
-  const mp4Abs = path.join(input.repoRoot, produced.outputRelativePath);
+  const durableRelativePath = sealFootageMp4UnderArtifactRoot({
+    repoRoot: input.repoRoot,
+    campaignId: input.campaign.campaignId,
+    dispatchId: record.dispatchId,
+    lane,
+    producedRelativePath: produced.outputRelativePath,
+  });
+  const mp4Abs = path.join(input.repoRoot, durableRelativePath);
   const mp4ContentSha256 = existsSync(mp4Abs) ? sha256File(mp4Abs) : "";
   mkdirSync(path.dirname(receiptAbs), { recursive: true });
   const receipt: FootageEditingHookReceipt = {
     ok: true,
     skuId: SHORT_FORM_VIDEO_EDITING_SKU,
     lane,
-    mp4RelativePath: produced.outputRelativePath,
+    mp4RelativePath: durableRelativePath,
     mp4ContentSha256,
     providerRenderId: produced.providerRenderId,
     durationSeconds: produced.edl.outputDurationSeconds,
@@ -300,7 +337,7 @@ export async function invokeFootageEditingDispatchHook(input: {
     invocationOutcome: "RENDERED",
     dispatchId: record.dispatchId,
     skuId: SHORT_FORM_VIDEO_EDITING_SKU,
-    mp4RelativePath: produced.outputRelativePath,
+    mp4RelativePath: durableRelativePath,
     mp4ContentSha256,
     providerRenderId: produced.providerRenderId,
     attempts: 1,

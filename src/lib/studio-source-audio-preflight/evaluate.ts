@@ -1,5 +1,6 @@
-import { spawnSync } from "child_process";
 import { existsSync } from "fs";
+
+import { spawnFfmpeg } from "@/lib/studio-media-runtime/ffmpeg-cli";
 
 import {
   SOURCE_AUDIO_CUSTOMER_NOTICE,
@@ -19,25 +20,34 @@ import type {
 function volumeOf(
   abs: string,
   extraAf?: string,
-): { meanVolumeDb: number | null; maxVolumeDb: number | null } {
+): {
+  meanVolumeDb: number | null;
+  maxVolumeDb: number | null;
+  ffmpegInfrastructureFailure: boolean;
+} {
   const af = extraAf ? `${extraAf},volumedetect` : "volumedetect";
-  const run = spawnSync(
-    "ffmpeg",
-    ["-vn", "-i", abs, "-map", "0:a:0", "-af", af, "-f", "null", "-"],
-    {
-      encoding: "utf8",
-    },
-  );
+  const run = spawnFfmpeg(["-vn", "-i", abs, "-map", "0:a:0", "-af", af, "-f", "null", "-"], {
+    encoding: "utf8",
+  });
   const text = `${run.stdout ?? ""}\n${run.stderr ?? ""}`;
   const mean = text.match(/mean_volume:\s*(-?[\d.]+)\s*dB/);
   const max = text.match(/max_volume:\s*(-?[\d.]+)\s*dB/);
+  const spawnErr = run.error ? String(run.error.message) : "";
+  const ffmpegInfrastructureFailure =
+    !mean &&
+    (spawnErr.includes("ENOENT") ||
+      /ffmpeg.*not found|No such file/i.test(text) ||
+      run.status === 127);
   return {
     meanVolumeDb: mean ? Number(mean[1]) : null,
     maxVolumeDb: max ? Number(max[1]) : null,
+    ffmpegInfrastructureFailure,
   };
 }
 
-export function measureSourceAudio(absolutePath: string): SourceAudioMeasurement {
+export function measureSourceAudio(absolutePath: string): SourceAudioMeasurement & {
+  ffmpegInfrastructureFailure?: boolean;
+} {
   const full = volumeOf(absolutePath);
   const hiss = volumeOf(absolutePath, "highpass=f=4000");
   const speechToHissDb =
@@ -50,6 +60,8 @@ export function measureSourceAudio(absolutePath: string): SourceAudioMeasurement
     maxVolumeDb: full.maxVolumeDb,
     hissMeanDb: hiss.meanVolumeDb,
     speechToHissDb,
+    ffmpegInfrastructureFailure:
+      full.ffmpegInfrastructureFailure || hiss.ffmpegInfrastructureFailure,
   };
 }
 
@@ -73,6 +85,16 @@ export function evaluateSourceAudioGate(input: {
   }
 
   let measurement = measureSourceAudio(input.sourceAbsolutePath);
+  if (measurement.ffmpegInfrastructureFailure) {
+    return {
+      packageId: STUDIO_SOURCE_AUDIO_PREFLIGHT_PACKAGE_ID,
+      outcome: "REPLACEMENT_REQUIRED",
+      measurement,
+      customerNotice: null,
+      reason:
+        "The Studio could not analyze source audio on this host (FFmpeg unavailable). This is not a judgment about your footage.",
+    };
+  }
   if (!measurement.hasAudio || (measurement.meanVolumeDb ?? -90) < -45) {
     return {
       packageId: STUDIO_SOURCE_AUDIO_PREFLIGHT_PACKAGE_ID,

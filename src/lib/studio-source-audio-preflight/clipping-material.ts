@@ -4,7 +4,7 @@
  * Does not use STT as the judge.
  */
 
-import { spawnSync } from "child_process";
+import { spawnFfmpeg } from "@/lib/studio-media-runtime/ffmpeg-cli";
 
 import { studioSourceAudioPreflightV1 } from "@/config/studio-source-audio-preflight-v1";
 
@@ -119,8 +119,7 @@ export function scanClippingFromPcm(
 }
 
 export function scanSourceClipping(absolutePath: string): SourceAudioClippingScan | null {
-  const run = spawnSync(
-    "ffmpeg",
+  const run = spawnFfmpeg(
     [
       "-hide_banner",
       "-vn",
@@ -136,15 +135,16 @@ export function scanSourceClipping(absolutePath: string): SourceAudioClippingSca
       "f32le",
       "pipe:1",
     ],
-    { encoding: "buffer", maxBuffer: 512 * 1024 * 1024 },
+    { maxBuffer: 512 * 1024 * 1024 },
   );
-  if (run.status !== 0 || !run.stdout || run.stdout.length < 4) {
+  const stdout = run.stdout;
+  if (run.status !== 0 || !Buffer.isBuffer(stdout) || stdout.length < 4) {
     return null;
   }
   const floats = new Float32Array(
-    run.stdout.buffer,
-    run.stdout.byteOffset,
-    Math.floor(run.stdout.length / 4),
+    stdout.buffer,
+    stdout.byteOffset,
+    Math.floor(stdout.length / 4),
   );
   return scanClippingFromPcm(floats, RULE.analysisSampleRate);
 }

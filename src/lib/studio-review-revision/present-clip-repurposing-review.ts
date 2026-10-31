@@ -52,7 +52,9 @@ function updateJobInEnvelope(
 
 function resolveAbsolutePath(relativeOrAbsolute: string | undefined): string | null {
   if (!relativeOrAbsolute?.trim()) return null;
-  const raw = relativeOrAbsolute.replace(/\\/g, "/");
+  const trimmed = relativeOrAbsolute.trim();
+  if (existsSync(trimmed)) return trimmed;
+  const raw = trimmed.replace(/\\/g, "/");
   if (path.isAbsolute(raw) && existsSync(raw)) return raw;
   const abs = path.join(process.cwd(), raw.replace(/^\.?\//, ""));
   return existsSync(abs) ? abs : null;
@@ -160,8 +162,28 @@ export async function presentClipRepurposingReviewProof(input: {
   if (!presentedAny) return { envelope: input.envelope, presented: false };
 
   let prep = workingJob.deliverablePrep;
-  for (const def of requiredDefs.length > 0
-    ? requiredDefs
+  const prepTargets =
+    requiredDefs.length > 0
+      ? requiredDefs
+      : [
+          ...new Set(
+            (workingJob.fileRegistry ?? [])
+              .filter(
+                (ref) =>
+                  ref.category === "review_proof" &&
+                  ref.status === "approved_for_review" &&
+                  ref.deliverableKey,
+              )
+              .map((ref) => ref.deliverableKey as string),
+          ),
+        ].map((key, index) => ({
+          key,
+          label:
+            workingJob.fileRegistry?.find((ref) => ref.deliverableKey === key)
+              ?.deliverableLabel ?? `Clip ${index + 1}`,
+        }));
+  for (const def of prepTargets.length > 0
+    ? prepTargets
     : [{ key: studioReviewRevisionFullLoopV1.deliverableKey, label: "Clip Repurposing set" }]) {
     prep = mergeDeliverablePrep(prep, def.key, def.label, true, MACHINE_ACTOR, occurredAt);
   }

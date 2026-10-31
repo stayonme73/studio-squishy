@@ -8,7 +8,11 @@ import path from "path";
 
 import sharp from "sharp";
 
-import { exactWords, paintExactTextLine } from "@/lib/studio-short-form-video-editing/caption-burn";
+import {
+  exactWords,
+  paintExactTextLine,
+  splitSpeechCaptionsForBurn,
+} from "@/lib/studio-short-form-video-editing/caption-burn";
 import type { EditDecisionList, SpeechWord, TimedCaption } from "@/lib/studio-short-form-video-editing/types";
 
 const MAX_WORDS = 6;
@@ -266,6 +270,8 @@ export function finishClipTimedSpeech(input: {
   );
 }
 
+export { splitSpeechCaptionsForBurn };
+
 export function finishClipDecisionList(
   edl: EditDecisionList,
   spokenWords?: readonly SpeechWord[],
@@ -282,7 +288,13 @@ export function finishClipDecisionList(
     original,
   );
   if (!finished.ok) return finished;
-  return { ok: true, edl: { ...edl, captions: finished.captions } };
+  return {
+    ok: true,
+    edl: {
+      ...edl,
+      captions: splitSpeechCaptionsForBurn(finished.captions),
+    },
+  };
 }
 
 export function wrapAuthorizedLine(words: readonly string[]): string[] {

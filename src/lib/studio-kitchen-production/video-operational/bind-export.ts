@@ -3,6 +3,8 @@ import { existsSync, readFileSync, statSync, writeFileSync } from "fs";
 import path from "path";
 import { execFileSync } from "child_process";
 
+import { resolveFfprobeExecutable } from "@/lib/studio-media-runtime/ffmpeg-cli";
+
 import type { VideoOperationalExportMeta, VideoWorkPacket } from "./types";
 
 export function sha256File(abs: string): string {
@@ -22,7 +24,7 @@ export type FfprobeVideoSummary = {
 export function probeMp4WithFfprobe(absolutePath: string): FfprobeVideoSummary | { error: string } {
   try {
     const out = execFileSync(
-      "ffprobe",
+      resolveFfprobeExecutable(),
       [
         "-v",
         "error",

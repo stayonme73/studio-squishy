@@ -20,10 +20,13 @@ export function prepareCustomerSourceAudio(input: {
   });
 
   if (gate.outcome === "REPLACEMENT_REQUIRED") {
+    const infrastructure = /FFmpeg unavailable/i.test(gate.reason);
     return {
       ok: false,
       outcome: gate.outcome,
-      failureCode: "SOURCE_AUDIO_REPLACEMENT_REQUIRED",
+      failureCode: infrastructure
+        ? "SOURCE_AUDIO_PREFLIGHT_FAILED"
+        : "SOURCE_AUDIO_REPLACEMENT_REQUIRED",
       message: gate.reason,
     };
   }

@@ -45,5 +45,6 @@ export async function GET() {
     repoRoot,
     fonts: fontChecks,
     chromium,
+    footageRuntimeProbe: "/api/hosted-cert/footage-runtime-probe",
   });
 }

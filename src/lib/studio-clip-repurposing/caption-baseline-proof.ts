@@ -6,7 +6,12 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 import sharp from "sharp";
 
-import { assembleBurnedShort, exactWords, paintExactTextLine } from "@/lib/studio-short-form-video-editing/caption-burn";
+import {
+  assembleBurnedShort,
+  exactWords,
+  isAssembleBurnedShortComplete,
+  paintExactTextLine,
+} from "@/lib/studio-short-form-video-editing/caption-burn";
 import { buildFootageShotstackPayload } from "@/lib/studio-short-form-video-editing/footage-payload";
 import { applyDotenvLocal } from "@/lib/studio-short-form-video-editing/load-env-local";
 import { resolveFootageRenderEnv } from "@/lib/studio-short-form-video-editing/render-env";
@@ -121,6 +126,9 @@ export async function produceCaptionBaselineComposite(repoRoot: string) {
   });
   if (!burned.ok) {
     throw new Error(burned.message);
+  }
+  if (!isAssembleBurnedShortComplete(burned)) {
+    throw new Error("Caption baseline proof requires a completed local burn, not a preview mux chunk.");
   }
   const renderEnv = resolveFootageRenderEnv(process.env);
   const shotstackKey = readShotstackApiKey(process.env, renderEnv.envName);

@@ -140,6 +140,29 @@ async function attachDesignRendererObserver(input: {
     };
   }
 
+  const envelopeAfterLaunch = await readCampaignEnvelope(input.campaign.campaignId);
+  await upsertCampaignRecord(
+    {
+      ...input.campaign,
+      routeMapIntake:
+        envelopeAfterLaunch?.record.routeMapIntake ?? input.campaign.routeMapIntake,
+      routeMapIntakeDraft:
+        envelopeAfterLaunch?.record.routeMapIntakeDraft ??
+        input.campaign.routeMapIntakeDraft,
+      routeMapIntakeSubmittedAt:
+        envelopeAfterLaunch?.record.routeMapIntakeSubmittedAt ??
+        input.campaign.routeMapIntakeSubmittedAt,
+      studioExtras: envelopeAfterLaunch?.record.studioExtras ?? input.campaign.studioExtras,
+      dispatchExecution: {
+        ...input.dispatch,
+        designRendererObserver: observer,
+        launchMenuProductionObserver: launchMenu,
+      },
+      updatedAt: new Date().toISOString(),
+    },
+    envelopeAfterLaunch?.clientUserId,
+  );
+
   let creativeQa: Awaited<ReturnType<typeof runCreativeQaFinishObserver>>;
   try {
     creativeQa = await runCreativeQaFinishObserver({

@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
       "./node_modules/@sparticuz/chromium/bin/**",
       "./node_modules/@sparticuz/chromium/build/**",
       "./node_modules/playwright-core/**",
+      "./node_modules/ffmpeg-static/ffmpeg",
+      "./node_modules/ffmpeg-static/ffmpeg.exe",
+      "./node_modules/ffprobe-static/bin/**",
     ],
   },
   outputFileTracingExcludes: {

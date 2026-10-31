@@ -9,7 +9,11 @@ import path from "path";
 
 import { studioShortFormVideoEditingBuildV1 } from "@/config/studio-short-form-video-editing-build-v1";
 import { finishFootageAudio } from "@/lib/studio-short-form-video-editing/audio-finish";
-import { assembleBurnedShort, exactWords } from "@/lib/studio-short-form-video-editing/caption-burn";
+import {
+  assembleBurnedShort,
+  exactWords,
+  isAssembleBurnedShortComplete,
+} from "@/lib/studio-short-form-video-editing/caption-burn";
 import { buildEditDecisionList } from "@/lib/studio-short-form-video-editing/edl";
 import { evaluateFootageIntake, evaluateFootageProbe } from "@/lib/studio-short-form-video-editing/gates";
 import { briefFromStoryPlan, pickIdeaFirstPlan } from "@/lib/studio-short-form-video-editing/idea-first";
@@ -448,6 +452,13 @@ export async function runFlagshipShortFormEdit(input: {
   });
   if (!burned.ok) {
     return { ok: false, message: burned.message, spend: done(spend, startedAt) };
+  }
+  if (!isAssembleBurnedShortComplete(burned)) {
+    return {
+      ok: false,
+      message: "Flagship pipeline requires a completed local burn, not a preview mux chunk.",
+      spend: done(spend, startedAt),
+    };
   }
 
   const punchedPath = path.join(workDir, "punched.mp4");

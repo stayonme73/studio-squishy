@@ -55,6 +55,18 @@ export function generalDesignReviewSetPrepared(job: PurchasedJobRecord): boolean
   );
 }
 
+/** Machine $349 footage / condensed launch-menu video: prep + client review proof without plan-line labels. */
+export function machineFootageReviewSetPrepared(job: PurchasedJobRecord): boolean {
+  const prepReady = (job.deliverablePrep ?? []).some((entry) => Boolean(entry.preparedAt));
+  if (!prepReady) return false;
+  return (job.fileRegistry ?? []).some(
+    (ref) =>
+      ref.category === "review_proof" &&
+      ref.visibility === "client_visible" &&
+      ref.status === "approved_for_review",
+  );
+}
+
 /** Review Room prepared set: catalog keys or the general-design members the customer actually sees. */
 export function reviewDeliverableSetPrepared(
   job: PurchasedJobRecord,
@@ -62,7 +74,8 @@ export function reviewDeliverableSetPrepared(
 ): boolean {
   return (
     allRequiredDeliverablesPrepared(job, requiredDeliverables) ||
-    generalDesignReviewSetPrepared(job)
+    generalDesignReviewSetPrepared(job) ||
+    machineFootageReviewSetPrepared(job)
   );
 }
 

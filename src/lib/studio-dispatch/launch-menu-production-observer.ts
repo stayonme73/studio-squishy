@@ -4,6 +4,7 @@
  */
 
 import type { CampaignRecord } from "@/config/studio-board";
+import { readTasksEnvelope } from "@/lib/campaign-tasks/store";
 import { readMaterialsEnvelope } from "@/lib/materials/store";
 import type { ShotstackFetch } from "@/lib/studio-kitchen-production/video-integration";
 
@@ -119,6 +120,7 @@ export async function runLaunchMenuProductionObserver(input: {
   }
   const materials =
     (await readMaterialsEnvelope(input.campaign.campaignId))?.items ?? [];
+  const tasksEnvelope = await readTasksEnvelope(input.campaign.campaignId);
   const results: LaunchMenuObserverResult[] = [];
   const heavyView = input.laneViews?.find((lane) => lane.lane === "heavy");
   const occupyingJobIds = heavyView?.activeJobs.map((job) => job.jobId) ?? [];
@@ -197,6 +199,104 @@ export async function runLaunchMenuProductionObserver(input: {
           });
           continue;
         }
+        const clipJob = tasksEnvelope?.jobRecords?.find(
+          (entry) => entry.skuId === CLIP_REPURPOSING_SKU,
+        );
+        const applyRevision = clipJob?.spineStatus === "revision_requested";
+        const { scheduleHostedClipProductionContinuation } = await import(
+          "@/lib/studio-hosted-cert/hosted-clip-production-orchestrator"
+        );
+        const { readClipRepurposingHookReceipt, clipRepurposingReceiptLane } = await import(
+          "@/lib/studio-dispatch/clip-repurposing-dispatch-hook"
+        );
+        const lane = clipRepurposingReceiptLane(applyRevision);
+        const receipt = readClipRepurposingHookReceipt({
+          repoRoot,
+          campaignId: input.campaign.campaignId,
+          dispatchId: record.dispatchId,
+          lane,
+        });
+        if (receipt?.ok) {
+          invokedOk = true;
+          results.push({
+            dispatchId: record.dispatchId,
+            skuId: record.skuId,
+            action: "invoked",
+            ok: true,
+            message: receipt.outcome?.customerExplanation ?? "Clip hook receipt satisfied.",
+            clipFiles: receipt.files,
+            customerOutcome: receipt.outcome,
+            ownerRoutineProduction: "NONE",
+          });
+          continue;
+        }
+        if (applyRevision && process.env.VERCEL_ENV !== "preview") {
+          const { resolveClipRepurposingSetRevisionFromCampaign } = await import(
+            "@/lib/studio-clip-repurposing/resolve-set-revision-from-campaign"
+          );
+          const { reproduceClipRepurposingAfterRevision } = await import(
+            "@/lib/studio-review-revision/reproduce-clip-repurposing-after-revision"
+          );
+          const setRevision = resolveClipRepurposingSetRevisionFromCampaign({
+            campaign: input.campaign,
+            materials,
+            repoRoot,
+          });
+          if (!setRevision) {
+            results.push({
+              dispatchId: record.dispatchId,
+              skuId: record.skuId,
+              action: "invoked",
+              ok: false,
+              failureCode: "SET_REVISION_UNMAPPED",
+              message:
+                "Included set revision could not be mapped from customer emphasis.",
+              ownerRoutineProduction: "NONE",
+            });
+            continue;
+          }
+          const hooked = await reproduceClipRepurposingAfterRevision({
+            repoRoot,
+            campaign: input.campaign,
+            dispatchRecord: record,
+            materials,
+            setRevision,
+          });
+          invokedOk = hooked.ok;
+          results.push({
+            dispatchId: record.dispatchId,
+            skuId: record.skuId,
+            action: "invoked",
+            ok: hooked.ok,
+            failureCode: hooked.ok ? undefined : hooked.failureCode,
+            message: hooked.ok ? hooked.outcome.customerExplanation : hooked.message,
+            invocationOutcome: hooked.ok ? hooked.invocationOutcome : undefined,
+            mp4RelativePath: hooked.ok ? hooked.mp4RelativePath : undefined,
+            mp4ContentSha256: hooked.ok ? hooked.mp4ContentSha256 : undefined,
+            clipFiles: hooked.ok ? hooked.files : undefined,
+            customerOutcome: hooked.ok ? hooked.outcome : undefined,
+            attempts: "attempts" in hooked ? hooked.attempts : undefined,
+            ownerRoutineProduction: "NONE",
+          });
+          continue;
+        }
+        if (process.env.VERCEL_ENV === "preview") {
+          await scheduleHostedClipProductionContinuation(input.campaign.campaignId, {
+            eager: true,
+          });
+          results.push({
+            dispatchId: record.dispatchId,
+            skuId: record.skuId,
+            action: "invoked",
+            ok: false,
+            failureCode: "PRODUCTION_IN_PROGRESS",
+            message: applyRevision
+              ? "Clip set revision: worker chunk scheduled."
+              : "Clip orchestrator: async chunk worker scheduled.",
+            ownerRoutineProduction: "NONE",
+          });
+          continue;
+        }
         const hooked = await invokeClipRepurposingDispatchHook({
           repoRoot,
           campaign: input.campaign,
@@ -231,12 +331,17 @@ export async function runLaunchMenuProductionObserver(input: {
           results.push(skip(record, "primary_tool_not_footage_factory"));
           continue;
         }
+        const footageJob = tasksEnvelope?.jobRecords?.find(
+          (entry) => entry.skuId === SHORT_FORM_VIDEO_EDITING_SKU,
+        );
+        const applyRevision = footageJob?.spineStatus === "revision_requested";
         const hooked = await invokeFootageEditingDispatchHook({
           repoRoot,
           campaign: input.campaign,
           dispatchRecord: record,
           materials,
           runPipeline: input.footageRunPipeline,
+          applyRevision,
         });
         invokedOk = hooked.ok;
         results.push({
@@ -315,7 +420,12 @@ export async function runLaunchMenuProductionObserver(input: {
         });
       }
     } finally {
-      if (heavyLockHeld && (process.env.NODE_ENV === "test" || !invokedOk)) {
+      if (
+        heavyLockHeld &&
+        (process.env.NODE_ENV === "test" ||
+          !invokedOk ||
+          process.env.VERCEL_ENV === "preview")
+      ) {
         await releaseHeavyOccupancyLockAsync({ repoRoot, jobId: record.jobId });
       }
       if (quickHeldJobId && !invokedOk) {

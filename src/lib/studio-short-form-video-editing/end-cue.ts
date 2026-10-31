@@ -4,6 +4,8 @@
  */
 
 import { execFileSync } from "child_process";
+
+import { resolveFfmpegExecutable } from "@/lib/studio-media-runtime/ffmpeg-cli";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import path from "path";
 
@@ -80,7 +82,7 @@ export function writeTalkingHeadEndCueWav(input: {
   mkdirSync(path.dirname(input.outputAbsolutePath), { recursive: true });
   try {
     execFileSync(
-      "ffmpeg",
+      resolveFfmpegExecutable(),
       [
         "-y",
         "-f",
@@ -121,7 +123,7 @@ export function mixEndCueOntoEndCardAudio(input: {
   const delayMs = Math.max(0, Math.round((input.delaySeconds ?? 0) * 1000));
   try {
     execFileSync(
-      "ffmpeg",
+      resolveFfmpegExecutable(),
       [
         "-y",
         "-i",
@@ -169,7 +171,7 @@ export function mixEndCueUnderLastSpeech(input: {
   );
   try {
     execFileSync(
-      "ffmpeg",
+      resolveFfmpegExecutable(),
       [
         "-y",
         "-i",

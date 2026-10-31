@@ -18,7 +18,11 @@ import { resolveStudioSourcedBroll } from "@/lib/studio-flagship-short-form-edit
 import { applyHookPunchIn } from "@/lib/studio-flagship-short-form-edit/visual";
 import { applyDotenvLocal } from "@/lib/studio-short-form-video-editing/load-env-local";
 import { finishFootageAudio } from "@/lib/studio-short-form-video-editing/audio-finish";
-import { assembleBurnedShort, exactWords } from "@/lib/studio-short-form-video-editing/caption-burn";
+import {
+  assembleBurnedShort,
+  exactWords,
+  isAssembleBurnedShortComplete,
+} from "@/lib/studio-short-form-video-editing/caption-burn";
 import { buildEditDecisionList } from "@/lib/studio-short-form-video-editing/edl";
 import { evaluateFootageProbe } from "@/lib/studio-short-form-video-editing/gates";
 import { probeFootageSource } from "@/lib/studio-short-form-video-editing/probe";
@@ -329,6 +333,13 @@ export async function runContentPackClip(input: {
   });
   if (!burned.ok) {
     return { ok: false, message: burned.message, spend: done(spend, startedAt) };
+  }
+  if (!isAssembleBurnedShortComplete(burned)) {
+    return {
+      ok: false,
+      message: "Content pack clip requires a completed local burn, not a preview mux chunk.",
+      spend: done(spend, startedAt),
+    };
   }
 
   let current = burned.outputAbsolutePath;

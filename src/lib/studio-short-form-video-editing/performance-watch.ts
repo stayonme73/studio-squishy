@@ -3,7 +3,13 @@
  * Does not rewrite speech. Does not iterate the transcript selector.
  */
 
-import { execFileSync, spawnSync } from "child_process";
+import { execFileSync } from "child_process";
+
+import {
+  resolveFfmpegExecutable,
+  resolveFfprobeExecutable,
+  spawnFfmpeg,
+} from "@/lib/studio-media-runtime/ffmpeg-cli";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
@@ -72,8 +78,7 @@ export function detectSilencePauses(absolutePath: string): Array<{
   start: number;
   end: number;
 }> {
-  const run = spawnSync(
-    "ffmpeg",
+  const run = spawnFfmpeg(
     [
       "-i",
       absolutePath,
@@ -110,7 +115,7 @@ export function extractWatchFrames(input: {
   let duration = Number.POSITIVE_INFINITY;
   try {
     const json = execFileSync(
-      "ffprobe",
+      resolveFfprobeExecutable(),
       [
         "-v",
         "error",
@@ -140,7 +145,7 @@ export function extractWatchFrames(input: {
       `watch-${at.toFixed(2).replace(".", "_")}.jpg`,
     );
     execFileSync(
-      "ffmpeg",
+      resolveFfmpegExecutable(),
       [
         "-y",
         "-ss",

@@ -4,7 +4,17 @@
  */
 
 import { execFileSync } from "child_process";
-import { existsSync, mkdirSync, writeFileSync } from "fs";
+
+import {
+  probeFormatDurationSeconds,
+  probeStreamDurations,
+  redactFfmpegLog,
+  resolveFfmpegExecutable,
+  spawnFfmpeg,
+  spawnFfmpegWithTimeout,
+} from "@/lib/studio-media-runtime/ffmpeg-cli";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
+import { tmpdir } from "os";
 import path from "path";
 import sharp from "sharp";
 
@@ -24,13 +34,108 @@ import type { EditDecisionList, TimedCaption } from "./types";
 const OFFER = studioShortFormVideoEditingBuildV1.offer;
 const CTA_HOLD = studioShortFormVideoEditingBuildV1.finishing.ctaHoldSeconds;
 
+function execFfmpegSync(
+  args: string[],
+  options?: { cwd?: string },
+): void {
+  try {
+    execFileSync(resolveFfmpegExecutable(), args, {
+      cwd: options?.cwd,
+      stdio: "pipe",
+      encoding: "utf8",
+      maxBuffer: 16 * 1024 * 1024,
+    });
+  } catch (error) {
+    const err = error as { message?: string; stderr?: string; stdout?: string };
+    const stderr = redactFfmpegLog(err.stderr ?? "").slice(-6000);
+    const stdout = redactFfmpegLog(err.stdout ?? "").slice(-2000);
+    throw new Error(
+      `${err.message ?? "ffmpeg failed"}\nstderr:\n${stderr}${stdout ? `\nstdout:\n${stdout}` : ""}`,
+    );
+  }
+}
+
 export const WINDOWS_BOLD_FONT = "C:/Windows/Fonts/arialbd.ttf";
+
+const BUNDLED_ARIAL_BOLD_FONT = path.join(
+  process.cwd(),
+  "assets/fonts/caption/arial-bold.ttf",
+);
+
+/** Desk Windows Arial, else bundled TTF for hosted Preview/Production (Linux). */
+export function resolveCaptionBoldFontPath(): string {
+  const env = process.env.STUDIO_CAPTION_BOLD_FONT_PATH?.trim();
+  if (env && existsSync(env)) return env;
+  if (existsSync(WINDOWS_BOLD_FONT)) return WINDOWS_BOLD_FONT;
+  if (existsSync(BUNDLED_ARIAL_BOLD_FONT)) return BUNDLED_ARIAL_BOLD_FONT;
+  return WINDOWS_BOLD_FONT;
+}
+
+const CAPTION_BOLD_FONT_FAMILY = "StudioCaptionBold";
+let cachedCaptionBoldFontFaceStyle: string | null = null;
+
+/** Base64 @font-face so Linux hosted burn matches desk metrics (file:// URLs fail in librsvg). */
+function captionBoldFontFaceStyle(): string {
+  if (cachedCaptionBoldFontFaceStyle) return cachedCaptionBoldFontFaceStyle;
+  const fontPath = resolveCaptionBoldFontPath();
+  if (!existsSync(fontPath)) {
+    cachedCaptionBoldFontFaceStyle = "";
+    return cachedCaptionBoldFontFaceStyle;
+  }
+  const base64 = readFileSync(fontPath).toString("base64");
+  cachedCaptionBoldFontFaceStyle = `@font-face{font-family:'${CAPTION_BOLD_FONT_FAMILY}';src:url('data:font/truetype;base64,${base64}') format('truetype');font-weight:700;font-style:normal;}`;
+  return cachedCaptionBoldFontFaceStyle;
+}
+
 export const EXACT_WORD_GAP_PX = 28;
 export const WORD_GAP_PAD_PX = 12;
 
 export function wordGapForFontSize(fontSize: number): number {
   const spaceWidth = Math.max(10, Math.round(fontSize * 0.38));
-  return Math.max(EXACT_WORD_GAP_PX, spaceWidth + WORD_GAP_PAD_PX);
+  let gap = Math.max(EXACT_WORD_GAP_PX, spaceWidth + WORD_GAP_PAD_PX);
+  if (fontSize <= 24) {
+    gap = Math.min(gap, Math.max(12, Math.round(fontSize * 0.85)));
+  }
+  if (fontSize <= 20) {
+    gap = Math.max(10, Math.round(fontSize * 0.55));
+  }
+  return gap;
+}
+
+export const CLIP_MAX_SPEECH_WORDS_PER_PAINTED_LINE = 5;
+
+/** Burn-only: keep words, but cap words per painted line (Clip repurposing). */
+export function splitSpeechCaptionsForBurn(
+  captions: readonly TimedCaption[],
+  maxWords = CLIP_MAX_SPEECH_WORDS_PER_PAINTED_LINE,
+): TimedCaption[] {
+  const out: TimedCaption[] = [];
+  for (const caption of captions) {
+    if (caption.role === "cta") {
+      out.push(caption);
+      continue;
+    }
+    const words = exactWords(caption.text);
+    if (words.length <= maxWords) {
+      out.push(caption);
+      continue;
+    }
+    const span = Math.max(0.15, caption.end - caption.start);
+    const slice = span / words.length;
+    for (let index = 0; index < words.length; index += maxWords) {
+      const chunk = words.slice(index, index + maxWords);
+      const start = caption.start + slice * index;
+      const end = caption.start + slice * (index + chunk.length);
+      out.push({
+        ...caption,
+        text: chunk.join(" "),
+        start: Number(start.toFixed(3)),
+        end: Number(end.toFixed(3)),
+        role: out.length === 0 && caption.role === "hook" ? "hook" : "speech",
+      });
+    }
+  }
+  return out;
 }
 
 export function exactWords(text: string): string[] {
@@ -181,7 +286,8 @@ async function renderWordSprite(
     : "";
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-  <text x="6" y="${baseline}" font-family="Arial" font-weight="700" font-size="${fontSize}" fill="${fill}"${strokeAttr}>${escapeXml(word)}</text>
+  <defs><style>${captionBoldFontFaceStyle()}</style></defs>
+  <text x="6" y="${baseline}" font-family="${CAPTION_BOLD_FONT_FAMILY}" font-weight="700" font-size="${fontSize}" fill="${fill}"${strokeAttr}>${escapeXml(word)}</text>
 </svg>`;
   const raw = await sharp(Buffer.from(svg)).ensureAlpha().raw().toBuffer({
     resolveWithObject: true,
@@ -218,12 +324,13 @@ export async function speechLineFitsFrame(
   text: string,
   width = OFFER.width,
   fontSize = 44,
+  stroke?: string,
 ): Promise<boolean> {
   const words = exactWords(text);
   if (words.length === 0) return false;
   const gap = wordGapForFontSize(fontSize);
   const sprites = await Promise.all(
-    words.map((word) => renderWordSprite(word, fontSize, "#ffffff")),
+    words.map((word) => renderWordSprite(word, fontSize, "#ffffff", stroke)),
   );
   const contentWidth =
     sprites.reduce((sum, sprite) => sum + sprite.width, 0) + gap * (sprites.length - 1);
@@ -253,9 +360,89 @@ function splitTimedCaption(caption: TimedCaption): [TimedCaption, TimedCaption] 
   ];
 }
 
+export const SPEECH_FONT_SIZE_LADDER = [44, 40, 36, 32, 28, 24, 22, 20, 18] as const;
+
+export const CLIP_CAPTION_PRODUCTION_PROBE_V1 = {
+  id: "clip-caption-production-v1",
+  ladder: SPEECH_FONT_SIZE_LADDER,
+  usesFinishClipDecisionList: true,
+} as const;
+
+/** Hosted Preview probe — confirms uniform fit/paint repair is deployed (not just Vercel Ready). */
+export const CAPTION_UNIFORM_FIT_PROBE_V1 = {
+  id: "caption-uniform-fit-v1",
+  ladder: SPEECH_FONT_SIZE_LADDER,
+  uniformSplitOnly: true,
+} as const;
+
+export const CLIP_CERT_CAPTION_REGRESSION_LINES = [
+  "I would rather sell 10 things",
+  "They think a bigger menu looks",
+  "than 50 things we can barely manage.",
+] as const;
+
+async function verifyFittedSpeechPaintable(
+  fitted: readonly TimedCaption[],
+  fontSize: number,
+  stroke: string | undefined,
+  paintProbeDir: string,
+  paintOptions?: { bandHeight?: number; background?: string },
+): Promise<boolean> {
+  const bandHeight = paintOptions?.bandHeight ?? 160;
+  const background = paintOptions?.background ?? "#111111";
+  const speech = fitted.filter((caption) => caption.role !== "cta");
+  for (const [index, caption] of speech.entries()) {
+    if (!(await speechLineFitsFrame(caption.text, OFFER.width, fontSize, stroke))) {
+      return false;
+    }
+    const painted = await paintExactTextLine({
+      text: caption.text,
+      outputAbsolutePath: path.join(paintProbeDir, `ladder-probe-${index}.png`),
+      width: OFFER.width,
+      height: bandHeight,
+      fontSize,
+      fill: "#ffffff",
+      background,
+      radius: 10,
+      stroke,
+    });
+    if (!painted.ok) return false;
+  }
+  return true;
+}
+
+/** Largest readable size where every speech line fits after word-splitting (stroke-aware). */
+export async function resolveUniformSpeechFontSize(
+  captions: readonly TimedCaption[],
+  stroke?: string,
+  paintOptions?: { bandHeight?: number; background?: string },
+): Promise<{ ok: true; fontSize: number } | { ok: false; message: string }> {
+  const paintProbeDir = mkdtempSync(path.join(tmpdir(), "caption-ladder-probe-"));
+  for (const fontSize of SPEECH_FONT_SIZE_LADDER) {
+    const fitted = await fitSpeechCaptionsToFrame(captions, { fontSize, stroke });
+    if (!Array.isArray(fitted)) continue;
+    if (
+      await verifyFittedSpeechPaintable(
+        fitted,
+        fontSize,
+        stroke,
+        paintProbeDir,
+        paintOptions,
+      )
+    ) {
+      return { ok: true, fontSize };
+    }
+  }
+  return {
+    ok: false,
+    message: "Caption lines could not fit the frame at readable sizes.",
+  };
+}
+
 /** Keep every spoken word. Break a line only when it cannot fit the frame. */
 export async function fitSpeechCaptionsToFrame(
   captions: readonly TimedCaption[],
+  options?: { fontSize?: number; stroke?: string },
 ): Promise<TimedCaption[] | { ok: false; message: string }> {
   const fitted: TimedCaption[] = [];
   for (const caption of captions) {
@@ -263,7 +450,7 @@ export async function fitSpeechCaptionsToFrame(
       fitted.push(caption);
       continue;
     }
-    const parts = await splitCaptionUntilItFits(caption);
+    const parts = await splitCaptionUntilItFits(caption, options?.fontSize ?? 44, options?.stroke);
     if (!Array.isArray(parts)) return parts;
     fitted.push(...parts);
   }
@@ -272,15 +459,21 @@ export async function fitSpeechCaptionsToFrame(
 
 async function splitCaptionUntilItFits(
   caption: TimedCaption,
+  fontSize = 44,
+  stroke?: string,
 ): Promise<TimedCaption[] | { ok: false; message: string }> {
-  if (await speechLineFitsFrame(caption.text)) return [caption];
+  if (await speechLineFitsFrame(caption.text, OFFER.width, fontSize, stroke)) return [caption];
   const halves = splitTimedCaption(caption);
   if (!halves) {
-    return { ok: false, message: `Exact-text line overflow: "${caption.text}"` };
+    const wordCount = exactWords(caption.text).length;
+    return {
+      ok: false,
+      message: `Exact-text line overflow: "${caption.text}" (${wordCount}w max=${CLIP_MAX_SPEECH_WORDS_PER_PAINTED_LINE} dpl=${process.env.VERCEL_DEPLOYMENT_ID ?? "local"})`,
+    };
   }
-  const left = await splitCaptionUntilItFits(halves[0]);
+  const left = await splitCaptionUntilItFits(halves[0], fontSize, stroke);
   if (!Array.isArray(left)) return left;
-  const right = await splitCaptionUntilItFits(halves[1]);
+  const right = await splitCaptionUntilItFits(halves[1], fontSize, stroke);
   if (!Array.isArray(right)) return right;
   return [...left, ...right];
 }
@@ -326,7 +519,7 @@ export async function paintExactTextLine(input: {
   if (contentWidth + padX * 2 > input.width) {
     return {
       ok: false,
-      message: `Exact-text line overflow: "${input.text}"`,
+      message: `Exact-text line overflow: "${input.text}" (${words.length}w max=${CLIP_MAX_SPEECH_WORDS_PER_PAINTED_LINE} dpl=${process.env.VERCEL_DEPLOYMENT_ID ?? "local"})`,
     };
   }
   const startX = Math.round((input.width - contentWidth) / 2);
@@ -434,6 +627,89 @@ export async function paintExactCtaCard(input: {
   return { ok: true, words: line.words, wordGapPx: line.wordGapPx };
 }
 
+/** Same resolve + paint ladder as assembleBurnedShort, without ffmpeg or end-card work. */
+export async function verifySpeechCaptionsBurnPaintLadder(input: {
+  captions: readonly TimedCaption[];
+  stroke?: string;
+  bandHeight?: number;
+  background?: string;
+  workDirectory?: string;
+}): Promise<
+  | { ok: true; fontSize: number; fittedCaptions: TimedCaption[] }
+  | { ok: false; message: string }
+> {
+  const captionsForLadder = splitSpeechCaptionsForBurn(input.captions);
+  const paintOptions = {
+    bandHeight: input.bandHeight ?? 160,
+    background: input.background ?? "#111111",
+  };
+  const speechFont = await resolveUniformSpeechFontSize(
+    captionsForLadder,
+    input.stroke,
+    paintOptions,
+  );
+  if (!speechFont.ok) return speechFont;
+  let speechFontSize = speechFont.fontSize;
+  let fittedCaptions: TimedCaption[] | { ok: false; message: string } =
+    await fitSpeechCaptionsToFrame(captionsForLadder, {
+      fontSize: speechFontSize,
+      stroke: input.stroke,
+    });
+  if (!Array.isArray(fittedCaptions)) return fittedCaptions;
+
+  const workDirectory =
+    input.workDirectory ?? mkdtempSync(path.join(tmpdir(), "caption-burn-verify-"));
+  mkdirSync(workDirectory, { recursive: true });
+
+  const ladderStart = SPEECH_FONT_SIZE_LADDER.indexOf(
+    speechFontSize as (typeof SPEECH_FONT_SIZE_LADDER)[number],
+  );
+  const ladderFrom =
+    ladderStart >= 0 ? SPEECH_FONT_SIZE_LADDER.slice(ladderStart) : SPEECH_FONT_SIZE_LADDER;
+  let paintReady = false;
+  for (const trySize of ladderFrom) {
+    speechFontSize = trySize;
+    const refit = await fitSpeechCaptionsToFrame(captionsForLadder, {
+      fontSize: trySize,
+      stroke: input.stroke,
+    });
+    if (!Array.isArray(refit)) return refit;
+    fittedCaptions = refit;
+    const trySpeech = refit.filter((caption) => caption.role !== "cta");
+    let failed: { ok: false; message: string } | null = null;
+    for (const [index, caption] of trySpeech.entries()) {
+      const paintedLine = await paintExactTextLine({
+        text: caption.text,
+        outputAbsolutePath: path.join(workDirectory, `cap-${trySize}-${index}.png`),
+        width: OFFER.width,
+        height: paintOptions.bandHeight,
+        fontSize: trySize,
+        fill: "#ffffff",
+        background: paintOptions.background,
+        radius: 10,
+        stroke: input.stroke,
+      });
+      if (!paintedLine.ok) {
+        failed = paintedLine;
+        break;
+      }
+      if (paintedLine.words.join(" ") !== exactWords(caption.text).join(" ")) {
+        failed = { ok: false, message: `Caption ${index} painted words drifted.` };
+        break;
+      }
+    }
+    if (!failed) {
+      paintReady = true;
+      break;
+    }
+    if (trySize === ladderFrom[ladderFrom.length - 1]) return failed;
+  }
+  if (!paintReady) {
+    return { ok: false, message: "Caption paint failed at all ladder sizes." };
+  }
+  return { ok: true, fontSize: speechFontSize, fittedCaptions };
+}
+
 export async function assembleBurnedShort(input: {
   sourceAbsolutePath: string;
   edl: EditDecisionList;
@@ -449,6 +725,10 @@ export async function assembleBurnedShort(input: {
   ctaFill?: string;
   ctaBackground?: string;
   applyEndCue?: boolean;
+  /** Production probe: run caption ladder + CTA paint only (no ffmpeg mux). */
+  captionsPaintOnly?: boolean;
+  /** Hosted Preview chunks: skip ladder/paint when painted-words.json + speech.ass already exist. */
+  resumeMuxFromPainted?: boolean;
   paintEndCard?: (input: {
     text: string;
     outputAbsolutePath: string;
@@ -459,6 +739,14 @@ export async function assembleBurnedShort(input: {
   | {
       ok: true;
       outputAbsolutePath: string;
+      assPath: string;
+      paintedWordsPath: string;
+      endCue: TalkingHeadEndCueChoice;
+    }
+  | {
+      ok: true;
+      previewMuxChunk: true;
+      phase: string;
       assPath: string;
       paintedWordsPath: string;
       endCue: TalkingHeadEndCueChoice;
@@ -480,7 +768,8 @@ export async function assembleBurnedShort(input: {
       findings: qa.findings,
     };
   }
-  if (!existsSync(WINDOWS_BOLD_FONT)) {
+  const boldFontPath = resolveCaptionBoldFontPath();
+  if (!existsSync(boldFontPath)) {
     return { ok: false, message: "Local Arial Bold font missing." };
   }
 
@@ -489,47 +778,321 @@ export async function assembleBurnedShort(input: {
     return { ok: false, message: "Frozen finishing cut must stay one continuous clip." };
   }
 
-  const fittedCaptions = await fitSpeechCaptionsToFrame(input.edl.captions);
-  if (!Array.isArray(fittedCaptions)) return fittedCaptions;
+  const paintOptions = {
+    bandHeight: input.captionBandHeight ?? 160,
+    background: input.captionBackground ?? "#111111",
+  };
 
   mkdirSync(input.workDirectory, { recursive: true });
+  const captionsForBurn = splitSpeechCaptionsForBurn(input.edl.captions);
+  const paintedWordsPath = path.join(input.workDirectory, "painted-words.json");
   const assPath = path.join(input.workDirectory, "speech.ass");
-  const ass = buildSpeechAss(fittedCaptions);
-  const assTexts = assDialogueTexts(ass);
-  const speechCaptions = fittedCaptions.filter((caption) => caption.role !== "cta");
+
   if (
-    assTexts.length !== speechCaptions.length ||
-    assTexts.some((text, index) => text !== speechCaptions[index]!.text)
+    !input.captionsPaintOnly &&
+    existsSync(input.outputAbsolutePath) &&
+    input.resumeMuxFromPainted
   ) {
-    return { ok: false, message: "ASS dialogue drifted from approved caption text." };
+    const lastSpeech = captionsForBurn.filter((caption) => caption.role !== "cta").at(-1);
+    return {
+      ok: true,
+      outputAbsolutePath: input.outputAbsolutePath,
+      assPath,
+      paintedWordsPath,
+      endCue: chooseTalkingHeadEndCue({
+        lastSpeechText: lastSpeech?.text ?? "",
+        lastSpeechDurationSeconds: lastSpeech
+          ? lastSpeech.end - lastSpeech.start
+          : 0,
+      }),
+    };
   }
-  writeFileSync(assPath, ass, "utf8");
+
+  let speechFontSize: number;
+  let fittedCaptions: TimedCaption[];
+  const canResumeMux =
+    input.resumeMuxFromPainted &&
+    existsSync(paintedWordsPath) &&
+    existsSync(assPath);
+  if (canResumeMux) {
+    fittedCaptions = captionsForBurn;
+    speechFontSize = SPEECH_FONT_SIZE_LADDER[0]!;
+  } else {
+    const verified = await verifySpeechCaptionsBurnPaintLadder({
+      captions: captionsForBurn,
+      stroke: input.captionStroke,
+      bandHeight: paintOptions.bandHeight,
+      background: paintOptions.background,
+      workDirectory: path.join(input.workDirectory, "ladder-probe"),
+    });
+    if (!verified.ok) return verified;
+    speechFontSize = verified.fontSize;
+    fittedCaptions = verified.fittedCaptions;
+    const ass = buildSpeechAss(fittedCaptions);
+    writeFileSync(assPath, ass, "utf8");
+  }
 
   const cutPath = path.join(input.workDirectory, "cut.mp4");
   const burnedPath = path.join(input.workDirectory, "burned.mp4");
+  const burnedCuedPath = path.join(input.workDirectory, "burned-cued.mp4");
   const cardPath = path.join(input.workDirectory, "end-card.mp4");
   const ctaHold = input.ctaHoldSeconds ?? CTA_HOLD;
-  const paintedWordsPath = path.join(input.workDirectory, "painted-words.json");
+
+  const previewMuxResumable =
+    (process.env.VERCEL_ENV === "preview" || process.env.STUDIO_HOSTED_CLIP_WORKER === "1") &&
+    Boolean(input.resumeMuxFromPainted);
+
+  /** Strategy B concat-only — bounded wall clock on worker/preview (default 120s). */
+  const concatOnlyTimeoutMs = Math.max(
+    5_000,
+    Number(process.env.STUDIO_HOSTED_CLIP_CONCAT_TIMEOUT_MS ?? 120_000),
+  );
+  const STRATEGY_B_FILTER =
+    "[0:v]fps=30,format=yuv420p,setpts=PTS-STARTPTS[v0];[1:v]fps=30,format=yuv420p,setpts=PTS-STARTPTS[v1];[0:a]aresample=48000,aformat=channel_layouts=stereo,asetpts=PTS-STARTPTS[a0];[1:a]aresample=48000,aformat=channel_layouts=stereo,asetpts=PTS-STARTPTS[a1];[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]";
+
+  const muxConcatTracePath = path.join(input.workDirectory, "mux-concat-trace.json");
+  function writeMuxConcatTrace(payload: Record<string, unknown>) {
+    writeFileSync(
+      muxConcatTracePath,
+      `${JSON.stringify({ ...payload, at: new Date().toISOString() }, null, 2)}\n`,
+    );
+  }
+
+  /** Preview resume: durable end_card + burned — run concat only (skip PNG ladder / overlay replay). */
+  const concatResumeReady =
+    existsSync(cardPath) && (existsSync(burnedPath) || existsSync(burnedCuedPath));
+  if (
+    previewMuxResumable &&
+    !input.captionsPaintOnly &&
+    !existsSync(input.outputAbsolutePath) &&
+    concatResumeReady
+  ) {
+    writeMuxConcatTrace({
+      branch: "concat_only_attempt",
+      hasBurnedCued: existsSync(burnedCuedPath),
+      hasEndCard: existsSync(cardPath),
+      hasBurned: existsSync(burnedPath),
+      outputAbsolutePath: input.outputAbsolutePath,
+    });
+    const speechForConcat = existsSync(burnedCuedPath) ? burnedCuedPath : burnedPath;
+    const inputDurSpeech = probeFormatDurationSeconds(speechForConcat);
+    const inputDurCard = probeFormatDurationSeconds(cardPath);
+    const expectedDurationSec =
+      inputDurSpeech != null && inputDurCard != null
+        ? inputDurSpeech + inputDurCard
+        : null;
+    const progressLogPath = path.join(input.workDirectory, "mux-concat-ffmpeg-progress.log");
+    const stderrLogPath = path.join(input.workDirectory, "mux-concat-ffmpeg-stderr.log");
+    writeMuxConcatTrace({
+      branch: "concat_only_ffmpeg_start",
+      strategy: "B_normalized_fps30_crf23",
+      concatOnlyTimeoutMs,
+      expectedDurationSec,
+      speechForConcat,
+      cardPath,
+      progressLogPath,
+      stderrLogPath,
+      filterComplex: STRATEGY_B_FILTER,
+    });
+    const ffmpegArgs = [
+      "-y",
+      "-i",
+      speechForConcat,
+      "-i",
+      cardPath,
+      "-filter_complex",
+      STRATEGY_B_FILTER,
+      "-map",
+      "[v]",
+      "-map",
+      "[a]",
+      "-c:v",
+      "libx264",
+      "-preset",
+      "veryfast",
+      "-crf",
+      "23",
+      "-pix_fmt",
+      "yuv420p",
+      "-c:a",
+      "aac",
+      "-ar",
+      "48000",
+      "-ac",
+      "2",
+      "-movflags",
+      "+faststart",
+      input.outputAbsolutePath,
+    ] as const;
+    const ffmpegRun = await spawnFfmpegWithTimeout({
+      args: ffmpegArgs,
+      timeoutMs: concatOnlyTimeoutMs,
+      progressLogPath,
+      stderrLogPath,
+    });
+    let progressTail = "";
+    if (existsSync(progressLogPath)) {
+      progressTail = redactFfmpegLog(readFileSync(progressLogPath, "utf8")).slice(-4000);
+    }
+    if (ffmpegRun.timedOut || ffmpegRun.terminated) {
+      if (existsSync(input.outputAbsolutePath)) {
+        try {
+          unlinkSync(input.outputAbsolutePath);
+        } catch {
+          // ignore
+        }
+      }
+      writeMuxConcatTrace({
+        branch: "concat_only_timeout",
+        elapsedMs: ffmpegRun.elapsedMs,
+        timedOut: ffmpegRun.timedOut,
+        progressTail,
+        stderrTail: ffmpegRun.stderr.slice(-2000),
+      });
+      return {
+        ok: false,
+        message: `Preview concat-only mux timed out after ${ffmpegRun.elapsedMs}ms.`,
+      };
+    }
+    if (ffmpegRun.status !== 0) {
+      writeMuxConcatTrace({
+        branch: "concat_only_failed",
+        exitStatus: ffmpegRun.status,
+        elapsedMs: ffmpegRun.elapsedMs,
+        progressTail,
+        stderrTail: ffmpegRun.stderr.slice(-2000),
+        stdoutTail: ffmpegRun.stdout.slice(-500),
+      });
+      return {
+        ok: false,
+        message: `Preview concat-only mux failed: ${ffmpegRun.stderr.slice(-400)}`,
+      };
+    }
+    if (!existsSync(input.outputAbsolutePath)) {
+      writeMuxConcatTrace({ branch: "concat_only_missing_output", progressTail });
+      return { ok: false, message: "Preview concat-only output missing after ffmpeg." };
+    }
+    const outputProbe = probeStreamDurations(input.outputAbsolutePath);
+    const formatDur = outputProbe.formatDuration;
+    const avDelta =
+      outputProbe.videoDuration != null && outputProbe.audioDuration != null
+        ? Math.abs(outputProbe.videoDuration - outputProbe.audioDuration)
+        : null;
+    const durationOk =
+      expectedDurationSec != null && formatDur != null
+        ? formatDur >= expectedDurationSec - 1 && formatDur <= expectedDurationSec + 2.5
+        : formatDur != null && formatDur >= 15 && formatDur <= 25;
+    const avSyncOk = avDelta == null || avDelta <= 0.35;
+    if (!durationOk || !avSyncOk) {
+      writeMuxConcatTrace({
+        branch: "concat_only_duration_rejected",
+        expectedDurationSec,
+        outputProbe,
+        avDelta,
+        durationOk,
+        avSyncOk,
+        progressTail,
+      });
+      try {
+        unlinkSync(input.outputAbsolutePath);
+      } catch {
+        // ignore
+      }
+      return {
+        ok: false,
+        message: `Concat output failed duration/sync gate (format=${formatDur ?? "null"}, expected≈${expectedDurationSec ?? "unknown"}, avDelta=${avDelta ?? "null"}).`,
+      };
+    }
+    writeMuxConcatTrace({
+      branch: "concat_only_ok",
+      strategy: "B_normalized_fps30_crf23",
+      elapsedMs: ffmpegRun.elapsedMs,
+      outputBytes: readFileSync(input.outputAbsolutePath).length,
+      expectedDurationSec,
+      outputProbe,
+      avDelta,
+      progressTail,
+      stderrLogPath,
+      progressLogPath,
+    });
+    const resumeSpeech = captionsForBurn.filter((caption) => caption.role !== "cta");
+    const lastSpeechResume = resumeSpeech.at(-1);
+    return {
+      ok: true,
+      outputAbsolutePath: input.outputAbsolutePath,
+      assPath,
+      paintedWordsPath,
+      endCue: chooseTalkingHeadEndCue({
+        lastSpeechText: lastSpeechResume?.text ?? "",
+        lastSpeechDurationSeconds: lastSpeechResume
+          ? lastSpeechResume.end - lastSpeechResume.start
+          : 0,
+      }),
+    };
+  }
+
+  function previewMuxChunkReturn(
+    phase: string,
+    endCue: TalkingHeadEndCueChoice,
+  ):
+    | {
+        ok: true;
+        previewMuxChunk: true;
+        phase: string;
+        assPath: string;
+        paintedWordsPath: string;
+        endCue: TalkingHeadEndCueChoice;
+      }
+    | null {
+    if (!previewMuxResumable) return null;
+    return {
+      ok: true,
+      previewMuxChunk: true,
+      phase,
+      assPath,
+      paintedWordsPath,
+      endCue,
+    };
+  }
 
   try {
     const painted: Array<{ role: string; text: string; words: string[]; file: string }> = [];
     const speechPngs: Array<{ caption: TimedCaption; fileName: string }> = [];
-    for (const [index, caption] of speechCaptions.entries()) {
+    const trySpeech = fittedCaptions.filter((caption) => caption.role !== "cta");
+    if (canResumeMux) {
+      const saved = JSON.parse(readFileSync(paintedWordsPath, "utf8")) as {
+        ok?: boolean;
+        painted?: Array<{ role: string; text: string; words: string[]; file: string }>;
+      };
+      if (!saved.ok || !saved.painted?.length) {
+        return { ok: false, message: "Invalid painted-words.json for resumeMuxFromPainted." };
+      }
+      for (const [index, caption] of trySpeech.entries()) {
+        const entry = saved.painted.find(
+          (row) => row.role !== "cta" && row.text === caption.text,
+        );
+        const fileName = entry?.file ?? `cap-${index}.png`;
+        if (!existsSync(path.join(input.workDirectory, fileName))) {
+          return { ok: false, message: `Missing painted PNG ${fileName} for resume mux.` };
+        }
+        speechPngs.push({ caption, fileName });
+      }
+      painted.push(...saved.painted);
+    } else {
+    for (const [index, caption] of trySpeech.entries()) {
       const fileName = `cap-${index}.png`;
       const paintedLine = await paintExactTextLine({
         text: caption.text,
         outputAbsolutePath: path.join(input.workDirectory, fileName),
         width: OFFER.width,
-        height: input.captionBandHeight ?? 160,
-        fontSize: 44,
+        height: paintOptions.bandHeight,
+        fontSize: speechFontSize,
         fill: "#ffffff",
-        background: input.captionBackground ?? "#111111",
+        background: paintOptions.background,
         radius: 10,
         stroke: input.captionStroke,
       });
-      if (!paintedLine.ok) {
-        return paintedLine;
-      }
+      if (!paintedLine.ok) return paintedLine;
       if (paintedLine.words.join(" ") !== exactWords(caption.text).join(" ")) {
         return { ok: false, message: `Caption ${index} painted words drifted.` };
       }
@@ -541,9 +1104,18 @@ export async function assembleBurnedShort(input: {
       });
       speechPngs.push({ caption, fileName });
     }
+    }
+    const speechCaptions = fittedCaptions.filter((caption) => caption.role !== "cta");
+    const assTexts = assDialogueTexts(readFileSync(assPath, "utf8"));
+    if (
+      assTexts.length !== speechCaptions.length ||
+      assTexts.some((text, index) => text !== speechCaptions[index]!.text)
+    ) {
+      return { ok: false, message: "ASS dialogue drifted from approved caption text." };
+    }
 
     const ctaWords = input.approvedCta.trim();
-    if (ctaWords) {
+    if (ctaWords && !(canResumeMux && existsSync(path.join(input.workDirectory, "cta-card.png")))) {
       const ctaPng = path.join(input.workDirectory, "cta-card.png");
       const ctaPaint = input.paintEndCard
         ? await input.paintEndCard({
@@ -574,35 +1146,75 @@ export async function assembleBurnedShort(input: {
         file: "cta-card.png",
       });
     }
-    writeFileSync(
-      paintedWordsPath,
-      `${JSON.stringify({ ok: true, wordGapPx: EXACT_WORD_GAP_PX, painted }, null, 2)}\n`,
-    );
+    if (!(canResumeMux && existsSync(paintedWordsPath))) {
+      writeFileSync(
+        paintedWordsPath,
+        `${JSON.stringify({ ok: true, wordGapPx: EXACT_WORD_GAP_PX, painted }, null, 2)}\n`,
+      );
+    }
 
-    execFileSync(
-      "ffmpeg",
-      [
-        "-y",
-        "-ss",
-        String(clip.sourceTrim),
-        "-i",
-        input.sourceAbsolutePath,
-        "-t",
-        String(clip.sourceLength),
-        "-c:v",
-        "libx264",
-        "-pix_fmt",
-        "yuv420p",
-        "-c:a",
-        "aac",
-        "-ar",
-        "48000",
-        "-ac",
-        "2",
-        cutPath,
-      ],
-      { stdio: "pipe" },
-    );
+    if (input.captionsPaintOnly) {
+      const lastSpeech = speechCaptions.at(-1);
+      return {
+        ok: true,
+        outputAbsolutePath: input.outputAbsolutePath,
+        assPath,
+        paintedWordsPath,
+        endCue: chooseTalkingHeadEndCue({
+          lastSpeechText: lastSpeech?.text ?? "",
+          lastSpeechDurationSeconds: Math.max(
+            0.2,
+            (lastSpeech?.end ?? 0) - (lastSpeech?.start ?? 0),
+          ),
+        }),
+      };
+    }
+
+    let cutCreatedThisInvocation = false;
+    if (!existsSync(cutPath)) {
+      if (!existsSync(input.sourceAbsolutePath)) {
+        return {
+          ok: false,
+          message: `Local burn-in failed: source missing before cut: ${input.sourceAbsolutePath}`,
+        };
+      }
+      execFfmpegSync(
+        [
+          "-y",
+          "-ss",
+          String(clip.sourceTrim),
+          "-i",
+          input.sourceAbsolutePath,
+          "-t",
+          String(clip.sourceLength),
+          "-c:v",
+          "libx264",
+          "-pix_fmt",
+          "yuv420p",
+          "-c:a",
+          "aac",
+          "-ar",
+          "48000",
+          "-ac",
+          "2",
+          cutPath,
+        ],
+        { cwd: input.workDirectory },
+      );
+      cutCreatedThisInvocation = true;
+    }
+
+    const lastSpeechAfterCut = speechCaptions[speechCaptions.length - 1];
+    const endCueAfterCut = chooseTalkingHeadEndCue({
+      lastSpeechText: lastSpeechAfterCut?.text ?? "",
+      lastSpeechDurationSeconds: lastSpeechAfterCut
+        ? lastSpeechAfterCut.end - lastSpeechAfterCut.start
+        : 0,
+    });
+    if (cutCreatedThisInvocation) {
+      const chunkAfterCut = previewMuxChunkReturn("cut", endCueAfterCut);
+      if (chunkAfterCut) return chunkAfterCut;
+    }
 
     const overlayInputs = speechPngs.flatMap(({ fileName }) => ["-i", fileName]);
     const captionBottomPx = input.captionBottomPx ?? 72;
@@ -621,29 +1233,33 @@ export async function assembleBurnedShort(input: {
     if (!speechPngs.length) {
       return { ok: false, message: "No speech captions to burn." };
     }
-    execFileSync(
-      "ffmpeg",
-      [
-        "-y",
-        "-i",
-        "cut.mp4",
-        ...overlayInputs,
-        "-filter_complex",
-        filter.slice(0, -1),
-        "-map",
-        "[vout]",
-        "-map",
-        "0:a",
-        "-c:v",
-        "libx264",
-        "-pix_fmt",
-        "yuv420p",
-        "-c:a",
-        "copy",
-        "burned.mp4",
-      ],
-      { stdio: "pipe", cwd: input.workDirectory },
-    );
+    let burnedCreatedThisInvocation = false;
+    if (!existsSync(burnedPath)) {
+      execFileSync(
+        resolveFfmpegExecutable(),
+        [
+          "-y",
+          "-i",
+          "cut.mp4",
+          ...overlayInputs,
+          "-filter_complex",
+          filter.slice(0, -1),
+          "-map",
+          "[vout]",
+          "-map",
+          "0:a",
+          "-c:v",
+          "libx264",
+          "-pix_fmt",
+          "yuv420p",
+          "-c:a",
+          "copy",
+          "burned.mp4",
+        ],
+        { stdio: "pipe", cwd: input.workDirectory },
+      );
+      burnedCreatedThisInvocation = true;
+    }
 
     const lastSpeech = speechCaptions[speechCaptions.length - 1];
     const endCue = chooseTalkingHeadEndCue({
@@ -657,12 +1273,20 @@ export async function assembleBurnedShort(input: {
       choice: endCue,
       lastSpeechText: lastSpeech?.text ?? "",
     });
+    if (burnedCreatedThisInvocation && input.approvedCta.trim()) {
+      const chunkAfterBurned = previewMuxChunkReturn("burned", endCue);
+      if (chunkAfterBurned) return chunkAfterBurned;
+    }
     const applyCue = input.applyEndCue !== false;
     const cueWav = path.join(input.workDirectory, "end-cue.wav");
     const cardAudio = path.join(input.workDirectory, "end-card-audio.wav");
     const burnedCued = path.join(input.workDirectory, "burned-cued.mp4");
     let speechForConcat = burnedPath;
-    if (!input.approvedCta.trim()) {
+    const resumeSpeechForConcat =
+      previewMuxResumable && existsSync(burnedCued) ? burnedCued : null;
+    if (resumeSpeechForConcat) {
+      speechForConcat = resumeSpeechForConcat;
+    } else if (!input.approvedCta.trim()) {
       if (applyCue) {
         const cueWritten = writeTalkingHeadEndCueWav({
           id: endCue.id,
@@ -679,7 +1303,7 @@ export async function assembleBurnedShort(input: {
         speechForConcat = burnedCued;
       }
       execFileSync(
-        "ffmpeg",
+        resolveFfmpegExecutable(),
         ["-y", "-i", speechForConcat, "-c", "copy", input.outputAbsolutePath],
         { stdio: "pipe" },
       );
@@ -690,7 +1314,7 @@ export async function assembleBurnedShort(input: {
         paintedWordsPath,
         endCue,
       };
-    }
+    } else if (!resumeSpeechForConcat) {
     if (applyCue) {
       const cueWritten = writeTalkingHeadEndCueWav({
         id: endCue.id,
@@ -714,7 +1338,7 @@ export async function assembleBurnedShort(input: {
       if (!cardMix.ok) return cardMix;
     } else {
       execFileSync(
-        "ffmpeg",
+        resolveFfmpegExecutable(),
         [
           "-y",
           "-f",
@@ -728,37 +1352,47 @@ export async function assembleBurnedShort(input: {
         { stdio: "pipe", cwd: input.workDirectory },
       );
     }
+    }
+
+    let endCardCreatedThisInvocation = false;
+    if (!existsSync(cardPath)) {
+      execFileSync(
+        resolveFfmpegExecutable(),
+        [
+          "-y",
+          "-loop",
+          "1",
+          "-i",
+          "cta-card.png",
+          "-i",
+          "end-card-audio.wav",
+          "-t",
+          String(ctaHold),
+          "-c:v",
+          "libx264",
+          "-pix_fmt",
+          "yuv420p",
+          "-c:a",
+          "aac",
+          "-ar",
+          "48000",
+          "-ac",
+          "2",
+          "-shortest",
+          "end-card.mp4",
+        ],
+        { stdio: "pipe", cwd: input.workDirectory },
+      );
+      endCardCreatedThisInvocation = true;
+    }
+
+    if (endCardCreatedThisInvocation) {
+      const chunkAfterEndCard = previewMuxChunkReturn("end_card", endCue);
+      if (chunkAfterEndCard) return chunkAfterEndCard;
+    }
 
     execFileSync(
-      "ffmpeg",
-      [
-        "-y",
-        "-loop",
-        "1",
-        "-i",
-        "cta-card.png",
-        "-i",
-        "end-card-audio.wav",
-        "-t",
-        String(ctaHold),
-        "-c:v",
-        "libx264",
-        "-pix_fmt",
-        "yuv420p",
-        "-c:a",
-        "aac",
-        "-ar",
-        "48000",
-        "-ac",
-        "2",
-        "-shortest",
-        "end-card.mp4",
-      ],
-      { stdio: "pipe", cwd: input.workDirectory },
-    );
-
-    execFileSync(
-      "ffmpeg",
+      resolveFfmpegExecutable(),
       [
         "-y",
         "-i",
@@ -766,13 +1400,17 @@ export async function assembleBurnedShort(input: {
         "-i",
         cardPath,
         "-filter_complex",
-        "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1[v][a]",
+        STRATEGY_B_FILTER,
         "-map",
         "[v]",
         "-map",
         "[a]",
         "-c:v",
         "libx264",
+        "-preset",
+        "veryfast",
+        "-crf",
+        "23",
         "-pix_fmt",
         "yuv420p",
         "-c:a",
@@ -781,6 +1419,8 @@ export async function assembleBurnedShort(input: {
         "48000",
         "-ac",
         "2",
+        "-movflags",
+        "+faststart",
         input.outputAbsolutePath,
       ],
       { stdio: "pipe" },
@@ -809,4 +1449,17 @@ export async function assembleBurnedShort(input: {
     paintedWordsPath,
     endCue,
   };
+}
+
+export type AssembleBurnedShortResult = Awaited<ReturnType<typeof assembleBurnedShort>>;
+
+export type AssembleBurnedShortComplete = Extract<
+  AssembleBurnedShortResult,
+  { ok: true; outputAbsolutePath: string }
+>;
+
+export function isAssembleBurnedShortComplete(
+  result: AssembleBurnedShortResult,
+): result is AssembleBurnedShortComplete {
+  return result.ok === true && "outputAbsolutePath" in result;
 }

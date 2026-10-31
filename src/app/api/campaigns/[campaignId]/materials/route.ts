@@ -43,6 +43,10 @@ import { ensureDispatchExecution } from "@/lib/studio-dispatch";
 import { identitySessionFromRequest } from "@/lib/studio-customer-identity-safety-gate/session";
 import { deliverLifecycleNoticesForCampaign } from "@/lib/studio-lifecycle-email/campaign";
 import {
+  acknowledgeSourceAudioLimitationForCampaign,
+  refreshSourceAudioPreflightForCampaign,
+} from "@/lib/studio-source-audio-preflight/sync-after-video-upload";
+import {
   applyCustomerWithdrawFile,
   resolveWithdrawTargetItemId,
 } from "@/lib/studio-customer-content-intake";
@@ -77,6 +81,10 @@ type MaterialsPatchBody =
       action: "customer_withdraw_file";
       itemId?: string;
       consolidatedItemId?: string;
+    }
+  | {
+      action: "acknowledge_source_audio_limitation";
+      proceedWithThisSource: boolean;
     };
 
 function resolveMaterialsAudience(
@@ -216,6 +224,10 @@ async function syncAfterClientSubmit(input: {
   );
   const payload = resolveMaterialsApiPayload(input.saved, audience, input.campaignEnvelope.record);
   await syncMaterialsSummaryOnCampaign(input.campaignId, payload.blockingRequiredCount);
+
+  if (input.submittedItemIds.length > 0) {
+    await refreshSourceAudioPreflightForCampaign(input.campaignId);
+  }
 
   if (input.campaignEnvelope.record.paymentTruth?.status === "confirmed") {
     const latest = await readCampaignEnvelope(input.campaignId);
@@ -432,6 +444,29 @@ export async function PATCH(request: Request, context: RouteContext) {
         user,
       );
       break;
+    }
+    case "acknowledge_source_audio_limitation": {
+      if (!canSubmitMaterials(user, campaignId, campaignEnvelope)) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      const ack = await acknowledgeSourceAudioLimitationForCampaign({
+        campaignId,
+        proceedWithThisSource: body.proceedWithThisSource === true,
+      });
+      if (!ack.ok) {
+        return NextResponse.json({ error: ack.error }, { status: ack.status });
+      }
+      if (ack.record.paymentTruth?.status === "confirmed") {
+        const identitySession = identitySessionFromRequest(request, user.id, campaignId);
+        const recovered = await recoverPaidOperatingChain(ack.record, { identitySession });
+        if (recovered.alreadyClear && recovered.campaign) {
+          await ensureDispatchExecution(recovered.campaign, identitySession);
+        }
+      }
+      return NextResponse.json({
+        ok: true,
+        sourceAudioPreflight: ack.record.sourceAudioPreflight ?? null,
+      });
     }
     case "customer_withdraw_file": {
       if (!canSubmitMaterials(user, campaignId, campaignEnvelope)) {

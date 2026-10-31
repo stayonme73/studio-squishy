@@ -2,6 +2,9 @@
  * Bind a Machine-produced Clip Repurposing set to Review + customer communication.
  */
 
+import { existsSync } from "fs";
+import path from "path";
+
 import type { CampaignRecord } from "@/config/studio-board";
 import { CLIP_REPURPOSING_SKU } from "@/config/studio-clip-repurposing-build-v1";
 import { upsertCampaignRecord, readCampaignEnvelope } from "@/lib/campaign-store/store";
@@ -10,8 +13,11 @@ import {
   buildQaRecord,
   formalQaTaskIdForService,
 } from "@/lib/campaign-tasks/qa";
+import { hydrateCampaignDesignArtifacts } from "@/lib/campaign-design-artifacts/hosted-durable";
 import { readTasksEnvelope, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
 import { applyJobSpineStatusChange } from "@/lib/job-control/actions";
+import { createEmptyJobReviewFeedback } from "@/lib/job-control/review-feedback-types";
+import { findActiveJobReviewFeedback } from "@/lib/job-control/review-room-view";
 import {
   enqueueJobCommunicationRecord,
   resolveCampaignCommunicationClientId,
@@ -38,6 +44,7 @@ const MACHINE_ACTOR = {
 
 export async function ensureClipRepurposingMachineReviewBindFromCampaign(
   campaign: CampaignRecord,
+  repoRoot?: string,
 ): Promise<CampaignRecord> {
   const observer = campaign.dispatchExecution?.launchMenuProductionObserver;
   const result = (observer?.results ?? []).find(
@@ -53,12 +60,20 @@ export async function ensureClipRepurposingMachineReviewBindFromCampaign(
   );
   if (!job) return campaign;
 
+  if (repoRoot) {
+    await hydrateCampaignDesignArtifacts(campaign.campaignId, repoRoot, {
+      clipFactoryScopedRender: false,
+    });
+  }
+
   const firstCutReceipt = readClipRepurposingHookReceipt({
+    repoRoot,
     campaignId: campaign.campaignId,
     dispatchId: result.dispatchId,
     lane: "first-cut",
   });
   const revisionReceipt = readClipRepurposingHookReceipt({
+    repoRoot,
     campaignId: campaign.campaignId,
     dispatchId: result.dispatchId,
     lane: "set-revision",
@@ -96,11 +111,19 @@ export async function ensureClipRepurposingMachineReviewBindFromCampaign(
       ),
       jobActivityEvents: changed.events,
     },
-    files: files.map((file, index) => ({
-      relativePath: file.relativePath,
-      contentSha256: file.contentSha256,
-      label: `Clip ${index + 1} — ${file.idea}`,
-    })),
+    files: files.map((file, index) => {
+      const absolutePath =
+        repoRoot && file.relativePath
+          ? path.join(repoRoot, file.relativePath.replace(/^\.?\//, ""))
+          : undefined;
+      return {
+        relativePath: file.relativePath,
+        absolutePath:
+          absolutePath && existsSync(absolutePath) ? absolutePath : undefined,
+        contentSha256: file.contentSha256,
+        label: `Clip ${index + 1} — ${file.idea}`,
+      };
+    }),
     renderVersion: useRevision ? 2 : 1,
   });
 
@@ -186,8 +209,29 @@ export async function ensureClipRepurposingMachineReviewBindFromCampaign(
   const authorizedJob =
     qaEnvelope.jobRecords?.find((record) => record.jobId === job.jobId) ??
     presentedJob;
+  let envelopeToSave = qaEnvelope;
+  if (useRevision && !alreadyReleased) {
+    const deliverableKeys = (authorizedJob.deliverablePrep ?? [])
+      .filter((entry) => entry.preparedAt && entry.deliverableKey)
+      .map((entry) => entry.deliverableKey as string);
+    if (
+      deliverableKeys.length > 0 &&
+      !findActiveJobReviewFeedback(qaEnvelope, job.jobId)
+    ) {
+      envelopeToSave = {
+        ...qaEnvelope,
+        jobReviewFeedback: [
+          ...(qaEnvelope.jobReviewFeedback ?? []),
+          createEmptyJobReviewFeedback(campaign.campaignId, job.jobId, deliverableKeys, {
+            packageId: `pkg:${job.jobId}:draft:revision-ready:${authorization?.authorizedAt ?? new Date().toISOString()}`,
+          }),
+        ],
+      };
+    }
+  }
+
   const withComm = enqueueJobCommunicationRecord(
-    qaEnvelope,
+    envelopeToSave,
     {
       job: authorizedJob,
       campaign,

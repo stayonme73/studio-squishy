@@ -24,6 +24,7 @@ import {
   type CorrectionUseRecord,
 } from "./correction-round-ledger";
 import {
+  machineFootageReviewSetPrepared,
   resolveRequiredDeliverableKeys,
   reviewDeliverableSetPrepared,
 } from "./production-workspace-gates";
@@ -270,7 +271,14 @@ export function applyReviewRoomPatch(
     job.skuId === CLIP_REPURPOSING_SKU &&
     requiredDeliverables.length === 0 &&
     (job.deliverablePrep ?? []).some((entry) => entry.preparedAt);
-  const deliverableCount = deliverableKeys.length > 0 ? deliverableKeys.length : clipSetPrepared ? 1 : 0;
+  const machineVideoSetPrepared =
+    requiredDeliverables.length === 0 && machineFootageReviewSetPrepared(job);
+  const deliverableCount =
+    deliverableKeys.length > 0
+      ? deliverableKeys.length
+      : clipSetPrepared || machineVideoSetPrepared
+        ? 1
+        : 0;
 
   const accounting = deriveCorrectionAccounting({
     campaign,

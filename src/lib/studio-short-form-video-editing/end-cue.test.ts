@@ -8,7 +8,7 @@ import { studioInternalSellNowRegisterV1 } from "@/config/studio-internal-sell-n
 import { studioTalkingHeadEndCueV1 } from "@/config/studio-talking-head-end-cue-v1";
 import { SHORT_VIDEO_STILLS_SKU_DO_NOT_REUSE } from "@/config/studio-short-form-video-editing-build-v1";
 
-import { assembleBurnedShort, exactWords } from "./caption-burn";
+import { assembleBurnedShort, exactWords, isAssembleBurnedShortComplete } from "./caption-burn";
 import { chooseTalkingHeadEndCue } from "./end-cue";
 
 function measureWindow(abs: string, start: number, seconds: number) {
@@ -181,7 +181,9 @@ describe("Talking-head end-cue finishing", () => {
       },
     });
     expect(burned.ok).toBe(true);
-    if (!burned.ok) throw new Error(burned.message);
+    if (!isAssembleBurnedShortComplete(burned)) {
+      throw new Error("Expected completed local burn in end-cue test.");
+    }
     expect(burned.endCue.id).toBe("soft_snap");
 
     const info = probe(burned.outputAbsolutePath);
