@@ -32,6 +32,7 @@
 - **`hosted-clip-repurposing-production-resume-1.mjs`** — official Preview API journey; `file.url` downloads; approve hygiene.
 - **`vercel.json`** — ffmpeg/ffprobe static includes for API routes.
 - **`next.config.ts`** — NFT excludes (data/docs/public heavy assets) to reduce serverless trace blow-up.
+- **`studioExtraArtifactAbsolutePath` + studio-extras file route** (`a980f0e1`) — removes Vercel-cited `path.join(process.cwd(), artifact.path)` whole-repo NFT chain; scoped under `data/campaign-design-artifacts/{campaignId}/…` only.
 
 ---
 
@@ -47,6 +48,7 @@
 
 ## Regression safeguards
 
+- `studio-extra-artifact-path.test.ts` — allowed paths resolve under campaign artifact root; traversal rejected.
 - `resolve-set-revision-from-campaign.test.ts`
 - `caption-burn.test.ts`, `caption-finish.test.ts`, `caption-production-burn.test.ts` (where present)
 - `hosted-durable` / file-storage preview env tests (bounded)
@@ -57,10 +59,53 @@
 ## Deployment version
 
 - **Git branch:** `preview/clip-repurposing-integration-2026-10-31` (Preview only).
-- **Commit:** `6191d640` — pushed to `origin` 2026-10-31 (130 files; no secrets; excludes `_tmp`/`.tmp`/run JSON evidence).
-- **Vercel deployment (single post-push attempt):** `dpl_7LX7U91qMEuT9Teefjr9r2wXRAUa` — **Error**, internal Vercel error after **27m 16s** build (same class as `dpl_3UJMk`, `dpl_Cu4D7`).
+- **Commit:** `6191d640` — integration bundle; **`a980f0e1`** — NFT studio-extras packaging fix + support case doc.
+- **Vercel deployment (pre-fix):** `dpl_7LX7U91qMEuT9Teefjr9r2wXRAUa` — **Error**, internal Vercel error after **27m 16s** build (NFT cited studio-extras chain).
+- **Bounded post-fix deploy:** *(record `dpl_*` + Ready/Error after Owner GO push `a980f0e1`)*.
 - **GitHub → Vercel hook:** not observed (zero check runs on commit).
 - **Fresh disposable E2E:** not started — no **Ready** integrated Preview.
+
+---
+
+## Deployment-unblock assignment (2026-10-31 Owner GO)
+
+### Evidence review (not “faultless code” assumption)
+
+Remote **`vercel inspect dpl_7LX7… --logs`** shows:
+
+1. **Compile succeeds** — `Build Completed in /vercel/output [1m]` (with cache from `9HQC…`).
+2. **Failure phase** — immediately after **`Deploying outputs…`** → *internal Vercel error* (post-build ~18s).
+3. **NFT warning** — *“whole project was traced unintentionally”* via `next.config.ts` → `studio-extras/files/.../route.ts` (dynamic `path.join(process.cwd(), …)` / fs reads). **4311** deployment files uploaded.
+
+**Conclusion:** Platform error label is real, but **trace/output payload is abnormally large** — likely contributor to deploy-phase failure.
+
+### NFT packaging fix — verified locally (`a980f0e1`, 2026-10-31)
+
+| Gate | Result |
+|------|--------|
+| `npm run build` | **PASS** (~9.6 min compile + TS + static gen) |
+| Vercel-cited trace (`next.config.ts` → `studio-extras/files/.../route.ts` → *whole project traced unintentionally*) | **Eliminated** — no longer appears in build log |
+| Remaining *whole project* NFT warnings (4×) | Import trace now **`next.config.ts` → `hosted-cert/footage-runtime-probe/route.ts`** only (separate follow-up; not deploy blocker for this bounded attempt) |
+| studio-extras broad-pattern warnings | Reduced severity class (scoped path join); `readFile(abs)` still dynamic — monitor |
+
+**Log artifact:** desk `.next-build-nft-verify.log` (same commit tree as `a980f0e1`).
+
+**Prevention:** Never `readFile(path.join(process.cwd(), dynamicRel))` for campaign artifacts — use fixed subfolder segments + allowlist (`studioExtraArtifactAbsolutePath` pattern; see `STUDIO-NEW-SITE-PREVIEW-BUILD-BLOCKERS-1-REPORT.md`).
+
+### DigitalOcean Linux prebuilt (one bounded try)
+
+| Check | Result |
+|-------|--------|
+| Isolation | Clone at `/home/studioadmin/preview-prebuilt-build-1/studio-squishy` — **worker** `/var/studio/studio-squishy` + `:8787` **unchanged** |
+| Resources | ~7 GB RAM available, 143 GB disk — **adequate** for `npm ci` |
+| Credentials | **BLOCKED** — `VERCEL_OIDC_TOKEN` is **not** a valid `VERCEL_TOKEN` on headless Linux; no `auth.json` at standard desk path for SCP |
+| Outcome | **`vercel pull` / `vercel build` on DO failed** before output — **no prebuilt upload** |
+
+**Prevention safeguard:** Headless build hosts require **`VERCEL_TOKEN` (account PAT)** in Owner-controlled secret store, or one-time `vercel login` on DO — not OIDC JWT from `.env.local`.
+
+### Vercel support
+
+Prepared case (paste into dashboard): [`VERCEL-SUPPORT-CASE-PREVIEW-DEPLOY-2026-10-31.md`](VERCEL-SUPPORT-CASE-PREVIEW-DEPLOY-2026-10-31.md).
 
 ---
 
